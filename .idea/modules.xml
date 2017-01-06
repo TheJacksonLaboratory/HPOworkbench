@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/HPOAPI.iml" filepath="$PROJECT_DIR$/HPOAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" filepath="$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" />
+    </modules>
+  </component>
+</project>
