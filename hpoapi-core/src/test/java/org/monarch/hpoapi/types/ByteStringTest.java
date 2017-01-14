@@ -1,5 +1,6 @@
 package org.monarch.hpoapi.types;
 
+import com.google.common.primitives.Bytes;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,59 +66,53 @@ public class ByteStringTest {
         Assert.assertTrue(b.contains("only"));
     }
 
+    /*timmedSubstring should take "only " to "only" */
     @Test
     public void trimmedSubstring() throws Exception {
-
+        ByteString b =  new ByteString("This is only a test");
+        ByteString c = b.trimmedSubstring(8,13);
+        Assert.assertEquals("only",c.toString());
     }
 
     @Test
     public void indexOf() throws Exception {
-
-    }
-
-    @Test
-    public void indexOf1() throws Exception {
-
+        ByteString b =  new ByteString("This is only a test");
+        int i = b.indexOf("only");
+        Assert.assertEquals(8,i);
     }
 
     @Test
     public void equals() throws Exception {
-
-    }
-
-    @Test
-    public void hashCodeTest() throws Exception {
-
+        ByteString b =  new ByteString("This is only a test");
+        ByteString c =  new ByteString("This is only");
+        ByteString d =  new ByteString("This is only a test");
+        Assert.assertTrue(b.equals(d));
+        Assert.assertFalse(b.equals(c));
     }
 
     @Test
     public void splitBySingleChar() throws Exception {
-
+        ByteString b =  new ByteString("This%is%only%a%test");
+        ByteString[] ar = b.splitBySingleChar('%');
+        ByteString[] exp = {new ByteString("This"),new ByteString("is"),
+                new ByteString("only"),
+                new ByteString("a"),
+                new ByteString("test")};
+        Assert.assertArrayEquals(exp,ar);
     }
 
     @Test
     public void parseFirstInt() throws Exception {
-
+        ByteString b = new ByteString("thenumber42bla");
+        int i = ByteString.parseFirstInt(b);
+        Assert.assertEquals(42,i);
     }
-
-    @Test
-    public void parseFirstInt1() throws Exception {
-
-    }
-
+/* b is lexicographically in front of c */
     @Test
     public void compareTo() throws Exception {
-
-    }
-
-    @Test
-    public void b() throws Exception {
-
-    }
-
-    @Test
-    public void toString1() throws Exception {
-
+        ByteString b = new ByteString("thenumber42bla");
+        ByteString c =  new ByteString("This%is%only%a%test");
+        Assert.assertTrue(c.compareTo(b)<0);
     }
 
 }
