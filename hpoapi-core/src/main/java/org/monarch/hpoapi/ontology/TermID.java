@@ -11,7 +11,7 @@ import org.monarch.hpoapi.util.Util;
 
 /**
  * This is a simple wrapper class for representing a term identifier such
- * as GO:0001004.
+ * as HP:0001004.
  *
  * The class is immutable.
  *
@@ -21,7 +21,7 @@ import org.monarch.hpoapi.util.Util;
 public class TermID
 {
     /** The default prefix. Only used with no prefix is specified */
-    public static final Prefix DEFAULT_PREFIX = new Prefix("GO");
+    public static final Prefix DEFAULT_PREFIX = new Prefix("HP");
 
     public static final ByteString COLON = new ByteString(":");
 
@@ -37,23 +37,7 @@ public class TermID
     /** The id to be used for the next string id. This is decreasing. */
     private static int nextId = Integer.MAX_VALUE;
 
-    /**
-     * Constructs the TermID from a plain integer value. The prefix defaults
-     * to DEFAULT_PREFIX. For example, when DEFAULT_PREFIX is GO, provide the
-     * integer 8150 to get the term id representing the term "biological_process"
-     * that has id "GO:0008150".
-     *
-     * @param id
-     *
-     * @deprecated as it lacks the specification of the prefix (assumes DEFAULT_PREFIX)
-     */
-    public TermID(int id)
-    {
-        this.id = id;
-        this.prefix = DEFAULT_PREFIX;
-    }
-
-    /**
+     /**
      * Constructs the TermID.
      *
      * @param prefix defines the prefix part of the identifier
