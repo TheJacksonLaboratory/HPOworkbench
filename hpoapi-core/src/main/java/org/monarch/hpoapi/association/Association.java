@@ -10,46 +10,42 @@ import org.monarch.hpoapi.ontology.TermID;
 import org.monarch.hpoapi.types.ByteString;
 
 /**
- * Objects of this class represent individual associations as defined by GO
- * association files. The meaning of the attributes is described in detail at
- * http://geneontology.org/page/annotation.
+ * Objects of this class represent individual associations as defined by HPO
+ * association files (Version March 2017). The meaning of the attributes is described in detail at
+ * http://human-phenotype-ontology.github.io/documentation.html#annot.
  *
  * The file format is (in brief)
  * <OL>
  * <LI> DB (database contributing the association file; cardinality=1; example:
- * WB)</LI>
- * <LI> DB_Object (unique identifier in DB for the item ebing annotated;
- * cardinality=1; example CE00429)</LI>
- * <LI> DB_Object_Symbol (unique symbol for object being matched that has
- * meaning to biologist, e.g., a gene name; Cardinality=1, example: cdc-25.3</LI>
- * <LI> NOT: annotators are allowed to prefix NOT if a gene product is <B>not</B>
- * associated with some GO term. cardinality=0,1, example "NOT GO:nnnnnnnn"</LI>
- * <LI> GOid: The GO identifier. Cardinality=1, example = GO:0007049</LI>
+ * MIM)</LI>
+ * <LI> DB_Object_ID (unique identifier in DB for the item ebing annotated;
+ * cardinality=1; example 154700)</LI>
+ * <LI> DB_Object_Name (name of a disease; Cardinality=1, example: Achondrogenesis, type IB</LI>
+ * <LI> NOT: annotators are allowed to prefix NOT if a disease is <B>not</B>
+ * associated with some HPO term. cardinality=0,1, example "NOT GO:nnnnnnnn"</LI>
+ * <LI> HPOid: The HPO identifier. Cardinality=1, example = HP:0002487</LI>
  * <LI> DB:Reference database ref. Cardinality 1, &gt;1 (separate by |),
- * example:PUBMED:9651482</LI>
- * <LI> Evidence: one of IMP, IGI, IPI,ISS, IDA, IEP, IEA, TAS, NAS, ND, IC.
+ * example:OMIM:154700 or PMID:15517394</LI>
+ * <LI> Evidence: one of IEA, PCS, ITM, TAS.
  * Cardinality = 1</LI>
- * <LI> With (or) from, cardinality 0,1,&gt;1</LI>
- * <LI> Aspect: One of P(biological process), F (molecular function), C
- * (cellular component). Cardinality=1</LI>
- * <LI> DB_Object_Name: Name of Gene or Gene Product. Cardinality 0,1, &gt;1 (e.g.,
- * ZK637.11)</LI>
- * <LI> Synonym: Gene symbol or other text. cardinality 0,1,&gt;1 </LI>
- * <LI> DB_Object_Type: One of gene, protein, protein_structure. Cardinality 1
+ * <LI> Onset modifier, cardinality 0,1,&gt;1. Example: A term-id from the HPO-sub-ontology below the term “Age of onset” (HP:0003674).</LI>
+ * <LI> Frequency modifier:A term-id from the HPO-sub-ontology below the term “Frequency” (HP:0040279). Cardinality=1</LI>
+ * <LI> With: This field is not currently used.</LI>
+ * <LI> Aspect: one of O (Phenotypic abnormality), I (inheritance), C (onset and clinical course) or M (Mortality/Aging).
+ * This field is mandatory; cardinality 1. </LI>
+ * <LI> Synonym: This optional field can be used for a common abbreviation for the disease referred to by
+ * the DB_Object_ID such as “NF1” for neurofibromatosis type 1 or “MFS” for Marfan syndrome.
  * </LI>
- * <LI> Taxon taxonomic identifiers, Cardinality 1,2</LI>
- * <LI> ???????????? DATE HERE ????????? </LI>
- * <LI> Assigned_by The database which made the annotation. Cardinality 1.</LI>
+ * <LI> Date, Date on which the annotation was made; format is YYYY.MM.DD this field is mandatory, cardinality 1</LI>
+ * <LI> Assigned_by The database & curator making the annotation. Cardinality 1.</LI>
  * </OL>
- * Objects of this class are used for one line of an annotation file. We are
+ * Objects of this class are used to represent one line of an annotation file. We are
  * interested in parsing the DB_Object_Symbol, NOT, aspect, and synonyms. The
- * English name of a GO term corresponding to the GOid is not provided in the
- * association file, but has to be supplied from the GO termdb.xml file. See the
- * Controller class for details. Note that not all entries in association files
- * conform entirely to this scheme. For instance, in some cases, DB_Object and
- * DB_Object_Symbol are null.
+ * English label of an HPO term corresponding to the HPOid is not provided in the
+ * association file.
  *
  * @author Peter Robinson, Sebastian Bauer
+ * @version 0.2 (April 5, 2017)
  */
 
 public class Association
@@ -66,49 +62,53 @@ public class Association
     /** The aspect */
     private ByteString aspect;
 
-    /** e.g., GO:0015888 */
+    /** e.g., HP:0015888 */
     private TermID termID;
 
     /** Has a not qualifier? */
     private boolean notQualifier;
 
-	/* TODO: Add "contributes_to" or "colocalizes_with" qualifier */
-
-    /** A synonym for the identifier */
+	/** A synonym for the identifier */
     private ByteString synonym;
 
     /** Used to hold the tab-separated fields of each line during parsing */
     private final static String DELIM = "\t";
 
     /** Number of fields in each gene_association.*** line */
-    private final static int FIELDS = 15;
+    private final static int FIELDS = 14;
 
-    /** Index of dbObject field */
-    private final static int DBOBJECTFIELD = 1;
+    /** Index of db field */
+    private final static int DBFIELD = 0;
 
-    /** Index of dbObjectSymbol field */
-    private final static int DBOBJECTSYMBOLFIELD = 2;
+    /** Index of dbObject_ID field */
+    private final static int DBOBJECTIDFIELD = 1;
+
+    /** Index of dbName field */
+    private final static int DBNAMEFIELD = 2;
 
     /** Index of NOT field */
     private final static int QUALIFIERFIELD = 3;
-//	private final static String QUALIFIERVALS[] =
-//		new String[] {"", "NOT", "contributes_to", "colocalizes_with"};
 
-    /** Index of GO:id field */
-    private final static int GOFIELD = 4;
+    /** Index of HP:id field */
+    private final static int HPOFIELD = 4;
+
+    /** Index of dbReference:id field */
+    private final static int DBREFERENCEFIELD = 5;
 
     /** Index of evidence field */
     private final static int EVIDENCEFIELD = 6;
 
     /** Index of aspect field */
-    private final static int ASPECTFIELD = 8;
+    private final static int ASPECTFIELD = 10;
 
     /** Index of synonym field */
-    private final static int SYNONYMFIELD = 10;
+    private final static int SYNONYMFIELD = 11;
 
     /** Index fo dbObjectType field */
-    @SuppressWarnings("unused")
-    private final static int DBOBJECTTYPEFIELD = 11;
+    private final static int DATEFIELD = 12;
+
+    /** Index fo AssignedBy field */
+    private final static int ASSSIGNEDBYFIELD = 13;
 
     /** Use this pattern to split tab-separated fields on a line */
     private static final Pattern pattern = Pattern.compile(DELIM);
@@ -267,13 +267,13 @@ public class Association
 		/* Split the tab-separated line: */
         String[] fields = pattern.split(line, FIELDS);
 
-        a.DB_Object = new ByteString(fields[DBOBJECTFIELD].trim());
+        a.DB_Object = new ByteString(fields[DBFIELD].trim());
 
 		/*
 		 * DB_Object_Symbol should always be at 2 (or is missing, then this
 		 * entry wont make sense for this program anyway)
 		 */
-        a.DB_Object_Symbol = new ByteString(fields[DBOBJECTSYMBOLFIELD].trim());
+        //a.DB_Object_Symbol = new ByteString(fields[DBOBJECTSYMBOLFIELD].trim());  TODO!!!
 
         a.evidence = new ByteString(fields[EVIDENCEFIELD].trim());
         a.aspect = new ByteString(fields[ASPECTFIELD].trim());
@@ -287,8 +287,8 @@ public class Association
             if (qual.equalsIgnoreCase("not")) a.notQualifier = true;
 
 		/* Find GO:nnnnnnn */
-        fields[GOFIELD] = fields[GOFIELD].trim();
-        a.termID = new TermID(fields[GOFIELD],prefixPool);
+        fields[HPOFIELD] = fields[HPOFIELD].trim();
+        a.termID = new TermID(fields[HPOFIELD],prefixPool);
 
         a.synonym = new ByteString(fields[SYNONYMFIELD].trim());
     }
@@ -366,13 +366,13 @@ public class Association
 				/* New field */
                 switch (fieldNo)
                 {
-                    case 	DBOBJECTFIELD: 	a.DB_Object = new ByteString(byteBuf,fieldOffset,p); break;
-                    case	DBOBJECTSYMBOLFIELD:	a.DB_Object_Symbol = new ByteString(byteBuf,fieldOffset,p); break;
+                    case DBFIELD: 	a.DB_Object = new ByteString(byteBuf,fieldOffset,p); break;
+                   // case	DBOBJECTSYMBOLFIELD:	a.DB_Object_Symbol = new ByteString(byteBuf,fieldOffset,p); break;
                     case	EVIDENCEFIELD:	a.evidence = new ByteString(byteBuf,fieldOffset,p); break;
                     case	ASPECTFIELD:	a.aspect = new ByteString(byteBuf,fieldOffset,p); break;
                     case	QUALIFIERFIELD: a.notQualifier = new ByteString(byteBuf,fieldOffset,p).indexOf(notString) != -1; break;
                     case	SYNONYMFIELD:	a.synonym = new ByteString(byteBuf,fieldOffset,p); break;
-                    case	GOFIELD:		a.termID = new TermID(new ByteString(byteBuf,fieldOffset,p),prefixPool); break;
+                    case	HPOFIELD:		a.termID = new TermID(new ByteString(byteBuf,fieldOffset,p),prefixPool); break;
 
                 }
 
