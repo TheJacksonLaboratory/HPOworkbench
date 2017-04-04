@@ -20,7 +20,7 @@ import org.monarch.hpoapi.types.ByteString;
 
 public class Term implements ITerm
 {
-    /** The id ("accession number") of this GO term */
+    /** The id ("accession number") of this HPO term */
     private TermID id;
 
     /** The short human readable name of the id */

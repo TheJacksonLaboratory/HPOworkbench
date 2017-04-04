@@ -1,13 +1,13 @@
 package org.monarch.hpoapi.association;
 
-import static ontologizer.types.ByteString.b;
-import static ontologizer.types.ByteString.EMPTY;
+import static org.monarch.hpoapi.types.ByteString.b;
+import static org.monarch.hpoapi.types.ByteString.EMPTY;
 
 import java.util.regex.*;
 
-import ontologizer.ontology.PrefixPool;
-import ontologizer.ontology.TermID;
-import ontologizer.types.ByteString;
+import org.monarch.hpoapi.ontology.PrefixPool;
+import org.monarch.hpoapi.ontology.TermID;
+import org.monarch.hpoapi.types.ByteString;
 
 /**
  * Objects of this class represent individual associations as defined by GO
@@ -134,13 +134,14 @@ public class Association
      * @param goIntID the of the term to which this object is annotated
      *
      * @deprecated as it works only for Gene Ontology IDs.
-     */
+
     public Association(ByteString db_object_symbol, int goIntID)
     {
         DB_Object = synonym = ByteString.EMPTY;
         DB_Object_Symbol = db_object_symbol;
         termID = new TermID(goIntID);
     }
+     */
 
 
     /**
