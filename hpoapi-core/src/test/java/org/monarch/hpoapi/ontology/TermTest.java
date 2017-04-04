@@ -20,10 +20,11 @@ public class TermTest {
     @BeforeClass
     public static void setup(){
         //Term(TermID id, String name, Namespace namespace, Collection<ParentTermID> parents)
-        TermID tid = new TermID(613);
+        Prefix pre = new Prefix("HP");
+        TermID tid = new TermID(pre,613);
         Namespace ns = new Namespace("human_phenotype");
-        ParentTermID ptid1 = new ParentTermID(new TermID(708),TermRelation.IS_A);
-        ParentTermID ptid2 = new ParentTermID(new TermID(504),TermRelation.IS_A);
+        ParentTermID ptid1 = new ParentTermID(new TermID(pre,708),TermRelation.IS_A);
+        ParentTermID ptid2 = new ParentTermID(new TermID(pre,504),TermRelation.IS_A);
         Collection<ParentTermID> c =  new ArrayList<ParentTermID>(Arrays.asList(ptid1,ptid2));
         TermTest.term = new Term(tid,"Photophobia",ns,c);
     }
