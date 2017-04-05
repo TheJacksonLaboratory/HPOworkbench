@@ -10,7 +10,7 @@ import org.monarch.hpoapi.util.ReferencePool;
  */
 public class PrefixPool
 {
-    private ReferencePool<Prefix> prefixPool = new ReferencePool<Prefix>();
+    private ReferencePool<Prefix> prefixPool = new ReferencePool<>();
 
     public Prefix map(Prefix ref)
     {

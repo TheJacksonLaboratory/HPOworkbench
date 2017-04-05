@@ -54,7 +54,7 @@ public class Association
     private ByteString DB_Object;
 
     /** A unique symbol such as a gene name (primary id) */
-    private ByteString DB_Object_Symbol;
+    //private ByteString DB_Object_Symbol;
 
     /** The evidence */
     private ByteString evidence;
@@ -154,7 +154,7 @@ public class Association
     public Association(ByteString db_object_symbol, TermID termID)
     {
         DB_Object = synonym = EMPTY;
-        DB_Object_Symbol = db_object_symbol;
+       // DB_Object_Symbol = db_object_symbol;
         this.termID = termID;
     }
 
@@ -168,7 +168,7 @@ public class Association
     public Association(ByteString db_object_symbol, String term)
     {
         DB_Object = synonym = EMPTY;
-        DB_Object_Symbol = db_object_symbol;
+       // DB_Object_Symbol = db_object_symbol;
         termID = new TermID(term);
     }
 
@@ -187,10 +187,10 @@ public class Association
     /**
      * @return the objects symbol (primary id).
      */
-    public ByteString getObjectSymbol()
+   /* public ByteString getObjectSymbol()
     {
         return DB_Object_Symbol;
-    }
+    }*/
 
     /**
      * @return the association's synonym.
@@ -261,7 +261,7 @@ public class Association
      */
     private static void initFromLine(Association a, String line, PrefixPool prefixPool)
     {
-        a.DB_Object = a.DB_Object_Symbol = a.synonym = emptyString;
+        //a.DB_Object = a.DB_Object_Symbol = a.synonym = emptyString;
         a.termID = null;
 
 		/* Split the tab-separated line: */
@@ -286,7 +286,7 @@ public class Association
         for (String qual : qualifiers)
             if (qual.equalsIgnoreCase("not")) a.notQualifier = true;
 
-		/* Find GO:nnnnnnn */
+		/* Find HP:nnnnnnn */
         fields[HPOFIELD] = fields[HPOFIELD].trim();
         a.termID = new TermID(fields[HPOFIELD],prefixPool);
 
@@ -353,7 +353,7 @@ public class Association
     public static Association createFromGAFLine(byte[] byteBuf, int offset, int len, PrefixPool prefixPool)
     {
         Association a = new Association();
-        a.DB_Object = a.DB_Object_Symbol = a.synonym = emptyString;
+        //a.DB_Object = a.DB_Object_Symbol = a.synonym = emptyString;
 
         int fieldOffset = offset;
         int p = offset;
