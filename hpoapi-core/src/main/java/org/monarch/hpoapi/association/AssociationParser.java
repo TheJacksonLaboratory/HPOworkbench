@@ -19,8 +19,8 @@ import org.monarch.hpoapi.ontology.TermMap;
 import org.monarch.hpoapi.types.ByteString;
 
 /**
- * This class is responsible for parsing GO association files. One object is
- * made for each entry; since genes can have 0, 1, or more than one synonyms, we also parse the
+ * This class is responsible for parsing HPO association files. One object is
+ * made for each entry (line in ; since genes can have 0, 1, or more than one synonyms, we also parse the
  * synonym field and create a mapping from each synonym to the gene-association
  * object. Therefore, if the user enters the synonym of a gene, we may still be
  * able to identify it.

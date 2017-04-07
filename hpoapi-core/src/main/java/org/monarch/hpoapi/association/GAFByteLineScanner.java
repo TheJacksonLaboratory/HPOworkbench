@@ -258,7 +258,7 @@ class GAFByteLineScanner extends AbstractByteLineScanner
                 dbObjectWarnings++;
                 if (dbObjectWarnings < 1000)
                 {
-                    String warning = "Line " + lineno + ": Expected that symbol \"" + assoc.getObjectID() + "\" maps to \"" + objectIds.get(objectIndex) + "\" but it maps to \"" + assoc.getDB_Object() + "\"";
+                    String warning = "Line " + lineno + ": Expected that symbol \"" + assoc.getObjectID() + "\" maps to \"" + objectIds.get(objectIndex) + "\" but it maps to \"" + assoc.getDatabase() + "\"";
                     if (progress != null)
                         progress.warning(warning);
                     logger.warning(warning);
@@ -274,7 +274,7 @@ class GAFByteLineScanner extends AbstractByteLineScanner
             symbolWarnings++;
             if (symbolWarnings < 1000)
             {
-                String warning = "Line " + lineno + ": Expected that dbObject \"" + assoc.getObjectID() + "\" maps to symbol \"" + items.get(objectIdIndex) + "\" but it maps to \"" + assoc.getObjectSymbol() + "\"";
+                String warning = "Line " + lineno + ": Expected that dbObject \"" + assoc.getObjectID() + "\" maps to symbol \"" + items.get(objectIdIndex) + "\" but it maps to \"" + assoc.getObjectID() + "\"";
                 if (progress != null)
                     progress.warning(warning);
                 logger.warning(warning);
