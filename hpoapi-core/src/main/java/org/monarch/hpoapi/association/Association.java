@@ -16,7 +16,7 @@ import org.monarch.hpoapi.types.ByteString;
  *
  * The file format is (in brief)
  * <OL>
- * <LI> DB (database contributing the association file; cardinality=1; example:
+ * <LI> database (database contributing the association file; cardinality=1; example:
  * MIM)</LI>
  * <LI> DB_Object_ID (unique identifier in DB for the item ebing annotated;
  * cardinality=1; example 154700)</LI>
@@ -50,17 +50,23 @@ import org.monarch.hpoapi.types.ByteString;
 
 public class Association
 {
-    /** A unique identifier in the database such as an accession number */
-    private ByteString DB_Object;
+    /** The name of the database (e.g., DECIPER or OMIM) that goes with the DB_Object_ID (which is an accession number) */
+    private ByteString database;
 
-    /** A unique symbol such as a gene name (primary id) */
-    //private ByteString DB_Object_Symbol;
+    /** The accession number with the database (e.g., 600123 for an OMIM entry) */
+    private ByteString DB_Object_ID;
+
+    /** The name of the disease in the database (e.g., 100050 AARSKOG SYNDROME, AUTOSOMAL DOMINANT) */
+    private ByteString DB_Name;
+
+    /** The database authority (reference) supporting this assertion, e.g., PMID. */
+    private ByteString DB_Reference;
 
     /** The evidence */
     private ByteString evidence;
 
     /** The aspect */
-    private ByteString aspect;
+    private ByteString onset;
 
     /** e.g., HP:0015888 */
     private TermID termID;
@@ -98,8 +104,11 @@ public class Association
     /** Index of evidence field */
     private final static int EVIDENCEFIELD = 6;
 
-    /** Index of aspect field */
-    private final static int ASPECTFIELD = 10;
+    /** Index of onset modifier field */
+    private final static int ONSETFIELD = 7;
+
+    /** Index of onset modifier field */
+    private final static int FREQUENCYFIELD = 8;
 
     /** Index of synonym field */
     private final static int SYNONYMFIELD = 11;
@@ -117,6 +126,9 @@ public class Association
 
     private static final ByteString notString = b("NOT");
 
+    /** Frequency of a disease manifestation */
+    private ByteString frequency;
+
     /**
      * @param line :
      *            line from a gene_association file
@@ -127,24 +139,7 @@ public class Association
         initFromLine(this, line, null);
     }
 
-    /**
-     * Constructs a new association object.
-     *
-     * @param db_object_symbol the name of the object
-     * @param goIntID the of the term to which this object is annotated
-     *
-     * @deprecated as it works only for Gene Ontology IDs.
-
-    public Association(ByteString db_object_symbol, int goIntID)
-    {
-        DB_Object = synonym = ByteString.EMPTY;
-        DB_Object_Symbol = db_object_symbol;
-        termID = new TermID(goIntID);
-    }
-     */
-
-
-    /**
+     /**
      * Constructs a new association object annotating
      * the given db_object_symbol to the given termID.
      *
@@ -153,7 +148,7 @@ public class Association
      */
     public Association(ByteString db_object_symbol, TermID termID)
     {
-        DB_Object = synonym = EMPTY;
+        this.database = synonym = EMPTY;
        // DB_Object_Symbol = db_object_symbol;
         this.termID = termID;
     }
@@ -167,7 +162,7 @@ public class Association
      */
     public Association(ByteString db_object_symbol, String term)
     {
-        DB_Object = synonym = EMPTY;
+        this.database = synonym = EMPTY;
        // DB_Object_Symbol = db_object_symbol;
         termID = new TermID(term);
     }
@@ -185,12 +180,16 @@ public class Association
     }
 
     /**
-     * @return the objects symbol (primary id).
+     * @return the object's accession number in {@link #database} (an accession number of the disease).
      */
-   /* public ByteString getObjectSymbol()
+    public ByteString getObjectID()
     {
-        return DB_Object_Symbol;
-    }*/
+        return DB_Object_ID;
+    }
+
+    public ByteString getName() {
+        return this.DB_Name;
+    }
 
     /**
      * @return the association's synonym.
@@ -209,20 +208,19 @@ public class Association
     }
 
     /**
-     * @return name of DB_Object, usually a name that has meaning in a database,
-     *         for instance, a swissprot accession number
+     * @return name of database, e.g., ORPHANET
      */
-    public ByteString getDB_Object()
+    public ByteString getDatabase()
     {
-        return DB_Object;
+        return database;
     }
 
     /**
      * @return the associations's aspect.
      */
-    public ByteString getAspect()
+    public ByteString getOnset()
     {
-        return aspect;
+        return this.onset;
     }
 
     /**
@@ -231,6 +229,17 @@ public class Association
     public ByteString getEvidence()
     {
         return evidence;
+    }
+
+    /**
+     * @return the database refernece
+     */
+    public  ByteString getDBReference() {
+        return DB_Reference;
+    }
+
+    public ByteString getFrequency() {
+        return frequency;
     }
 
 
@@ -261,35 +270,22 @@ public class Association
      */
     private static void initFromLine(Association a, String line, PrefixPool prefixPool)
     {
-        //a.DB_Object = a.DB_Object_Symbol = a.synonym = emptyString;
-        a.termID = null;
-
-		/* Split the tab-separated line: */
+        /* Split the tab-separated line: */
         String[] fields = pattern.split(line, FIELDS);
-
-        a.DB_Object = new ByteString(fields[DBFIELD].trim());
-
-		/*
-		 * DB_Object_Symbol should always be at 2 (or is missing, then this
-		 * entry wont make sense for this program anyway)
-		 */
-        //a.DB_Object_Symbol = new ByteString(fields[DBOBJECTSYMBOLFIELD].trim());  TODO!!!
-
+        /* field 0--the database, e.g., OMIM or DECIPHER or ORPHANET */
+        a.database = new ByteString(fields[DBFIELD].trim());
+        a.DB_Object_ID = new ByteString(fields[DBOBJECTIDFIELD].trim());
+        a.DB_Name = new ByteString(fields[DBNAMEFIELD].trim());
+        a.DB_Reference = new ByteString(fields[DBREFERENCEFIELD].trim());
         a.evidence = new ByteString(fields[EVIDENCEFIELD].trim());
-        a.aspect = new ByteString(fields[ASPECTFIELD].trim());
-
-		/* TODO: There are new fields (colocalizes_with (a component) and
-		 * contributes_to (a molecular function term) ), checkout how
-		 * these should be fitted into this framework */
-
+        a.onset = new ByteString(fields[ONSETFIELD].trim());
+        a.frequency = new ByteString(fields[FREQUENCYFIELD].trim());
+        /* Find HP:nnnnnnn */
+        a.termID = new TermID(fields[HPOFIELD].trim(),prefixPool);
         String [] qualifiers = fields[QUALIFIERFIELD].trim().split("\\|");
+        a.notQualifier=false;
         for (String qual : qualifiers)
             if (qual.equalsIgnoreCase("not")) a.notQualifier = true;
-
-		/* Find HP:nnnnnnn */
-        fields[HPOFIELD] = fields[HPOFIELD].trim();
-        a.termID = new TermID(fields[HPOFIELD],prefixPool);
-
         a.synonym = new ByteString(fields[SYNONYMFIELD].trim());
     }
 
@@ -366,10 +362,10 @@ public class Association
 				/* New field */
                 switch (fieldNo)
                 {
-                    case DBFIELD: 	a.DB_Object = new ByteString(byteBuf,fieldOffset,p); break;
+                    case DBFIELD: 	a.database = new ByteString(byteBuf,fieldOffset,p); break;
                    // case	DBOBJECTSYMBOLFIELD:	a.DB_Object_Symbol = new ByteString(byteBuf,fieldOffset,p); break;
                     case	EVIDENCEFIELD:	a.evidence = new ByteString(byteBuf,fieldOffset,p); break;
-                    case	ASPECTFIELD:	a.aspect = new ByteString(byteBuf,fieldOffset,p); break;
+                    case	ONSETFIELD:	a.onset = new ByteString(byteBuf,fieldOffset,p); break;
                     case	QUALIFIERFIELD: a.notQualifier = new ByteString(byteBuf,fieldOffset,p).indexOf(notString) != -1; break;
                     case	SYNONYMFIELD:	a.synonym = new ByteString(byteBuf,fieldOffset,p); break;
                     case	HPOFIELD:		a.termID = new TermID(new ByteString(byteBuf,fieldOffset,p),prefixPool); break;
@@ -383,4 +379,6 @@ public class Association
         }
         return a;
     }
+
+
 }

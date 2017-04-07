@@ -250,6 +250,8 @@ public final class ByteString
             }
             return true;
         }
+        if (obj == null)
+            return false;
         return equals(obj);
     }
 
