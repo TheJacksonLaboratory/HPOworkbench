@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.ontology;
+package org.monarch.hpoapi.util;
 
 
 import java.io.FileInputStream;
@@ -14,14 +14,14 @@ import java.util.zip.GZIPInputStream;
  *
  * @author Sebastian Bauer
  */
-public class OBOParserFileInput implements IParserInput
+public class ParserFileInput implements IParserInput
 {
     private String filename;
     private FileInputStream fis;
     private InputStream is;
     private FileChannel fc;
 
-    public OBOParserFileInput(String filename) throws IOException
+    public ParserFileInput(String filename) throws IOException
     {
         this.filename = filename;
         fis = new FileInputStream(filename);

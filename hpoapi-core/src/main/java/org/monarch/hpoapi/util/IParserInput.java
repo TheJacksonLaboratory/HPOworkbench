@@ -1,11 +1,13 @@
-package org.monarch.hpoapi.ontology;
+package org.monarch.hpoapi.util;
 
 import java.io.InputStream;
 
 /**
- * An interface wrapping the input for miscellaneous parsers.
+ * An interface wrapping the input for miscellaneous parsers. It is intended to be used with classes such as {@link ParserFileInput}
+ * and to provide a common interface that offers and inputStream.
  *
- * @author Sebastian Bauer
+ * @author Sebastian Bauer, Peter Robinson
+ * @version 0.2 (April 19, 2017)
  */
 public interface IParserInput
 {

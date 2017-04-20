@@ -3,11 +3,8 @@ package org.monarch.hpoapi.ontology;
 /**
  * Created by robinp on 3/8/17.
  */
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.FileChannel;
-import java.util.zip.GZIPInputStream;
 
 
 import static org.monarch.hpoapi.ontology.OBOKeywords.ALT_ID_KEYWORD;
@@ -34,8 +31,6 @@ import static org.monarch.hpoapi.ontology.OBOKeywords.TRUE_KEYWORD;
 import static org.monarch.hpoapi.ontology.OBOKeywords.TYPEDEF_KEYWORD;
 import static org.monarch.hpoapi.ontology.OBOKeywords.XREF_KEYWORD;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +42,7 @@ import java.util.logging.Logger;
 import org.monarch.hpoapi.util.AbstractByteLineScanner;
 import org.monarch.hpoapi.types.ByteString;
 import org.monarch.hpoapi.collections.ReferencePool;
+import org.monarch.hpoapi.util.IParserInput;
 
 /*
  * I gratefully acknowledge the help of John Richter Day, who provided the
