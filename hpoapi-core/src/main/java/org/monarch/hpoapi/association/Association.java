@@ -113,10 +113,10 @@ public class Association
     /** Index of synonym field */
     private final static int SYNONYMFIELD = 11;
 
-    /** Index fo dbObjectType field */
+    /** Index fo dbObjectType field (currently not used in this class) */
     private final static int DATEFIELD = 12;
 
-    /** Index fo AssignedBy field */
+    /** Index fo AssignedBy field (currently not used in this class) */
     private final static int ASSSIGNEDBYFIELD = 13;
 
     /** Use this pattern to split tab-separated fields on a line */

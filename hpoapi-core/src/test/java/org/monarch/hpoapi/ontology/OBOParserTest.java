@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
+import org.monarch.hpoapi.util.ParserFileInput;
+
 import static org.junit.Assert.*;
 
 /**
@@ -25,7 +27,7 @@ public class OBOParserTest {
     public static void setup() throws Exception {
         ClassLoader classLoader = OBOParserTest.class.getClassLoader();
         String filename = classLoader.getResource("hp-smalltest.obo").getFile();
-        oboparser = new OBOParser(new OBOParserFileInput(filename));
+        oboparser = new OBOParser(new ParserFileInput(filename));
         System.err.println(oboparser.doParse());
 
 

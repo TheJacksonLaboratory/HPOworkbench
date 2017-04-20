@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.monarch.hpoapi.util.AbstractByteLineScanner;
-import org.monarch.hpoapi.ontology.IParserInput;
+import org.monarch.hpoapi.util.IParserInput;
 import org.monarch.hpoapi.ontology.PrefixPool;
 import org.monarch.hpoapi.ontology.Term;
 import org.monarch.hpoapi.ontology.TermID;
