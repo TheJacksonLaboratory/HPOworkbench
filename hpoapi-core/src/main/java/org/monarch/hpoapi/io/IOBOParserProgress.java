@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.ontology;
+package org.monarch.hpoapi.io;
 
 /**
  * Created by robinp on 3/8/17.

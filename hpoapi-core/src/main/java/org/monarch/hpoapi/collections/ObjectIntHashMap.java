@@ -4,7 +4,7 @@ package org.monarch.hpoapi.collections;
 import java.util.Arrays;
 
 /**
- * A hashmap mapping onjects to ints.
+ * A hashmap mapping objects to ints.
  *
  * Derived from the Eclipse Collections
  *
@@ -66,6 +66,8 @@ public class ObjectIntHashMap<K>
     private int occupiedWithData;
     private int occupiedWithSentinels;
 
+    // note left shift by one is like multiplication by 2 since {@link DEFAULT_INITIAL_CAPACITY} is 8
+    // todo -- why is this necessary here?
     public ObjectIntHashMap()
     {
         this.allocateTable(DEFAULT_INITIAL_CAPACITY << 1);

@@ -296,7 +296,7 @@ public class Term implements ITerm
      *
      * @param currentObsolete
      */
-    protected void setObsolete(boolean currentObsolete) {
+    public void setObsolete(boolean currentObsolete) {
         obsolete = currentObsolete;
     }
 

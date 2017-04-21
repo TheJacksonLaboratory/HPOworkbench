@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.ontology;
+package org.monarch.hpoapi.io;
 
 /**
  * An exception which may be thrown by the OBOParser class.

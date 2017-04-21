@@ -1,9 +1,4 @@
-package org.monarch.hpoapi.association;
-
-/**
- * Created by robinp on 4/7/17.
- */
-
+package org.monarch.hpoapi.io;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.monarch.hpoapi.util.AbstractByteLineScanner;
-import org.monarch.hpoapi.util.IParserInput;
+import org.monarch.hpoapi.association.AnnotationContext;
+import org.monarch.hpoapi.association.Association;
 import org.monarch.hpoapi.ontology.PrefixPool;
 import org.monarch.hpoapi.ontology.Term;
 import org.monarch.hpoapi.ontology.TermID;
@@ -72,7 +67,7 @@ class GAFByteLineScanner extends AbstractByteLineScanner
     /** Unique list of items seen so far */
     private List<ByteString> items = new ArrayList<ByteString>();
 
-    /** And the corresponding object ids */
+    /** And the corresponding object ids. These would be the database IDs of diseases or models, e.g., 600123 for OMIM. */
     private List<ByteString> objectIds = new ArrayList<ByteString>();
 
     /** Maps object symbols to item indices within the items list */
@@ -95,8 +90,11 @@ class GAFByteLineScanner extends AbstractByteLineScanner
         this.terms = terms;
         this.evidences = evidences;
         this.progress = progress;
+        System.out.println("In CTOR -- objectIDS="+objectIds);
     }
 
+    /** Parse one line of the annotation file. If all is successful it adds an
+     *  {@link Association} object to {@link associations}*/
     @Override
     public boolean newLine(byte[] buf, int start, int len)
     {
@@ -248,7 +246,19 @@ class GAFByteLineScanner extends AbstractByteLineScanner
             objectIds.add(assoc.getObjectID());
         } else
         {
-			/* Object symbol was seen before */
+			System.out.println("assoc = " + assoc);
+            System.out.println("objectIds = " + objectIds);
+            if (objectIds==null) {
+                System.out.println("obejctIds is NULL!");
+            } else {
+                System.out.println("Size of obejctIds is " + objectIds.size());
+                System.out.println("objectIndex " + objectIndex);
+                System.out.println("objectIds.get(objectIndex) " + objectIds.get(objectIndex));
+
+                System.out.println(" assoc.getObjectID() " +  assoc.getObjectID());
+                System.out.println(" assoc " +  assoc.toString());
+            }
+            /* Object symbol was seen before */
             if (!assoc.getObjectID().equals(objectIds.get(objectIndex)))
             {
 				/* Record this as a synonym now */

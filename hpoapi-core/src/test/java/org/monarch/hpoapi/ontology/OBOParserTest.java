@@ -4,16 +4,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Set;
 
-import org.monarch.hpoapi.util.ParserFileInput;
-
-import static org.junit.Assert.*;
+import org.monarch.hpoapi.io.OBOParser;
+import org.monarch.hpoapi.io.ParserFileInput;
 
 /**
  * Created by robinp on 3/8/17.

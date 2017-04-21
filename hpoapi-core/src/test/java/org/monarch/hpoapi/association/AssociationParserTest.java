@@ -3,10 +3,10 @@ package org.monarch.hpoapi.association;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.monarch.hpoapi.ontology.OBOParser;
+import org.monarch.hpoapi.io.AssociationParser;
+import org.monarch.hpoapi.io.OBOParser;
 import org.monarch.hpoapi.ontology.TermContainer;
-import org.monarch.hpoapi.util.IParserInput;
-import org.monarch.hpoapi.util.ParserFileInput;
+import org.monarch.hpoapi.io.ParserFileInput;
 
 import java.util.ArrayList;
 
@@ -28,6 +28,7 @@ public class AssociationParserTest {
 
         String associationFile = classLoader.getResource("small-annotationfile1.tab").getFile();
         ap=new AssociationParser(new ParserFileInput(associationFile), hpoTerms);
+        System.out.println("About to parse ap");
         System.out.print(ap.parse());
         /*
         AssociationParser ap = new AssociationParser(new OBOParserFileInput(args.associationFile),goTerms,populationSet.getAllGeneNames(),

@@ -18,7 +18,7 @@ import org.monarch.hpoapi.types.ByteString;
  * <OL>
  * <LI> database (database contributing the association file; cardinality=1; example:
  * MIM)</LI>
- * <LI> DB_Object_ID (unique identifier in DB for the item ebing annotated;
+ * <LI> DB_Object_ID (unique identifier in DB for the item being annotated;
  * cardinality=1; example 154700)</LI>
  * <LI> DB_Object_Name (name of a disease; Cardinality=1, example: Achondrogenesis, type IB</LI>
  * <LI> NOT: annotators are allowed to prefix NOT if a disease is <B>not</B>
@@ -248,7 +248,7 @@ public class Association
      *
      * @param termID
      */
-    void setTermID(TermID termID)
+    public void setTermID(TermID termID)
     {
         this.termID = termID;
     }
@@ -349,12 +349,9 @@ public class Association
     public static Association createFromGAFLine(byte[] byteBuf, int offset, int len, PrefixPool prefixPool)
     {
         Association a = new Association();
-        //a.DB_Object = a.DB_Object_Symbol = a.synonym = emptyString;
-
         int fieldOffset = offset;
         int p = offset;
         int fieldNo = 0;
-
         while (p < offset + len)
         {
             if (byteBuf[p] == '\t')
@@ -363,7 +360,7 @@ public class Association
                 switch (fieldNo)
                 {
                     case DBFIELD: 	a.database = new ByteString(byteBuf,fieldOffset,p); break;
-                   // case	DBOBJECTSYMBOLFIELD:	a.DB_Object_Symbol = new ByteString(byteBuf,fieldOffset,p); break;
+                    case	DBOBJECTIDFIELD:	a.DB_Object_ID = new ByteString(byteBuf,fieldOffset,p); break;
                     case	EVIDENCEFIELD:	a.evidence = new ByteString(byteBuf,fieldOffset,p); break;
                     case	ONSETFIELD:	a.onset = new ByteString(byteBuf,fieldOffset,p); break;
                     case	QUALIFIERFIELD: a.notQualifier = new ByteString(byteBuf,fieldOffset,p).indexOf(notString) != -1; break;
@@ -378,6 +375,11 @@ public class Association
             p++;
         }
         return a;
+    }
+
+
+    public String toString() {
+        return String.format("Association: DB[%s] objectID[%s]", this.database, this.getObjectID());
     }
 
 

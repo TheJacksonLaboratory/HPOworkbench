@@ -22,6 +22,7 @@ public class AssociationTest {
 
     private static String association_line2="OMIM\t100050\t100050 AARSKOG SYNDROME, AUTOSOMAL DOMINANT\t\tHP:0000175\tOMIM:100050\tTAS\tHP:0003584\tHP:0040282\t\tO\t\t2012.07.16\tHPO:probinson";
 
+    private static String association_line3="OMIM\t999999\tMADE UP 1\t\tHP:0002084\tOMIM:999999\tPCS\t\t\t\tI\t\t2012.04.11\tHPO:probinson";
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -62,6 +63,15 @@ public class AssociationTest {
         Assert.assertEquals(expected,obID);
         obID = association2.getObjectID();
         Assert.assertEquals(expected,obID);
+    }
+
+    @Test
+    public void testGetDBObjectID2() throws Exception {
+        Association assoc = new Association(association_line3);
+        ByteString obID = assoc.getObjectID();
+        ByteString expected = new ByteString("999999");
+        Assert.assertEquals(expected,obID);
+
     }
 
     @Test

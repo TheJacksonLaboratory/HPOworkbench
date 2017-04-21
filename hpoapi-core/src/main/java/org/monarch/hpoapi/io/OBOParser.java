@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.ontology;
+package org.monarch.hpoapi.io;
 
 /**
  * Created by robinp on 3/8/17.
@@ -39,10 +39,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.monarch.hpoapi.util.AbstractByteLineScanner;
+import org.monarch.hpoapi.ontology.*;
 import org.monarch.hpoapi.types.ByteString;
 import org.monarch.hpoapi.collections.ReferencePool;
-import org.monarch.hpoapi.util.IParserInput;
 
 /*
  * I gratefully acknowledge the help of John Richter Day, who provided the

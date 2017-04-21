@@ -1,4 +1,6 @@
-package org.monarch.hpoapi.util;
+package org.monarch.hpoapi.io;
+
+import org.monarch.hpoapi.io.ParserFileInput;
 
 import java.io.InputStream;
 

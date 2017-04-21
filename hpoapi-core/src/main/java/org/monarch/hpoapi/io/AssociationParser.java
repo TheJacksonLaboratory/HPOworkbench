@@ -1,8 +1,6 @@
-package org.monarch.hpoapi.association;
+package org.monarch.hpoapi.io;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,9 +9,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.monarch.hpoapi.util.AbstractByteLineScanner;
-import org.monarch.hpoapi.util.IParserInput;
-import org.monarch.hpoapi.ontology.TermID;
+import org.monarch.hpoapi.association.AnnotationContext;
+import org.monarch.hpoapi.association.Association;
 import org.monarch.hpoapi.ontology.TermMap;
 import org.monarch.hpoapi.types.ByteString;
 
@@ -36,9 +33,7 @@ public class AssociationParser
     enum Type
     {
         UNKNOWN,
-        GAF,
-        IDS,
-        AFFYMETRIX
+        GAF
     };
 
     private IParserInput input;
@@ -174,33 +169,30 @@ public class AssociationParser
         }
 
         long startMillis = System.currentTimeMillis();
-
-        			/* First, skip headers */
-            final List<byte[]> lines = new ArrayList<byte[]>();
-            AbstractByteLineScanner abls = new AbstractByteLineScanner(input.inputStream()) {
-                @Override
-                public boolean newLine(byte[] buf, int start, int len)
-                {
-                    if (len > 0 && buf[start] != '#')
-                    {
-                        byte [] b = new byte[len+1];
-                        System.arraycopy(buf, start, b, 0, len);
-                        b[len] = 10;
-                        lines.add(b);
-                        return false;
-                    }
-                    return true;
+		/* First, skip headers */
+        final List<byte[]> lines = new ArrayList<byte[]>();
+        AbstractByteLineScanner abls = new AbstractByteLineScanner(input.inputStream()) {
+            @Override
+            public boolean newLine(byte[] buf, int start, int len) {
+                if (len > 0 && buf[start] != '#') {
+                    byte[] b = new byte[len + 1];
+                    System.arraycopy(buf, start, b, 0, len);
+                    b[len] = 10;
+                    lines.add(b);
+                    return false;
                 }
-            };
-            abls.scan();
-
-            if (lines.size() == 0)
                 return true;
+            }
+        };
+        abls.scan();
 
-            byte [] head = merge(lines.get(0), abls.availableBuffer());
+        if (lines.size() == 0)
+            return true;
 
-            importGAF(input,head,names,terms,evidences,progress);
-            fileType = Type.GAF;
+        byte[] head = merge(lines.get(0), abls.availableBuffer());
+
+        importGAF(input, head, names, terms, evidences, progress);
+        fileType = Type.GAF;
 
 
 

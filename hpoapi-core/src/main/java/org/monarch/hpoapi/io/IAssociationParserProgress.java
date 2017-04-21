@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.association;
+package org.monarch.hpoapi.io;
 
 /**
  * Created by robinp on 4/7/17.
