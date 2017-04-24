@@ -288,9 +288,9 @@ public class AssociationParser
     }
 
     /**
-     * @return the list of object symbols of all associations.
+     * @return the list of object ids of all associations.
      */
-    public List<ByteString> getListOfObjectSymbols()
+    public List<ByteString> getListOfObjectIDs()
     {
         ArrayList<ByteString> arrayList = new ArrayList<ByteString>();
 
