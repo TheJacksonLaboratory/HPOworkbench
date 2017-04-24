@@ -20,7 +20,7 @@ import org.monarch.hpoapi.collections.ObjectIntHashMap;
  * A GAF Line scanner.
  *
  * @author Sebastian Bauer, Peter Robinson
- * @version 0.2.1 (7 April, 2017)
+ * @version 0.2.2 (24 April, 2017)
  */
 class GAFByteLineScanner extends AbstractByteLineScanner
 {
@@ -90,11 +90,10 @@ class GAFByteLineScanner extends AbstractByteLineScanner
         this.terms = terms;
         this.evidences = evidences;
         this.progress = progress;
-        System.out.println("In CTOR -- objectIDS="+objectIds);
     }
 
     /** Parse one line of the annotation file. If all is successful it adds an
-     *  {@link Association} object to {@link associations}*/
+     *  {@link Association} object.*/
     @Override
     public boolean newLine(byte[] buf, int start, int len)
     {
@@ -245,20 +244,7 @@ class GAFByteLineScanner extends AbstractByteLineScanner
             items.add(objectSymbol);
             objectIds.add(assoc.getObjectID());
         } else
-        {
-			System.out.println("assoc = " + assoc);
-            System.out.println("objectIds = " + objectIds);
-            if (objectIds==null) {
-                System.out.println("obejctIds is NULL!");
-            } else {
-                System.out.println("Size of obejctIds is " + objectIds.size());
-                System.out.println("objectIndex " + objectIndex);
-                System.out.println("objectIds.get(objectIndex) " + objectIds.get(objectIndex));
-
-                System.out.println(" assoc.getObjectID() " +  assoc.getObjectID());
-                System.out.println(" assoc " +  assoc.toString());
-            }
-            /* Object symbol was seen before */
+                   /* Object symbol was seen before */
             if (!assoc.getObjectID().equals(objectIds.get(objectIndex)))
             {
 				/* Record this as a synonym now */
@@ -274,7 +260,7 @@ class GAFByteLineScanner extends AbstractByteLineScanner
                     logger.warning(warning);
                 }
             }
-        }
+
 
 		/* Get how the object id is mapped to our id space */
         int objectIdIndex = objectIdMap.getIfAbsentPut(assoc.getObjectID(), objectIndex);
