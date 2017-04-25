@@ -3,7 +3,7 @@ package org.monarch.hpoapi.ontology;
 import org.monarch.hpoapi.types.ByteString;
 
 /**
- * This class represents a single subset. Terms can be accompanied by
+ * This class represents a single subset of the ontology. Terms can be accompanied by
  * subsets to restrict the ontology for certain purposes.
  *
  * @author Sebastian Bauer
