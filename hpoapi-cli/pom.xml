@@ -91,7 +91,7 @@
                                 the classpath has the SNAPSHOT instead of the build number prefixed to the
                                 dependency -->
                             <useUniqueVersions>false</useUniqueVersions>
-                            <mainClass>org.monarch.HPOAPI</mainClass>
+                            <mainClass>org.monarch.hpoapi.HPOAPI</mainClass>
                         </manifest>
                     </archive>
              <!--       <compilerArgument>-Xlint:all</compilerArgument>
@@ -113,7 +113,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.monarch.HPOAPI</mainClass>
+                                    <mainClass>org.monarch.hpoapi.HPOAPI</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
