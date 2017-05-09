@@ -94,8 +94,8 @@ final public class DataSourceFactory {
             String type = section.fetch("type");
             if (type == null)
                 throw new InvalidDataSourceException("Data source config does not have \"type\" key.");
-            else if (type.equals("ucsc"))
-                return new UCSCDataSource(options, section);
+            else if (type.equals("obo"))
+                return new OBODataSource(options, section);
             else if (type.equals("ensembl"))
                 return new EnsemblDataSource(options, section);
             else if (type.equals("refseq"))
