@@ -7,7 +7,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
 import org.monarch.hpoapi.cmd.HPOCommand;
-import org.monarch.hpoapi.cmd.HPODBListOptions;
+import org.monarch.hpoapi.cmd.PhenotypeDBListOptions;
 import org.monarch.hpoapi.cmd.PhenotypeDownloadOptions;
 import org.monarch.hpoapi.exception.HPOException;
 
@@ -22,14 +22,13 @@ public class HPOAPI {
 
 
     public static void main(String[] argv){
-        System.out.println("HPOAPI");
         // Setup command line parser
         ArgumentParser parser = ArgumentParsers.newArgumentParser("hpoapi-cli");
         parser.version(getVersion());
         parser.addArgument("--version").help("Show HPOAPI version").action(Arguments.version());
         parser.description("HPOAPI CLI performs a series of Human Phenotype Ontology (HPO) and HPO-annotation tasks.");
         Subparsers subParsers = parser.addSubparsers();
-        HPODBListOptions.setupParser(subParsers);
+        PhenotypeDBListOptions.setupParser(subParsers);
         PhenotypeDownloadOptions.setupParser(subParsers);
         parser.defaultHelp(true);
         parser.epilog("You can find out more at http://TODO.rtfd.org");

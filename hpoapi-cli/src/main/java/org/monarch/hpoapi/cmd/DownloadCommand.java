@@ -11,7 +11,9 @@ import org.monarch.hpoapi.util.PathUtil;
 
 
 /**
- * Implementation of download step in HPOAPI.
+ * Implementation of download in HPOAPI. The command is intended to download
+ * both the OBO file and the association file. For HPO, this is {@code hp.obo} and
+ * {@code phenotype_annotation.tab}.
  * Code modified from Download command in Jannovar.
  * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
@@ -21,6 +23,12 @@ public final class DownloadCommand extends HPOCommand {
 
     private PhenotypeDownloadOptions options;
 
+    /**
+     *
+     * @param argv
+     * @param args A wrapper around the command-line arguments
+     * @throws CommandLineParsingException
+     */
     public DownloadCommand(String argv[], Namespace args) throws CommandLineParsingException {
         this.options = new PhenotypeDownloadOptions();
         this.options.setFromArgs(args);
@@ -31,20 +39,12 @@ public final class DownloadCommand extends HPOCommand {
      */
     @Override
     public void run() throws HPOException {
-        System.err.println("Options");
-        System.err.println(options.toString());
-
         DatasourceOptions dsOptions = new DatasourceOptions(options.getHttpProxy(), options.getHttpsProxy(),
                 options.getFtpProxy(), options.isReportProgress());
 
-        System.err.println("options:"+options);
-        System.err.println("dsOptions:"+dsOptions);
-
         DataSourceFactory factory = new DataSourceFactory(dsOptions, options.dataSourceFiles);
         for (String name : options.getDatabaseNames()) {
-            System.err.println("Downloading/parsing for io source \"" + name + "\"");
             DataSource ds = factory.getDataSource(name);
-            System.err.println("Datasource : "+ds);
             PhenotypeData data = factory.getDataSource(name).getDataFactory().build(options.getDownloadDir(),
                     options.isReportProgress());
             String filename = PathUtil.join(options.getDownloadDir(),

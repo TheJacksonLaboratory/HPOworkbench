@@ -12,11 +12,18 @@ public class DatabaseListCommand extends HPOCommand {
     /**
      * Configuration
      */
-    private HPODBListOptions options;
+    private PhenotypeDBListOptions options;
 
+    /**
+     *
+     * @param argv
+     * @param args A wrapper around the command line arguments.
+     * @throws CommandLineParsingException
+     */
     public DatabaseListCommand(String argv[], Namespace args) throws CommandLineParsingException {
-        this.options = new HPODBListOptions();
+        this.options = new PhenotypeDBListOptions();
         this.options.setFromArgs(args);
+        System.err.println("Namespace args: "+ args);
     }
 
     /**
@@ -31,7 +38,7 @@ public class DatabaseListCommand extends HPOCommand {
                 options.getFtpProxy(), options.isReportProgress());
 
         DataSourceFactory factory = new DataSourceFactory(dsOptions, options.getDataSourceFiles());
-        System.err.println("Available io sources:\n");
+        System.err.println("Available data sources:\n");
         for (String name : factory.getNames())
             System.err.println(String.format("    %s", name));
     }

@@ -36,15 +36,6 @@ final public class DataSourceFactory {
      */
     public DataSourceFactory(DatasourceOptions options, List<String> iniFilePaths) throws InvalidDataSourceException {
         this.options = options;
-        if (iniFilePaths==null){
-            System.err.println("DataSourceFacotry.java: inifile paths null");
-            System.exit(1);
-        } else {
-            System.err.println("Size of iniFIlePaths=" + iniFilePaths.size() + "\n");
-            for (String s : iniFilePaths) {
-                System.err.println("\t"+s);
-            }
-        }
 
         ImmutableList.Builder<Ini> inisBuilder = new ImmutableList.Builder<Ini>();
         for (String iniFilePath : iniFilePaths) {

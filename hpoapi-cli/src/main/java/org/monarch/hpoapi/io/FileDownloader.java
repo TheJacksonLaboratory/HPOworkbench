@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -225,7 +226,7 @@ public class FileDownloader {
         BufferedInputStream in = null;
         FileOutputStream out = null;
         try {
-            URLConnection connection = src.openConnection();
+            URLConnection connection =  src.openConnection();
             final int fileSize = connection.getContentLength();
             in = new BufferedInputStream(connection.getInputStream());
             out = new FileOutputStream(dest);

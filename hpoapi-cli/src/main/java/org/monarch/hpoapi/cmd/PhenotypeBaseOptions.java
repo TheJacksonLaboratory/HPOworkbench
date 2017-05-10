@@ -14,7 +14,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import org.monarch.hpoapi.HPOAPI;
 
 /**
- * Base option class for global HPOAPI options
+ * Base option class for global Phenotype Base options
  *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>, based on Jannovar code by Manueal Holtgrewe
  * @version 0.0.1 (May 9, 2017)

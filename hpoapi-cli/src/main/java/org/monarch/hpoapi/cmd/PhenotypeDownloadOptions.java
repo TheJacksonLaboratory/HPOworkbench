@@ -56,7 +56,7 @@ public class PhenotypeDownloadOptions extends PhenotypeDBOptions {
                 .setDefault(new ArrayList<String>()).action(Arguments.append()).required(true);
 
         ArgumentGroup optionalGroup = subParser.addArgumentGroup("Optional Arguments");
-        optionalGroup.addArgument("-s", "--io-source-list").help("INI file with io source list")
+        optionalGroup.addArgument("-s", "--data-source-list").help("INI file with data source list")
                 .setDefault(Lists.newArrayList("bundle:///default_sources.ini")).action(Arguments.append());
         optionalGroup.addArgument("--download-dir").help("Path to download directory").setDefault("io");
 
@@ -66,12 +66,8 @@ public class PhenotypeDownloadOptions extends PhenotypeDBOptions {
     @Override
     public void setFromArgs(Namespace args) throws CommandLineParsingException {
         super.setFromArgs(args);
-        System.err.println("setfrom args" + args);
         downloadDir = args.getString("download_dir");
         databaseNames = args.getList("database");
-        for (String n : databaseNames){
-            System.out.println("I GOT "+n);
-        }
     }
 
     public String getDownloadDir() {

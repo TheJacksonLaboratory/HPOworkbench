@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableList;
  * Base class for all io sources.
  *
  * Data sources combine the information of (1) a name, (2) a list of URLs with files to download, and (3) obtaining a
- * factory for constructing a {@link JannovarData} object from this information.
+ * factory for constructing a {@link PhenotypeData} object from this information.
  *
  * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
  */
@@ -42,7 +42,6 @@ public abstract class DataSource {
      */
     public final String getFileName(String key) throws InvalidDataSourceException {
         String urlString = iniSection.fetch(key);
-        System.err.println("getFIleanme key = " + key + ", iniSection="+iniSection);
         if (urlString == null || urlString.equals(""))
             throw new InvalidDataSourceException("Cannot retrieve URL for key " + key);
         URL url;

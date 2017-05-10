@@ -2,6 +2,7 @@ package org.monarch.hpoapi.cmd;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 
@@ -25,21 +26,23 @@ public class PhenotypeDBOptions extends PhenotypeBaseOptions {
         this.dataSourceFiles = dataSourceFiles;
     }
 
+    /** See {@link PhenotypeDBListOptions} to understand how  {@link #dataSourceFiles} is being initialized. */
     @Override
     public void setFromArgs(Namespace args) throws CommandLineParsingException {
         super.setFromArgs(args);
-
         dataSourceFiles = args.getList("data_source_list");
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder("dataSourceFiles:");
         if (dataSourceFiles.size()>0){
-            sb.append(dataSourceFiles.get(0));
+            sb.append("\t" + dataSourceFiles.get(0) + "\n");
             for (int i=1;i<dataSourceFiles.size();++i) {
-                sb.append("," + dataSourceFiles.get(i));
+                sb.append("\t" + dataSourceFiles.get(i)+ "\n");
             }
+        } else {
+            sb.append("\tnone\n");
         }
         return "JannovarDBOptions [dataSourceFiles=" + sb.toString() + ", isReportProgress()=" + isReportProgress()
                 + ", getHttpProxy()=" + getHttpProxy() + ", getHttpsProxy()=" + getHttpsProxy() + ", getFtpProxy()="
