@@ -18,7 +18,7 @@
 
     <modules>
         <module>hpoapi-core</module>
-        <!-- later: hpoapi-cli -->
+        <module>hpoapi-cli</module>
     </modules>
 
 

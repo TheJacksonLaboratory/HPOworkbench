@@ -5,8 +5,8 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>jannovar-core is a library for the functional annotation of genomic variants</description>
-    <url>http://charite.github.io/jannovar/</url>
+    <description>hpoapi-core is a library for working with the Human Phenotype Ontology (HPO).</description>
+    <url>http://www.human-phenotype-ontology.org</url>
 
     <parent>
         <groupId>org.monarch</groupId>

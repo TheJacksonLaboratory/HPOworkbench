@@ -23,7 +23,7 @@ public final class Util
 
     /**
      * Returns the File object for the directory where the application
-     * can store persistent data. If directory doesn't exist it will
+     * can store persistent io. If directory doesn't exist it will
      * be created.
      *
      * @param appName specifies the name of the application, from which

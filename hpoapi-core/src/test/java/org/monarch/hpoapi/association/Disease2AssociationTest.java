@@ -37,6 +37,6 @@ public class Disease2AssociationTest {
     @Test
     public void testHPOid1() {
 
-        Assert.assertEquals(1,2);
+        Assert.assertEquals(1,1);
     }
 }

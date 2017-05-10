@@ -119,7 +119,7 @@ public class OBOParser
         }
     }
 
-    /** Input source of the OBO data, e.g., a source that delivers gene_ontology.obo */
+    /** Input source of the OBO io, e.g., a source that delivers gene_ontology.obo */
     IParserInput input;
 
     /** The current parse options */
@@ -866,7 +866,7 @@ public class OBOParser
     }
 
     /**
-     * @return the version number of the data of described by obo file.
+     * @return the version number of the io of described by obo file.
      */
     public ByteString getDataVersion()
     {

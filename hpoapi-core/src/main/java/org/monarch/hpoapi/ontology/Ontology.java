@@ -1,6 +1,7 @@
 package org.monarch.hpoapi.ontology;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,8 +54,12 @@ class OntologyEdge extends Edge<Term>
  *
  * @author Sebastian Bauer
  */
-public class Ontology implements Iterable<Term>
-{
+public class Ontology implements Iterable<Term>, Serializable {
+    /**
+     * Serial version ID.
+     */
+    private static final long serialVersionUID = 1L;
+
     private static Logger logger = Logger.getLogger(Ontology.class.getName());
 
     /** The five top level sobontologies of the HPO */

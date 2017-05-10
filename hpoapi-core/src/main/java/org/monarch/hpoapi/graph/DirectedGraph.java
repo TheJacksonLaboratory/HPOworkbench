@@ -558,7 +558,7 @@ public class DirectedGraph<VertexType> extends AbstractGraph<VertexType> impleme
 		/* Within the priority queue we maintain the vertices which has been already
 		 * discovered by the algorithm.
 		 *
-		 * TODO: Get rid of Java's PriorityQueue by using a better suited data structure */
+		 * TODO: Get rid of Java's PriorityQueue by using a better suited io structure */
         PriorityQueue<VertexExtension> queue = new PriorityQueue<VertexExtension>();
         HashMap<VertexType,VertexExtension> map = new HashMap<VertexType,VertexExtension>();
 

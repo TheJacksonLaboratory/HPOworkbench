@@ -3,7 +3,7 @@ package org.monarch.hpoapi.collections;
 import java.util.HashMap;
 
 /**
- * A data structure to hold a pool of references. Simpler
+ * A io structure to hold a pool of references. Simpler
  * than a factory.
  *
  * @author Sebastian Bauer

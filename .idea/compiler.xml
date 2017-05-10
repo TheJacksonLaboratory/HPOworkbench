@@ -6,11 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="hpoapi-cli" />
         <module name="hpoapi-core" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="HPOAPI" target="1.8" />
+      <module name="hpoapi-cli" target="1.8" />
       <module name="hpoapi-core" target="1.8" />
     </bytecodeTargetLevel>
   </component>

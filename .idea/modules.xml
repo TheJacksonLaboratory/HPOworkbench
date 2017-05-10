@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HPOAPI.iml" filepath="$PROJECT_DIR$/HPOAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hpoapi-cli/hpoapi-cli.iml" filepath="$PROJECT_DIR$/hpoapi-cli/hpoapi-cli.iml" />
       <module fileurl="file://$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" filepath="$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" />
     </modules>
   </component>

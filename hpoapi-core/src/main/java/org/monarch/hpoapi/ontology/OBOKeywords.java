@@ -12,7 +12,7 @@ public class OBOKeywords
     /* Supported header types */
     public final static byte [] FORMAT_VERSION_KEYWORD = "format-version".getBytes();
     public final static byte [] DATE_KEYWORD = "date".getBytes();
-    public final static byte [] DATA_VERSION_KEYWORD = "data-version".getBytes();
+    public final static byte [] DATA_VERSION_KEYWORD = "io-version".getBytes();
     public final static byte [] SUBSETDEF_KEYWORD = "subsetdef".getBytes();
 
     /* Supported term types */

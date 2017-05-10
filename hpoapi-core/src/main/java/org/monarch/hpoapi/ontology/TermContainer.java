@@ -35,7 +35,7 @@ public class TermContainer extends TermMap implements Iterable<Term>
         formatVersion = format;
         date = datum;
 
-		/* Build our data structures linked list */
+		/* Build our io structures linked list */
         termList = new LinkedList<Term>();
         for (Term entry : terms)
             termList.add(entry);
