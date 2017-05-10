@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.data;
+package org.monarch.hpoapi.io;
 
 
 import java.io.BufferedInputStream;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
  */
-final class FileDownloader {
+public class FileDownloader {
 
     /** the logger object to use */
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDownloader.class);
@@ -53,7 +53,7 @@ final class FileDownloader {
     Options options;
 
     /** Initializer FileDownloader with the given options string */
-    FileDownloader(Options options) {
+    public FileDownloader(Options options) {
         this.options = options;
     }
 

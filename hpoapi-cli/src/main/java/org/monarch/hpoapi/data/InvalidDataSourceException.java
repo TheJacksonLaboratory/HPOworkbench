@@ -1,10 +1,10 @@
-package org.monarch.hpoapi.cmd;
+package org.monarch.hpoapi.data;
 
 
 import org.monarch.hpoapi.exception.HPOException;
 
 /**
- * Thrown on problems with data source configuration files.
+ * Thrown on problems with io source configuration files.
  *
  * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
  */

@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.cmd;
+package org.monarch.hpoapi.data;
 
 
 import java.io.BufferedInputStream;
@@ -12,29 +12,37 @@ import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 import org.ini4j.Profile.Section;
+//import org.monarch.hpoapi.association.Association;
+import org.monarch.hpoapi.association.AssociationContainer;
+import org.monarch.hpoapi.io.FileDownloadException;
+import org.monarch.hpoapi.io.FileDownloader;
+import org.monarch.hpoapi.io.OBOParserException;
+import org.monarch.hpoapi.ontology.Ontology;
+import org.monarch.hpoapi.util.PathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
 
-import de.charite.compbio.jannovar.data.JannovarData;
-//import de.charite.compbio.jannovar.data.ReferenceDictionary;
-import de.charite.compbio.jannovar.datasource.FileDownloader.ProxyOptions;
-//import de.charite.compbio.jannovar.impl.parse.ReferenceDictParser;
-//import de.charite.compbio.jannovar.impl.parse.TranscriptParseException;
+
+import org.monarch.hpoapi.io.FileDownloader.ProxyOptions;
+
 
 
 /**
- * Interface for data factories, allowing to create {@link JannovarData} objects from {@link DataSource}s.
- *
- * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
+ * Interface for io factories, allowing to create {@link PhenotypeData} objects from {@link DataSource}s.
+ * Phenotype io consists of an OBO ontology as well as Annotations.
+ * We are now (May 9, 2017) implementing this for just the HPO, but inted to extend this so
+ * that it will also work with MPO and potentially other phenotype ontologies and would like to use a
+ * single interface.
+ * This code is based on JannovarDataFactory for Jannovar by Manuel Holtgrewe.
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
-public abstract class HPODataFactory {
+public abstract class PhenotypeDataFactory {
 
     /**
      * the logger object to use
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HPODataFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PhenotypeDataFactory.class);
 
     /**
      * the {@link DatasourceOptions} to use for proxy settings
@@ -53,10 +61,10 @@ public abstract class HPODataFactory {
      * Construct the factory with the given {@link DataSource}.
      *
      * @param options    configuration for proxy settings
-     * @param dataSource the data source to use.
+     * @param dataSource the io source to use.
      * @param iniSection {@link Section} with configuration from INI file
      */
-    public HPODataFactory(DatasourceOptions options, DataSource dataSource, Section iniSection) {
+    public PhenotypeDataFactory(DatasourceOptions options, DataSource dataSource, Section iniSection) {
         this.options = options;
         this.dataSource = dataSource;
         this.iniSection = iniSection;
@@ -65,19 +73,18 @@ public abstract class HPODataFactory {
     /**
      * @param downloadDir       path of directory to download files to
      * @param printProgressBars whether or not to print progress bars
-     * @return {@link JannovarData} object for the factory's state.
-     * @throws InvalidDataSourceException on problems with the data source or data source file
-     * @throws TranscriptParseException   on problems with processing the transcript and reference dictionary data
+     * @return {@link PhenotypeData} object for the factory's state.
+     * @throws InvalidDataSourceException on problems with the io source or io source file
      * @throws FileDownloadException      on problems while downloading files.
      */
-    public final JannovarData build(String downloadDir, boolean printProgressBars)
-            throws InvalidDataSourceException, TranscriptParseException, FileDownloadException {
+    public final PhenotypeData build(String downloadDir, boolean printProgressBars)
+            throws InvalidDataSourceException, FileDownloadException {
         String targetDir = PathUtil.join(downloadDir, dataSource.getName());
 
         FileDownloader downloader = new FileDownloader(buildOptions(printProgressBars));
 
         // Download files.
-        LOGGER.info("Downloading data...");
+        LOGGER.info("Downloading io...");
         try {
             for (String url : dataSource.getDownloadURLs()) {
                 LOGGER.info("Downloading {}", url);
@@ -95,21 +102,25 @@ public abstract class HPODataFactory {
             throw new FileDownloadException("Invalid URL.", e);
         }
 
-        // Parse files for building ReferenceDictionary objects.
-        LOGGER.info("Building ReferenceDictionary...");
-        final String chromInfoPath = PathUtil.join(downloadDir, dataSource.getName(),
-                dataSource.getFileName("chromInfo"));
-        final String chrToAccessionsPath = PathUtil.join(downloadDir, dataSource.getName(),
-                dataSource.getFileName("chrToAccessions"));
-        ReferenceDictParser dictParser = new ReferenceDictParser(chromInfoPath, chrToAccessionsPath, iniSection);
-        ReferenceDictionary refDict = dictParser.parse();
-        // refDict.print(System.err);
-
-        // Parse transcript files.
-        LOGGER.info("Parsing transcripts...");
-        ImmutableList<TranscriptModel> transcripts = parseTranscripts(refDict, targetDir);
-
-        return new JannovarData(refDict, transcripts);
+        // Parse files for building Ontology objects.
+        LOGGER.info("Building Ontology...");
+        System.out.println("Datasource: "+dataSource);
+        final String oboPath = PathUtil.join(downloadDir, dataSource.getName(),
+                dataSource.getFileName("obo"));
+        final String associationsPath = PathUtil.join(downloadDir, dataSource.getName(),
+                dataSource.getFileName("annotation"));
+        Ontology ontology=null;
+        AssociationContainer container=null;
+        try {
+            LOGGER.info("Parsing obo file...");
+            ontology = parseOntology(oboPath);
+            LOGGER.info("Parsing associations...");
+            container = parseAssociations(associationsPath);
+        } catch (OBOParserException e) {
+            e.printStackTrace();
+            System.exit(1); //TOOD -- clean this up
+        }
+        return new PhenotypeData(ontology, container);
     }
 
     /**
@@ -165,13 +176,24 @@ public abstract class HPODataFactory {
         }
     }
 
-    /**
-     * @param refDict   {@link ReferenceDictionary} to use
-     * @param targetDir path where the downloaded files are
-     * @return list of {@link TranscriptModel} objects that are parsed from the files in <code>targetDir</code>
-     * @throws TranscriptParseException on problems with parsing the transcript database
-     */
-    protected abstract ImmutableList<TranscriptModel> parseTranscripts(ReferenceDictionary refDict, String targetDir)
-            throws TranscriptParseException;
 
+    /**
+     * @param targetDir
+     *            path where the downloaded files are
+     * @return {@link Ontology} object representing a phenotype ontology
+     * * @throws OBOParserException
+     *             on problems with parsing the obo file
+     */
+    protected abstract Ontology parseOntology(String targetDir)
+            throws OBOParserException;
+
+    /**
+     * @param targetDir
+     *            path where the downloaded files are
+     * @return {@link AssociationContainer} object representing list of associations to a phenotype ontology
+     * @throws OBOParserException
+     *             on problems with parsing the obo file
+     */
+    protected abstract AssociationContainer parseAssociations(String targetDir)
+            throws OBOParserException;
 }

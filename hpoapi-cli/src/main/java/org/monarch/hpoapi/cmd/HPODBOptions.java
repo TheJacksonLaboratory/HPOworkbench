@@ -11,7 +11,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
  *
  * @author <a href="mailto:manuel.holtgrewe@bihealth.de">Manuel Holtgrewe</a>
  */
-public class HPODBOptions extends HPOAPIBaseOptions {
+public class HPODBOptions extends PhenotypeBaseOptions {
 
     /**
      * paths to INI files ot use for parsing

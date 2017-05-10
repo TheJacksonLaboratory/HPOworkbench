@@ -1,11 +1,10 @@
 package org.monarch.hpoapi.cmd;
 
 
+import org.monarch.hpoapi.data.DataSourceFactory;
+import org.monarch.hpoapi.data.DatasourceOptions;
 import org.monarch.hpoapi.exception.HPOException;
-import de.charite.compbio.jannovar.cmd.CommandLineParsingException;
-import de.charite.compbio.jannovar.cmd.JannovarCommand;
-import de.charite.compbio.jannovar.datasource.DataSourceFactory;
-import de.charite.compbio.jannovar.datasource.DatasourceOptions;
+
 import net.sourceforge.argparse4j.inf.Namespace;
 
 public class DatabaseListCommand extends HPOCommand {
@@ -32,7 +31,7 @@ public class DatabaseListCommand extends HPOCommand {
                 options.getFtpProxy(), options.isReportProgress());
 
         DataSourceFactory factory = new DataSourceFactory(dsOptions, options.getDataSourceFiles());
-        System.err.println("Available data sources:\n");
+        System.err.println("Available io sources:\n");
         for (String name : factory.getNames())
             System.err.println(String.format("    %s", name));
     }

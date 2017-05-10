@@ -10,7 +10,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
  *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a> closely based on code by Manuel Holtgrewe for Jannovar.
  */
-public class HPOAPIDBOptions extends HPOAPIBaseOptions {
+public class PhenotypeDBOptions extends PhenotypeBaseOptions {
 
     /**
      * paths to INI files to use for parsing
@@ -34,7 +34,14 @@ public class HPOAPIDBOptions extends HPOAPIBaseOptions {
 
     @Override
     public String toString() {
-        return "JannovarDBOptions [dataSourceFiles=" + dataSourceFiles + ", isReportProgress()=" + isReportProgress()
+        StringBuilder sb = new StringBuilder("");
+        if (dataSourceFiles.size()>0){
+            sb.append(dataSourceFiles.get(0));
+            for (int i=1;i<dataSourceFiles.size();++i) {
+                sb.append("," + dataSourceFiles.get(i));
+            }
+        }
+        return "JannovarDBOptions [dataSourceFiles=" + sb.toString() + ", isReportProgress()=" + isReportProgress()
                 + ", getHttpProxy()=" + getHttpProxy() + ", getHttpsProxy()=" + getHttpsProxy() + ", getFtpProxy()="
                 + getFtpProxy() + "]";
     }

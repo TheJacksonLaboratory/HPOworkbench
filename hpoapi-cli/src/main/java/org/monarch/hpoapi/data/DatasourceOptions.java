@@ -1,9 +1,9 @@
-package org.monarch.hpoapi.cmd;
+package org.monarch.hpoapi.data;
 
 import java.net.URL;
 
 /**
- * Configuration for data sources.
+ * Configuration for io sources.
  *
  * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
  */
@@ -74,6 +74,12 @@ public class DatasourceOptions {
     /** Set whether to print progress bars or not */
     public void setPrintProgressBars(boolean printProgressBars) {
         this.printProgressBars = printProgressBars;
+    }
+
+
+    @Override
+    public String toString() {
+        return String.format("DatasourceOptions: http proxy: %s, ftp proxy: %s, https proxy: %s",httpProxy,ftpProxy,httpsProxy);
     }
 
 }

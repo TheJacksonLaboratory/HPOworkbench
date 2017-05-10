@@ -19,7 +19,7 @@ import org.monarch.hpoapi.HPOAPI;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>, based on Jannovar code by Manueal Holtgrewe
  * @version 0.0.1 (May 9, 2017)
  */
-public class HPOAPIBaseOptions {
+public class PhenotypeBaseOptions {
     /** Whether or not to print progress */
     private boolean reportProgress = true;
 

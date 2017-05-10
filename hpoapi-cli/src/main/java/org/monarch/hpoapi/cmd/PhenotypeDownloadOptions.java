@@ -14,15 +14,17 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
-import org.monarch.hpoapi.HPOAPI;
+import org.monarch.hpoapi.exception.UncheckedException;
 
 
 /**
  * Configuration for the <tt>download</tt> command
  *
- * @author Peter Robinson, adapted from Jannovar code by <a href="mailto:manuel.holtgrewe@bihealth.de">Manuel Holtgrewe</a>
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>, adapted from Jannovar code.
+ * @author <a href="mailto:manuel.holtgrewe@bihealth.de">Manuel Holtgrewe</a>
+ * @version 0.0.1 (May 10,2017)
  */
-public class HPODownloadOptions extends HPOAPIDBOptions {
+public class PhenotypeDownloadOptions extends PhenotypeDBOptions {
 
     /** Path to download directory */
     private String downloadDir = null;
@@ -41,35 +43,35 @@ public class HPODownloadOptions extends HPOAPIDBOptions {
             try {
                 return new DownloadCommand(argv, args);
             } catch (CommandLineParsingException e) {
-                //throw new UncheckedJannovarException("Could not parse command line", e);
-                System.err.println("Could not parse command line");
-                e.printStackTrace();
-                System.exit(1);
+                throw new UncheckedException("Could not parse command line", e);
             }
         };
 
-        Subparser subParser = subParsers.addParser("download", true).help("download transcript databases")
+        Subparser subParser = subParsers.addParser("download", true).help("download phenotype databases")
                 .setDefault("cmd", handler);
-        subParser.description("Download transcript database");
+        subParser.description("Download OBO/Association files for phenotype ontology");
 
         ArgumentGroup requiredGroup = subParser.addArgumentGroup("Required arguments");
         requiredGroup.addArgument("-d", "--database").help("Name of database to download, can be given multiple times")
                 .setDefault(new ArrayList<String>()).action(Arguments.append()).required(true);
 
         ArgumentGroup optionalGroup = subParser.addArgumentGroup("Optional Arguments");
-        optionalGroup.addArgument("-s", "--data-source-list").help("INI file with data source list")
+        optionalGroup.addArgument("-s", "--io-source-list").help("INI file with io source list")
                 .setDefault(Lists.newArrayList("bundle:///default_sources.ini")).action(Arguments.append());
-        optionalGroup.addArgument("--download-dir").help("Path to download directory").setDefault("data");
+        optionalGroup.addArgument("--download-dir").help("Path to download directory").setDefault("io");
 
-        HPOAPIBaseOptions.setupParser(subParser);
+        PhenotypeBaseOptions.setupParser(subParser);
     }
 
     @Override
     public void setFromArgs(Namespace args) throws CommandLineParsingException {
         super.setFromArgs(args);
-
+        System.err.println("setfrom args" + args);
         downloadDir = args.getString("download_dir");
         databaseNames = args.getList("database");
+        for (String n : databaseNames){
+            System.out.println("I GOT "+n);
+        }
     }
 
     public String getDownloadDir() {
@@ -90,7 +92,7 @@ public class HPODownloadOptions extends HPOAPIDBOptions {
 
     @Override
     public String toString() {
-        return "HPODownloadOptions [downloadDir=" + downloadDir + ", getDataSourceFiles()=" + getDataSourceFiles()
+        return "PhenotypeDownloadOptions [downloadDir=" + downloadDir + ", getDataSourceFiles()=" + getDataSourceFiles()
                 + ", isReportProgress()=" + isReportProgress() + ", getHttpProxy()=" + getHttpProxy()
                 + ", getHttpsProxy()=" + getHttpsProxy() + ", getFtpProxy()=" + getFtpProxy() + "]";
     }

@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.cmd;
+package org.monarch.hpoapi.data;
 
 
 import java.io.File;
@@ -9,11 +9,11 @@ import org.ini4j.Profile.Section;
 
 import com.google.common.collect.ImmutableList;
 
-import de.charite.compbio.jannovar.data.JannovarData;
+//import de.charite.compbio.jannovar.io.JannovarData;
 //import de.charite.compbio.jannovar.hgnc.HGNCParser;
 
 /**
- * Base class for all data sources.
+ * Base class for all io sources.
  *
  * Data sources combine the information of (1) a name, (2) a list of URLs with files to download, and (3) obtaining a
  * factory for constructing a {@link JannovarData} object from this information.
@@ -28,20 +28,21 @@ public abstract class DataSource {
     /** the {@link Section} to create the DataSource from */
     protected final Section iniSection;
 
-    /** @return name of the data source, e.g. "hg19/ucsc" */
+    /** @return name of the io source, e.g. "hg19/ucsc" */
     public final String getName() {
         return iniSection.getName();
     }
 
     /**
      * @param key The key to get the file name for.
-     * @return name of file with the given key in the data source, e.g. "knownGene.txt.gz" for
+     * @return name of file with the given key in the io source, e.g. "knownGene.txt.gz" for
      *         "knownGene=http://.../knownGene.txt.gz".
      * @throws InvalidDataSourceException
      *             if there are problems with retrieving or parsing the URL string
      */
     public final String getFileName(String key) throws InvalidDataSourceException {
         String urlString = iniSection.fetch(key);
+        System.err.println("getFIleanme key = " + key + ", iniSection="+iniSection);
         if (urlString == null || urlString.equals(""))
             throw new InvalidDataSourceException("Cannot retrieve URL for key " + key);
         URL url;
@@ -54,10 +55,10 @@ public abstract class DataSource {
     }
 
     /**
-     * @return {@link JannovarDataFactory} to use for creating a {@link JannovarData} object from this
+     * @return {@link PhenotypeDataFactory} to use for creating a {@link PhenotypeData} object from this
      *         {@link DataSource} .
      */
-    public abstract JannovarDataFactory getDataFactory();
+    public abstract PhenotypeDataFactory getDataFactory();
 
     /**
      * Construct {@link DataSource} from INI {@link Section}.
@@ -65,7 +66,7 @@ public abstract class DataSource {
      * @param options
      *            configuration to use (for proxy settings)
      * @param iniSection
-     *            data to construct the {@link DataSource} from.
+     *            io to construct the {@link DataSource} from.
      */
     DataSource(DatasourceOptions options, Section iniSection) {
         this.options = options;
@@ -75,14 +76,14 @@ public abstract class DataSource {
     /**
      * @return list of keys that are required to have a URL for download in {@link #iniSection}
      */
-    protected abstract ImmutableList<String> getURLKeys();
+    protected abstract ImmutableList<String> getRequiredKeys();
 
     /**
-     * @return list of URLs with files to download for this data source
+     * @return list of URLs with files to download for this io source
      */
     public final ImmutableList<String> getDownloadURLs() {
         ImmutableList.Builder<String> builder = new ImmutableList.Builder<String>();
-        for (String key : getURLKeys())
+        for (String key : getRequiredKeys())
             builder.add(iniSection.fetch(key));
         // Always download hgnc_complete_set.txt
         //builder.add(HGNCParser.DOWNLOAD_URL);
@@ -96,9 +97,11 @@ public abstract class DataSource {
      *             if a key is missing.
      */
     protected final void checkURLs() throws InvalidDataSourceException {
-        for (String key : getURLKeys())
+        for (String key : getRequiredKeys())
             if (!iniSection.containsKey(key))
                 throw new InvalidDataSourceException("Section " + iniSection.getName() + " does not contain key " + key);
     }
+
+    public abstract String toString();
 
 }

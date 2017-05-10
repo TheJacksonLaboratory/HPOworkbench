@@ -1,4 +1,4 @@
-package org.monarch.hpoapi.cmd;
+package org.monarch.hpoapi.data;
 
 
 import java.io.FileInputStream;
@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * Factory class that allows the construction of {@link DataSource} objects as configured in INI files.
  *
- * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
+ * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>, <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 final public class DataSourceFactory {
 
@@ -25,17 +25,26 @@ final public class DataSourceFactory {
      */
     private final DatasourceOptions options;
     /**
-     * {@link Ini} object to use for loading data
+     * {@link Ini} object to use for loading io
      */
     private final ImmutableList<Ini> inis;
 
     /**
      * @param options      for proxy configuration
-     * @param iniFilePaths path to INI file to load the data source config from
-     * @throws InvalidDataSourceException on problems with the data source config file
+     * @param iniFilePaths path to INI file to load the io source config from
+     * @throws InvalidDataSourceException on problems with the io source config file
      */
     public DataSourceFactory(DatasourceOptions options, List<String> iniFilePaths) throws InvalidDataSourceException {
         this.options = options;
+        if (iniFilePaths==null){
+            System.err.println("DataSourceFacotry.java: inifile paths null");
+            System.exit(1);
+        } else {
+            System.err.println("Size of iniFIlePaths=" + iniFilePaths.size() + "\n");
+            for (String s : iniFilePaths) {
+                System.err.println("\t"+s);
+            }
+        }
 
         ImmutableList.Builder<Ini> inisBuilder = new ImmutableList.Builder<Ini>();
         for (String iniFilePath : iniFilePaths) {
@@ -51,16 +60,16 @@ final public class DataSourceFactory {
                     is = new FileInputStream(iniFilePath);
                 } catch (FileNotFoundException e) {
                     throw new InvalidDataSourceException(
-                            "Problem opening data source file " + iniFilePath + ": " + e.getMessage());
+                            "Problem opening io source file " + iniFilePath + ": " + e.getMessage());
                 }
             }
             Ini ini = new Ini();
             try {
                 ini.load(is);
             } catch (InvalidFileFormatException e) {
-                throw new InvalidDataSourceException("Problem loading data source file.", e);
+                throw new InvalidDataSourceException("Problem loading io source file.", e);
             } catch (IOException e) {
-                throw new InvalidDataSourceException("Problem loading data source file.", e);
+                throw new InvalidDataSourceException("Problem loading io source file.", e);
             }
             inisBuilder.add(ini);
         }
@@ -68,7 +77,7 @@ final public class DataSourceFactory {
     }
 
     /**
-     * @return list of data source names
+     * @return list of io source names
      */
     public ImmutableList<String> getNames() {
         ImmutableList.Builder<String> builder = new ImmutableList.Builder<String>();
@@ -82,30 +91,29 @@ final public class DataSourceFactory {
     /**
      * Construct {@link DataSource}
      *
-     * @param name key of the INI section to load the data source from
-     * @return {@link DataSource} with data from the file
-     * @throws InvalidDataSourceException if <code>name</code> could not be found in any data source config file
+     * @param name key of the INI section to load the io source from
+     * @return {@link DataSource} with io from the file
+     * @throws InvalidDataSourceException if <code>name</code> could not be found in any io source config file
      */
     public DataSource getDataSource(String name) throws InvalidDataSourceException {
         for (Ini ini : inis) {
             if (!ini.keySet().contains(name))
-                continue; // not found in data source
+                continue; // not found in io source
             Section section = ini.get(name);
             String type = section.fetch("type");
             if (type == null)
                 throw new InvalidDataSourceException("Data source config does not have \"type\" key.");
-            else if (type.equals("obo"))
-                return new OBODataSource(options, section);
-            else if (type.equals("ensembl"))
-                return new EnsemblDataSource(options, section);
-            else if (type.equals("refseq"))
-                return new RefSeqDataSource(options, section);
-            else if (type.equals("flat_bed"))
-                return new FlatBEDDataSource(options, section);
+            else if (type.equals("hpo"))
+                return new HPODataSource(options, section);
+            /*else if (type.equals("mpo"))
+
+                // not implemented yet for Mammalian Phenotype Ontology
+
+                */
             else
                 throw new InvalidDataSourceException("Data source config has invalid \"type\" key: " + type);
         }
 
-        throw new InvalidDataSourceException("Could not find data source " + name + " in any data source file.");
+        throw new InvalidDataSourceException("Could not find io source " + name + " in any io source file.");
     }
 }
