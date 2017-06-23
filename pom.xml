@@ -90,23 +90,37 @@
 
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
-                <configuration>
-                    <skipTests>false</skipTests>
-                    <forkCount>3</forkCount>
-                    <reuseForks>true</reuseForks>
-                    <argLine>-Xms512m -Xmx1024m</argLine>
-                    <systemPropertyVariables>
-                        <user.language>en</user.language>
-                        <user.region>GB</user.region>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
+        <!--
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.17</version>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                            <forkCount>3</forkCount>
+                            <reuseForks>true</reuseForks>
+                            <argLine>-Xms512m -Xmx1024m</argLine>
+                            <systemPropertyVariables>
+                                <user.language>en</user.language>
+                                <user.region>GB</user.region>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin> -->
+<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -126,7 +140,7 @@
                 </executions>
             </plugin>
 
-            <!-- Javadoc generation. -->
+           Javadoc generation.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -156,7 +170,7 @@
                 </executions>
             </plugin>
 
-            <!-- Javadoc to gh-pages  TODO
+            Javadoc to gh-pages  TODO
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-publish-plugin</artifactId>
@@ -172,22 +186,20 @@
                 </configuration>
             </plugin>-->
 
-            <!-- Jacoco Coverage Reports -->
+            <!-- Jacoco Coverage Reports
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.2.201409121644</version>
                 <executions>
-                    <!-- Prepares the property pointing to the JaCoCo runtime
-                        agent which is passed as VM argument when Maven the Surefire plugin is executed. -->
+
                     <execution>
                         <id>pre-unit-test</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <!-- Ensures that the code coverage report for unit tests
-                        is created after unit tests have been run. -->
+
                     <execution>
                         <id>post-unit-test</id>
                         <phase>test</phase>
@@ -198,7 +210,6 @@
                 </executions>
             </plugin>
 
-            <!-- Compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -212,7 +223,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Set versions into JAR -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -225,8 +236,8 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
-        </plugins>
+            </plugin> -->
+
     </build>
 
 </project>

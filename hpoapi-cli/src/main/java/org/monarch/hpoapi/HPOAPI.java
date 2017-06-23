@@ -6,6 +6,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
+import org.monarch.hpoapi.cmd.HPO2CSVOptions;
 import org.monarch.hpoapi.cmd.HPOCommand;
 import org.monarch.hpoapi.cmd.PhenotypeDBListOptions;
 import org.monarch.hpoapi.cmd.PhenotypeDownloadOptions;
@@ -22,6 +23,7 @@ public class HPOAPI {
 
 
     public static void main(String[] argv){
+        System.out.println("HPOAPI");
         // Setup command line parser
         ArgumentParser parser = ArgumentParsers.newArgumentParser("hpoapi-cli");
         parser.version(getVersion());
@@ -30,13 +32,16 @@ public class HPOAPI {
         Subparsers subParsers = parser.addSubparsers();
         PhenotypeDBListOptions.setupParser(subParsers);
         PhenotypeDownloadOptions.setupParser(subParsers);
+        HPO2CSVOptions.setupParser(subParsers);
         parser.defaultHelp(true);
         parser.epilog("You can find out more at http://TODO.rtfd.org");
 
         // Parse command line arguments
         Namespace args = null;
         try {
+            System.out.println("BEFORE@");
             args = parser.parseArgs(argv);
+            System.out.println("args="+args.toString());
         } catch (ArgumentParserException e) {
             parser.handleError(e);
             System.exit(1);
