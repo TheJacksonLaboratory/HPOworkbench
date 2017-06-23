@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.monarch</groupId>
         <artifactId>HPOAPI</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>hpoapi-cli</artifactId>
     <packaging>jar</packaging>
@@ -64,8 +64,26 @@
             <artifactId>commons-csv</artifactId>
             <version>1.4</version>
         </dependency>
+	<!-- https://mvnrepository.com/artifact/net.sourceforge.argparse4j/argparse4j -->
+	<dependency>
+	  <groupId>net.sourceforge.argparse4j</groupId>
+	  <artifactId>argparse4j</artifactId>
+	  <version>0.7.0</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-core -->
+	<dependency>
+	  <groupId>de.ontologizer</groupId>
+	  <artifactId>ontologizerlib-core</artifactId>
+	  <version>0.1</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-io -->
+	<dependency>
+	  <groupId>de.ontologizer</groupId>
+	  <artifactId>ontologizerlib-io</artifactId>
+	  <version>0.1</version>
+	</dependency>
     </dependencies>
-
+    
     <build>
         <resources>
             <resource>
