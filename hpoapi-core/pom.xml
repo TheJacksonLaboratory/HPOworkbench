@@ -1,9 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hpoapi-core</artifactId>
-    <packaging>jar</packaging>
-
     <name>${project.groupId}:${project.artifactId}</name>
     <description>hpoapi-core is a library for working with the Human Phenotype Ontology (HPO).</description>
     <url>http://www.human-phenotype-ontology.org</url>
@@ -13,6 +10,11 @@
         <artifactId>HPOAPI</artifactId>
         <version>0.0.2-SNAPSHOT</version>
     </parent>
+    <groupId>org.monarch</groupId>
+    <artifactId>hpoapi-core</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,6 +1,7 @@
 package org.monarch.hpoapi.argparser;
 
 import net.sourceforge.argparse4j.annotation.Arg;
+import org.monarch.hpoapi.cmd.HPOCommand;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ public class ArgumentParser {
 
     private String programName=null;
     private String version=null;
+    private Map<String,HPOCommand> commandmap=null;
+    private HPOCommand runnableCommand=null;
 
 
     private List<Argument> arglist;
@@ -24,6 +27,7 @@ public class ArgumentParser {
         this.programName=program;
         arglist = new ArrayList<>();
         argmap = new HashMap<>();
+        commandmap=new HashMap<>();
     }
 
 
@@ -57,9 +61,13 @@ public class ArgumentParser {
                     }
                     String value = args[i+1];
                     am.addArgWithValue(arg,value);
+                    i++;
                 } else {
                     am.addArgWithoutValue(arg);
                 }
+            } else {
+                // must be a command if it does not belong to a flagged argument and does not start with "-" or "--"
+                setRunnableCommand(s);
             }
         }
 
@@ -74,6 +82,25 @@ public class ArgumentParser {
         return am;
     }
 
+    private Map<String,String>  getOptionMap() {
+        Map<String,String> options = new HashMap<>();
+        for (Argument arg : argmap.values()) {
+            options.put(arg.getName(),arg.getValue());
+        }
+        return  options;
+    }
+
+
+
+
+    /** This initializes the command object to the values in the parser and returns a fully runable and finished object. */
+    public HPOCommand getCommand() throws ArgumentParserException {
+        Map<String,String> options = getOptionMap();
+        this.runnableCommand.setOptions(options);
+        return this.runnableCommand;
+    }
+
+
 
     public void handleError(ArgumentParserException e) {
         e.printStackTrace();
@@ -81,5 +108,24 @@ public class ArgumentParser {
     }
 
 
+    public HPOCommand addCommand(HPOCommand cmd) {
+        commandmap.put(cmd.getName(),cmd);
+        return cmd;
+    }
 
+    /** Sets the command that will be used to run the program. Rules:
+     * only one command is allowed at a time.
+     * @param arg String (name of command) from command line
+     * @throws ArgumentParserException
+     */
+    private void setRunnableCommand(String arg) throws ArgumentParserException {
+        HPOCommand cmd = this.commandmap.get(arg);
+        if (cmd==null) {
+            throw new ArgumentParserException("[ERROR] Did not recognize command: "+arg);
+        }
+        if (this.runnableCommand != null) {
+            throw new ArgumentParserException(String.format("[ERROR] not allowed to run more than one command: (%s and %s)",arg,this.runnableCommand));
+        }
+        this.runnableCommand=cmd;
+    }
 }

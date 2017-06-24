@@ -2,12 +2,15 @@ package org.monarch.hpoapi.cmd;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 
+import org.monarch.hpoapi.argparser.ArgumentParserException;
 import org.monarch.hpoapi.data.DataSource;
 import org.monarch.hpoapi.data.DataSourceFactory;
 import org.monarch.hpoapi.data.DatasourceOptions;
 import org.monarch.hpoapi.data.PhenotypeData;
 import org.monarch.hpoapi.exception.HPOException;
 import org.monarch.hpoapi.util.PathUtil;
+
+import java.util.Map;
 
 
 /**
@@ -21,7 +24,12 @@ import org.monarch.hpoapi.util.PathUtil;
  */
 public final class DownloadCommand extends HPOCommand {
 
-    private PhenotypeDownloadOptions options;
+
+    public String getName() { return "download"; }
+
+    public void setOptions(Map<String,String> mp) throws ArgumentParserException {
+        System.err.println("TODO IMPLEMENT setOptions in DownloadCommand");System.exit(1);
+    }
 
     /**
      *
@@ -30,16 +38,15 @@ public final class DownloadCommand extends HPOCommand {
      * @throws CommandLineParsingException
      */
     public DownloadCommand(String argv[], Namespace args) throws CommandLineParsingException {
-        this.options = new PhenotypeDownloadOptions();
-        this.options.setFromArgs(args);
+
     }
 
     /**
      * Perform the downloading.
      */
     @Override
-    public void run() throws HPOException {
-        DatasourceOptions dsOptions = new DatasourceOptions(options.getHttpProxy(), options.getHttpsProxy(),
+    public void run()  {
+       /* DatasourceOptions dsOptions = new DatasourceOptions(options.getHttpProxy(), options.getHttpsProxy(),
                 options.getFtpProxy(), options.isReportProgress());
 
         DataSourceFactory factory = new DataSourceFactory(dsOptions, options.dataSourceFiles);
@@ -51,7 +58,8 @@ public final class DownloadCommand extends HPOCommand {
                     name.replace('/', '_').replace('\\', '_') + ".ser");
             //JannovarDataSerializer serializer = new JannovarDataSerializer(filename);
             //serializer.save(io);
-        }
+            */
+
     }
 
 }

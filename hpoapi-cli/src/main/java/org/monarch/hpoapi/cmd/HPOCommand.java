@@ -6,7 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 
+import org.monarch.hpoapi.argparser.ArgumentParserException;
 import org.monarch.hpoapi.exception.HPOException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Super class for all commands, i.e. the classes implementing one Jannovar execution step.
@@ -14,6 +18,11 @@ import org.monarch.hpoapi.exception.HPOException;
  * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
  */
 public abstract class HPOCommand {
+
+    public abstract String getName();
+
+    protected Map<String,String> defaults=new HashMap<>();
+
 
     /**
      * Set log level, depending on this.verbosity.
@@ -37,6 +46,14 @@ public abstract class HPOCommand {
      *
      * @throws HPOException on problems executing the command.
      */
-    public abstract void run() throws HPOException;
+    public abstract void run();
+
+    public abstract void setOptions(Map<String,String> mp) throws ArgumentParserException;
+
+
+    public HPOCommand setDefaultValue(String key,String value) {
+        defaults.put(key,value);
+        return this;
+    }
 
 }

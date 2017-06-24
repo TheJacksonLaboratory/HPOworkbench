@@ -1,44 +1,43 @@
 package org.monarch.hpoapi;
 
-
-
-import net.sourceforge.argparse4j.inf.Namespace;
-import net.sourceforge.argparse4j.inf.Subparsers;
 import org.monarch.hpoapi.argparser.ArgumentMap;
 import org.monarch.hpoapi.argparser.ArgumentParserException;
 import org.monarch.hpoapi.argparser.Arguments;
-import org.monarch.hpoapi.cmd.HPO2CSVOptions;
-import org.monarch.hpoapi.cmd.HPOCommand;
-import org.monarch.hpoapi.cmd.PhenotypeDBListOptions;
-import org.monarch.hpoapi.cmd.PhenotypeDownloadOptions;
-import org.monarch.hpoapi.exception.HPOException;
-
-import java.util.function.BiFunction;
+import org.monarch.hpoapi.cmd.*;
 
 /**
  * Created by peter on 08.05.17.
  */
 public class HPOAPI {
 
-
-
-
     public static void main(String[] argv){
-        System.out.println("HPOAPI");System.exit(1);
+        System.out.println("HPOAPI");
         org.monarch.hpoapi.argparser.ArgumentParser parser = new org.monarch.hpoapi.argparser.ArgumentParser("hpoapi");
         parser.setVersion(getVersion());
         parser.addArgument("--version").setShortFlag("-v").help("Show HPOAPI version").action(Arguments.version(getVersion()));
+        parser.addArgument("--input").setShortFlag("-i").help("path to input file").required();
+        parser.addCommand(new HPO2CSVCommand()).setDefaultValue("input","data/hp.obo");
         ArgumentMap args;
         try {
-            System.out.println("BEFORE@");
             args = parser.parseArgs(argv);
             System.out.println("args="+args.toString());
         } catch (ArgumentParserException e) {
             parser.handleError(e);
             System.exit(1);
         }
+        // The following provides us with the command. The command object has been provided
+        //; with all of the command line options.
+        HPOCommand cmd=null;
+        try {
+            cmd = parser.getCommand();
+        } catch (ArgumentParserException e) {
+            System.err.println("[ERROR] Failure to parse arguments: " + e.toString());
+            System.exit(1);
+        }
 
-        // Setup command line parser
+         cmd.run();
+
+
 
         /*
         ArgumentParser parser = ArgumentParsers.newArgumentParser("hpoapi-cli");

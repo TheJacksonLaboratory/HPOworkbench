@@ -5,7 +5,7 @@ package org.monarch.hpoapi.argparser;
  */
 public class ArgumentParserException extends Exception{
 
-        ArgumentParserException(String msg) {
+    public ArgumentParserException(String msg) {
         super(msg);
     }
 }

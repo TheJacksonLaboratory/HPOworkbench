@@ -29,6 +29,8 @@ public class Argument {
 
     public void setValue(String v) {this.value=v;}
 
+    public String getValue() { return  value; }
+
     public void run() {
         action.run(this);
     }

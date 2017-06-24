@@ -1,7 +1,5 @@
 package org.monarch.hpoapi.cmd;
 
-import net.sourceforge.argparse4j.inf.Namespace;
-
 import ontologizer.io.obo.OBOParser;
 import ontologizer.io.obo.OBOParserException;
 import ontologizer.io.obo.OBOParserFileInput;
@@ -22,27 +20,46 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-
+import org.monarch.hpoapi.argparser.ArgumentParserException;
 
 /**
  * Make a CSV file representing the HPO hp.obo file
  * Created by robinp on 6/23/17.
  */
 public class HPO2CSVCommand extends HPOCommand {
-
-
+    /** name of this command */
+    private final static String name = "csv";
     private Map<String,String> hpoName2IDmap=null;
+
+    public String getName() { return name; }
+
+    private String pathToHpObo=null;
 
 
     /**
      *
-     * @param argv
-     * @param args A wrapper around the command-line arguments
-     * @throws CommandLineParsingException
      */
-    public HPO2CSVCommand(String argv[], Namespace args) throws CommandLineParsingException {
+    public HPO2CSVCommand()  {
         //this.options = new PhenotypeDownloadOptions();
        // this.options.setFromArgs(args);
+    }
+
+    /** This function passes the options to the command
+     * and makes sure we have everything we need. It checks
+     * the default values if it doesnt find the values here.
+     * If it is missing something, it throws and exception.
+     * @param mp
+     */
+    public void setOptions(Map<String,String> mp) throws ArgumentParserException {
+        String path=null;
+        if (mp.containsKey("input")) {
+            path=mp.get("input");
+        } else if (this.defaults.containsKey("input")) {
+            path=defaults.get("input");
+        } else {
+            throw new ArgumentParserException("--input option must be provided to run csv");
+        }
+        //todo -- output file path
     }
 
 
@@ -51,7 +68,7 @@ public class HPO2CSVCommand extends HPOCommand {
      * Perform the downloading.
      */
     @Override
-    public void run() throws HPOException {
+    public void run()  {
         Ontology ontology=null;
         String obopath="io/hp.obo"; // TODO - make flexible
         try {

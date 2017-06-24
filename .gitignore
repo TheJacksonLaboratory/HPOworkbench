@@ -14,3 +14,6 @@ hpoapi-cli/target/
 hpoapi-core/target/
 io/
 .idea/
+HPOAPI.iml
+hpoapi-core/hpoapi-core.iml
+hpoapi-cli/hpoapi-cli.iml
