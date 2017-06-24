@@ -1,13 +1,12 @@
 package org.monarch.hpoapi;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-//net.sourceforge.argparse4j.inf.ArgumentParserException
+
 
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
+import org.monarch.hpoapi.argparser.ArgumentMap;
+import org.monarch.hpoapi.argparser.ArgumentParserException;
+import org.monarch.hpoapi.argparser.Arguments;
 import org.monarch.hpoapi.cmd.HPO2CSVOptions;
 import org.monarch.hpoapi.cmd.HPOCommand;
 import org.monarch.hpoapi.cmd.PhenotypeDBListOptions;
@@ -25,8 +24,23 @@ public class HPOAPI {
 
 
     public static void main(String[] argv){
-        System.out.println("HPOAPI");
+        System.out.println("HPOAPI");System.exit(1);
+        org.monarch.hpoapi.argparser.ArgumentParser parser = new org.monarch.hpoapi.argparser.ArgumentParser("hpoapi");
+        parser.setVersion(getVersion());
+        parser.addArgument("--version").setShortFlag("-v").help("Show HPOAPI version").action(Arguments.version(getVersion()));
+        ArgumentMap args;
+        try {
+            System.out.println("BEFORE@");
+            args = parser.parseArgs(argv);
+            System.out.println("args="+args.toString());
+        } catch (ArgumentParserException e) {
+            parser.handleError(e);
+            System.exit(1);
+        }
+
         // Setup command line parser
+
+        /*
         ArgumentParser parser = ArgumentParsers.newArgumentParser("hpoapi-cli");
         parser.version(getVersion());
         parser.addArgument("--version").help("Show HPOAPI version").action(Arguments.version());
@@ -37,6 +51,7 @@ public class HPOAPI {
         HPO2CSVOptions.setupParser(subParsers);
         parser.defaultHelp(true);
         parser.epilog("You can find out more at http://TODO.rtfd.org");
+
 
         // Parse command line arguments
         Namespace args = null;
@@ -62,6 +77,7 @@ public class HPOAPI {
             e.printStackTrace();
             System.exit(1);
         }
+        */
     }
 
     public static String getVersion() {
