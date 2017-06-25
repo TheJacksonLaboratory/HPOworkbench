@@ -74,7 +74,7 @@ public class HPO2CSVCommand extends HPOCommand {
      is_a: HP:0025423 ! Abnormal larynx morphology
      TODO 	def not working,
      */
-    public static final String header="#id\tname\tsynonyms\tis_a";
+    public static final String header="#id\tname\tdef\tsynonyms\txrefs\tis_a";
 
 
     private String join(ByteString[] syn) {
@@ -116,7 +116,7 @@ public class HPO2CSVCommand extends HPOCommand {
         Ontology ontology=null;
         String obopath=pathToHpObo;
         try {
-            OBOParser parser = new OBOParser(new OBOParserFileInput(obopath));
+            OBOParser parser = new OBOParser(new OBOParserFileInput(obopath),OBOParser.PARSE_DEFINITIONS|OBOParser.PARSE_XREFS);
 
             String parseResult = parser.doParse();
 
@@ -156,7 +156,7 @@ public class HPO2CSVCommand extends HPOCommand {
                 String xrefString=join(xrefs);
                 ParentTermID [] parents = t.getParents();
                 String parentsString=join(parents);
-                bw.write(String.format("%s\t%s\t%s\t%s\n",id,label,synString,parentsString));
+                bw.write(String.format("%s\t%s\t%s\t%s\t%s\t%s\n",label,id,defString,synString,xrefString,parentsString));
                 //System.out.println(String.format("%s\t%s\t%s\t%s\t%s\t%s\n",label,id,defString,synString,xrefString,parentsString));
             }
 
