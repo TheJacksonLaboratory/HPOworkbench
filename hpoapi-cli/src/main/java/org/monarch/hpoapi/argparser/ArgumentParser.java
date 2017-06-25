@@ -1,6 +1,5 @@
 package org.monarch.hpoapi.argparser;
 
-import net.sourceforge.argparse4j.annotation.Arg;
 import org.monarch.hpoapi.cmd.HPOCommand;
 
 import java.util.ArrayList;
@@ -15,7 +14,9 @@ public class ArgumentParser {
 
     private String programName=null;
     private String version=null;
+    /** This map will take all of the potential commands--the user needs to choose one of them. */
     private Map<String,HPOCommand> commandmap=null;
+    /** This is the command chosen by the user that will be run with the passed options. */
     private HPOCommand runnableCommand=null;
 
 
@@ -70,10 +71,10 @@ public class ArgumentParser {
                 setRunnableCommand(s);
             }
         }
-
-        if (true)
-
+        /** This will run arguments with actions such as Version */
+        System.out.println("ARG=LOOP");
         for (Argument arg : arglist) {
+            System.out.println("ARG="+arg);
             if (arg.hasAction()) {
                 arg.run();
             }

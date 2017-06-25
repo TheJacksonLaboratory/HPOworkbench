@@ -1,6 +1,5 @@
 package org.monarch.hpoapi.cmd;
 
-import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.monarch.hpoapi.argparser.ArgumentParserException;
 import org.monarch.hpoapi.data.DataSource;
@@ -34,10 +33,9 @@ public final class DownloadCommand extends HPOCommand {
     /**
      *
      * @param argv
-     * @param args A wrapper around the command-line arguments
      * @throws CommandLineParsingException
      */
-    public DownloadCommand(String argv[], Namespace args) throws CommandLineParsingException {
+    public DownloadCommand(String argv[]) throws CommandLineParsingException {
 
     }
 

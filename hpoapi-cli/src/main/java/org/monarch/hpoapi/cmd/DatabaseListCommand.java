@@ -6,7 +6,6 @@ import org.monarch.hpoapi.data.DataSourceFactory;
 import org.monarch.hpoapi.data.DatasourceOptions;
 import org.monarch.hpoapi.exception.HPOException;
 
-import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.util.Map;
 
@@ -26,12 +25,11 @@ public class DatabaseListCommand extends HPOCommand {
     /**
      *
      * @param argv
-     * @param args A wrapper around the command line arguments.
      * @throws CommandLineParsingException
      */
-    public DatabaseListCommand(String argv[], Namespace args) throws CommandLineParsingException {
+    public DatabaseListCommand(String argv[]) throws CommandLineParsingException {
 
-        System.err.println("Namespace args: "+ args);
+        System.err.println("Namespace args: ");
     }
 
     /**

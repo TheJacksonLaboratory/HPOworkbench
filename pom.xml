@@ -12,15 +12,10 @@
         <log4j.version>2.5</log4j.version>
     </properties>
 
-    <prerequisites>
-        <maven>3.0</maven>
-    </prerequisites>
-
     <modules>
         <module>hpoapi-core</module>
         <module>hpoapi-cli</module>
     </modules>
-
 
     <!-- Inherit artifact from SonaType OSS pom.xml Following this article:
         http://java.dzone.com/articles/deploy-maven-central -->
@@ -41,40 +36,34 @@
 
     <!-- Developers Information for Maven Central -->
     <developers>
-    <developer>
-        <name>Peter Robinson</name>
-        <email>peter.robinson@jax.org</email>
-        <organization>The Jackson Laboratory for Genomic Medicine</organization>
-        <organizationUrl>http://jax.org/</organizationUrl>
-    </developer>
+        <developer>
+            <name>Peter N Robinson</name>
+            <email>peter.robinson@jax.org</email>
+            <organization>The Jackson Laboratory for Genomic Medicine</organization>
+            <organizationUrl>https://www.jax.org</organizationUrl>
+        </developer>
     </developers>
 
-    <!-- SCM Information for Maven Central   TODO
+    <!-- SCM Information for Maven Central
+    Put HPOAPI onto Monarch github site and then publish
+    <scm>
         <connection>scm:git:git@github.com:charite/jannovar.git</connection>
         <developerConnection>scm:git:git@github.com:charite/jannovar.git</developerConnection>
         <url>scm:git:git@github.com:charite/jannovar.git</url>
     </scm>
--->
+    -->
 
     <dependencies>
         <!--Logging framework -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.12</version>
-        </dependency>
-        <!-- Logging implementation for test only. -->
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
-            <scope>test</scope>
         </dependency>
         <!-- JUnit testing -->
         <dependency>
@@ -85,42 +74,25 @@
         </dependency>
     </dependencies>
 
-
-
-
-
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <!-- JUnit testing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+                <configuration>
+                    <skipTests>false</skipTests>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
+                  <!-- not working  <argLine>${argLine} -Xms512m -Xmx1024m -Duser.language=en -Duser.region=US</argLine> -->
+                    <systemPropertyVariables>
+                        <user.language>en</user.language>
+                        <user.region>US</user.region>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
 
-        <!--
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.17</version>
-                        <configuration>
-                            <skipTests>false</skipTests>
-                            <forkCount>3</forkCount>
-                            <reuseForks>true</reuseForks>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
-                            <systemPropertyVariables>
-                                <user.language>en</user.language>
-                                <user.region>GB</user.region>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin> -->
-<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -140,7 +112,7 @@
                 </executions>
             </plugin>
 
-           Javadoc generation.
+            <!-- Javadoc generation. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -170,7 +142,7 @@
                 </executions>
             </plugin>
 
-            Javadoc to gh-pages  TODO
+            <!-- Javadoc to gh-pages -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-publish-plugin</artifactId>
@@ -182,24 +154,26 @@
                     <content>${project.reporting.outputDirectory}/apidocs</content>
                     <skipDeletedFiles>true</skipDeletedFiles>
                     <pubScmUrl>scm:git:git@github.com:charite/jannovar.git</pubScmUrl>
-                    <scmBranch>gh-pages</scmBranch>
+                    <scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
                 </configuration>
-            </plugin>-->
+            </plugin>
 
-            <!-- Jacoco Coverage Reports
+            <!-- Jacoco Coverage Reports -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.2.201409121644</version>
                 <executions>
-
+                    <!-- Prepares the property pointing to the JaCoCo runtime
+                        agent which is passed as VM argument when Maven the Surefire plugin is executed. -->
                     <execution>
                         <id>pre-unit-test</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-
+                    <!-- Ensures that the code coverage report for unit tests
+                        is created after unit tests have been run. -->
                     <execution>
                         <id>post-unit-test</id>
                         <phase>test</phase>
@@ -210,6 +184,7 @@
                 </executions>
             </plugin>
 
+            <!-- Compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -223,7 +198,7 @@
                 </configuration>
             </plugin>
 
-
+            <!-- Set versions into JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -236,8 +211,62 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin> -->
+            </plugin>
+        </plugins>
 
+        <!-- Ignore maven-enforce-plugin in Eclipse/m2e -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-enforcer-plugin</artifactId>
+                                        <versionRange>[1.0.0,)</versionRange>
+                                        <goals>
+                                            <goal>enforce</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
+    <!-- Sphinx Manual, build with "mvn site". -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.4</version>
+                <reportSets>
+                    <reportSet>
+                        <reports />
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.tomdz.maven</groupId>
+                <artifactId>sphinx-maven-plugin</artifactId>
+                <version>1.0.2</version>
+                <configuration>
+                    <sourceDirectory>${basedir}/manual</sourceDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

@@ -1,5 +1,6 @@
 package org.monarch.hpoapi;
 
+import org.apache.log4j.Logger;
 import org.monarch.hpoapi.argparser.ArgumentMap;
 import org.monarch.hpoapi.argparser.ArgumentParserException;
 import org.monarch.hpoapi.argparser.Arguments;
@@ -9,8 +10,9 @@ import org.monarch.hpoapi.cmd.*;
  * Created by peter on 08.05.17.
  */
 public class HPOAPI {
-
+    private static Logger LOGGER = Logger.getLogger(HPOAPI.class);
     public static void main(String[] argv){
+
         System.out.println("HPOAPI");
         org.monarch.hpoapi.argparser.ArgumentParser parser = new org.monarch.hpoapi.argparser.ArgumentParser("hpoapi");
         parser.setVersion(getVersion());
@@ -19,6 +21,7 @@ public class HPOAPI {
         parser.addCommand(new HPO2CSVCommand()).setDefaultValue("input","data/hp.obo");
         ArgumentMap args;
         try {
+            System.out.println("HPOAPI about to parse args");
             args = parser.parseArgs(argv);
             System.out.println("args="+args.toString());
         } catch (ArgumentParserException e) {
