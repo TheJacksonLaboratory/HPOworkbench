@@ -58,6 +58,11 @@ public class FileDownloader {
         this.options = options;
     }
 
+    /** Downloader with default options */
+    public FileDownloader() {
+        options=new Options();
+    }
+
     /**
      * This method downloads a file to the specified local file path. If the file already exists, it emits a warning
      * message and does nothing.

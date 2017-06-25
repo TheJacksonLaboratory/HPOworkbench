@@ -12,8 +12,10 @@
 hs_err_pid*
 hpoapi-cli/target/
 hpoapi-core/target/
-io/
 .idea/
 HPOAPI.iml
 hpoapi-core/hpoapi-core.iml
 hpoapi-cli/hpoapi-cli.iml
+hpoapi-core/dependency-reduced-pom.xml
+hpoapi-cli/dependency-reduced-pom.xml
+hp.tsv

@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Super class for all commands, i.e. the classes implementing one Jannovar execution step.
+ * Super class for all commands, i.e. the classes implementing one HPOAPI execution step.
  *
- * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public abstract class HPOCommand {
 
@@ -54,6 +54,10 @@ public abstract class HPOCommand {
     public HPOCommand setDefaultValue(String key,String value) {
         defaults.put(key,value);
         return this;
+    }
+
+    public String toString() {
+        return getName();
     }
 
 }

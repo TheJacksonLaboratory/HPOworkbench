@@ -7,8 +7,11 @@ import org.monarch.hpoapi.data.DataSourceFactory;
 import org.monarch.hpoapi.data.DatasourceOptions;
 import org.monarch.hpoapi.data.PhenotypeData;
 import org.monarch.hpoapi.exception.HPOException;
+import org.monarch.hpoapi.io.FileDownloader;
 import org.monarch.hpoapi.util.PathUtil;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 
@@ -23,19 +26,20 @@ import java.util.Map;
  */
 public final class DownloadCommand extends HPOCommand {
 
+    private String downloadDirectory=null;
 
     public String getName() { return "download"; }
 
     public void setOptions(Map<String,String> mp) throws ArgumentParserException {
-        System.err.println("TODO IMPLEMENT setOptions in DownloadCommand");System.exit(1);
+        if (mp.containsKey("directory")) {
+            this.downloadDirectory=mp.get("directory");
+        }
     }
 
     /**
-     *
-     * @param argv
-     * @throws CommandLineParsingException
+
      */
-    public DownloadCommand(String argv[]) throws CommandLineParsingException {
+    public DownloadCommand()  {
 
     }
 
@@ -44,19 +48,25 @@ public final class DownloadCommand extends HPOCommand {
      */
     @Override
     public void run()  {
-       /* DatasourceOptions dsOptions = new DatasourceOptions(options.getHttpProxy(), options.getHttpsProxy(),
-                options.getFtpProxy(), options.isReportProgress());
+        if (downloadDirectory==null) {
+            downloadDirectory=defaults.get("directory");
+        }
+        String downloadLocation=String.format("%s%shp.obo",downloadDirectory, File.separator);
+        File f = new File(downloadLocation);
+        try {
+            URL url = new URL("https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo");
+            FileDownloader downloader = new FileDownloader();
+            boolean result = downloader.copyURLToFile(url,f);
+            if (result) {
+                System.out.println("[INFO] Downloaded hp.obo to "+ downloadLocation);
+            } else {
+                System.out.println("[ERROR] Could not download hp.obo to " + downloadLocation);
+            }
 
-        DataSourceFactory factory = new DataSourceFactory(dsOptions, options.dataSourceFiles);
-        for (String name : options.getDatabaseNames()) {
-            DataSource ds = factory.getDataSource(name);
-            PhenotypeData data = factory.getDataSource(name).getDataFactory().build(options.getDownloadDir(),
-                    options.isReportProgress());
-            String filename = PathUtil.join(options.getDownloadDir(),
-                    name.replace('/', '_').replace('\\', '_') + ".ser");
-            //JannovarDataSerializer serializer = new JannovarDataSerializer(filename);
-            //serializer.save(io);
-            */
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
 
     }
 
