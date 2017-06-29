@@ -1,16 +1,9 @@
 package org.monarch.hpoapi.cmd;
 
-import ontologizer.io.obo.OBOParser;
-import ontologizer.io.obo.OBOParserException;
-import ontologizer.io.obo.OBOParserFileInput;
 import ontologizer.ontology.*;
 import ontologizer.types.ByteString;
-import org.monarch.hpoapi.data.DataSource;
-import org.monarch.hpoapi.data.DataSourceFactory;
-import org.monarch.hpoapi.data.DatasourceOptions;
-import org.monarch.hpoapi.data.PhenotypeData;
 import org.monarch.hpoapi.exception.HPOException;
-import org.monarch.hpoapi.util.PathUtil;
+import org.monarch.hpoapi.io.HPO_OBOParser;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -114,26 +107,11 @@ public class HPO2CSVCommand extends HPOCommand {
     @Override
     public void run()  {
         Ontology ontology=null;
-        String obopath=pathToHpObo;
+        HPO_OBOParser hpoparser=new HPO_OBOParser(pathToHpObo);
         try {
-            OBOParser parser = new OBOParser(new OBOParserFileInput(obopath),OBOParser.PARSE_DEFINITIONS|OBOParser.PARSE_XREFS);
-
-            String parseResult = parser.doParse();
-
-            System.err.println("Information about parse result:");
-            System.err.println(parseResult);
-            TermContainer termContainer =
-                    new TermContainer(parser.getTermMap(), parser.getFormatVersion(), parser.getDate());
-            ontology = Ontology.create(termContainer);
-        } catch (IOException e) {
-            System.err.println(
-                    "ERROR: Problem reading input file. See below for technical information\n\n");
-            e.printStackTrace();
-            System.exit(1);
-        } catch (OBOParserException e) {
-            System.err.println(
-                    "ERROR: Problem parsing OBO file. See below for technical information\n\n");
-            e.printStackTrace();
+            ontology = hpoparser.parserOntologyFile();
+        } catch (HPOException e) {
+            System.err.println("[ERROR] could not partse hp.obo file.\n"+e.toString() );
             System.exit(1);
         }
         TermMap tmap = ontology.getTermMap();

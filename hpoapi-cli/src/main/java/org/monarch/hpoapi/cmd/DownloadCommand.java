@@ -2,13 +2,7 @@ package org.monarch.hpoapi.cmd;
 
 
 import org.monarch.hpoapi.argparser.ArgumentParserException;
-import org.monarch.hpoapi.data.DataSource;
-import org.monarch.hpoapi.data.DataSourceFactory;
-import org.monarch.hpoapi.data.DatasourceOptions;
-import org.monarch.hpoapi.data.PhenotypeData;
-import org.monarch.hpoapi.exception.HPOException;
 import org.monarch.hpoapi.io.FileDownloader;
-import org.monarch.hpoapi.util.PathUtil;
 
 import java.io.File;
 import java.net.URL;

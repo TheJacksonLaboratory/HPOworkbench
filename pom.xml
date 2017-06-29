@@ -72,6 +72,19 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-core -->
+        <dependency>
+            <groupId>de.ontologizer</groupId>
+            <artifactId>ontologizerlib-core</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-io -->
+        <dependency>
+            <groupId>de.ontologizer</groupId>
+            <artifactId>ontologizerlib-io</artifactId>
+            <version>0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
