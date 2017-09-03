@@ -9,9 +9,9 @@
     <url>https://github.com/TheJacksonLaboratory/HPOAPI/</url>
 
     <parent>
-        <groupId>org.monarch</groupId>
+        <groupId>org.monarchinitiative</groupId>
         <artifactId>HPOAPI</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -19,12 +19,6 @@
     </properties>
 
     <dependencies>
-        <!-- INI parsing
-        <dependency>
-            <groupId>org.ini4j</groupId>
-            <artifactId>ini4j</artifactId>
-            <version>0.5.1</version>
-        </dependency>  -->
 
     </dependencies>
 
@@ -82,7 +76,6 @@
                                         <include>application.properties</include>
                                         <include>example.settings</include>
                                         <include>test.settings</include>
-                                        <include>log4j2.xml</include>
                                     </includes>
                                 </resource>
                             </resources>

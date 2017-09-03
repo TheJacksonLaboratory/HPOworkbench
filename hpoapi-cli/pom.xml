@@ -9,9 +9,9 @@
     <url>https://github.com/TheJacksonLaboratory/HPOAPI/</url>
 
     <parent>
-        <groupId>org.monarch</groupId>
+        <groupId>org.monarchinitiative</groupId>
         <artifactId>HPOAPI</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -19,18 +19,7 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-core -->
-        <dependency>
-            <groupId>de.ontologizer</groupId>
-            <artifactId>ontologizerlib-core</artifactId>
-            <version>0.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-io -->
-        <dependency>
-            <groupId>de.ontologizer</groupId>
-            <artifactId>ontologizerlib-io</artifactId>
-            <version>0.1</version>
-        </dependency>
+
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -42,23 +31,13 @@
             <artifactId>commons-net</artifactId>
             <version>3.3</version>
         </dependency>
+
         <dependency>
-            <groupId>org.ini4j</groupId>
-            <artifactId>ini4j</artifactId>
-            <version>0.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.monarch</groupId>
+            <groupId>org.monarchinitiative</groupId>
             <artifactId>hpoapi-core</artifactId>
-            <version>${project.version}</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
-        <!-- Logging -->
-        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -83,11 +62,14 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
-                    <compilerArgs>
+                 <!--
+                 Incorrect here?
+                 <compilerArgs>
                         <arg>-Xmaxerrs=1000</arg>
                         <arg>-Xlint</arg>
                         <arg>-J-Duser.language=en_us</arg>
                     </compilerArgs>
+                    -->
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
@@ -95,7 +77,7 @@
                             <!-- set useUniqueVersions=false in order that the classpath has the
                                 SNAPSHOT instead of the build number prefixed to the dependency -->
                             <useUniqueVersions>false</useUniqueVersions>
-                            <mainClass>org.monarch.hpoapi.HPOAPI</mainClass>
+                            <mainClass>org.monarchinitiative.hpoapi.HPOAPI</mainClass>
                         </manifest>
                     </archive>
 
@@ -117,7 +99,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.monarch.hpoapi.HPOAPI</mainClass>
+                                    <mainClass>org.monarchinitiative.hpoapi.HPOAPI</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

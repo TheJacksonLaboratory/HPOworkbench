@@ -177,7 +177,6 @@ xref: SNOMEDCT_US:48777005
 xref: SNOMEDCT_US:55999004
 xref: UMLS:C0014065
 is_a: HP:0002011 ! Morphological abnormality of the central nervous system
-is_a: HP:0011815 ! Cephalocele
 
 [Term]
 id: HP:0002143

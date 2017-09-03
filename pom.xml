@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.monarch</groupId>
+    <groupId>org.monarchinitiative</groupId>
     <artifactId>HPOAPI</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <version>0.0.3-SNAPSHOT</version>
+    <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
     <name>HPOAPI</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.5</log4j.version>
+        <ontolib.version>0.2</ontolib.version>
     </properties>
 
     <modules>
@@ -60,11 +61,7 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
+
         <!-- JUnit testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -73,17 +70,20 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-core -->
         <dependency>
-            <groupId>de.ontologizer</groupId>
-            <artifactId>ontologizerlib-core</artifactId>
-            <version>0.1</version>
+            <groupId>com.github.phenomics</groupId>
+            <artifactId>ontolib-core</artifactId>
+            <version>${ontolib.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/de.ontologizer/ontologizerlib-io -->
         <dependency>
-            <groupId>de.ontologizer</groupId>
-            <artifactId>ontologizerlib-io</artifactId>
-            <version>0.1</version>
+            <groupId>com.github.phenomics</groupId>
+            <artifactId>ontolib-cli</artifactId>
+            <version>${ontolib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.phenomics</groupId>
+            <artifactId>ontolib-io</artifactId>
+            <version>${ontolib.version}</version>
         </dependency>
     </dependencies>
 
@@ -226,36 +226,6 @@
                 </configuration>
             </plugin>
         </plugins>
-
-        <!-- Ignore maven-enforce-plugin in Eclipse/m2e -->
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-enforcer-plugin</artifactId>
-                                        <versionRange>[1.0.0,)</versionRange>
-                                        <goals>
-                                            <goal>enforce</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <!-- Sphinx Manual, build with "mvn site". -->
