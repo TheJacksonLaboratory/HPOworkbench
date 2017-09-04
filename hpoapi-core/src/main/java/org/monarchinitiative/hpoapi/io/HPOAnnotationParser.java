@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,8 @@ public class HPOAnnotationParser {
     }
 
     private void parse(String path) {
-        File inputFile = new File("phenotype_annotation.tab");
+        File inputFile = new File(path);
+        annotations=new ArrayList<>();
         try {
             HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(inputFile);
             while (parser.hasNext()) {
@@ -31,9 +33,11 @@ public class HPOAnnotationParser {
                annotations.add(anno);
             }
         } catch (IOException e) {
-            System.err.println("Problem reading from file.");
+            LOGGER.error("Could not read from file at \""+path+"\"");
+            LOGGER.error(e,e);
         } catch (TermAnnotationParserException e) {
-            System.err.println("Problem parsing file.");
+            LOGGER.error("Could not parse file at "+path);
+            LOGGER.error(e,e);
         }
     }
 

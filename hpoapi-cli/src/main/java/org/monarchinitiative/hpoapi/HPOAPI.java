@@ -12,19 +12,19 @@ import org.monarchinitiative.hpoapi.cmd.*;
 public class HPOAPI {
     private static Logger LOGGER = Logger.getLogger(HPOAPI.class);
     public static void main(String[] argv){
-        ArgumentParser parser = new org.monarchinitiative.hpoapi.argparser.ArgumentParser("hpoapiOLD");
+        ArgumentParser parser = new org.monarchinitiative.hpoapi.argparser.ArgumentParser("hpoapi");
         parser.setVersion(getVersion());
         parser.addArgument("--version").setShortFlag("-v").help("Show HPOAPI version").action(Arguments.version(getVersion()));
         parser.addArgument("--input").setShortFlag("-i").help("path to input file").required();
         parser.addCommand(new HPO2CSVCommand()).setDefaultValue("input","data/hp.obo");
-        parser.addCommand(new DownloadCommand()).setDefaultValue("directory","data");
-        parser.addCommand(new NeurologyCommand()).setDefaultValue("directory","data");
+        parser.addCommand(new DownloadCommand()).setDefaultValue("input","data");
+        parser.addCommand(new NeurologyCommand()).setDefaultValue("input","data");
         parser.debugPrint();
         try {
             parser.parseArgs(argv);
             HPOCommand cmd=null;
             cmd = parser.getCommand();
-            System.out.println("HPOAPI command="+cmd.getName());
+            LOGGER.trace("HPOAPI command="+cmd.getName());
             cmd.run();
         } catch (ArgumentParserException e) {
             parser.handleError(e);

@@ -21,7 +21,7 @@ public class Argument {
         return this;
     }
 
-    public boolean hasAction() { System.out.println("Checking hasAction");return action !=null; }
+    public boolean hasAction() { return action !=null; }
     /** This flag requires an argument (default:false).*/
     public Argument required() { this.required=true; return this;}
 
@@ -37,7 +37,6 @@ public class Argument {
 
     public Argument action(ArgumentAction action) {
         this.action=action;
-        System.out.println("Adding action"+action);
         return this;
     }
 

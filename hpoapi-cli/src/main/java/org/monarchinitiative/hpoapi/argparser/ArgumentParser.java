@@ -1,5 +1,6 @@
 package org.monarchinitiative.hpoapi.argparser;
 
+import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoapi.cmd.HPOCommand;
 
 import java.util.*;
@@ -8,6 +9,7 @@ import java.util.*;
  * Created by peter on 24.06.17.
  */
 public class ArgumentParser {
+    private static Logger LOGGER = Logger.getLogger(ArgumentParser.class.getName());
 
     private String programName=null;
     private String version=null;
@@ -44,7 +46,7 @@ public class ArgumentParser {
      */
     public Argument addArgument(String s) {
         if (! s.startsWith("--")) {
-            System.err.println("[ERROR] long argument string must start with \"--\"");
+            LOGGER.error("long argument string must start with \"--\"");
             System.exit(1);
         }
         Argument a = new Argument(s);
@@ -142,13 +144,13 @@ public class ArgumentParser {
 
     public void debugPrint() {
         System.out.println("ArgumentParser:"+
-        "\n\tArguments:"+argmap.size()+"\n");
+        "\n\tArguments:"+argmap.size());
         for (Argument a: argmap.values()) {
-            System.out.println("\t\t"+a+"\n");
+            System.out.println("\t\t"+a);
         }
-        System.out.println("\tCommands:\n");
+        System.out.println("\tCommands:");
         for (HPOCommand hpoc: commandmap.values()) {
-            System.out.println("\t\t"+hpoc+"\n");
+            System.out.println("\t\t"+hpoc);
         }
         System.out.println("\tVersion: " + version);
     }
