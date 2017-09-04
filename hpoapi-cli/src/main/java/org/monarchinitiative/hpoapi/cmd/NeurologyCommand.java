@@ -9,14 +9,12 @@ import com.github.phenomics.ontolib.ontology.data.TermId;
 import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoapi.argparser.ArgumentParserException;
+import org.monarchinitiative.hpoapi.hpo.Disease;
 import org.monarchinitiative.hpoapi.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoapi.io.HPOParser;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /** This is a prototype to test usage of the ontolib library. It should be factored into an App.
  *
@@ -28,12 +26,24 @@ public class NeurologyCommand extends HPOCommand  {
     HpoOntology hpoOntology=null;
     List<HpoDiseaseAnnotation>annots=null;
     /** Set of all HPO terms that are descencents of {@code Abnormality of the nervous system}, HP:0000707. */
-    Set<HpoTerm> neurologyDescendents=null;
+    Set<TermId> neurologyDescendents=null;
+    Set<TermId> adultOnset=null;
+    Set<TermId> childhoodOnset=null;
+
+
+    Map<String,Disease> diseases =null;
+
+    List<Disease> omim;
+    List<Disease> orphanet;
+    List<Disease> decipher;
 
 
 
     public NeurologyCommand() {
-
+        diseases =new HashMap<>();
+        omim=new ArrayList<>();
+        orphanet=new ArrayList<>();
+        decipher=new ArrayList<>();
     }
 
 
@@ -59,10 +69,144 @@ public class NeurologyCommand extends HPOCommand  {
         for (HpoTerm t: this.hpoOntology.getTerms()) {
             Set<TermId> ancs= hpoOntology.getAncestorTermIds(t.getId());
             if (ancs.contains(neuroId)) {
-                neurologyDescendents.add(t);
+                neurologyDescendents.add(t.getId());
             }
         }
-        LOGGER.trace(String.format("We found a totla of %d neurology terms",neurologyDescendents.size()));
+        LOGGER.trace(String.format("We found a total of %d neurology terms",neurologyDescendents.size()));
+    }
+
+
+    private void getAdultOnsetTerms() {
+
+        // Adult onset HP:0003581 (has various children)
+        TermPrefix tp =new ImmutableTermPrefix("HP");
+        TermId adultOnsetId = new ImmutableTermId(tp, "0003581");
+        adultOnset=new HashSet<>();
+        adultOnset.add(adultOnsetId);
+        for (HpoTerm t: this.hpoOntology.getTerms()) {
+            Set<TermId> ancs= hpoOntology.getAncestorTermIds(t.getId());
+            if (ancs.contains(adultOnsetId)) {
+                adultOnset.add(t.getId());
+            }
+        }
+        LOGGER.trace(String.format("We found a total of %d adult onset terms",adultOnset.size()));
+    }
+
+    private void getChildhoodOnsetTerms() {
+        childhoodOnset = new HashSet<>();
+        TermPrefix tp =new ImmutableTermPrefix("HP");
+        childhoodOnset.add(new ImmutableTermId(tp,"0011463"));//Childhood onset
+        TermId antenatal=new ImmutableTermId(tp,"0030674"); //Antenatal onset
+        childhoodOnset.add(antenatal);
+        for (HpoTerm t: this.hpoOntology.getTerms()) {
+            Set<TermId> ancs= hpoOntology.getAncestorTermIds(t.getId());
+            if (ancs.contains(antenatal)) {
+                childhoodOnset.add(t.getId());
+            }
+        }
+        childhoodOnset.add(new ImmutableTermId(tp,"HP:0003577")); // Congenital onset
+        childhoodOnset.add(new ImmutableTermId(tp,"0011460")); // Embryonal onset
+        childhoodOnset.add(new ImmutableTermId(tp,"0011461")); // Fetal onset
+        childhoodOnset.add(new ImmutableTermId(tp,"0003593")); // Infantile onset
+        childhoodOnset.add(new ImmutableTermId(tp,"0003621")); // Juvenile onset
+        childhoodOnset.add(new ImmutableTermId(tp,"0003623")); // neonatal onset
+
+    }
+
+
+
+
+    private void inputDiseases() {
+        for (HpoDiseaseAnnotation ann: annots) {
+            String db = ann.getDb();
+            String disease = ann.getDbName();
+            String id = ann.getDbObjectId();
+            TermId hpo=ann.getHpoId();
+            String key=String.format("%s_%s",id,disease);
+            Disease d=null;
+            if (diseases.containsKey(key)) {
+                d= diseases.get(key);
+            } else {
+                d=new Disease(db,disease,id);
+                this.diseases.put(key,d);
+            }
+            d.addHpo(hpo);
+
+        }
+    }
+
+
+    boolean isNeuroDisease(Disease d) {
+        List<TermId> ids=d.getHpoIds();
+        for (TermId id:ids) {
+          if (this.neurologyDescendents.contains(id))
+              return true;
+        }
+        return false;
+    }
+
+
+    private void filterNeuroDiseasesAccordingToDatabase() {
+        for (Disease d:this.diseases.values()) {
+            if (!isNeuroDisease(d)) {
+                continue;
+            }
+            String database=d.getDiseaseDatabase();
+            if (database.equals("OMIM")) {
+                omim.add(d);
+            } else if (database.equals("ORPHA")){
+                orphanet.add(d);
+            } else if (database.equals("DECIPHER")) {
+                decipher.add(d);
+            } else {
+                LOGGER.error("Did not recognize data base"+ database);
+                System.exit(1);
+            }
+        }
+        LOGGER.trace(String.format("We found %d neurological diseases in OMIM",omim.size()));
+        LOGGER.trace(String.format("We found %d neurological diseases in Orphanet",orphanet.size()));
+        LOGGER.trace(String.format("We found %d neurological diseases in DECIPHER",decipher.size()));
+    }
+
+
+    private boolean hasAdultOnset(Disease d) {
+        List<TermId> ids=d.getHpoIds();
+        for (TermId id:ids) {
+            if (this.adultOnset.contains(id))
+                return  true;
+        }
+        return false;
+    }
+
+    private boolean hasChildhoodOnset(Disease d) {
+        List<TermId> ids=d.getHpoIds();
+        for (TermId id:ids) {
+            if (this.childhoodOnset.contains(id))
+                return  true;
+        }
+        return false;
+    }
+
+
+
+    private void filterNeuroDiseasesAccordingToOnset(List<Disease> diseases) {
+        int no_onset=0;
+        int early_onset=0;
+        int adult_onset=0;
+        for (Disease d:diseases) {
+            if (hasAdultOnset(d))
+                adult_onset++;
+            else if (hasChildhoodOnset(d))
+                early_onset++;
+            else
+                no_onset++;
+        }
+
+        LOGGER.trace("ONSET CATEGORIES");
+        LOGGER.trace(String.format("\tChildhood: %d",early_onset));
+        LOGGER.trace(String.format("\tAdult: %d",adult_onset));
+        LOGGER.trace(String.format("\tNo data: %d",no_onset));
+
     }
 
 
@@ -72,6 +216,16 @@ public class NeurologyCommand extends HPOCommand  {
     public  void run() {
        inputHPOdata(this.hpopath,this.annotpath);
        getNeurologyTerms();
+       inputDiseases();
+       filterNeuroDiseasesAccordingToDatabase();
+       getAdultOnsetTerms();
+       getChildhoodOnsetTerms();
+       LOGGER.trace("Getting OMIM diseases according to onset");
+       filterNeuroDiseasesAccordingToOnset(this.omim);
+       LOGGER.trace("Getting ORPHANET diseases according to onset");
+       filterNeuroDiseasesAccordingToOnset(this.orphanet);
+       LOGGER.trace("Getting DECIPER diseases according to onset");
+       filterNeuroDiseasesAccordingToOnset(this.decipher);
     }
 
 
