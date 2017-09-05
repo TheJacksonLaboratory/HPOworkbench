@@ -104,7 +104,7 @@ public class NeurologyCommand extends HPOCommand  {
                 childhoodOnset.add(t.getId());
             }
         }
-        childhoodOnset.add(new ImmutableTermId(tp,"HP:0003577")); // Congenital onset
+        childhoodOnset.add(new ImmutableTermId(tp,"0003577")); // Congenital onset
         childhoodOnset.add(new ImmutableTermId(tp,"0011460")); // Embryonal onset
         childhoodOnset.add(new ImmutableTermId(tp,"0011461")); // Fetal onset
         childhoodOnset.add(new ImmutableTermId(tp,"0003593")); // Infantile onset
