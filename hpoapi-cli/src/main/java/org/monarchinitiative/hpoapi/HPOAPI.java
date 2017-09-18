@@ -17,7 +17,7 @@ public class HPOAPI {
         parser.addArgument("--version").setShortFlag("-v").help("Show HPOAPI version").action(Arguments.version(getVersion()));
         parser.addArgument("--input").setShortFlag("-i").help("path to input file").required();
         parser.addCommand(new HPO2CSVCommand()).setDefaultValue("input","data/hp.obo");
-        parser.addCommand(new DownloadCommand()).setDefaultValue("input","data");
+        parser.addCommand(new DownloadCommand()).setDefaultValue("directory","data");
         parser.addCommand(new NeurologyCommand()).setDefaultValue("input","data");
         parser.debugPrint();
         try {

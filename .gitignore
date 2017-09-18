@@ -20,3 +20,4 @@ hpoapi-core/dependency-reduced-pom.xml
 hpoapi-cli/dependency-reduced-pom.xml
 hp.tsv
 data/
+/hpoapi-cli/hpoapi-cli.iml
