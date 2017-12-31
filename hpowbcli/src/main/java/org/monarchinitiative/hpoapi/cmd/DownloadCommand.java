@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 /**
- * Implementation of download in HPOAPI. The command is intended to download
+ * Implementation of download in HpoWorkbench. The command is intended to download
  * both the OBO file and the association file. For HPO, this is {@code hp.obo} and
  * {@code phenotype_annotation.tab}.
  * Code modified from Download command in Jannovar.

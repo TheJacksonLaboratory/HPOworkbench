@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HPOAPI.iml" filepath="$PROJECT_DIR$/HPOAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/HPOworkbench.iml" filepath="$PROJECT_DIR$/.idea/HPOworkbench.iml" />
       <module fileurl="file://$PROJECT_DIR$/hpoapi-cli/hpoapi-cli.iml" filepath="$PROJECT_DIR$/hpoapi-cli/hpoapi-cli.iml" />
       <module fileurl="file://$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" filepath="$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hpowbcli/hpowbcli.iml" filepath="$PROJECT_DIR$/hpowbcli/hpowbcli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hpowbcore/hpowbcore.iml" filepath="$PROJECT_DIR$/hpowbcore/hpowbcore.iml" />
     </modules>
   </component>
 </project>

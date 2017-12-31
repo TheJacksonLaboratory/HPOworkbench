@@ -10,7 +10,7 @@
 
     <parent>
         <groupId>org.monarchinitiative</groupId>
-        <artifactId>HPOAPI</artifactId>
+        <artifactId>HPOworkbench</artifactId>
         <version>0.0.3-SNAPSHOT</version>
     </parent>
 

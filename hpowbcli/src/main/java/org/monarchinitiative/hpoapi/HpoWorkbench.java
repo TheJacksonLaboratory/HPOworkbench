@@ -9,22 +9,24 @@ import org.monarchinitiative.hpoapi.cmd.*;
 /**
  * Created by peter on 08.05.17.
  */
-public class HPOAPI {
-    private static Logger LOGGER = Logger.getLogger(HPOAPI.class);
+public class HpoWorkbench {
+    private static Logger LOGGER = Logger.getLogger(HpoWorkbench.class);
     public static void main(String[] argv){
         ArgumentParser parser = new org.monarchinitiative.hpoapi.argparser.ArgumentParser("hpoapi");
         parser.setVersion(getVersion());
-        parser.addArgument("--version").setShortFlag("-v").help("Show HPOAPI version").action(Arguments.version(getVersion()));
+        parser.addArgument("--version").setShortFlag("-v").help("Show HpoWorkbench version").action(Arguments.version(getVersion()));
         parser.addArgument("--input").setShortFlag("-i").help("path to input file").required();
+        parser.addArgument("--startterm").setShortFlag("-s").help("start HPO term").required();
         parser.addCommand(new HPO2CSVCommand()).setDefaultValue("input","data/hp.obo");
         parser.addCommand(new DownloadCommand()).setDefaultValue("directory","data");
         parser.addCommand(new NeurologyCommand()).setDefaultValue("input","data");
+        parser.addCommand(new RtfCommand()).setDefaultValue("input","data");
         parser.debugPrint();
         try {
             parser.parseArgs(argv);
             HPOCommand cmd=null;
             cmd = parser.getCommand();
-            LOGGER.trace("HPOAPI command="+cmd.getName());
+            LOGGER.trace("HpoWorkbench command="+cmd.getName());
             cmd.run();
         } catch (ArgumentParserException e) {
             parser.handleError(e);
@@ -39,6 +41,6 @@ public class HPOAPI {
     }
 
     public static String getVersion() {
-        return HPOAPI.class.getPackage().getSpecificationVersion();
+        return HpoWorkbench.class.getPackage().getSpecificationVersion();
     }
 }

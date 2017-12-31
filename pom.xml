@@ -2,20 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.monarchinitiative</groupId>
-    <artifactId>HPOAPI</artifactId>
+    <artifactId>HPOworkbench</artifactId>
     <version>0.0.3-SNAPSHOT</version>
     <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
-    <name>HPOAPI</name>
+    <name>HPOworkbench</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.5</log4j.version>
-        <ontolib.version>0.2</ontolib.version>
+        <ontolib.version>0.3</ontolib.version>
     </properties>
 
     <modules>
-        <module>hpoapi-core</module>
-        <module>hpoapi-cli</module>
+        <module>hpowbcore</module>
+        <module>hpowbcli</module>
     </modules>
 
     <!-- Inherit artifact from SonaType OSS pom.xml Following this article:
