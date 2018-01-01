@@ -1,6 +1,8 @@
 package org.monarchinitiative.hpoapi.argparser;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoapi.cmd.HPOCommand;
 
 import java.util.*;
@@ -9,7 +11,7 @@ import java.util.*;
  * Created by peter on 24.06.17.
  */
 public class ArgumentParser {
-    private static Logger LOGGER = Logger.getLogger(ArgumentParser.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String programName=null;
     private String version=null;

@@ -45,21 +45,16 @@
         </developer>
     </developers>
 
-    <!-- SCM Information for Maven Central
-    Put HPOAPI onto Monarch github site and then publish
-    <scm>
-        <connection>scm:git:git@github.com:charite/jannovar.git</connection>
-        <developerConnection>scm:git:git@github.com:charite/jannovar.git</developerConnection>
-        <url>scm:git:git@github.com:charite/jannovar.git</url>
-    </scm>
-    -->
 
     <dependencies>
         <!--Logging framework -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
         </dependency>
 
         <!-- JUnit testing -->
@@ -86,6 +81,18 @@
             <version>${ontolib.version}</version>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-bom</artifactId>
+                <version>2.9.1</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

@@ -1,16 +1,20 @@
 package org.monarchinitiative.hpoapi;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoapi.argparser.ArgumentParser;
 import org.monarchinitiative.hpoapi.argparser.ArgumentParserException;
 import org.monarchinitiative.hpoapi.argparser.Arguments;
 import org.monarchinitiative.hpoapi.cmd.*;
 
 /**
- * Created by peter on 08.05.17.
+ * A collection of utilities for working with the HPO.
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ * @version 0.1.0
  */
 public class HpoWorkbench {
-    private static Logger LOGGER = Logger.getLogger(HpoWorkbench.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     public static void main(String[] argv){
         ArgumentParser parser = new org.monarchinitiative.hpoapi.argparser.ArgumentParser("hpoapi");
         parser.setVersion(getVersion());
@@ -21,11 +25,10 @@ public class HpoWorkbench {
         parser.addCommand(new DownloadCommand()).setDefaultValue("directory","data");
         parser.addCommand(new NeurologyCommand()).setDefaultValue("input","data");
         parser.addCommand(new RtfCommand()).setDefaultValue("input","data");
-        parser.debugPrint();
+        //parser.debugPrint();
         try {
             parser.parseArgs(argv);
-            HPOCommand cmd=null;
-            cmd = parser.getCommand();
+            HPOCommand cmd = parser.getCommand();
             LOGGER.trace("HpoWorkbench command="+cmd.getName());
             cmd.run();
         } catch (ArgumentParserException e) {
