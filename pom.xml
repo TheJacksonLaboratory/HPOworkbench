@@ -16,6 +16,7 @@
     <modules>
         <module>hpowbcore</module>
         <module>hpowbcli</module>
+        <module>hpowbgui</module>
     </modules>
 
     <!-- Inherit artifact from SonaType OSS pom.xml Following this article:

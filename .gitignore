@@ -8,6 +8,8 @@
 *.war
 *.ear
 
+*.rtf
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 hpoapi-cli/target/
@@ -21,3 +23,19 @@ hpoapi-cli/dependency-reduced-pom.xml
 hp.tsv
 data/
 /hpoapi-cli/hpoapi-cli.iml
+/hpowbcli/hpowbcli.iml
+.DS_Store
+hpo.rtf
+hpotest.rtf
+hpowbcli/hpowbcli.iml
+hpowbcli/target/classes/default_sources.ini
+hpowbcli/target/classes/log4j2.xml
+hpowbcli/target/generated-sources/
+hpowbcore/hpowbcore.iml
+hpowbcore/target/generated-sources/
+hpowbcore/target/generated-test-sources/
+hpowbcore/target/test-classes/hp-smalltest.obo
+hpowbcore/target/test-classes/small-annotationfile1.tab
+target/
+~$potest.rtf
+/hpowbcore/hpowbcore.iml

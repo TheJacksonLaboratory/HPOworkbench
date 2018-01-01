@@ -1,7 +1,7 @@
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.monarchinitiative.hpoapi.io.HPOParser;
+import org.monarchinitiative.hpoworkbench.io.HPOParser;
 
 public class HPOParserTest {
 

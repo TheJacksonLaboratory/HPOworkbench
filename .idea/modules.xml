@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" filepath="$PROJECT_DIR$/hpoapi-core/hpoapi-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/hpowbcli/hpowbcli.iml" filepath="$PROJECT_DIR$/hpowbcli/hpowbcli.iml" />
       <module fileurl="file://$PROJECT_DIR$/hpowbcore/hpowbcore.iml" filepath="$PROJECT_DIR$/hpowbcore/hpowbcore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hpowbgui/hpowbgui.iml" filepath="$PROJECT_DIR$/hpowbgui/hpowbgui.iml" />
     </modules>
   </component>
 </project>
