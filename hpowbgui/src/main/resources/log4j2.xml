@@ -2,10 +2,10 @@
 <Configuration status="WARN">
     <Appenders>
         <File name="LogFile" fileName="target/hpoworkbenchgui.log" append="false">
-            <PatternLayout pattern="[%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="[%t] %-5level (%F:%L) - %msg%n"/>
         </File>
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="[%t] %-5level (%F:%L) - %msg%n"/>
         </Console>
     </Appenders>
     <Loggers>

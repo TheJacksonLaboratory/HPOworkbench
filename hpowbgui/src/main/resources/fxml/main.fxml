@@ -93,7 +93,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button mnemonicParsing="false" text="Export RTF Summary with selected root" />
+                        <Button mnemonicParsing="false" onAction="#exportHierarchicalSummary" text="Export hierarchical Summary" />
                         <Button mnemonicParsing="false" onAction="#exportToExcel" text="Export ontology as Excel file" GridPane.rowIndex="1" />
                      </children>
                      <HBox.margin>

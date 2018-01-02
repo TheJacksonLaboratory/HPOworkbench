@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
@@ -64,13 +65,14 @@ public class MainController {
     /** Approved {@link HpoTerm} is submitted here. */
     private Consumer<HpoTerm> addHook;
 
-
+    /** The term that is currently selected in the Browser window. */
+    private HpoTerm selectedTerm=null;
 
 
     public MainController() {
         logger.trace("CTOR");
         this.model=new Model();
-
+        ensureUserDirectoryExists();
 
 
     }
@@ -82,7 +84,7 @@ public class MainController {
      * Then it will return the path of the settings file.
      * @return
      */
-    private File getPathToSettingsFileAndEnsurePathExists() {
+    private void ensureUserDirectoryExists() {
         File userDirectory = PlatformUtil.getHpoWorkbenchDir();
         if (!userDirectory.exists()) {
             File fck = new File(userDirectory.getAbsolutePath());
@@ -92,9 +94,7 @@ public class MainController {
                 System.exit(1);
             }
         }
-        String defaultSettingsPath = PlatformUtil.getPathToSettingsFile();
-        File settingsFile=new File(defaultSettingsPath);
-        return settingsFile;
+        logger.trace("Created HpoWorkench user directory at "+userDirectory);
     }
 
 
@@ -132,8 +132,6 @@ public class MainController {
             window.close();
             logger.trace(String.format("Successfully downloaded hpo to %s",dirpath));
             String fullpath=String.format("%s%shp.obo",dirpath,File.separator);
-            model.setPathToHpOboFile(fullpath);
-            model.writeSettings();
         });
         hpodownload.setOnFailed(event -> {
             window.close();
@@ -270,6 +268,7 @@ public class MainController {
             HpoTerm rootTerm = ontology.getTermMap().get(rootId);
             logger.warn(String.format("Unable to find the path from %s to %s", rootTerm.toString(), term.getName()));
         }
+        selectedTerm=term;
     }
 
 
@@ -333,6 +332,32 @@ public class MainController {
         }
         event.consume();
     }
+
+
+    @FXML private void exportHierarchicalSummary(ActionEvent event) {
+        if (selectedTerm==null) {
+            logger.error("Select a term before exporting hierarchical summary TODO show error window");
+        }
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Export HPO as Excel-format file");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel file (*.xlsx)", "*.xlsx");
+        chooser.getExtensionFilters().add(extFilter);
+        chooser.setInitialFileName(String.format("%s.xlsx",selectedTerm.getName()));
+        File f = chooser.showSaveDialog(null);
+        if (f != null) {
+            String path = f.getAbsolutePath();
+            logger.trace(String.format("Setting path to hierarchical export file to %s",path));
+            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getOntology());
+            exporter.exportToExcelFile(path);
+        } else {
+            logger.error("Unable to obtain path to Excel export file");
+        }
+        logger.trace(String.format("Exporting hierarchical summary starting from term %s", selectedTerm.toString()));
+        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(model.getOntology(),selectedTerm);
+        exporter.exportToExcel(f.getAbsolutePath());
+    }
+
+
 
     /** Show the about message */
     @FXML private void aboutWindow(ActionEvent e) {

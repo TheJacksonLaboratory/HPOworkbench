@@ -41,4 +41,6 @@ target/
 /hpowbcore/hpowbcore.iml
 /hpowbgui/hpowbgui.iml
 hpowbcli/dependency-reduced-pom.xml
-hpowbgui/src/test/
+/HPOworkbench.iml
+HPOworkbench.iml
+
