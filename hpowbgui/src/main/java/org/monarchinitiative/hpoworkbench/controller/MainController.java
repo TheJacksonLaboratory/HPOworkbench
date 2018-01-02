@@ -20,10 +20,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
@@ -310,6 +312,37 @@ public class MainController {
 
         String content = String.format(HTML_TEMPLATE, termID, term.getName(), synonyms, definition,comment);
         infoWebEngine.loadContent(content);
+    }
+
+
+    @FXML private void exportToExcel(ActionEvent event) {
+        logger.trace("exporting to excel");
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Export HPO as Excel-format file");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel file (*.xlsx)", "*.xlsx");
+        chooser.getExtensionFilters().add(extFilter);
+        chooser.setInitialFileName("hpo.xlsx");
+        File f = chooser.showSaveDialog(null);
+        if (f != null) {
+            String path = f.getAbsolutePath();
+            logger.trace(String.format("Setting path to LOINC Core Table file to %s",path));
+            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getOntology());
+            exporter.exportToExcelFile(path);
+        } else {
+            logger.error("Unable to obtain path to Excel export file");
+        }
+        event.consume();
+    }
+
+    /** Show the about message */
+    @FXML private void aboutWindow(ActionEvent e) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("HPO Workbench");
+        alert.setHeaderText("Human Phenotype Ontology Workbench");
+        String s = "A tool for working with the HPO.";
+        alert.setContentText(s);
+        alert.showAndWait();
+        e.consume();
     }
 
 

@@ -39,3 +39,6 @@ hpowbcore/target/test-classes/small-annotationfile1.tab
 target/
 ~$potest.rtf
 /hpowbcore/hpowbcore.iml
+/hpowbgui/hpowbgui.iml
+hpowbcli/dependency-reduced-pom.xml
+hpowbgui/src/test/
