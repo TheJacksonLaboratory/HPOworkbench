@@ -47,21 +47,28 @@ public class Main extends Application {
 
     @Override
     public void init() throws IOException {
-        final Injector injector = Guice.createInjector(new DepInjectionModule());
-        final Callback<Class<?>, Object> guiceFactory = clazz -> injector.getInstance(clazz);
-        rootNode = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"),
-                null, //  The resource bundle, useful to internationalised apps. Null here.
-                new JavaFXBuilderFactory(),
-                // The controller factory that will be a Guice factory:
-                // this Guice factory will manage the instantiation of the controllers and their dependency injections.
-                guiceFactory);
+//        final Injector injector = Guice.createInjector(new DepInjectionModule());
+//        final Callback<Class<?>, Object> guiceFactory = clazz -> injector.getInstance(clazz);
+//        rootNode = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"),
+//                null, //  The resource bundle, useful to internationalised apps. Null here.
+//                new JavaFXBuilderFactory(),
+//                // The controller factory that will be a Guice factory:
+//                // this Guice factory will manage the instantiation of the controllers and their dependency injections.
+//                guiceFactory);
+        logger.trace("end of init");
     }
 
 
 
     @Override
     public void start(Stage window) throws Exception {
-        window.setScene(new Scene(rootNode));
+
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
+
+        Scene scene = new Scene(root, 10000, 800);
+
+        window.setTitle(WINDOW_TITLE);
+       window.setScene(scene);
         Image image = new Image(Main.class.getResourceAsStream("/img/icon.jpg"));
         window.getIcons().add(image);
         window.setTitle(WINDOW_TITLE);
@@ -70,7 +77,6 @@ public class Main extends Application {
                 URL iconURL = Main.class.getResource("/img/icon.jpg");
                 java.awt.Image macimage = new ImageIcon(iconURL).getImage();
                 com.apple.eawt.Application.getApplication().setDockIconImage(macimage);
-                //stem.setProperty("org.monarchinitiative.loinc2hpo.gui.Main", "Loinc2Hpo");
             } catch (Exception e) {
                 // Not for Windows or Linux. Just skip it!
             }

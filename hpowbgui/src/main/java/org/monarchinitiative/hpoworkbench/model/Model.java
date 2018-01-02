@@ -1,9 +1,14 @@
 package org.monarchinitiative.hpoworkbench.model;
 
+import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.io.HPOParser;
 
 import java.io.*;
+
+import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalHPOPath;
+import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalPhenotypeAnnotationPath;
 
 public class Model {
     private static final Logger logger = LogManager.getLogger();
@@ -14,9 +19,20 @@ public class Model {
     private String pathToHpoOboFile=null;
     /** Path to the file we are creating with LOINC code to HPO annotations. */
     private String pathToAnnotationFile=null;
+    /** Ontology model for full HPO ontology (all subhierarchies). */
+    HpoOntology ontology=null;
 
 
-    public Model(){}
+    public Model(){
+        initPaths();
+    }
+
+
+
+    private void initPaths() {
+        this.pathToHpoOboFile=getLocalHPOPath();
+        this.pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
+    }
 
 
     public void setPathToHpOboFile(String p) { pathToHpoOboFile=p; }
@@ -66,5 +82,20 @@ public class Model {
             logger.error("Could not open settings at " + path);
         }
     }
+
+
+    public HpoOntology getOntology() {
+        if (ontology==null) {
+            if (pathToHpoOboFile==null) {
+                logger.error("Path to hp.obo was not initialized");
+                return null;
+            }
+            HPOParser parser = new HPOParser(pathToHpoOboFile);
+            this.ontology=parser.getHPO();
+        }
+        return ontology;
+    }
+
+
 
 }

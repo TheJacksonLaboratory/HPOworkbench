@@ -46,6 +46,15 @@ public class PlatformUtil {
         return new String(dir + File.separator + "hp.obo");
     }
 
+    /** Return the absolute path to the settings file, which is kept in the .loinc2hpo directory in the
+     * user's home directory. For simplicity assume one user per account etc. The file is a simple key:value file.
+     * @return
+     */
+    public static String getLocalPhenotypeAnnotationPath() {
+        File dir = getHpoWorkbenchDir();
+        return new String(dir + File.separator + "phenotype_annotation.tab");
+    }
+
     /**
      * Get the absolute path to the log file.
      * @return the absolute path,e.g., /home/user/.vpvgui/vpvgui.log

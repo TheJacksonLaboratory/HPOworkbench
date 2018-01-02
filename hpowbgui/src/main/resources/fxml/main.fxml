@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
       <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
          <children>
@@ -18,12 +24,12 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
-                    <MenuItem fx:id="close" mnemonicParsing="false" text="Close" />
+                    <MenuItem fx:id="close" mnemonicParsing="false" onAction="#close" text="Quit" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
+                    <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
                   </items>
                 </Menu>
               </menus>
@@ -41,4 +47,41 @@
          </children>
       </HBox>
    </top>
+   <left>
+      <VBox prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <SplitPane dividerPositions="0.27717391304347827" orientation="VERTICAL" VBox.vgrow="ALWAYS">
+              <items>
+                  <VBox>
+                     <children>
+                        <Label text="HPO Browser" />
+                        <HBox prefHeight="78.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <TextField fx:id="searchTextField" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="180.0">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </TextField>
+                              <Button fx:id="GoButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#goButtonAction" prefHeight="30.0" prefWidth="43.0" text="Go" textOverrun="CLIP">
+                                 <tooltip>
+                                    <Tooltip text="tell me what to do" />
+                                 </tooltip>
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <TreeView fx:id="ontologyTreeView" maxHeight="1.7976931348623157E308" minHeight="200.0" VBox.vgrow="SOMETIMES" />
+                     </children>
+                  </VBox>
+                  <VBox minHeight="-Infinity" prefWidth="232.0">
+                     <children>
+                        <WebView fx:id="infoWebView" prefHeight="262.0" prefWidth="232.0" VBox.vgrow="ALWAYS" />
+                     </children></VBox>
+              </items>
+            </SplitPane>
+         </children>
+      </VBox>
+   </left>
 </BorderPane>
