@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
       <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
          <children>
@@ -32,6 +32,7 @@
                 <Menu mnemonicParsing="false" text="Edit">
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
+                        <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
                   </items>
                 </Menu>
               </menus>
@@ -53,9 +54,9 @@
       <VBox prefWidth="300.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="HPO Browser" />
-            <HBox prefHeight="78.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
+            <HBox maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
                <children>
-                  <TextField fx:id="searchTextField" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="180.0">
+                  <TextField fx:id="searchTextField" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="290.0" promptText="autocomplete HPO term...">
                      <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
@@ -70,7 +71,7 @@
                   </Button>
                </children>
             </HBox>
-            <TreeView fx:id="ontologyTreeView" maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+            <TreeView fx:id="ontologyTreeView" maxHeight="1.7976931348623157E308" minWidth="300.0" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>

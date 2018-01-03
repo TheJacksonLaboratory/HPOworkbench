@@ -43,6 +43,7 @@ public class MainController {
 
     /** Download address for {@code hp.obo}. */
     private final static String HP_OBO_URL ="https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo";
+    private final static String PHENOTYPE_ANNOTATION_URL="http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation.tab";
     private Model model=null;
     @FXML private Button goButton;
     /** Ontology object containing {@link HpoTerm}s and their relationships. */
@@ -53,7 +54,7 @@ public class MainController {
     /** Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}. */
     private Map<String, TermId> labels = new HashMap<>();
     /** Tree hierarchy of the ontology is presented here. */
-    @FXML private TreeView<HpoTerm> ontologyTreeView;
+    @FXML private TreeView<HpoTermWrapper> ontologyTreeView;
     /** WebView for displaying details of the Term that is selected in the {@link #ontologyTreeView}.*/
     @FXML private WebView infoWebView;
     /** WebEngine backing up the {@link #infoWebView}. */
@@ -70,19 +71,14 @@ public class MainController {
 
 
     public MainController() {
-        logger.trace("CTOR");
         this.model=new Model();
         ensureUserDirectoryExists();
-
-
     }
 
 
 
     /**
      * This function will create the .hpoworkbench directory in the user's home directory if it does not yet exist.
-     * Then it will return the path of the settings file.
-     * @return
      */
     private void ensureUserDirectoryExists() {
         File userDirectory = PlatformUtil.getHpoWorkbenchDir();
@@ -143,12 +139,52 @@ public class MainController {
         e.consume();
     }
 
+    @FXML
+    private void downloadHPOAnnotations(ActionEvent e) {
+        String dirpath= PlatformUtil.getHpoWorkbenchDir().getAbsolutePath();
+        File f = new File(dirpath);
+        if (f==null || ! (f.exists() && f.isDirectory())) {
+            logger.trace("Cannot download phenotype_annotation.tab, because directory not existing at " + f.getAbsolutePath());
+            return;
+        }
+        String BASENAME="phenotype_annotation.tab";
+
+        ProgressIndicator pb = new ProgressIndicator();
+        javafx.scene.control.Label label=new javafx.scene.control.Label("downloading phenotype_annotation.tab...");
+        FlowPane root = new FlowPane();
+        root.setPadding(new Insets(10));
+        root.setHgap(10);
+        root.getChildren().addAll(label,pb);
+        Scene scene = new Scene(root, 400, 100);
+        Stage window = new Stage();
+        window.setTitle("HPO annotation download");
+        window.setScene(scene);
+
+        Task hpodownload = new Downloader(dirpath, PHENOTYPE_ANNOTATION_URL,BASENAME,pb);
+        new Thread(hpodownload).start();
+        window.show();
+        hpodownload.setOnSucceeded(event -> {
+            window.close();
+            logger.trace(String.format("Successfully downloaded %s to %s",BASENAME,dirpath));
+            String fullpath=String.format("%s%s%s",dirpath,File.separator,BASENAME);
+        });
+        hpodownload.setOnFailed(event -> {
+            window.close();
+            logger.error("Unable to download phenotype_annotation.tab file");
+        });
+        Thread thread = new Thread(hpodownload);
+        thread.start();
+
+        e.consume();
+    }
+
     /**
      * Expand & scroll to the term selected in the search text field.
      */
     @FXML
     private void goButtonAction() {
         TermId id = labels.get(searchTextField.getText());
+        if (id==null) return; // button was clicked while field was empty, no need to do anything
         logger.trace("go button for term %s [%s]",searchTextField.getText(),id.getIdWithPrefix());
         if (id != null) {
             expandUntilTerm(ontology.getTermMap().get(id));
@@ -184,7 +220,7 @@ public class MainController {
         // populate the TreeView with top-level elements from ontology hierarchy
         TermId rootId = ontology.getRootTermId();
         HpoTerm rootTerm = ontology.getTermMap().get(rootId);
-        TreeItem<HpoTerm> root = new HpoTermTreeItem(rootTerm);
+        TreeItem<HpoTermWrapper> root = new HpoTermTreeItem(new HpoTermWrapper(rootTerm));
         root.setExpanded(true);
         if (ontologyTreeView==null) {
             logger.fatal("Tree view is not initialized");
@@ -193,7 +229,11 @@ public class MainController {
         ontologyTreeView.setShowRoot(false);
         ontologyTreeView.setRoot(root);
         ontologyTreeView.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> updateDescription(newValue));
+                .addListener((observable, oldValue, newValue) -> {
+            HpoTermWrapper w =newValue.getValue();
+            TreeItem item = new HpoTermTreeItem(w);
+            updateDescription(item);
+                });
 
 
         // create Map for lookup of the terms in the ontology based on their Name
@@ -247,13 +287,13 @@ public class MainController {
             }
 
             // expand tree nodes in top -> down direction
-            List<TreeItem<HpoTerm>> children = ontologyTreeView.getRoot().getChildren();
+            List<TreeItem<HpoTermWrapper>> children = ontologyTreeView.getRoot().getChildren();
             termStack.pop(); // get rid of 'All' node which is hidden
-            TreeItem<HpoTerm> target = ontologyTreeView.getRoot();
+            TreeItem<HpoTermWrapper> target = ontologyTreeView.getRoot();
             while (!termStack.empty()) {
                 HpoTerm current = termStack.pop();
-                for (TreeItem<HpoTerm> child : children) {
-                    if (child.getValue().equals(current)) {
+                for (TreeItem<HpoTermWrapper> child : children) {
+                    if (child.getValue().term.equals(current)) {
                         child.setExpanded(true);
                         target = child;
                         children = child.getChildren();
@@ -288,10 +328,10 @@ public class MainController {
      *
      * @param treeItem currently selected {@link TreeItem} containing {@link HpoTerm}
      */
-    private void updateDescription(TreeItem<HpoTerm> treeItem) {
+    private void updateDescription(TreeItem<HpoTermWrapper> treeItem) {
         if (treeItem == null)
             return;
-        HpoTerm term = treeItem.getValue();
+        HpoTerm term = treeItem.getValue().term;
         String HTML_TEMPLATE = "<!DOCTYPE html>" +
                 "<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>HPO tree browser</title></head>" +
                 "<body>" +
@@ -347,8 +387,7 @@ public class MainController {
         if (f != null) {
             String path = f.getAbsolutePath();
             logger.trace(String.format("Setting path to hierarchical export file to %s",path));
-            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getOntology());
-            exporter.exportToExcelFile(path);
+            return;
         } else {
             logger.error("Unable to obtain path to Excel export file");
         }
@@ -375,12 +414,12 @@ public class MainController {
      * Inner class that defines a bridge between hierarchy of {@link HpoTerm}s and {@link TreeItem}s of the
      * {@link TreeView}.
      */
-    class HpoTermTreeItem extends TreeItem<HpoTerm> {
+    class HpoTermTreeItem extends TreeItem<HpoTermWrapper> {
 
         /**
          * List used for caching of the children of this term
          */
-        private ObservableList<TreeItem<HpoTerm>> childrenList;
+        private ObservableList<TreeItem<HpoTermWrapper>> childrenList;
 
 
         /**
@@ -388,7 +427,7 @@ public class MainController {
          *
          * @param term {@link HpoTerm} that is represented by this TreeItem
          */
-        HpoTermTreeItem(HpoTerm term) {
+        HpoTermTreeItem(HpoTermWrapper term) {
             super(term);
         }
 
@@ -400,7 +439,7 @@ public class MainController {
          */
         @Override
         public boolean isLeaf() {
-            return getTermChildren(getValue()).size()==0;
+            return getTermChildren(getValue().term).size()==0;
         }
 
 
@@ -410,14 +449,14 @@ public class MainController {
          * {@inheritDoc}
          */
         @Override
-        public ObservableList<TreeItem<HpoTerm>> getChildren() {
+        public ObservableList<TreeItem<HpoTermWrapper>> getChildren() {
             if (childrenList == null) {
-                logger.debug(String.format("Getting children for term %s", getValue().getName()));
+                logger.debug(String.format("Getting children for term %s", getValue().term.getName()));
                 childrenList = FXCollections.observableArrayList();
-                Set<HpoTerm> children = getTermChildren(getValue()) ;
+                Set<HpoTerm> children = getTermChildren(getValue().term) ;
                 children.stream()
                         .sorted((l, r) -> l.getName().compareTo(r.getName()))
-                        .map(HpoTermTreeItem::new)
+                        .map(term -> new HpoTermTreeItem(new HpoTermWrapper(term)))
                         .forEach(childrenList::add);
                 super.getChildren().setAll(childrenList);
             }

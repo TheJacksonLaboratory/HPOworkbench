@@ -30,7 +30,6 @@ public class HierarchicalExcelExporter {
 
     private final HpoOntology ontology;
     private static final TermPrefix HPPREFIX = new ImmutableTermPrefix("HP");
-    private String DEFAULT_OUTPUTNAME="hpotest.xlsx";
 
     private final HpoTerm subhierarchyRoot;
 
