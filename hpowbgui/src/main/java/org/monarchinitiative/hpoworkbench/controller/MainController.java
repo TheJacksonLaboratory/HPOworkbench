@@ -387,9 +387,9 @@ public class MainController {
         if (f != null) {
             String path = f.getAbsolutePath();
             logger.trace(String.format("Setting path to hierarchical export file to %s",path));
-            return;
         } else {
             logger.error("Unable to obtain path to Excel export file");
+            return;
         }
         logger.trace(String.format("Exporting hierarchical summary starting from term %s", selectedTerm.toString()));
         HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(model.getOntology(),selectedTerm);
