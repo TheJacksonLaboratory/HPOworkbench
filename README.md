@@ -5,7 +5,7 @@ A Java app for working with HPO and HPO annotation data. HPO Workbench can be us
 through the hierarchy and displaying the term definition etc. To start the application enter the following command.
 ```
 $ mvn package
-$ java -jar hpowbgui/target/hpoawbgui-0.0.3-SNAPSHOT.jar
+$ java -jar hpowbgui/target/hpowbgui-0.0.3-SNAPSHOT.jar 
 ```
 Excel files containing all terms of the HPO or containing a "hierarchical view" of the HPO and starting from a specific term of the HPO can be exported. Especially the latter may be useful for clinical colleagues who would like to provide feedback on current HPO terms (add a column with comments or corrections etc).
 
