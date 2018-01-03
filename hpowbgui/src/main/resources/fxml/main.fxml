@@ -51,12 +51,12 @@
       </HBox>
    </top>
    <left>
-      <VBox prefWidth="300.0" BorderPane.alignment="CENTER">
+      <VBox prefWidth="400.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="HPO Browser" />
             <HBox maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
                <children>
-                  <TextField fx:id="searchTextField" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="290.0" promptText="autocomplete HPO term...">
+                  <TextField fx:id="searchTextField" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" promptText="autocomplete HPO term...">
                      <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
