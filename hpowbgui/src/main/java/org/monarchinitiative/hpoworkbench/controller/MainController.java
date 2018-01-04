@@ -348,8 +348,11 @@ public class MainController {
         // Synonyms
         String definition = (term.getDefinition() == null) ? "" : term.getDefinition().toString();
         String comment = (term.getComment() == null) ? "-" : term.getComment();
-
-        String content = String.format(HTML_TEMPLATE, termID, term.getName(), synonyms, definition,comment);
+        List<String> annotatedDiseases = model.getDiseaseAnnotations(termID);
+        if (annotatedDiseases==null) {
+            logger.error("could not retrieve diseases for " + termID);
+        }
+        String content = HpoHtmlPageGenerator.getHTML(term,annotatedDiseases);
         infoWebEngine.loadContent(content);
     }
 

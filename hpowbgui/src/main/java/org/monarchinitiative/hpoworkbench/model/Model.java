@@ -1,11 +1,20 @@
 package org.monarchinitiative.hpoworkbench.model;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
+import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
+import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
+import com.github.phenomics.ontolib.ontology.data.TermId;
+import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.hpoworkbench.io.HpoAnnotationParser;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalHPOPath;
 import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalPhenotypeAnnotationPath;
@@ -19,19 +28,43 @@ public class Model {
     private String pathToHpoOboFile=null;
     /** Path to the file we are creating with LOINC code to HPO annotations. */
     private String pathToAnnotationFile=null;
+    private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
     /** Ontology model for full HPO ontology (all subhierarchies). */
-    HpoOntology ontology=null;
+    private HpoOntology ontology=null;
+    /** List of annotated diseases */
+    private Map<TermId,List<String>> annotmap=null;
 
 
     public Model(){
         initPaths();
+        importData();
     }
+
+
 
 
 
     private void initPaths() {
         this.pathToHpoOboFile=getLocalHPOPath();
         this.pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
+    }
+
+    private void importData() {
+        if (ontology==null) {
+            if (pathToHpoOboFile==null) {
+                logger.error("Path to hp.obo was not initialized");
+                return;
+            }
+            HPOParser parser = new HPOParser(pathToHpoOboFile);
+            this.ontology=parser.getHPO();
+        }
+        if (annotmap==null) {
+            HpoOntology ontology = getOntology();
+            HpoAnnotationParser parser = new HpoAnnotationParser(this.pathToAnnotationFile,ontology);
+            annotmap=parser.parse();
+        }
+        logger.trace("Ingested annot map with size="+annotmap.size());
+
     }
 
 
@@ -56,32 +89,37 @@ public class Model {
         }
     }
 
-    /** Read the loinc2hpo settings file from the user's .loinc2hpo directory. */
-    public void inputSettings(final String path) {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                int idx=line.indexOf(":");
-                if (idx<0) {
-                    logger.error("Malformed settings line (no semicolon): "+line);
-                }
-                if (line.length()<idx+2) {
-                    logger.error("Malformed settings line (value too short): "+line);
-                }
-                String key,value;
-                key=line.substring(0,idx).trim();
-                value=line.substring(idx+1).trim();
 
-                if (key.equals("annotationFile")) this.pathToAnnotationFile = value;
-                else if (key.equals("hp-obo")) this.pathToHpoOboFile = value;
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("Could not open settings at " + path);
+    public List<String> getDiseaseAnnotations(String hpoTermId) {
+        List<String> diseases=new ArrayList<>();
+        TermId id = string2TermId(hpoTermId);
+        if (id!=null) {
+            diseases=annotmap.get(id);
         }
+        if (diseases==null) diseases=new ArrayList<>();// return empty
+
+        return diseases;
     }
+
+
+    private TermId string2TermId(String termstring) {
+        if (termstring.startsWith("HP:")) {
+            termstring=termstring.substring(3);
+        }
+        if (termstring.length()!=7) {
+            logger.error("Malformed termstring: "+termstring);
+            return null;
+        }
+        TermId tid = new ImmutableTermId(HP_PREFIX,termstring);
+        if (! ontology.getAllTermIds().contains(tid)) {
+            logger.error("Unknown TermId "+tid.getIdWithPrefix());
+            return null;
+        }
+        return tid;
+    }
+
+
+
 
 
     public HpoOntology getOntology() {
