@@ -11,10 +11,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The purpose of this class is to parse the phenotype_annotation.tab file in order to give the user
@@ -69,12 +66,18 @@ public class HpoAnnotationParser {
                 if (i>0) diseasename=diseasename.substring(0,i); // other synonyms follow the first ";"
                 String HPOid=A[4];
                 TermId id=string2TermId(HPOid);
-                if (!annotmap.containsKey(id)) {
-                    annotmap.put(id,new ArrayList<String>());
-                    logger.trace("Adding "+ id.getIdWithPrefix() + " size of map = "+ annotmap.size());
+                // get all ancestors of the term (annotation propagation rule)
+                Set<TermId> ancs =ontology.getAncestorTermIds(id);
+                //ancs.add(id);
+                for (TermId t:ancs) {
+                    if (!annotmap.containsKey(t)) {
+                        annotmap.put(t, new ArrayList<String>());
+                    }
+                    List<String> diseaselist=annotmap.get(t);
+                    diseaselist.add(String.format("%s|%s:%s",diseasename,db,dbId));
                 }
-                List<String> diseaselist=annotmap.get(id);
-                diseaselist.add(String.format("%s|%s:%s",diseasename,db,dbId));
+
+
                // logger.trace(String.format("Adding disease %s [%s:%s] to term %s",diseasename,db,dbId,id.getIdWithPrefix()));
             }
         } catch (IOException e) {

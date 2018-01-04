@@ -7,8 +7,33 @@ through the hierarchy and displaying the term definition etc. To start the appli
 $ mvn package
 $ java -jar hpowbgui/target/hpowbgui-0.0.3-SNAPSHOT.jar 
 ```
-Excel files containing all terms of the HPO or containing a "hierarchical view" of the HPO and starting from a specific term of the HPO can be exported. Especially the latter may be useful for clinical colleagues who would like to provide feedback on current HPO terms (add a column with comments or corrections etc).
+## Using HPO Workbench
+Navigate through the hierarchy of the using the tree browser or
+use the autocomplete text field to find the HPO term of your choice.
+HPO Workbench will display the ID, definition, comment, and synyonyms 
+for the term. If any diseases in the HPO corpus are annotated to 
+the term, a list of the diseases will be displayed.
 
-Some of the functionality is also available in the cli module.
+![HPO Workbench screenshot](misc/HPOworkbench.png)
+
+## Creating Excel files to revise or extend the HPO
+Users who would like to contribute new terms or other information to the
+HPO project and who would prefer to use Excel can use HPO Workbench to
+create an Excel file to work with. We recommend using the "Create hierarchical summary"
+option. To do so, first navigate to the area of the HPO you would like to 
+work with (e.g., Abnormality of thyroid physiology). Clicking
+on the "Create hierarchical summary" button will create an Excel file that
+contains only the portion of the ontology that starts from this term.
+It will suggest the hierarchy of the ontology by indenting child, grandchild,
+great-grandchild (etc) terms in columns located further to the right ("indentation by column").
+Please create a new column or columns in this file that will contain your comments
+and suggestions. You are welcome to contact the HPO team to 
+get advice about this before you start (see the HPO Website for email addresses).
+
+## Command line
+Some of the functionality is also available in the command line (cli) module
+and may be useful for scripting.
+
+## Warning
 
 This project is still in a very early phase, the software is mature enough for demonstration purposes but will be subject to Q/C and testing shortly.
