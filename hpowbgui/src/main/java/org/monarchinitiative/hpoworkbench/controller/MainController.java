@@ -423,6 +423,16 @@ public class MainController {
         exporter.exportToExcel(f.getAbsolutePath());
     }
 
+    @FXML private void suggestCorrectionToTerm(ActionEvent e) {
+        selectedTerm=getSelectedTerm().getValue().term;
+        logger.trace("Will suggest correction to "+selectedTerm.getName());
+    }
+
+    @FXML private void suggestNewChildTerm(ActionEvent e) {
+        selectedTerm=getSelectedTerm().getValue().term;
+        logger.trace("Will suggest new child term of "+selectedTerm.getName());
+    }
+
 
 
     /** Show the about message */
