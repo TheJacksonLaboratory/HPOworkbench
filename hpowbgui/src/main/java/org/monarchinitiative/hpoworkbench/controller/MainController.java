@@ -15,6 +15,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -31,6 +32,7 @@ import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
 import org.monarchinitiative.hpoworkbench.model.Model;
+import sun.util.resources.cldr.ebu.LocaleNames_ebu;
 
 import java.io.File;
 import java.util.*;
@@ -62,6 +64,7 @@ public class MainController {
     /** Text field with autocompletion for jumping to a particular HPO term in the tree view. */
     @FXML private TextField searchTextField;
     @FXML private Button GoButton;
+    @FXML private Label browserlabel;
 
     /** Approved {@link HpoTerm} is submitted here. */
     private Consumer<HpoTerm> addHook;
@@ -192,6 +195,20 @@ public class MainController {
         }
     }
 
+    public static String getVersion() {
+        String version="0.0.0";// default, should be overwritten by the following.
+        try {
+            Package p = MainController.class.getPackage();
+            logger.trace("got package p="+p.toString());
+            logger.trace("got i p="+p.getImplementationVersion());
+            version = p.getImplementationVersion();
+        } catch (Exception e) {
+            // do nothing
+        }
+        if (version==null) version = "0.1.1"; // this works on a maven build but needs to be reassigned in intellij
+        return version;
+    }
+
     @FXML
     private void initialize()
     {
@@ -211,6 +228,9 @@ public class MainController {
         }
         initTree(model.getOntology(), addHook);
         logger.trace("done init");
+        browserlabel.setAlignment(Pos.BOTTOM_RIGHT);
+        String ver = getVersion();
+        browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
     }
 
 
@@ -359,6 +379,7 @@ public class MainController {
 
     @FXML private void exportToExcel(ActionEvent event) {
         logger.trace("exporting to excel");
+
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Export HPO as Excel-format file");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel file (*.xlsx)", "*.xlsx");
@@ -381,6 +402,9 @@ public class MainController {
         if (selectedTerm==null) {
             logger.error("Select a term before exporting hierarchical summary TODO show error window");
         }
+        logger.trace("pre term "+ getSelectedTerm().toString());
+        selectedTerm=getSelectedTerm().getValue().term;
+        logger.trace("post term "+ getSelectedTerm().toString());
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Export HPO as Excel-format file");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel file (*.xlsx)", "*.xlsx");

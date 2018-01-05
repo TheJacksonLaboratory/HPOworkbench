@@ -68,7 +68,6 @@ public class HpoAnnotationParser {
                 TermId id=string2TermId(HPOid);
                 // get all ancestors of the term (annotation propagation rule)
                 Set<TermId> ancs =ontology.getAncestorTermIds(id);
-                //ancs.add(id);
                 for (TermId t:ancs) {
                     if (!annotmap.containsKey(t)) {
                         annotmap.put(t, new ArrayList<String>());
