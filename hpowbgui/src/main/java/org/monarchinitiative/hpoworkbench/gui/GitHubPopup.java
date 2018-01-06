@@ -2,8 +2,14 @@ package org.monarchinitiative.hpoworkbench.gui;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -23,6 +29,10 @@ public class GitHubPopup {
     private final String definition;
     private final String comment;
     private final String synlist;
+    private String uname=null;
+    private String pword=null;
+
+    String githubIssueText=null;
 
     public GitHubPopup(HpoTerm term) {
         termlabel=term.getName();
@@ -41,40 +51,73 @@ public class GitHubPopup {
         window.initStyle(StageStyle.UTILITY);
         window.initModality(Modality.APPLICATION_MODAL);
 
+        VBox root = new VBox();
+        root.setPadding(new Insets(10));
+        root.setSpacing(5);
 
+        root.getChildren().add(new Label(String.format("Enter new GitHub issue about %s:",termlabel)));
 
-//        Stage adjWindow = adjustStagePosition(window, ownerWindow);
-//        adjWindow.initStyle(StageStyle.DECORATED);
-//        adjWindow.setResizable(true);
+        TextArea textArea = new TextArea();
+        textArea.setText(getInitialText() );
+        root.getChildren().add(textArea);
 
-        WebView browser = new WebView();
-        WebEngine engine = browser.getEngine();
-        engine.load(getHTML());
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(e -> window.close());
+        Button okButton = new Button("Create GitHub issue");
 
-//        adjWindow.setScene(new Scene(browser));
-//        adjWindow.showAndWait();
-        window.setScene(new Scene(browser));
+        GridPane grid=new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+//        Text scenetitle = new Text("Welcome");
+//        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+//        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Label userName = new Label("GitHub Username:");
+        grid.add(userName, 0, 0);
+
+        TextField userTextField = new TextField();
+        grid.add(userTextField, 1, 0);
+
+        Label pw = new Label("GitHub Password:");
+        grid.add(pw, 0, 1);
+        PasswordField pwBox = new PasswordField();
+        grid.add(pwBox, 1, 1);
+        okButton.setOnAction(e -> {
+            githubIssueText=textArea.getText();
+            uname=userTextField.getText();
+            pword=pwBox.getText();
+            window.close();
+        });
+        HBox hbox= new HBox();
+        hbox.setSpacing(10);
+        hbox.getChildren().addAll(cancelButton,okButton);
+
+        root.getChildren().add(hbox);
+        root.getChildren().add(grid);
+        Scene scene = new Scene(root, 500, 400);
+
+        window.setScene(scene);
         window.showAndWait();
-
-
     }
 
 
-    private String getHTML() {
-        final String HTML_TEMPLATE = String.format("<!DOCTYPE html>" +
-                "<html lang=\"en\"><head>" +
-               // "<style>%s</style>\n" +
-                "<meta charset=\"UTF-8\"><title>Current term</title></head>" +
-                "<body>" +
-                "<h1>%s</h1>" +
-                "<p><b>ID:</b> %s</p>" +
-                "<p><b>Definition:</b> %s</p>" +
-                "<p><b>Comment:</b> %s</p>" +
-                "<p><b>Synonyms:</b> %s</p>" +
-                "</body></html>",termlabel,termid,definition,comment,synlist);
-        logger.trace(HTML_TEMPLATE);
-        return HTML_TEMPLATE;
+    private String getInitialText() {
+        return String.format("Suggestion about term %s [%s]\nCurrent definition: %s\n" +
+                        "Current comment: %s\nCurrent synonym list: %s\n\n" +
+                        "My suggestion: \n",
+               termlabel,
+                termid,
+                definition!=null?definition:"no definition available",
+                comment!=null?comment:"no comment available",
+                synlist!=null?synlist:"-");
     }
+
+
+    public String retrieveGitHubIssue(){ return githubIssueText; }
+    public String getGitHubUserName() { return uname;}
+    public String getGitHubPassWord() { return pword;}
 
 
 

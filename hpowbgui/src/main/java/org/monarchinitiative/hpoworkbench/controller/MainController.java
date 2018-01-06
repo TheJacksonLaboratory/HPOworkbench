@@ -16,7 +16,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -24,26 +23,28 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.Main;
 import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
+import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
 import org.monarchinitiative.hpoworkbench.model.Model;
-import sun.util.resources.cldr.ebu.LocaleNames_ebu;
-
+import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-
+/**
+ * Controller for HPO Workbench
+ */
 public class MainController {
     private static final Logger logger = LogManager.getLogger();
 
@@ -270,8 +271,6 @@ public class MainController {
             TreeItem item = new HpoTermTreeItem(w);
             updateDescription(item);
                 });
-
-
         // create Map for lookup of the terms in the ontology based on their Name
         ontology.getTermMap().values().forEach(term -> labels.put(term.getName(), term.getId()));
         WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
@@ -415,6 +414,9 @@ public class MainController {
 
 
     @FXML private void exportHierarchicalSummary(ActionEvent event) {
+        HpoTerm t = getSelectedTerm().getValue().term;
+        logger.trace("export hierarchy I found term " + t.getName());
+
         if (selectedTerm==null) {
             logger.error("Select a term before exporting hierarchical summary TODO show error window");
             PopUps.showInfoMessage("Please select an HPO term in order to export a term with its subhierarchy",
@@ -441,17 +443,39 @@ public class MainController {
     }
 
     @FXML private void suggestCorrectionToTerm(ActionEvent e) {
-        if (selectedTerm==null) {
+
+
+        if (getSelectedTerm()==null) {
             logger.error("Select a term before creating GitHub issue");
             PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
                     "Error: No HPO Term selected");
             return;
+        } else {
+            selectedTerm = getSelectedTerm().getValue().term;
         }
         selectedTerm=getSelectedTerm().getValue().term;
         logger.trace("Will suggest correction to "+selectedTerm.getName());
         GitHubPopup popup = new GitHubPopup(selectedTerm);
         //Stage thisStage = (Stage) goButton.getScene().getWindow();
         popup.displayWindow(primarystage);
+        String githubissue=popup.retrieveGitHubIssue();
+        if (githubissue==null) {
+            logger.trace("got back null githuib issue");
+            return;
+        }
+        String pword=popup.getGitHubPassWord();
+        String uname=popup.getGitHubUserName();
+        logger.trace("I got github issue: "+githubissue);
+        GitHubPoster poster = new GitHubPoster(uname,pword,String.format("Correction to term %s",selectedTerm.getName()),githubissue);
+        try {
+            poster.postIssue();
+        } catch (HPOWorkbenchException he) {
+            PopUps.showException("GitHub error","Bad Request (400)","Could not post issue", he);
+        }
+        catch (Exception ex) {
+            PopUps.showException("GitHub error","GitHub error","Could not post issue", ex);
+        }
+
     }
 
     @FXML private void suggestNewChildTerm(ActionEvent e) {
