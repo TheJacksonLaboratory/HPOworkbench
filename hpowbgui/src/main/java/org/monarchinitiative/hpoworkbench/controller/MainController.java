@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -26,9 +27,12 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.Main;
 import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
+import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
+import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
 import org.monarchinitiative.hpoworkbench.model.Model;
@@ -66,6 +70,10 @@ public class MainController {
     @FXML private Button GoButton;
     @FXML private Label browserlabel;
 
+    private  Stage primarystage;
+
+    private Main mainApp=null;
+
     /** Approved {@link HpoTerm} is submitted here. */
     private Consumer<HpoTerm> addHook;
 
@@ -76,6 +84,13 @@ public class MainController {
     public MainController() {
         this.model=new Model();
         ensureUserDirectoryExists();
+    }
+
+
+    public void setMainApp(Main mainApp) {
+        this.mainApp = mainApp;
+        logger.trace("Set main app to " + mainApp.toString());
+
     }
 
 
@@ -231,6 +246,7 @@ public class MainController {
         browserlabel.setAlignment(Pos.BOTTOM_RIGHT);
         String ver = getVersion();
         browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
+        this.primarystage=Main.primarystage;
     }
 
 
@@ -401,10 +417,11 @@ public class MainController {
     @FXML private void exportHierarchicalSummary(ActionEvent event) {
         if (selectedTerm==null) {
             logger.error("Select a term before exporting hierarchical summary TODO show error window");
+            PopUps.showInfoMessage("Please select an HPO term in order to export a term with its subhierarchy",
+                    "Error: No HPO Term selected");
+            return; // to do throw exceptio
         }
-        logger.trace("pre term "+ getSelectedTerm().toString());
         selectedTerm=getSelectedTerm().getValue().term;
-        logger.trace("post term "+ getSelectedTerm().toString());
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Export HPO as Excel-format file");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel file (*.xlsx)", "*.xlsx");
@@ -424,8 +441,17 @@ public class MainController {
     }
 
     @FXML private void suggestCorrectionToTerm(ActionEvent e) {
+        if (selectedTerm==null) {
+            logger.error("Select a term before creating GitHub issue");
+            PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
+                    "Error: No HPO Term selected");
+            return;
+        }
         selectedTerm=getSelectedTerm().getValue().term;
         logger.trace("Will suggest correction to "+selectedTerm.getName());
+        GitHubPopup popup = new GitHubPopup(selectedTerm);
+        //Stage thisStage = (Stage) goButton.getScene().getWindow();
+        popup.displayWindow(primarystage);
     }
 
     @FXML private void suggestNewChildTerm(ActionEvent e) {

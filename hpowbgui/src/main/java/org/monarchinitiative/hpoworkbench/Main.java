@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.controller.MainController;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 
 import javax.swing.*;
@@ -28,7 +29,8 @@ import java.net.URL;
 public class Main extends Application {
     private static final Logger logger = LogManager.getLogger();
     private static final String WINDOW_TITLE = "Human Phenotype Ontology Workbench";
-
+    /** reference to the primary stage. */
+    public static Stage primarystage;
 
     public static void main(String[] args) {
         launch(args);
@@ -43,6 +45,7 @@ public class Main extends Application {
     public void start(Stage window) throws Exception {
 
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
+        primarystage=window;
 
         Scene scene = new Scene(root, 1200, 800);
 
@@ -64,6 +67,10 @@ public class Main extends Application {
         window.show();
         window.setOnCloseRequest(e -> Platform.exit());
 
+    }
+
+    public Stage getStage() {
+        return primarystage;
     }
 
     /**
