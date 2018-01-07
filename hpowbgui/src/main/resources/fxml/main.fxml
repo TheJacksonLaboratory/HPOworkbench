@@ -130,22 +130,22 @@
                               </Label>
                               <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <RadioButton fx:id="allDatabaseButton" mnemonicParsing="false" text="All">
+                                    <RadioButton fx:id="allDatabaseButton" mnemonicParsing="false" text="All" userData="all">
                                        <HBox.margin>
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>
                                     </RadioButton>
-                                    <RadioButton fx:id="orphanetButton" mnemonicParsing="false" text="Orphanet">
+                                    <RadioButton fx:id="orphanetButton" mnemonicParsing="false" text="Orphanet" userData="orphanet">
                                        <HBox.margin>
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>
                                     </RadioButton>
-                                    <RadioButton fx:id="omimButton" mnemonicParsing="false" text="OMIM">
+                                    <RadioButton fx:id="omimButton" mnemonicParsing="false" text="OMIM" userData="omim">
                                        <HBox.margin>
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>
                                     </RadioButton>
-                                    <RadioButton fx:id="decipherButton" mnemonicParsing="false" text="DECIPHER">
+                                    <RadioButton fx:id="decipherButton" mnemonicParsing="false" text="DECIPHER" userData="decipher">
                                        <HBox.margin>
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>

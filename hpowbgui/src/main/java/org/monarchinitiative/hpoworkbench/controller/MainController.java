@@ -10,6 +10,7 @@ import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 
 import com.github.phenomics.ontolib.ontology.data.TermSynonym;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -74,6 +75,8 @@ public class MainController {
 
     private  Stage primarystage;
 
+    private DiseaseModel.database selectedDatabase=DiseaseModel.database.ALL;
+
     private Main mainApp=null;
 
     /** Approved {@link HpoTerm} is submitted here. */
@@ -87,14 +90,6 @@ public class MainController {
         this.model=new Model();
         ensureUserDirectoryExists();
     }
-
-
-//    public void setMainApp(Main mainApp) {
-//        this.mainApp = mainApp;
-//        logger.trace("Set main app to " + mainApp.toString());
-//
-//    }
-
 
 
     /**
@@ -239,13 +234,40 @@ public class MainController {
         browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
         this.primarystage=Main.primarystage;
         Encryption decryption=new Encryption();
-        decryption.decryptSettings();
+        //decryption.decryptSettings();
         initRadioButtons();
     }
 
     private void initRadioButtons() {
-
+        ToggleGroup group = new ToggleGroup();
         allDatabaseButton.setSelected(true);
+        allDatabaseButton.setToggleGroup(group);
+        omimButton.setSelected(false);
+        omimButton.setToggleGroup(group);
+        orphanetButton.setSelected(false);
+        orphanetButton.setToggleGroup(group);
+        decipherButton.setSelected(false);
+        decipherButton.setToggleGroup(group);
+        group.selectedToggleProperty().addListener(
+                (ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) -> {
+                    if (group.getSelectedToggle() != null) {
+                        String userdata=(String)group.getSelectedToggle().getUserData();
+                        if (userdata==null) {
+                            logger.warn("Could not retrieve user data for database radio buttons");
+                        }
+                        if (userdata.equals("orphanet"))
+                            selectedDatabase= DiseaseModel.database.ORPHANET;
+                        else if (userdata.equals("omim"))
+                            selectedDatabase = DiseaseModel.database.OMIM;
+                        else if (userdata.equals("all"))
+                            selectedDatabase= DiseaseModel.database.ALL;
+                        else if (userdata.equals("decipher"))
+                            selectedDatabase= DiseaseModel.database.DECIPHER;
+                        else {
+                            logger.warn("did not recognize database " + userdata);
+                        }
+                    }
+                });
     }
 
 
@@ -383,9 +405,7 @@ public class MainController {
         // Synonyms
         String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
         String comment = (term.getComment() == null) ? "-" : term.getComment();
-        // todo set database from the radio button
-        DiseaseModel.database database = DiseaseModel.database.ORPHANET;
-        List<DiseaseModel> annotatedDiseases = model.getDiseaseAnnotations(termID,database);
+        List<DiseaseModel> annotatedDiseases = model.getDiseaseAnnotations(termID,selectedDatabase);
         if (annotatedDiseases==null) {
             logger.error("could not retrieve diseases for " + termID);
         }

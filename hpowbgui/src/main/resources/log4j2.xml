@@ -11,7 +11,7 @@
     <Loggers>
         <Root level="ERROR">
             <AppenderRef ref="LogFile"/>
-            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="SYSTEM_OUT"/>
         </Root>
     </Loggers>
 </Configuration>
