@@ -1,27 +1,28 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
+import com.github.phenomics.ontolib.ontology.data.TermSynonym;
+import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HpoHtmlPageGenerator {
+class HpoHtmlPageGenerator {
 
-    public static String getHTML(HpoTerm term, List<String> annotatedDiseases) {
+     static String getHTML(HpoTerm term, List<DiseaseModel> annotatedDiseases) {
 
         String termID = term.getId().getIdWithPrefix();
-        String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(s -> s.getValue())
+        String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
                 .collect(Collectors.joining("; "));
         // Synonyms
-        String definition = (term.getDefinition() == null) ? "" : term.getDefinition().toString();
+        String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
         String comment = (term.getComment() == null) ? "-" : term.getComment();
         String diseaseTable=getDiseaseTableHTML(annotatedDiseases,termID);
-        String content = String.format(HTML_TEMPLATE,CSS, term.getName(),termID, definition, comment,  synonyms,diseaseTable);
-        return content;
+        return String.format(HTML_TEMPLATE,CSS, term.getName(),termID, definition, comment,  synonyms,diseaseTable);
     }
 
 
-    private static final String getDiseaseTableHTML(List<String> diseases,String Id) {
+    private static String getDiseaseTableHTML(List<DiseaseModel> diseases,String Id) {
         if (diseases==null) { return "<p>No disease annotations found.</p>"; }
         String header=String.format("\n" +
                 "  <table class=\"zebra\">\n" +
@@ -38,18 +39,14 @@ public class HpoHtmlPageGenerator {
                 "      </tr>\n" +
                 "    </tfoot>",Id,diseases.size());
         StringBuilder sb = new StringBuilder();
-        for (String s : diseases) {
-            String A[]=s.split("\\|");
+        for (DiseaseModel s : diseases) {
             String row = String.format("<tr>\n" +
                     "        <td>%s</td>\n" +
                     "        <td>%s</td>\n" +
-                    "      </tr>",A[0],A[1]);
+                    "      </tr>",s.getDiseaseDbAndId(),s.getDiseaseName());
             sb.append(row);
         }
-        String table = String.format("%s<tbody>%s</tbody></table></div>",header,sb.toString());
-        return table;
-
-
+        return String.format("%s<tbody>%s</tbody></table></div>",header,sb.toString());
     }
 
 

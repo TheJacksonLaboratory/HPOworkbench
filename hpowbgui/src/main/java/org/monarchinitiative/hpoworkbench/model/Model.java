@@ -5,6 +5,7 @@ import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
 import com.github.phenomics.ontolib.ontology.data.TermPrefix;
+import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
@@ -12,7 +13,6 @@ import org.monarchinitiative.hpoworkbench.io.HpoAnnotationParser;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +32,7 @@ public class Model {
     /** Ontology model for full HPO ontology (all subhierarchies). */
     private HpoOntology ontology=null;
     /** List of annotated diseases */
-    private Map<TermId,List<String>> annotmap=null;
+    private Map<TermId,List<DiseaseModel>> annotmap=null;
 
 
     public Model(){
@@ -90,15 +90,23 @@ public class Model {
     }
 
 
-    public List<String> getDiseaseAnnotations(String hpoTermId) {
-        List<String> diseases=new ArrayList<>();
+    public List<DiseaseModel> getDiseaseAnnotations(String hpoTermId, DiseaseModel.database dbase) {
+        List<DiseaseModel> diseases=new ArrayList<>();
         TermId id = string2TermId(hpoTermId);
         if (id!=null) {
             diseases=annotmap.get(id);
         }
-        if (diseases==null) diseases=new ArrayList<>();// return empty
-
-        return diseases;
+        if (diseases==null) return new ArrayList<>();// return empty
+        // user wan't all databases, just pass through
+        if (dbase== DiseaseModel.database.ALL) return diseases;
+        // filter for desired database
+        ImmutableList.Builder builder = new ImmutableList.Builder();
+        for (DiseaseModel dm : diseases) {
+            if (dm.database().equals(dbase)) {
+                builder.add(dm);
+            }
+        }
+        return builder.build();
     }
 
 

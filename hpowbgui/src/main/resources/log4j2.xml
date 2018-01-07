@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="ERROR">
     <Appenders>
         <File name="LogFile" fileName="target/hpoworkbenchgui.log" append="false">
             <PatternLayout pattern="[%t] %-5level (%F:%L) - %msg%n"/>
         </File>
-        <Console name="STDOUT" target="SYSTEM_OUT">
+        <Console name="ERROR" target="SYSTEM_OUT">
             <PatternLayout pattern="[%t] %-5level (%F:%L) - %msg%n"/>
         </Console>
     </Appenders>
     <Loggers>
-        <Root level="TRACE">
+        <Root level="ERROR">
             <AppenderRef ref="LogFile"/>
             <AppenderRef ref="STDOUT"/>
         </Root>

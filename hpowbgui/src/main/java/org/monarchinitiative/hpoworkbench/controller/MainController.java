@@ -8,6 +8,7 @@ import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
 import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 
+import com.github.phenomics.ontolib.ontology.data.TermSynonym;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,11 +31,10 @@ import org.monarchinitiative.hpoworkbench.Main;
 import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
-import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
-import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
-import org.monarchinitiative.hpoworkbench.gui.PopUps;
-import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
+import org.monarchinitiative.hpoworkbench.gui.*;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
+import org.monarchinitiative.hpoworkbench.io.Encryption;
+import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
 import java.io.File;
@@ -70,6 +70,7 @@ public class MainController {
     @FXML private TextField searchTextField;
     @FXML private Button GoButton;
     @FXML private Label browserlabel;
+    @FXML private RadioButton allDatabaseButton,orphanetButton,omimButton,decipherButton;
 
     private  Stage primarystage;
 
@@ -88,11 +89,11 @@ public class MainController {
     }
 
 
-    public void setMainApp(Main mainApp) {
-        this.mainApp = mainApp;
-        logger.trace("Set main app to " + mainApp.toString());
-
-    }
+//    public void setMainApp(Main mainApp) {
+//        this.mainApp = mainApp;
+//        logger.trace("Set main app to " + mainApp.toString());
+//
+//    }
 
 
 
@@ -123,7 +124,7 @@ public class MainController {
     private void downloadHPO(ActionEvent e) {
         String dirpath= PlatformUtil.getHpoWorkbenchDir().getAbsolutePath();
         File f = new File(dirpath);
-        if (f==null || ! (f.exists() && f.isDirectory())) {
+        if (! (f.exists() && f.isDirectory())) {
             logger.trace("Cannot download hp.obo, because directory not existing at " + f.getAbsolutePath());
             return;
         }
@@ -162,7 +163,7 @@ public class MainController {
     private void downloadHPOAnnotations(ActionEvent e) {
         String dirpath= PlatformUtil.getHpoWorkbenchDir().getAbsolutePath();
         File f = new File(dirpath);
-        if (f==null || ! (f.exists() && f.isDirectory())) {
+        if (! (f.exists() && f.isDirectory())) {
             logger.trace("Cannot download phenotype_annotation.tab, because directory not existing at " + f.getAbsolutePath());
             return;
         }
@@ -205,18 +206,14 @@ public class MainController {
         TermId id = labels.get(searchTextField.getText());
         if (id==null) return; // button was clicked while field was empty, no need to do anything
         logger.trace("go button for term %s [%s]",searchTextField.getText(),id.getIdWithPrefix());
-        if (id != null) {
-            expandUntilTerm(ontology.getTermMap().get(id));
-            searchTextField.clear();
-        }
+        expandUntilTerm(ontology.getTermMap().get(id));
+        searchTextField.clear();
     }
 
     public static String getVersion() {
         String version="0.0.0";// default, should be overwritten by the following.
         try {
             Package p = MainController.class.getPackage();
-            logger.trace("got package p="+p.toString());
-            logger.trace("got i p="+p.getImplementationVersion());
             version = p.getImplementationVersion();
         } catch (Exception e) {
             // do nothing
@@ -234,24 +231,27 @@ public class MainController {
         if (model.getOntology()==null) {
             logger.error("Need to initialize ontology before we can start the application.");
             return;
-        } else {
-            logger.trace("retrieved ontology");
-        }
-        if (GoButton==null) {
-            logger.fatal("Go Button null");
-        } else {
-            logger.trace("Go Button OK");
         }
         initTree(model.getOntology(), addHook);
-        logger.trace("done init");
+        logger.trace("Finished initilizing Human Phenotype Ontology");
         browserlabel.setAlignment(Pos.BOTTOM_RIGHT);
         String ver = getVersion();
         browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
         this.primarystage=Main.primarystage;
+        Encryption decryption=new Encryption();
+        decryption.decryptSettings();
+        initRadioButtons();
+    }
+
+    private void initRadioButtons() {
+
+        allDatabaseButton.setSelected(true);
     }
 
 
-    public void initTree(HpoOntology ontology, Consumer<HpoTerm> addHook) {
+
+
+    private void initTree(HpoOntology ontology, Consumer<HpoTerm> addHook) {
         this.ontology=ontology;
         this.addHook = addHook;
         // populate the TreeView with top-level elements from ontology hierarchy
@@ -290,7 +290,7 @@ public class MainController {
      *
      * @param termId String with HPO term id (e.g. HP:0002527 for Falls)
      */
-    void focusOnTerm(String termId) {
+    void focusOnTerm(TermId termId) {
 
         HpoTerm term = ontology.getTermMap().get(termId);
         if (term == null) {
@@ -352,7 +352,7 @@ public class MainController {
      *
      * @return {@link HpoTermTreeItem} that is currently selected
      */
-    HpoTermTreeItem getSelectedTerm() {
+    private HpoTermTreeItem getSelectedTerm() {
         return (ontologyTreeView.getSelectionModel().getSelectedItem() == null) ? null
                 : (HpoTermTreeItem) ontologyTreeView.getSelectionModel().getSelectedItem();
     }
@@ -378,15 +378,19 @@ public class MainController {
                 "</body></html>";
 
         String termID = term.getId().getIdWithPrefix();
-        String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(s->s.getValue())
+        String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
                 .collect(Collectors.joining("; "));
         // Synonyms
-        String definition = (term.getDefinition() == null) ? "" : term.getDefinition().toString();
+        String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
         String comment = (term.getComment() == null) ? "-" : term.getComment();
-        List<String> annotatedDiseases = model.getDiseaseAnnotations(termID);
+        // todo set database from the radio button
+        DiseaseModel.database database = DiseaseModel.database.ORPHANET;
+        List<DiseaseModel> annotatedDiseases = model.getDiseaseAnnotations(termID,database);
         if (annotatedDiseases==null) {
             logger.error("could not retrieve diseases for " + termID);
         }
+
+
         String content = HpoHtmlPageGenerator.getHTML(term,annotatedDiseases);
         infoWebEngine.loadContent(content);
     }
@@ -443,8 +447,6 @@ public class MainController {
     }
 
     @FXML private void suggestCorrectionToTerm(ActionEvent e) {
-
-
         if (getSelectedTerm()==null) {
             logger.error("Select a term before creating GitHub issue");
             PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
@@ -456,17 +458,37 @@ public class MainController {
         selectedTerm=getSelectedTerm().getValue().term;
         logger.trace("Will suggest correction to "+selectedTerm.getName());
         GitHubPopup popup = new GitHubPopup(selectedTerm);
-        //Stage thisStage = (Stage) goButton.getScene().getWindow();
+        popup.displayWindow(primarystage);
+        String githubissue=popup.retrieveGitHubIssue();
+        if (githubissue==null) {
+            logger.trace("got back null GitHub issue");
+            return;
+        }
+        String title=String.format("Correction to term %s",selectedTerm.getName());
+        postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
+    }
+
+    @FXML private void suggestNewChildTerm(ActionEvent e) {
+        selectedTerm=getSelectedTerm().getValue().term;
+        if (getSelectedTerm()==null) {
+            logger.warn("Select a term before creating GitHub issue");
+            PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
+                    "Error: No HPO Term selected");
+            return;
+        }
+        GitHubPopup popup = new GitHubPopup(selectedTerm,true);
         popup.displayWindow(primarystage);
         String githubissue=popup.retrieveGitHubIssue();
         if (githubissue==null) {
             logger.trace("got back null githuib issue");
             return;
         }
-        String pword=popup.getGitHubPassWord();
-        String uname=popup.getGitHubUserName();
-        logger.trace("I got github issue: "+githubissue);
-        GitHubPoster poster = new GitHubPoster(uname,pword,String.format("Correction to term %s",selectedTerm.getName()),githubissue);
+        String title=String.format("Suggesting new child term of \"%s\"",selectedTerm.getName());
+        postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
+    }
+
+    private void postGitHubIssue(String message,String title, String uname, String pword) {
+        GitHubPoster poster = new GitHubPoster(uname,pword,title,message);
         try {
             poster.postIssue();
         } catch (HPOWorkbenchException he) {
@@ -482,9 +504,15 @@ public class MainController {
 
     }
 
-    @FXML private void suggestNewChildTerm(ActionEvent e) {
-        selectedTerm=getSelectedTerm().getValue().term;
-        logger.trace("Will suggest new child term of "+selectedTerm.getName());
+
+
+    @FXML private void storeGitHubPassword() {
+        PasswordPopup popup = new PasswordPopup();
+        popup.displayWindow(this.primarystage);
+        String password = popup.getPassword();
+        String username = popup.getUsername();
+        Encryption encryption = new Encryption();
+        encryption.encryptSettings(username,password);
     }
 
 
@@ -494,7 +522,7 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("HPO Workbench");
         alert.setHeaderText("Human Phenotype Ontology Workbench");
-        String s = "A tool for working with the HPO.";
+        String s = "A tool for working with the HPO.\n\u00A9 Monarch Initiative 2018";
         alert.setContentText(s);
         alert.showAndWait();
         e.consume();
@@ -546,7 +574,7 @@ public class MainController {
                 childrenList = FXCollections.observableArrayList();
                 Set<HpoTerm> children = getTermChildren(getValue().term) ;
                 children.stream()
-                        .sorted((l, r) -> l.getName().compareTo(r.getName()))
+                        .sorted(Comparator.comparing(HpoTerm::getName))
                         .map(term -> new HpoTermTreeItem(new HpoTermWrapper(term)))
                         .forEach(childrenList::add);
                 super.getChildren().setAll(childrenList);
@@ -557,7 +585,7 @@ public class MainController {
     }
 
 
-    public  Set<HpoTerm> getTermChildren(HpoTerm term) {
+    private  Set<HpoTerm> getTermChildren(HpoTerm term) {
         Set<HpoTerm> kids = new HashSet<>();
         Iterator it =  ontology.getGraph().inEdgeIterator(term.getId());
         while (it.hasNext()) {
@@ -582,7 +610,7 @@ public class MainController {
     }
 
 
-    public boolean existsPathFromRoot(HpoTerm term) {
+    private boolean existsPathFromRoot(HpoTerm term) {
         TermId rootId = ontology.getRootTermId();
         TermId tid = term.getId();
         DirectedGraph dag = ontology.getGraph();

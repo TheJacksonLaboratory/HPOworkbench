@@ -5,8 +5,11 @@ import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
 import com.github.phenomics.ontolib.ontology.data.TermPrefix;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -48,11 +51,12 @@ public class HpoAnnotationParser {
         return tid;
     }
 
-    public  Map<TermId,List<String>> parse() {
-        Map<TermId,List<String>> annotmap=new HashMap<>();
+    public  Map<TermId,List<DiseaseModel>> parse() {
+        Map<TermId,List<DiseaseModel>> annotmap=new HashMap<>();
+        Map<TermId,Set<DiseaseModel>> tempmap=new HashMap<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader(pathToPhenotypeAnnotationTab));
-            String line=null;
+            String line;
             while ((line=br.readLine())!=null) {
                 String A[]= line.split("\t");
                 if (A.length<5) {
@@ -64,28 +68,31 @@ public class HpoAnnotationParser {
                 String diseasename=A[2];
                 int i = diseasename.indexOf(";");
                 if (i>0) diseasename=diseasename.substring(0,i); // other synonyms follow the first ";"
+                DiseaseModel dis = new DiseaseModel(db,dbId,diseasename);
                 String HPOid=A[4];
                 TermId id=string2TermId(HPOid);
                 // get all ancestors of the term (annotation propagation rule)
                 Set<TermId> ancs =ontology.getAncestorTermIds(id);
                 for (TermId t:ancs) {
-                    if (!annotmap.containsKey(t)) {
-                        annotmap.put(t, new ArrayList<String>());
+                    if (!tempmap.containsKey(t)) {
+                        tempmap.put(t, new HashSet<>());
                     }
-                    List<String> diseaselist=annotmap.get(t);
-                    diseaselist.add(String.format("%s|%s:%s",diseasename,db,dbId));
+                    Set<DiseaseModel> diseaseset=tempmap.get(t);
+                    diseaseset.add(dis);
                 }
-
-
                // logger.trace(String.format("Adding disease %s [%s:%s] to term %s",diseasename,db,dbId,id.getIdWithPrefix()));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
-        return annotmap;
+        // When we get here, we transform the sets into an immutable, sorted list
+        ImmutableMap.Builder<TermId,List<DiseaseModel>> mapbuilder= new ImmutableMap.Builder();
+        for (TermId key : tempmap.keySet()) {
+            ImmutableList.Builder<DiseaseModel> listbuilder = new ImmutableList.Builder();
+            listbuilder.addAll(tempmap.get(key));
+            mapbuilder.put(key,listbuilder.build());
+        }
+        return mapbuilder.build();
     }
 
 }

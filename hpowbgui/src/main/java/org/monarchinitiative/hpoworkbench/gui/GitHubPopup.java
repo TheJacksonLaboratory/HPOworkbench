@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.gui;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
+import com.github.phenomics.ontolib.ontology.data.TermSynonym;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,17 +32,34 @@ public class GitHubPopup {
     private final String synlist;
     private String uname=null;
     private String pword=null;
+    /** True if our new GitHub issue is to suggest a new child term for an existing HPO Term. */
+    private boolean suggestNewChildTerm=false;
+    /** This is tbhe payload of the git issue we will create. */
+    private String githubIssueText=null;
 
-    String githubIssueText=null;
-
+    /** Use this contructor to Suggest a correction to an existing HPO Term.
+     * @param term and HPO Term to which we suggest a correction as a new GitHub issue.
+     */
     public GitHubPopup(HpoTerm term) {
         termlabel=term.getName();
         termid=term.getId().getIdWithPrefix();
         definition=term.getDefinition();
         comment=term.getComment();
         synlist=term.getSynonyms().size()==0?"-":term.getSynonyms().
-                stream().map(s->s.getValue()).collect(Collectors.joining(";"));
+                stream().map(TermSynonym::getValue).collect(Collectors.joining(";"));
     }
+
+    /**
+     *
+     * @param term An HPO Term for which we ant to suggest a new child term.
+     * @param childterm set this to true if we want to create an issue to make a new child term
+     */
+    public GitHubPopup(HpoTerm term, boolean childterm) {
+        this(term);
+        this.suggestNewChildTerm=childterm;
+    }
+
+
 
     public void displayWindow(Stage ownerWindow) {
         Stage window = new Stage();
@@ -70,9 +88,7 @@ public class GitHubPopup {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
-//        Text scenetitle = new Text("Welcome");
-//        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-//        grid.add(scenetitle, 0, 0, 2, 1);
+
 
         Label userName = new Label("GitHub Username:");
         grid.add(userName, 0, 0);
@@ -104,6 +120,18 @@ public class GitHubPopup {
 
 
     private String getInitialText() {
+        if (suggestNewChildTerm) {
+            return String.format("Suggest creating new child term of %s [%s] \n" +
+                    "New term label:\n" +
+                    "New term definition:\n" +
+                    "New term comment (if any):\n" +
+                    "New term synonyms(if any):\n" +
+                    "New term lay person synonyms (if any):\n" +
+                    "Reference (e.g., PubMed ID):\n" +
+                    "Your biocurator ID for nanoattribution (if desired):",termlabel,termid);
+        }
+
+
         return String.format("Suggestion about term %s [%s]\nCurrent definition: %s\n" +
                         "Current comment: %s\nCurrent synonym list: %s\n\n" +
                         "My suggestion: \n",
@@ -124,9 +152,9 @@ public class GitHubPopup {
     /**
      * Ensure that popup Stage will be displayed on the same monitor as the parent Stage
      *
-     * @param childStage
-     * @param parentStage
-     * @return
+     * @param childStage reference to new window that will appear
+     * @param parentStage reference to the primary stage
+     * @return a new Stage to display a dialog.
      */
     private static Stage adjustStagePosition(Stage childStage, Stage parentStage) {
         ObservableList<Screen> screensForParentWindow = Screen.getScreensForRectangle(parentStage.getX(), parentStage.getY(),
