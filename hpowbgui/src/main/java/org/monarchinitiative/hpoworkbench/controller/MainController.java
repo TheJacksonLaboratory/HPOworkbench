@@ -474,7 +474,11 @@ public class MainController {
         }
         catch (Exception ex) {
             PopUps.showException("GitHub error","GitHub error","Could not post issue", ex);
+            return;
         }
+        String response=poster.getHttpResponse();
+        PopUps.showInfoMessage(
+                String.format("Created issue for %s\nServer response: %s",selectedTerm.getName(),response),"Created new issue");
 
     }
 

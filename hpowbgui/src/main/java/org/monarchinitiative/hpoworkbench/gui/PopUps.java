@@ -218,29 +218,6 @@ public class PopUps {
         alert.showAndWait();
     }
 
-   /* public static void showValidationResults(String windowTitle, List<ValidationLine> valList, Stage ownerWindow) {
-        Stage window = getPopUpStage(windowTitle);
-        Stage adjWindow = adjustStagePosition(window, ownerWindow);
-
-        Parent parent = null;
-        ValidationResultsController controller = null;
-        try {
-            FXMLLoader loader = new FXMLLoader(PopUps.class.getResource(showValidationResults));
-            parent = (Parent) loader.load();
-            controller = (ValidationResultsController) loader.getController();
-
-        } catch (IOException ioe) {
-            System.err.println("Fatal error - unaccessible resource " + showValidationResults);
-            System.err.println(ioe.getMessage());
-            System.exit(1);
-        }
-
-        controller.setWindow(adjWindow);
-        controller.addValidationResults(valList);
-        adjWindow.setScene(new Scene(parent));
-        adjWindow.showAndWait();
-
-    }*/
 
     public static void showHtmlContent(String windowTitle, String resourcePath, Stage ownerWindow) {
         Stage window = getPopUpStage(windowTitle);

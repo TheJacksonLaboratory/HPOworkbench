@@ -1,11 +1,14 @@
 package org.monarchinitiative.hpoworkbench.github;
 
 
+import org.json.simple.JSONValue;
+
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+
 
 
 public class GitHubPoster {
@@ -19,7 +22,11 @@ public class GitHubPoster {
     private String password;
     private String payload;
 
+    private int responsecode;
+    private String response=null;
 
+
+    public String getHttpResponse() { return String.format("%s [code: %d]",response,responsecode);}
 
 
     public GitHubPoster(String uname, String passw, String title, String messagebody) {
@@ -29,12 +36,17 @@ public class GitHubPoster {
     }
 
 
+    private String jsonFormat(String s) {
+        return JSONValue.escape(s);
+    }
+
+
+
     private String formatPayload(String title, String messagebody) {
         return String.format("{\n" +
                         "\"title\": \"%s\",\n" +
                         "\"body\": \"%s\"}",
-               title,messagebody.replaceAll("\"","'"));
-
+                JSONValue.escape(title),JSONValue.escape(messagebody));
     }
 
 
@@ -67,11 +79,11 @@ public class GitHubPoster {
                     http.getResponseMessage(),
                     http.getResponseCode());
             throw new Exception(erro);
+        } else {
+            this.response=http.getResponseMessage();
+            this.responsecode=http.getResponseCode();
         }
 
-
-
-       System.out.println("Response: "+http.getResponseMessage() + " (" + http.getResponseCode() + ")");
     }
 
 
