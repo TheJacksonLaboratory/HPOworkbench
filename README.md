@@ -30,6 +30,18 @@ Please create a new column or columns in this file that will contain your commen
 and suggestions. You are welcome to contact the HPO team to 
 get advice about this before you start (see the HPO Website for email addresses).
 
+## Creating GitHub issues
+Users can create an issue with a suggestion for an existing term by navigating to a term they would like to
+comment on and clicking on the create suggestion button. Users will need to enter their GitHub username
+and password (which will be stored for the duration of the session, so that multiple issues can be created
+without having to reenter the GitHub username and password multiple times.
+If users would like to suggest a new term, navigate to the proposed parent of the new term, and click on
+suggest child term.
+
+## Viewing annotated diseases
+The diseases annotated to a given HPO term (including direct and implied annotations) can be viewed in the
+browser. If desired, users can limit the diseases to one of the databases, Orphanet, OMIM, or DECIPHER.
+
 ## Command line
 Some of the functionality is also available in the command line (cli) module
 and may be useful for scripting.
