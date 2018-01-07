@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.io;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
+import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
@@ -18,22 +19,27 @@ import java.util.*;
 
 /**
  * The purpose of this class is to parse the phenotype_annotation.tab file in order to give the user
- * and overview of the diseases annotated to any given HPO term. For now we will not provide an overview
- * that starts with diseases and show the HPO terms (ToDo add this once the functionality has been added
- * to the main branch of ontolib).
+ * and overview of the diseases annotated to any given HPO term.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
- * @version 0.0.1
+ * @version 0.2.13
  */
 public class HpoAnnotationParser {
     private static final Logger logger = LogManager.getLogger();
     private final String pathToPhenotypeAnnotationTab;
     private final HpoOntology ontology;
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
+
+
+    private Map<TermId,List<DiseaseModel>> directannotmap=null;
+    private Map<TermId,List<DiseaseModel>> indirectannotmap=null;
+
     public HpoAnnotationParser(String path,HpoOntology onto) {
         pathToPhenotypeAnnotationTab=path;
         ontology=onto;
     }
 
+
+    public Map<TermId,List<DiseaseModel>> getDirectannotmap() { return directannotmap; }
 
     private TermId string2TermId(String termstring) {
         if (termstring.startsWith("HP:")) {
@@ -52,11 +58,15 @@ public class HpoAnnotationParser {
     }
 
     public  Map<TermId,List<DiseaseModel>> parse() {
-        Map<TermId,List<DiseaseModel>> annotmap=new HashMap<>();
+        indirectannotmap=new HashMap<>();
+        directannotmap=new HashMap<>();
         Map<TermId,Set<DiseaseModel>> tempmap=new HashMap<>();
+
+
         try {
             BufferedReader br = new BufferedReader(new FileReader(pathToPhenotypeAnnotationTab));
             String line;
+            int c=0;
             while ((line=br.readLine())!=null) {
                 String A[]= line.split("\t");
                 if (A.length<5) {
@@ -71,7 +81,11 @@ public class HpoAnnotationParser {
                 DiseaseModel dis = new DiseaseModel(db,dbId,diseasename);
                 String HPOid=A[4];
                 TermId id=string2TermId(HPOid);
-                // get all ancestors of the term (annotation propagation rule)
+                if (!directannotmap.containsKey(id)) {
+                    directannotmap.put(id,new ArrayList<>());
+
+                }
+                directannotmap.get(id).add(dis);
                 Set<TermId> ancs =ontology.getAncestorTermIds(id);
                 for (TermId t:ancs) {
                     if (!tempmap.containsKey(t)) {

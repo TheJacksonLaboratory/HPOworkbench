@@ -54,6 +54,29 @@
    <left>
       <VBox BorderPane.alignment="CENTER">
          <children>
+            <HBox prefHeight="44.0" prefWidth="380.0">
+               <children>
+                  <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse HPO Terms or Diseases">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox prefHeight="39.0" prefWidth="380.0">
+               <children>
+                  <RadioButton fx:id="hpoTermRadioButton" mnemonicParsing="false" text="HPO Terms" userData="hpo">
+                     <HBox.margin>
+                        <Insets left="5.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="diseaseRadioButton" mnemonicParsing="false" text="Diseases" userData="disease">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
+               </children>
+            </HBox>
             <HBox maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
                <children>
                   <TextField fx:id="searchTextField" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" promptText="autocomplete HPO term...">

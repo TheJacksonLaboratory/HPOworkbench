@@ -62,4 +62,30 @@ public class DiseaseModel {
 
 
 
+    /** Hash code is based on the end and start positions as well as on the chromosome */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = prime * diseasename.hashCode();
+        result = result * disease_id.hashCode();
+        result = result * database().hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DiseaseModel other = (DiseaseModel) obj;
+        return (database().equals(other.database()) &&
+            disease_id.equals(other.disease_id) &&
+            diseasename.equals(other.diseasename));
+    }
+
+
+
 }

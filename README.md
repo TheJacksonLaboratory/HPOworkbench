@@ -48,4 +48,5 @@ and may be useful for scripting.
 
 ## Warning
 
-This project is still in a very early phase, the software is mature enough for demonstration purposes but will be subject to Q/C and testing shortly.
+This project is still in an early phase, and the code is not yet entirely mature. Please report any
+bugs or make feature requests.

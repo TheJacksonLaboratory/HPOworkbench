@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 
 /**
  * Controller for HPO Workbench
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class MainController {
     private static final Logger logger = LogManager.getLogger();
@@ -71,6 +72,8 @@ public class MainController {
     @FXML private Button GoButton;
     @FXML private Label browserlabel;
     @FXML private RadioButton allDatabaseButton,orphanetButton,omimButton,decipherButton;
+    @FXML private RadioButton hpoTermRadioButton;
+    @FXML private RadioButton diseaseRadioButton;
 
     private String githubUsername=null;
     private String githubPassword;
@@ -78,8 +81,12 @@ public class MainController {
     private  Stage primarystage;
 
     private DiseaseModel.database selectedDatabase=DiseaseModel.database.ALL;
+    /** If this is true, then the HPO Workbench browser will display the HPO terms that directly annotate a disease. */
+    private boolean browseDiseases=false;
 
-    private Main mainApp=null;
+    private Map<String,DiseaseModel> string2diseasemap=null;
+
+    //private Main mainApp=null;
 
     /** Approved {@link HpoTerm} is submitted here. */
     private Consumer<HpoTerm> addHook;
@@ -200,11 +207,19 @@ public class MainController {
      */
     @FXML
     private void goButtonAction() {
-        TermId id = labels.get(searchTextField.getText());
-        if (id==null) return; // button was clicked while field was empty, no need to do anything
-        logger.trace("go button for term %s [%s]",searchTextField.getText(),id.getIdWithPrefix());
-        expandUntilTerm(ontology.getTermMap().get(id));
-        searchTextField.clear();
+        if (browseDiseases ) {
+            DiseaseModel dmod = string2diseasemap.get(searchTextField.getText());
+            if (dmod==null) return;
+            logger.trace("Got disease "+ dmod.getDiseaseName());
+            updateDescriptionToDiseaseModel(dmod);
+            searchTextField.clear();
+        } else {
+            TermId id = labels.get(searchTextField.getText());
+            if (id == null) return; // button was clicked while field was empty, no need to do anything
+            logger.trace("got term %s [%s]", searchTextField.getText(), id.getIdWithPrefix());
+            expandUntilTerm(ontology.getTermMap().get(id));
+            searchTextField.clear();
+        }
     }
 
     public static String getVersion() {
@@ -236,6 +251,11 @@ public class MainController {
         browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
         this.primarystage=Main.primarystage;
         initRadioButtons();
+        initDiseaseAutocomplete();
+    }
+
+    private void initDiseaseAutocomplete() {
+        string2diseasemap = model.getDiseases();
     }
 
     private void initRadioButtons() {
@@ -268,6 +288,30 @@ public class MainController {
                         }
                     }
                 });
+        // now the HPO vs disease
+        ToggleGroup group2=new ToggleGroup();
+        hpoTermRadioButton.setSelected(true);
+        hpoTermRadioButton.setToggleGroup(group2);
+        diseaseRadioButton.setToggleGroup(group2);
+        group2.selectedToggleProperty().addListener((ov,oldval,newval) ->{
+            String userdata=(String)newval.getUserData();
+            if (userdata.equals("hpo")) {
+                browseDiseases=false;
+                if (labels !=null) {
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
+                } else {
+                    logger.error("Attempt to init autocomplete with null list of HPO terms");
+                }
+            }
+            else if (userdata.equals("disease")){
+                browseDiseases=true;
+                if (this.string2diseasemap!=null) {
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField,string2diseasemap.keySet());
+                } else {
+                    logger.warn("Attempt to init autocomplete with null list of diseases");
+                }
+            }
+        });
     }
 
 
@@ -389,29 +433,26 @@ public class MainController {
         if (treeItem == null)
             return;
         HpoTerm term = treeItem.getValue().term;
-        String HTML_TEMPLATE = "<!DOCTYPE html>" +
-                "<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>HPO tree browser</title></head>" +
-                "<body>" +
-                "<p><b>Term ID:</b> %s</p>" +
-                "<p><b>Term Name:</b> %s</p>" +
-                "<p><b>Synonyms:</b> %s</p>" +
-                "<p><b>Definition:</b> %s</p>" +
-                "<p><b>Comment:</b> %s</p>" +
-                "</body></html>";
-
         String termID = term.getId().getIdWithPrefix();
-        String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
-                .collect(Collectors.joining("; "));
-        // Synonyms
-        String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
-        String comment = (term.getComment() == null) ? "-" : term.getComment();
         List<DiseaseModel> annotatedDiseases = model.getDiseaseAnnotations(termID,selectedDatabase);
         if (annotatedDiseases==null) {
             logger.error("could not retrieve diseases for " + termID);
         }
-
-
         String content = HpoHtmlPageGenerator.getHTML(term,annotatedDiseases);
+        infoWebEngine.loadContent(content);
+    }
+
+
+    /**
+     * Update content of the {@link #infoWebView} with currently selected {@link HpoTerm}.
+     *
+     * @param dmodel currently selected {@link TreeItem} containing {@link HpoTerm}
+     */
+    private void updateDescriptionToDiseaseModel(DiseaseModel dmodel) {
+        String dbName = dmodel.getDiseaseDbAndId();
+        String diseaseName = dmodel.getDiseaseName();
+        List<HpoTerm> annotatingTerms=model.getAnnotationTermsForDisease(dmodel);
+        String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName,diseaseName,annotatingTerms);
         infoWebEngine.loadContent(content);
     }
 
