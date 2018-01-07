@@ -95,6 +95,9 @@ public class GitHubPopup {
 
         TextField userTextField = new TextField();
         grid.add(userTextField, 1, 0);
+        if (uname!=null) {
+            userTextField.setText(uname);
+        }
 
         Label pw = new Label("GitHub Password:");
         grid.add(pw, 0, 1);
@@ -106,6 +109,9 @@ public class GitHubPopup {
             pword=pwBox.getText();
             window.close();
         });
+        if (pword!=null) {
+            pwBox.setText(pword);
+        }
         HBox hbox= new HBox();
         hbox.setSpacing(10);
         hbox.getChildren().addAll(cancelButton,okButton);
@@ -116,6 +122,11 @@ public class GitHubPopup {
 
         window.setScene(scene);
         window.showAndWait();
+    }
+
+    public void setupGithubUsernamePassword(String ghuname, String ghpword) {
+        uname=ghuname;
+        pword=ghpword;
     }
 
 

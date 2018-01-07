@@ -34,7 +34,6 @@ import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.gui.*;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
-import org.monarchinitiative.hpoworkbench.io.Encryption;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
@@ -72,6 +71,9 @@ public class MainController {
     @FXML private Button GoButton;
     @FXML private Label browserlabel;
     @FXML private RadioButton allDatabaseButton,orphanetButton,omimButton,decipherButton;
+
+    private String githubUsername=null;
+    private String githubPassword;
 
     private  Stage primarystage;
 
@@ -233,8 +235,6 @@ public class MainController {
         String ver = getVersion();
         browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
         this.primarystage=Main.primarystage;
-        Encryption decryption=new Encryption();
-        //decryption.decryptSettings();
         initRadioButtons();
     }
 
@@ -478,6 +478,7 @@ public class MainController {
         selectedTerm=getSelectedTerm().getValue().term;
         logger.trace("Will suggest correction to "+selectedTerm.getName());
         GitHubPopup popup = new GitHubPopup(selectedTerm);
+        popup.setupGithubUsernamePassword(githubUsername,githubPassword);
         popup.displayWindow(primarystage);
         String githubissue=popup.retrieveGitHubIssue();
         if (githubissue==null) {
@@ -497,6 +498,7 @@ public class MainController {
             return;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm,true);
+        popup.setupGithubUsernamePassword(githubUsername,githubPassword);
         popup.displayWindow(primarystage);
         String githubissue=popup.retrieveGitHubIssue();
         if (githubissue==null) {
@@ -509,6 +511,8 @@ public class MainController {
 
     private void postGitHubIssue(String message,String title, String uname, String pword) {
         GitHubPoster poster = new GitHubPoster(uname,pword,title,message);
+        this.githubUsername=uname;
+        this.githubPassword=pword;
         try {
             poster.postIssue();
         } catch (HPOWorkbenchException he) {
@@ -522,17 +526,6 @@ public class MainController {
         PopUps.showInfoMessage(
                 String.format("Created issue for %s\nServer response: %s",selectedTerm.getName(),response),"Created new issue");
 
-    }
-
-
-
-    @FXML private void storeGitHubPassword() {
-        PasswordPopup popup = new PasswordPopup();
-        popup.displayWindow(this.primarystage);
-        String password = popup.getPassword();
-        String username = popup.getUsername();
-        Encryption encryption = new Encryption();
-        encryption.encryptSettings(username,password);
     }
 
 

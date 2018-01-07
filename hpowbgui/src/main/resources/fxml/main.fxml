@@ -34,7 +34,6 @@
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
                         <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
-                        <MenuItem mnemonicParsing="false" onAction="#storeGitHubPassword" text="Save GitHub username" />
                   </items>
                 </Menu>
               </menus>
