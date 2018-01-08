@@ -38,9 +38,28 @@ without having to reenter the GitHub username and password multiple times.
 If users would like to suggest a new term, navigate to the proposed parent of the new term, and click on
 suggest child term.
 
+A dialog will appear with information about the term selected by the user. Enter your suggestion in the
+text field. Then, enter your GitHub username and password, and  and click on *Create github issue*. HPO
+Workbench will store the username and password for the duration of the session so they only need to be
+entered once. The data is not written to disk.
+
+![HPO Workbench screenshot](misc/GitHubNewIssue.png)
+
 ## Viewing annotated diseases
 The diseases annotated to a given HPO term (including direct and implied annotations) can be viewed in the
 browser. If desired, users can limit the diseases to one of the databases, Orphanet, OMIM, or DECIPHER.
+To find the disease of interest, choose the radio button *diseases* and use the autocomplete field
+to find the disease, and click on the GO button.
+
+![HPO Workbench screenshot](misc/HPOworkbenchDiseaseView.png)
+
+
+## Suggesting new annotations
+First navigate to a disease of interest as above. Then, click on the *New annotation* radio button. Then
+use the autocomplete field or the HPO ontology hierarchy on the left to find the term you would like to
+propose as a new annotation for the disease. Then, click on the *Suggest new annotation* button to
+open a new GitHub issue as above. Again, please modify the text to provide information to support the suggestion.
+
 
 ## Command line
 Some of the functionality is also available in the command line (cli) module
