@@ -27,7 +27,7 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
-                    <MenuItem fx:id="close" mnemonicParsing="false" onAction="#close" text="Quit" />
+                    <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
@@ -75,6 +75,11 @@
                         <Insets left="5.0" right="5.0" top="10.0" />
                      </HBox.margin>
                   </RadioButton>
+                  <RadioButton fx:id="newAnnotationRadioButton" mnemonicParsing="false" text="New Annotation" userData="newannotation">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
                </children>
             </HBox>
             <HBox maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
@@ -116,6 +121,7 @@
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
                         <Button minWidth="150.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" text="Export hierarchical Summary">
@@ -136,6 +142,7 @@
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
+                        <Button mnemonicParsing="false" onAction="#suggestNewAnnotation" text="Suggest new annotation" GridPane.rowIndex="2" />
                      </children>
                      <HBox.margin>
                         <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />

@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 
 import java.util.stream.Collectors;
 
@@ -30,35 +31,49 @@ public class GitHubPopup {
     private final String definition;
     private final String comment;
     private final String synlist;
-    private String uname=null;
-    private String pword=null;
-    /** True if our new GitHub issue is to suggest a new child term for an existing HPO Term. */
-    private boolean suggestNewChildTerm=false;
-    /** This is tbhe payload of the git issue we will create. */
-    private String githubIssueText=null;
+    private String uname = null;
+    private String pword = null;
+    /**
+     * True if our new GitHub issue is to suggest a new child term for an existing HPO Term.
+     */
+    private boolean suggestNewChildTerm = false;
+    /**
+     * This is tbhe payload of the git issue we will create.
+     */
+    private String githubIssueText = null;
+    private boolean newAnnotation = false;
+    private DiseaseModel dmodel = null;
 
-    /** Use this contructor to Suggest a correction to an existing HPO Term.
+    /**
+     * Use this contructor to Suggest a correction to an existing HPO Term.
+     *
      * @param term and HPO Term to which we suggest a correction as a new GitHub issue.
      */
     public GitHubPopup(HpoTerm term) {
-        termlabel=term.getName();
-        termid=term.getId().getIdWithPrefix();
-        definition=term.getDefinition();
-        comment=term.getComment();
-        synlist=term.getSynonyms().size()==0?"-":term.getSynonyms().
+        termlabel = term.getName();
+        termid = term.getId().getIdWithPrefix();
+        definition = term.getDefinition();
+        comment = term.getComment();
+        synlist = term.getSynonyms().size() == 0 ? "-" : term.getSynonyms().
                 stream().map(TermSynonym::getValue).collect(Collectors.joining(";"));
     }
 
     /**
-     *
-     * @param term An HPO Term for which we ant to suggest a new child term.
+     * @param term      An HPO Term for which we ant to suggest a new child term.
      * @param childterm set this to true if we want to create an issue to make a new child term
      */
     public GitHubPopup(HpoTerm term, boolean childterm) {
         this(term);
-        this.suggestNewChildTerm=childterm;
+        this.suggestNewChildTerm = childterm;
     }
 
+
+    public GitHubPopup(HpoTerm term, DiseaseModel dmodel) {
+        this(term);
+        this.dmodel = dmodel;
+        newAnnotation = true;
+
+    }
 
 
     public void displayWindow(Stage ownerWindow) {
@@ -73,17 +88,17 @@ public class GitHubPopup {
         root.setPadding(new Insets(10));
         root.setSpacing(5);
 
-        root.getChildren().add(new Label(String.format("Enter new GitHub issue about %s:",termlabel)));
+        root.getChildren().add(new Label(String.format("Enter new GitHub issue about %s:", termlabel)));
 
         TextArea textArea = new TextArea();
-        textArea.setText(getInitialText() );
+        textArea.setText(getInitialText());
         root.getChildren().add(textArea);
 
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> window.close());
         Button okButton = new Button("Create GitHub issue");
 
-        GridPane grid=new GridPane();
+        GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
@@ -95,7 +110,7 @@ public class GitHubPopup {
 
         TextField userTextField = new TextField();
         grid.add(userTextField, 1, 0);
-        if (uname!=null) {
+        if (uname != null) {
             userTextField.setText(uname);
         }
 
@@ -104,17 +119,17 @@ public class GitHubPopup {
         PasswordField pwBox = new PasswordField();
         grid.add(pwBox, 1, 1);
         okButton.setOnAction(e -> {
-            githubIssueText=textArea.getText();
-            uname=userTextField.getText();
-            pword=pwBox.getText();
+            githubIssueText = textArea.getText();
+            uname = userTextField.getText();
+            pword = pwBox.getText();
             window.close();
         });
-        if (pword!=null) {
+        if (pword != null) {
             pwBox.setText(pword);
         }
-        HBox hbox= new HBox();
+        HBox hbox = new HBox();
         hbox.setSpacing(10);
-        hbox.getChildren().addAll(cancelButton,okButton);
+        hbox.getChildren().addAll(cancelButton, okButton);
 
         root.getChildren().add(hbox);
         root.getChildren().add(grid);
@@ -125,8 +140,8 @@ public class GitHubPopup {
     }
 
     public void setupGithubUsernamePassword(String ghuname, String ghpword) {
-        uname=ghuname;
-        pword=ghpword;
+        uname = ghuname;
+        pword = ghpword;
     }
 
 
@@ -139,31 +154,46 @@ public class GitHubPopup {
                     "New term synonyms(if any):\n" +
                     "New term lay person synonyms (if any):\n" +
                     "Reference (e.g., PubMed ID):\n" +
-                    "Your biocurator ID for nanoattribution (if desired):",termlabel,termid);
+                    "Your biocurator ID for nanoattribution (if desired):", termlabel, termid);
+        } else if (newAnnotation) {
+            return String.format("Suggest creating new annotation for disease %s [%s] \n" +
+                            "New annotation: %s [%s]\n" +
+                            "Reference (e.g., PubMed ID):\n" +
+                            "Your biocurator ID for nanoattribution (if desired):\n" +
+                            "Anything else:",
+                    dmodel.getDiseaseName(),
+                    dmodel.getDiseaseDbAndId(),
+                    termlabel, termid);
+        } else {
+            return String.format("Suggestion about term %s [%s]\nCurrent definition: %s\n" +
+                            "Current comment: %s\nCurrent synonym list: %s\n\n" +
+                            "My suggestion: \n",
+                    termlabel,
+                    termid,
+                    definition != null ? definition : "no definition available",
+                    comment != null ? comment : "no comment available",
+                    synlist != null ? synlist : "-");
         }
-
-
-        return String.format("Suggestion about term %s [%s]\nCurrent definition: %s\n" +
-                        "Current comment: %s\nCurrent synonym list: %s\n\n" +
-                        "My suggestion: \n",
-               termlabel,
-                termid,
-                definition!=null?definition:"no definition available",
-                comment!=null?comment:"no comment available",
-                synlist!=null?synlist:"-");
     }
 
 
-    public String retrieveGitHubIssue(){ return githubIssueText; }
-    public String getGitHubUserName() { return uname;}
-    public String getGitHubPassWord() { return pword;}
+    public String retrieveGitHubIssue() {
+        return githubIssueText;
+    }
 
+    public String getGitHubUserName() {
+        return uname;
+    }
+
+    public String getGitHubPassWord() {
+        return pword;
+    }
 
 
     /**
      * Ensure that popup Stage will be displayed on the same monitor as the parent Stage
      *
-     * @param childStage reference to new window that will appear
+     * @param childStage  reference to new window that will appear
      * @param parentStage reference to the primary stage
      * @return a new Stage to display a dialog.
      */
