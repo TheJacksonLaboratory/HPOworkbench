@@ -27,7 +27,7 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
-                    <MenuItem fx:id="close" mnemonicParsing="false" onAction="#close" text="Quit" />
+                    <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
@@ -54,6 +54,34 @@
    <left>
       <VBox BorderPane.alignment="CENTER">
          <children>
+            <HBox prefHeight="44.0" prefWidth="380.0">
+               <children>
+                  <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse HPO Terms or Diseases">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox prefHeight="39.0" prefWidth="380.0">
+               <children>
+                  <RadioButton fx:id="hpoTermRadioButton" mnemonicParsing="false" text="HPO Terms" userData="hpo">
+                     <HBox.margin>
+                        <Insets left="5.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="diseaseRadioButton" mnemonicParsing="false" text="Diseases" userData="disease">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="newAnnotationRadioButton" mnemonicParsing="false" text="New Annotation" userData="newannotation">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
+               </children>
+            </HBox>
             <HBox maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
                <children>
                   <TextField fx:id="searchTextField" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" promptText="autocomplete HPO term...">
@@ -93,22 +121,32 @@
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button minWidth="150.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" text="Export hierarchical Summary">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" text="Export hierarchical Summary">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="150.0" mnemonicParsing="false" onAction="#exportToExcel" text="Export ontology as Excel file" GridPane.rowIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportToExcel" text="Export ontology as Excel file" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="180.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" text="Suggest correction " GridPane.columnIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" text="Suggest correction " GridPane.columnIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button minWidth="180.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </GridPane.margin>
+                        </Button>
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" text="Suggest new annotation" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets right="5.0" />
+                           </GridPane.margin></Button>
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>

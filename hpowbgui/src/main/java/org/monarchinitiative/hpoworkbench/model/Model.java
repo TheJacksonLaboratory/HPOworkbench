@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.model;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
+import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
@@ -8,13 +9,13 @@ import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.exception.HPOException;
+import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.hpoworkbench.io.HpoAnnotationParser;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalHPOPath;
 import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalPhenotypeAnnotationPath;
@@ -31,16 +32,17 @@ public class Model {
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
     /** Ontology model for full HPO ontology (all subhierarchies). */
     private HpoOntology ontology=null;
-    /** List of annotated diseases */
+    /** List of annotated diseases (direct annotations) */
     private Map<TermId,List<DiseaseModel>> annotmap=null;
+    /** List of all indirected annotations (by annotation propagation rule). */
+    private Map<TermId,List<DiseaseModel>> directAnnotMap=null;
+
 
 
     public Model(){
         initPaths();
         importData();
     }
-
-
 
 
 
@@ -62,32 +64,13 @@ public class Model {
             HpoOntology ontology = getOntology();
             HpoAnnotationParser parser = new HpoAnnotationParser(this.pathToAnnotationFile,ontology);
             annotmap=parser.parse();
+            directAnnotMap=parser.getDirectannotmap();
         }
         logger.trace("Ingested annot map with size="+annotmap.size());
 
     }
 
 
-    public void setPathToHpOboFile(String p) { pathToHpoOboFile=p; }
-    public void setPathToSettingsFile(String p) { this.pathToSettingsFile=p;}
-
-    /** Write a few settings to a file in the user's .hpoworkbench directory. */
-    public void writeSettings() {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(pathToSettingsFile));
-
-            if (pathToAnnotationFile!=null) {
-                bw.write(String.format("annotationFile:%s\n",pathToAnnotationFile));
-            }
-            if (pathToHpoOboFile!=null) {
-                bw.write(String.format("hp-obo:%s\n",pathToHpoOboFile));
-            }
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("Could not write settings at " + pathToSettingsFile);
-        }
-    }
 
 
     public List<DiseaseModel> getDiseaseAnnotations(String hpoTermId, DiseaseModel.database dbase) {
@@ -100,7 +83,7 @@ public class Model {
         // user wan't all databases, just pass through
         if (dbase== DiseaseModel.database.ALL) return diseases;
         // filter for desired database
-        ImmutableList.Builder builder = new ImmutableList.Builder();
+        ImmutableList.Builder<DiseaseModel> builder = new ImmutableList.Builder();
         for (DiseaseModel dm : diseases) {
             if (dm.database().equals(dbase)) {
                 builder.add(dm);
@@ -127,6 +110,28 @@ public class Model {
     }
 
 
+    public List<HpoTerm> getAnnotationTermsForDisease(DiseaseModel dmod) {
+        List<HpoTerm> annotating=new ArrayList<>();
+        for (TermId tid : directAnnotMap.keySet()) {
+            if (directAnnotMap.get(tid).contains(dmod)) {
+                HpoTerm term = ontology.getTermMap().get(tid);
+                annotating.add(term);
+            }
+        }
+        return annotating;
+    }
+
+
+    public HashMap<String,DiseaseModel> getDiseases() {
+        HashMap<String,DiseaseModel> mods = new HashMap<>();
+        for (TermId tid : directAnnotMap.keySet()) {
+            List<DiseaseModel> ls = directAnnotMap.get(tid);
+            for (DiseaseModel dmod : ls) {
+                mods.put(dmod.getDiseaseName(),dmod);
+            }
+        }
+        return mods;
+    }
 
 
 

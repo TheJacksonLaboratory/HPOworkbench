@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 
 /**
  * Controller for HPO Workbench
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class MainController {
     private static final Logger logger = LogManager.getLogger();
@@ -71,6 +72,9 @@ public class MainController {
     @FXML private Button GoButton;
     @FXML private Label browserlabel;
     @FXML private RadioButton allDatabaseButton,orphanetButton,omimButton,decipherButton;
+    @FXML private RadioButton hpoTermRadioButton;
+    @FXML private RadioButton diseaseRadioButton;
+    @FXML private RadioButton newAnnotationRadioButton;
 
     private String githubUsername=null;
     private String githubPassword;
@@ -78,14 +82,21 @@ public class MainController {
     private  Stage primarystage;
 
     private DiseaseModel.database selectedDatabase=DiseaseModel.database.ALL;
+    /** Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations? */
+    enum mode {BROWSE_HPO,BROWSE_DISEASE,NEW_ANNOTATION}
+    /** Current behavior of HPO Workbench. See {@link mode}. */
+    private mode currentMode=mode.BROWSE_HPO;
 
-    private Main mainApp=null;
+    private Map<String,DiseaseModel> string2diseasemap=null;
+
 
     /** Approved {@link HpoTerm} is submitted here. */
     private Consumer<HpoTerm> addHook;
 
     /** The term that is currently selected in the Browser window. */
     private HpoTerm selectedTerm=null;
+
+    private DiseaseModel selectedDisease=null;
 
 
     public MainController() {
@@ -200,11 +211,26 @@ public class MainController {
      */
     @FXML
     private void goButtonAction() {
-        TermId id = labels.get(searchTextField.getText());
-        if (id==null) return; // button was clicked while field was empty, no need to do anything
-        logger.trace("go button for term %s [%s]",searchTextField.getText(),id.getIdWithPrefix());
-        expandUntilTerm(ontology.getTermMap().get(id));
-        searchTextField.clear();
+        if (currentMode.equals(mode.BROWSE_DISEASE) ) {
+            DiseaseModel dmod = string2diseasemap.get(searchTextField.getText());
+            if (dmod==null) return;
+            logger.trace("Got disease "+ dmod.getDiseaseName());
+            updateDescriptionToDiseaseModel(dmod);
+            selectedDisease=dmod;
+            searchTextField.clear();
+        } else if (currentMode.equals(mode.BROWSE_HPO)){
+            TermId id = labels.get(searchTextField.getText());
+            if (id == null) return; // button was clicked while field was empty, no need to do anything
+            logger.trace("got term %s [%s]", searchTextField.getText(), id.getIdWithPrefix());
+            expandUntilTerm(ontology.getTermMap().get(id));
+            searchTextField.clear();
+        } else if (currentMode==mode.NEW_ANNOTATION) {
+            TermId id = labels.get(searchTextField.getText());
+            if (id == null) return; // button was clicked while field was empty, no need to do anything
+            logger.trace("got term %s [%s]", searchTextField.getText(), id.getIdWithPrefix());
+            expandUntilTerm(ontology.getTermMap().get(id));
+            searchTextField.clear();
+        }
     }
 
     public static String getVersion() {
@@ -236,6 +262,11 @@ public class MainController {
         browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
         this.primarystage=Main.primarystage;
         initRadioButtons();
+        initDiseaseAutocomplete();
+    }
+
+    private void initDiseaseAutocomplete() {
+        string2diseasemap = model.getDiseases();
     }
 
     private void initRadioButtons() {
@@ -268,6 +299,37 @@ public class MainController {
                         }
                     }
                 });
+        // now the HPO vs disease
+        ToggleGroup group2=new ToggleGroup();
+        hpoTermRadioButton.setSelected(true);
+        hpoTermRadioButton.setToggleGroup(group2);
+        diseaseRadioButton.setToggleGroup(group2);
+        newAnnotationRadioButton.setToggleGroup(group2);
+        group2.selectedToggleProperty().addListener((ov,oldval,newval) ->{
+            String userdata=(String)newval.getUserData();
+            if (userdata.equals("hpo")) {
+                currentMode=mode.BROWSE_HPO;
+                if (labels !=null) {
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
+                } else {
+                    logger.error("Attempt to init autocomplete with null list of HPO terms");
+                }
+            } else if (userdata.equals("disease")){
+                currentMode=mode.BROWSE_DISEASE;
+                if (this.string2diseasemap!=null) {
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField,string2diseasemap.keySet());
+                } else {
+                    logger.warn("Attempt to init autocomplete with null list of diseases");
+                }
+            } else if (userdata.equals("newannotation")) {
+                currentMode=mode.NEW_ANNOTATION;
+                if (labels !=null) {
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
+                } else {
+                    logger.error("Attempt to init autocomplete with null list of HPO terms");
+                }
+            }
+        });
     }
 
 
@@ -386,32 +448,31 @@ public class MainController {
      * @param treeItem currently selected {@link TreeItem} containing {@link HpoTerm}
      */
     private void updateDescription(TreeItem<HpoTermWrapper> treeItem) {
+        if (currentMode.equals(mode.NEW_ANNOTATION)) {return; }
         if (treeItem == null)
             return;
-        HpoTerm term = treeItem.getValue().term;
-        String HTML_TEMPLATE = "<!DOCTYPE html>" +
-                "<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>HPO tree browser</title></head>" +
-                "<body>" +
-                "<p><b>Term ID:</b> %s</p>" +
-                "<p><b>Term Name:</b> %s</p>" +
-                "<p><b>Synonyms:</b> %s</p>" +
-                "<p><b>Definition:</b> %s</p>" +
-                "<p><b>Comment:</b> %s</p>" +
-                "</body></html>";
 
+        HpoTerm term = treeItem.getValue().term;
         String termID = term.getId().getIdWithPrefix();
-        String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
-                .collect(Collectors.joining("; "));
-        // Synonyms
-        String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
-        String comment = (term.getComment() == null) ? "-" : term.getComment();
         List<DiseaseModel> annotatedDiseases = model.getDiseaseAnnotations(termID,selectedDatabase);
         if (annotatedDiseases==null) {
             logger.error("could not retrieve diseases for " + termID);
         }
-
-
         String content = HpoHtmlPageGenerator.getHTML(term,annotatedDiseases);
+        infoWebEngine.loadContent(content);
+    }
+
+
+    /**
+     * Update content of the {@link #infoWebView} with currently selected {@link HpoTerm}.
+     *
+     * @param dmodel currently selected {@link TreeItem} containing {@link HpoTerm}
+     */
+    private void updateDescriptionToDiseaseModel(DiseaseModel dmodel) {
+        String dbName = dmodel.getDiseaseDbAndId();
+        String diseaseName = dmodel.getDiseaseName();
+        List<HpoTerm> annotatingTerms=model.getAnnotationTermsForDisease(dmodel);
+        String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName,diseaseName,annotatingTerms);
         infoWebEngine.loadContent(content);
     }
 
@@ -438,6 +499,13 @@ public class MainController {
 
 
     @FXML private void exportHierarchicalSummary(ActionEvent event) {
+        if (getSelectedTerm() == null ){
+            logger.warn("attempt to get term with no selection");
+            return;
+        } else {
+            selectedTerm = getSelectedTerm().getValue().term;
+        }
+
         HpoTerm t = getSelectedTerm().getValue().term;
         logger.trace("export hierarchy I found term " + t.getName());
 
@@ -509,6 +577,72 @@ public class MainController {
         postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
     }
 
+    @FXML private void suggestNewAnnotation(ActionEvent e) {
+        if (getSelectedTerm()==null) {
+            logger.error("Select a term before creating GitHub issue");
+            PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
+                    "Error: No HPO Term selected");
+            return;
+        } else {
+            selectedTerm = getSelectedTerm().getValue().term;
+        }
+        if (! currentMode.equals(mode.NEW_ANNOTATION)) {
+            PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
+                    "Error: No disease selected");
+            return;
+        }
+        selectedTerm=getSelectedTerm().getValue().term;
+        if (selectedDisease==null) {
+            PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
+                    "Error: No disease selected");
+            return;
+        }
+        logger.trace("Will suggest correction to "+selectedTerm.getName());
+        GitHubPopup popup = new GitHubPopup(selectedTerm,selectedDisease);
+        popup.setupGithubUsernamePassword(githubUsername,githubPassword);
+        popup.displayWindow(primarystage);
+        String githubissue=popup.retrieveGitHubIssue();
+        if (githubissue==null) {
+            logger.trace("got back null GitHub issue");
+            return;
+        }
+        String title=String.format("New annotation suggestion for %s",selectedDisease.getDiseaseName());
+        postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
+    }
+
+    @FXML private void reportMistakenAnnotation(ActionEvent e) {
+        if (getSelectedTerm()==null) {
+            logger.error("Select a term before creating GitHub issue");
+            PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
+                    "Error: No HPO Term selected");
+            return;
+        } else {
+            selectedTerm = getSelectedTerm().getValue().term;
+        }
+        if (! currentMode.equals(mode.NEW_ANNOTATION)) {
+            PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
+                    "Error: No disease selected");
+            return;
+        }
+        selectedTerm=getSelectedTerm().getValue().term;
+        if (selectedDisease==null) {
+            PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
+                    "Error: No disease selected");
+            return;
+        }
+        logger.trace("Will suggest correction to "+selectedTerm.getName());
+        GitHubPopup popup = new GitHubPopup(selectedTerm,selectedDisease,true);
+        popup.setupGithubUsernamePassword(githubUsername,githubPassword);
+        popup.displayWindow(primarystage);
+        String githubissue=popup.retrieveGitHubIssue();
+        if (githubissue==null) {
+            logger.trace("got back null GitHub issue");
+            return;
+        }
+        String title=String.format("Erroneous annotation for %s",selectedDisease.getDiseaseName());
+        postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
+    }
+
     private void postGitHubIssue(String message,String title, String uname, String pword) {
         GitHubPoster poster = new GitHubPoster(uname,pword,title,message);
         this.githubUsername=uname;
@@ -547,23 +681,15 @@ public class MainController {
      * {@link TreeView}.
      */
     class HpoTermTreeItem extends TreeItem<HpoTermWrapper> {
-
-        /**
-         * List used for caching of the children of this term
-         */
+        /** List used for caching of the children of this term */
         private ObservableList<TreeItem<HpoTermWrapper>> childrenList;
-
-
         /**
          * Default & only constructor for the TreeItem.
-         *
          * @param term {@link HpoTerm} that is represented by this TreeItem
          */
         HpoTermTreeItem(HpoTermWrapper term) {
             super(term);
         }
-
-
         /**
          * Check that the {@link HpoTerm} that is represented by this TreeItem is a leaf term as described below.
          * <p>
