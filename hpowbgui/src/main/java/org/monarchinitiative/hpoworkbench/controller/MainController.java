@@ -610,6 +610,39 @@ public class MainController {
         postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
     }
 
+    @FXML private void reportMistakenAnnotation(ActionEvent e) {
+        if (getSelectedTerm()==null) {
+            logger.error("Select a term before creating GitHub issue");
+            PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
+                    "Error: No HPO Term selected");
+            return;
+        } else {
+            selectedTerm = getSelectedTerm().getValue().term;
+        }
+        if (! currentMode.equals(mode.NEW_ANNOTATION)) {
+            PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
+                    "Error: No disease selected");
+            return;
+        }
+        selectedTerm=getSelectedTerm().getValue().term;
+        if (selectedDisease==null) {
+            PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
+                    "Error: No disease selected");
+            return;
+        }
+        logger.trace("Will suggest correction to "+selectedTerm.getName());
+        GitHubPopup popup = new GitHubPopup(selectedTerm,selectedDisease,true);
+        popup.setupGithubUsernamePassword(githubUsername,githubPassword);
+        popup.displayWindow(primarystage);
+        String githubissue=popup.retrieveGitHubIssue();
+        if (githubissue==null) {
+            logger.trace("got back null GitHub issue");
+            return;
+        }
+        String title=String.format("Erroneous annotation for %s",selectedDisease.getDiseaseName());
+        postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
+    }
+
     private void postGitHubIssue(String message,String title, String uname, String pword) {
         GitHubPoster poster = new GitHubPoster(uname,pword,title,message);
         this.githubUsername=uname;

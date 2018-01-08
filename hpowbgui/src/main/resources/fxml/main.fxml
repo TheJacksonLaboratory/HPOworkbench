@@ -124,25 +124,33 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button minWidth="150.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" text="Export hierarchical Summary">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" text="Export hierarchical Summary">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="150.0" mnemonicParsing="false" onAction="#exportToExcel" text="Export ontology as Excel file" GridPane.rowIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportToExcel" text="Export ontology as Excel file" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="180.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" text="Suggest correction " GridPane.columnIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" text="Suggest correction " GridPane.columnIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button minWidth="180.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#suggestNewAnnotation" text="Suggest new annotation" GridPane.rowIndex="2" />
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" text="Suggest new annotation" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets right="5.0" />
+                           </GridPane.margin></Button>
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </GridPane.margin>
+                        </Button>
                      </children>
                      <HBox.margin>
                         <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />

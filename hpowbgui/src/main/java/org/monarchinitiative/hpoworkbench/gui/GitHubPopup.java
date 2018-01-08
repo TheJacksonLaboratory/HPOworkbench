@@ -43,6 +43,7 @@ public class GitHubPopup {
     private String githubIssueText = null;
     private boolean newAnnotation = false;
     private DiseaseModel dmodel = null;
+    private boolean mistakenAnnotation = false;
 
     /**
      * Use this contructor to Suggest a correction to an existing HPO Term.
@@ -72,6 +73,12 @@ public class GitHubPopup {
         this(term);
         this.dmodel = dmodel;
         newAnnotation = true;
+
+    }
+
+    public GitHubPopup(HpoTerm term, DiseaseModel dmodel, boolean mistaken) {
+        this(term, dmodel);
+        mistakenAnnotation = true;
 
     }
 
@@ -155,6 +162,15 @@ public class GitHubPopup {
                     "New term lay person synonyms (if any):\n" +
                     "Reference (e.g., PubMed ID):\n" +
                     "Your biocurator ID for nanoattribution (if desired):", termlabel, termid);
+        } else if (mistakenAnnotation) {
+            return String.format("Erroneous annotation for disease %s [%s] \n" +
+                            "Erroneous annotation: %s [%s]\n" +
+                            "Reference (e.g., PubMed ID):\n" +
+                            "Your biocurator ID for nanoattribution (if desired):\n" +
+                            "Anything else (replacement?):",
+                    dmodel.getDiseaseName(),
+                    dmodel.getDiseaseDbAndId(),
+                    termlabel, termid);
         } else if (newAnnotation) {
             return String.format("Suggest creating new annotation for disease %s [%s] \n" +
                             "New annotation: %s [%s]\n" +

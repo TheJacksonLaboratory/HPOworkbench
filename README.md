@@ -59,6 +59,7 @@ First navigate to a disease of interest as above. Then, click on the *New annota
 use the autocomplete field or the HPO ontology hierarchy on the left to find the term you would like to
 propose as a new annotation for the disease. Then, click on the *Suggest new annotation* button to
 open a new GitHub issue as above. Again, please modify the text to provide information to support the suggestion.
+Use the *Report mistaken annotation* if you have found an error in the annotations for some disease.
 
 
 ## Command line
