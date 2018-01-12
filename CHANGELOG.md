@@ -5,3 +5,4 @@
 ### hpowbgui
 
 * info/error dialogs added
+* RTD documentation

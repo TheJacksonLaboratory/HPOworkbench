@@ -9,10 +9,9 @@ HPO Workbench
    :maxdepth: 2
    :caption: Contents:
 
-   In silico digest <digest>
-   Truncating raw reads <truncate>
-   Mapping truncated reads <mapping>
-   testing
+   index
+   installation
+   usage
 
 HPO Workbench
 ~~~~~~~~~~~~~
