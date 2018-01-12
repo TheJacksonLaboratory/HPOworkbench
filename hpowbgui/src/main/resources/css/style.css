@@ -1,6 +1,6 @@
 /*
  * #%L
- * VPV
+ * HPO Workbench
  * %%
  * Copyright (C) 2017 Peter Robinson
  * %%
@@ -28,7 +28,7 @@
 .mylabel {
     -fx-text-fill: black;
     -fx-font: 16px "Helvetica";
-    -fx-padding: 5 10 5 10;
+    -fx-padding: 5 5 5 5;
 }
 
 
@@ -46,11 +46,11 @@
 }
 
 .bluelabel {
-    -fx-font-size: 11pt;
+    -fx-font-size: 12pt;
     -fx-font-family: "monospace";
-    -fx-font-style: italic;
+    -fx-font-style: plain;
      -fx-text-fill: darkblue;
-    -fx-opacity: 0.75;
+    -fx-opacity: 0.85;
 }
 
 

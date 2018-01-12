@@ -14,7 +14,7 @@ HPO Workbench will display the ID, definition, comment, and synyonyms
 for the term. If any diseases in the HPO corpus are annotated to 
 the term, a list of the diseases will be displayed.
 
-![HPO Workbench screenshot](misc/HPOworkbench.png)
+![HPO Workbench screenshot](docs/img/HPOworkbench.png)
 
 ## Creating Excel files to revise or extend the HPO
 Users who would like to contribute new terms or other information to the
@@ -43,7 +43,7 @@ text field. Then, enter your GitHub username and password, and  and click on *Cr
 Workbench will store the username and password for the duration of the session so they only need to be
 entered once. The data is not written to disk.
 
-![HPO Workbench screenshot](misc/GitHubNewIssue.png)
+![HPO Workbench screenshot](docs/img/GitHubNewIssue.png)
 
 ## Viewing annotated diseases
 The diseases annotated to a given HPO term (including direct and implied annotations) can be viewed in the
@@ -51,7 +51,7 @@ browser. If desired, users can limit the diseases to one of the databases, Orpha
 To find the disease of interest, choose the radio button *diseases* and use the autocomplete field
 to find the disease, and click on the GO button.
 
-![HPO Workbench screenshot](misc/HPOworkbenchDiseaseView.png)
+![HPO Workbench screenshot](docs/img/HPOworkbenchDiseaseView.png)
 
 
 ## Suggesting new annotations

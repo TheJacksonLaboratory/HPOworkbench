@@ -89,7 +89,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
                   </TextField>
-                  <Button fx:id="GoButton" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" onAction="#goButtonAction" prefHeight="30.0" prefWidth="43.0" text="Go" textOverrun="CLIP">
+                  <Button fx:id="goButton" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" onAction="#goButtonAction" prefHeight="30.0" prefWidth="43.0" styleClass="Button" stylesheets="@../css/style.css" text="Go" textOverrun="CLIP">
                      <tooltip>
                         <Tooltip text="tell me what to do" />
                      </tooltip>
@@ -124,29 +124,29 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" text="Export hierarchical Summary">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportToExcel" text="Export ontology as Excel file" GridPane.rowIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportToExcel" styleClass="Button" stylesheets="@../css/style.css" text="Export ontology as Excel file" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" text="Suggest correction " GridPane.columnIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest correction " GridPane.columnIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" text="Suggest new annotation" GridPane.rowIndex="2">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new annotation" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
@@ -160,7 +160,7 @@
                      <children>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Label text="Disease databases:">
+                              <Label styleClass="mylabel" stylesheets="@../css/style.css" text="Disease databases:">
                                  <VBox.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </VBox.margin>

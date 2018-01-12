@@ -3,7 +3,6 @@ package org.monarchinitiative.hpoworkbench.excel;
 import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.graph.data.Edge;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
 import com.github.phenomics.ontolib.ontology.data.TermPrefix;
@@ -14,6 +13,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.rtf.Pair;
 
 
@@ -23,21 +23,29 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.monarchinitiative.hpoworkbench.excel.TermRow.getHeader;
-
+/**
+ * The purpose of this class is to export a portion of the HPO file as an excel sheet suggests the hierarchy of the
+ * HPO by using a different column for each level.
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ * @version 0.2.13
+ */
 public class HierarchicalExcelExporter {
-
     private static final Logger logger = LogManager.getLogger();
-
     private final HpoOntology ontology;
     private static final TermPrefix HPPREFIX = new ImmutableTermPrefix("HP");
-
+    /** The term of the subhierarchy of the HPO that we will export. */
     private final HpoTerm subhierarchyRoot;
-
+    /** Ordered list of terms and their attributes for all terms that descend from {@link #subhierarchyRoot}.
+     * The {@link TermRow} objects have all of the data we need to export one row in Excel.
+     */
     ArrayList<TermRow> termRowList=new ArrayList<>();
-
+    /** The maximum depth of the hierarchy that we will export. */
     private int maxlevel=0;
 
-
+    /**
+     * @param onto Reference to the HPO ontology
+     * @param selectedTerm term that defines the subhierarchy to export.
+     */
     public HierarchicalExcelExporter(HpoOntology onto, HpoTerm selectedTerm) {
         this.ontology=onto;
         if (ontology==null) {
@@ -48,12 +56,11 @@ public class HierarchicalExcelExporter {
 
 
 
-    public void exportToExcel(String newfilename) {
+    public void exportToExcel(String newfilename) throws HPOException {
         calculateRowHierarchy();
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(String.format("HPO Export (%s)",subhierarchyRoot.getName()));
         int rowNum = 0;
-        logger.trace("Creating excel");
         Row header = sheet.createRow(rowNum++);
         int colNum=0;
         for (String h : getHeader(maxlevel)) {
@@ -75,11 +82,10 @@ public class HierarchicalExcelExporter {
             workbook.write(outputStream);
             workbook.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new HPOException(String.format("Could not find file %s [%s]",newfilename,e.getMessage()));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new HPOException(String.format("I/O exception in excel export [%s]",e.getMessage()));
         }
-
     }
 
 
@@ -102,7 +108,7 @@ public class HierarchicalExcelExporter {
 
     /**
      * Create a set of rows that will be displayed as an RTF table. Noting that the HPO has multiple parentage,
-     * only show any one subhierarchy once.
+     * only show any one subhierarchy once. This function fills the list {@link #termRowList}.
      * @return
      */
     private void calculateRowHierarchy() {

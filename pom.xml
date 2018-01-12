@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.monarchinitiative</groupId>
     <artifactId>HPOworkbench</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.8</version>
     <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
     <name>HPOworkbench</name>
 
@@ -116,7 +116,6 @@
                     <skipTests>false</skipTests>
                     <forkCount>3</forkCount>
                     <reuseForks>true</reuseForks>
-                  <!-- not working  <argLine>${argLine} -Xms512m -Xmx1024m -Duser.language=en -Duser.region=US</argLine> -->
                     <systemPropertyVariables>
                         <user.language>en</user.language>
                         <user.region>US</user.region>

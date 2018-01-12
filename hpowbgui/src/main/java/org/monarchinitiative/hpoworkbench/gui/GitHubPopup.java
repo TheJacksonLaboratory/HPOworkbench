@@ -33,6 +33,10 @@ public class GitHubPopup {
     private final String synlist;
     private String uname = null;
     private String pword = null;
+    /** Will be set to true if the user clicks the cancel button. */
+    private boolean wasCancelled=false;
+
+
     /**
      * True if our new GitHub issue is to suggest a new child term for an existing HPO Term.
      */
@@ -79,7 +83,6 @@ public class GitHubPopup {
     public GitHubPopup(HpoTerm term, DiseaseModel dmodel, boolean mistaken) {
         this(term, dmodel);
         mistakenAnnotation = true;
-
     }
 
 
@@ -102,7 +105,10 @@ public class GitHubPopup {
         root.getChildren().add(textArea);
 
         Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> window.close());
+        cancelButton.setOnAction(e -> {
+            wasCancelled=true;
+            window.close();
+        });
         Button okButton = new Button("Create GitHub issue");
 
         GridPane grid = new GridPane();
@@ -146,10 +152,20 @@ public class GitHubPopup {
         window.showAndWait();
     }
 
+    /** This is used if the user has alreay entered their GitHub name and password (they are stored in the
+     * {@link org.monarchinitiative.hpoworkbench.model.Model} object.
+     * @param ghuname
+     * @param ghpword
+     */
     public void setupGithubUsernamePassword(String ghuname, String ghpword) {
         uname = ghuname;
         pword = ghpword;
     }
+
+
+    public boolean wasCancelled() { return wasCancelled; }
+
+
 
 
     private String getInitialText() {

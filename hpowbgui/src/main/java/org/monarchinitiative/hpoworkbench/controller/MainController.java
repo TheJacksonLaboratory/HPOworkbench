@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.Main;
 import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
+import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.gui.*;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
@@ -48,16 +49,38 @@ import java.util.stream.Collectors;
  */
 public class MainController {
     private static final Logger logger = LogManager.getLogger();
-
     /** Download address for {@code hp.obo}. */
     private final static String HP_OBO_URL ="https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo";
+    /** Download address for {@code phenotype_annotation.tab}. */
     private final static String PHENOTYPE_ANNOTATION_URL="http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation.tab";
     private Model model=null;
-    @FXML private Button goButton;
+
     /** Ontology object containing {@link HpoTerm}s and their relationships. */
     private HpoOntology ontology;
 
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
+    /** Users can create a github issue. Username and password will be stored for the current session only. */
+    private String githubUsername=null;
+    private String githubPassword;
+    /** This determines which disease as shown (OMIM, Orphanet, DECIPHER, or all). Default: ALL. */
+    private DiseaseModel.database selectedDatabase=DiseaseModel.database.ALL;
+    /** Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations? */
+    enum mode {BROWSE_HPO,BROWSE_DISEASE,NEW_ANNOTATION}
+    /** Current behavior of HPO Workbench. See {@link mode}. */
+    private mode currentMode=mode.BROWSE_HPO;
+
+    private Map<String,DiseaseModel> string2diseasemap=null;
+
+    /** Approved {@link HpoTerm} is submitted here. */
+    private Consumer<HpoTerm> addHook;
+
+    /** The term that is currently selected in the Browser window. */
+    private HpoTerm selectedTerm=null;
+
+    private DiseaseModel selectedDisease=null;
+    /** Reference to the primary stage of the App. */
+    private  Stage primarystage;
+
 
     /** Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}. */
     private Map<String, TermId> labels = new HashMap<>();
@@ -69,34 +92,12 @@ public class MainController {
     private WebEngine infoWebEngine;
     /** Text field with autocompletion for jumping to a particular HPO term in the tree view. */
     @FXML private TextField searchTextField;
-    @FXML private Button GoButton;
+    @FXML private Button goButton;
     @FXML private Label browserlabel;
     @FXML private RadioButton allDatabaseButton,orphanetButton,omimButton,decipherButton;
     @FXML private RadioButton hpoTermRadioButton;
     @FXML private RadioButton diseaseRadioButton;
     @FXML private RadioButton newAnnotationRadioButton;
-
-    private String githubUsername=null;
-    private String githubPassword;
-
-    private  Stage primarystage;
-
-    private DiseaseModel.database selectedDatabase=DiseaseModel.database.ALL;
-    /** Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations? */
-    enum mode {BROWSE_HPO,BROWSE_DISEASE,NEW_ANNOTATION}
-    /** Current behavior of HPO Workbench. See {@link mode}. */
-    private mode currentMode=mode.BROWSE_HPO;
-
-    private Map<String,DiseaseModel> string2diseasemap=null;
-
-
-    /** Approved {@link HpoTerm} is submitted here. */
-    private Consumer<HpoTerm> addHook;
-
-    /** The term that is currently selected in the Browser window. */
-    private HpoTerm selectedTerm=null;
-
-    private DiseaseModel selectedDisease=null;
 
 
     public MainController() {
@@ -202,7 +203,6 @@ public class MainController {
         });
         Thread thread = new Thread(hpodownload);
         thread.start();
-
         e.consume();
     }
 
@@ -241,7 +241,7 @@ public class MainController {
         } catch (Exception e) {
             // do nothing
         }
-        if (version==null) version = "0.1.1"; // this works on a maven build but needs to be reassigned in intellij
+        if (version==null) version = "0.1.7"; // this works on a maven build but needs to be reassigned in intellij
         return version;
     }
 
@@ -333,8 +333,11 @@ public class MainController {
     }
 
 
-
-
+    /**
+     * Initialize the ontology browser-tree in the left column of the app.
+     * @param ontology Reference to the HPO
+     * @param addHook function hook (currently unused)
+     */
     private void initTree(HpoOntology ontology, Consumer<HpoTerm> addHook) {
         this.ontology=ontology;
         this.addHook = addHook;
@@ -388,11 +391,9 @@ public class MainController {
     /**
      * Find the path from the root term to given {@link HpoTerm}, expand the tree and set the selection model of the
      * TreeView to the term position.
-     *
      * @param term {@link HpoTerm} to be displayed
      */
     private void expandUntilTerm(HpoTerm term) {
-        //if (ontology.existsPath(ontology.getRootTerm().getID(), term.getID())) {
         logger.trace("expand until term " + term.toString());
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
@@ -499,16 +500,6 @@ public class MainController {
 
 
     @FXML private void exportHierarchicalSummary(ActionEvent event) {
-        if (getSelectedTerm() == null ){
-            logger.warn("attempt to get term with no selection");
-            return;
-        } else {
-            selectedTerm = getSelectedTerm().getValue().term;
-        }
-
-        HpoTerm t = getSelectedTerm().getValue().term;
-        logger.trace("export hierarchy I found term " + t.getName());
-
         if (selectedTerm==null) {
             logger.error("Select a term before exporting hierarchical summary TODO show error window");
             PopUps.showInfoMessage("Please select an HPO term in order to export a term with its subhierarchy",
@@ -531,7 +522,11 @@ public class MainController {
         }
         logger.trace(String.format("Exporting hierarchical summary starting from term %s", selectedTerm.toString()));
         HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(model.getOntology(),selectedTerm);
-        exporter.exportToExcel(f.getAbsolutePath());
+        try {
+            exporter.exportToExcel(f.getAbsolutePath());
+        } catch (HPOException e) {
+            PopUps.showException("Error","Error in Excel export","could not export excel file",e);
+        }
     }
 
     @FXML private void suggestCorrectionToTerm(ActionEvent e) {
@@ -549,6 +544,9 @@ public class MainController {
         popup.setupGithubUsernamePassword(githubUsername,githubPassword);
         popup.displayWindow(primarystage);
         String githubissue=popup.retrieveGitHubIssue();
+        if (popup.wasCancelled()) {
+            return;
+        }
         if (githubissue==null) {
             logger.trace("got back null GitHub issue");
             return;
@@ -558,12 +556,13 @@ public class MainController {
     }
 
     @FXML private void suggestNewChildTerm(ActionEvent e) {
-        selectedTerm=getSelectedTerm().getValue().term;
         if (getSelectedTerm()==null) {
-            logger.warn("Select a term before creating GitHub issue");
+            logger.error("Select a term before creating GitHub issue");
             PopUps.showInfoMessage("Please select an HPO term before creating GitHub issue",
                     "Error: No HPO Term selected");
             return;
+        } else {
+            selectedTerm = getSelectedTerm().getValue().term;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm,true);
         popup.setupGithubUsernamePassword(githubUsername,githubPassword);
@@ -643,7 +642,7 @@ public class MainController {
         postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
     }
 
-    private void postGitHubIssue(String message,String title, String uname, String pword) {
+    @FXML private void postGitHubIssue(String message,String title, String uname, String pword) {
         GitHubPoster poster = new GitHubPoster(uname,pword,title,message);
         this.githubUsername=uname;
         this.githubPassword=pword;
@@ -703,7 +702,7 @@ public class MainController {
 
         /**
          * Get list of children of the {@link HpoTerm} that is represented by this TreeItem.
-         * <p>
+         * <p>  qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
          * {@inheritDoc}
          */
         @Override
