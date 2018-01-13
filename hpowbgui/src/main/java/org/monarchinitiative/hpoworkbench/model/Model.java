@@ -45,6 +45,14 @@ public class Model {
     }
 
 
+    public Model(String hpoOboPath, String phenoAnnotationPath) {
+        this.pathToHpoOboFile=hpoOboPath;
+        this.pathToAnnotationFile=phenoAnnotationPath;
+        importData();
+    }
+
+
+
 
     private void initPaths() {
         this.pathToHpoOboFile=getLocalHPOPath();

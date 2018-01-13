@@ -34,6 +34,7 @@
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
                         <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
+                        <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
                   </items>
                 </Menu>
               </menus>

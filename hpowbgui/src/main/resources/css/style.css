@@ -48,7 +48,6 @@
 .bluelabel {
     -fx-font-size: 12pt;
     -fx-font-family: "monospace";
-    -fx-font-style: plain;
      -fx-text-fill: darkblue;
     -fx-opacity: 0.85;
 }

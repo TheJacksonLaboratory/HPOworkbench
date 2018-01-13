@@ -43,6 +43,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalPhenotypeAnnotationPath;
+
 /**
  * Controller for HPO Workbench
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
@@ -104,6 +106,25 @@ public class MainController {
         this.model=new Model();
         ensureUserDirectoryExists();
     }
+
+
+    @FXML private void importLocalHpObo(ActionEvent e) {
+        e.consume();
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Import local hp.obo file");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HPO OBO file (*.obo)", "*.obo");
+        chooser.getExtensionFilters().add(extFilter);
+        File f = chooser.showOpenDialog(null);
+        if (f != null) {
+            String hpoOboPath = f.getAbsolutePath();
+            String pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
+            this.model=new Model(hpoOboPath,pathToAnnotationFile);
+        } else {
+            logger.error("Unable to obtain path to local HPO OBO file");
+            PopUps.showInfoMessage("Unable to obtain path to local HPO OBO file","Error");
+        }
+       }
 
 
     /**
