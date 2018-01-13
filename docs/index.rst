@@ -12,12 +12,18 @@ HPO Workbench
    index
    installation
    usage
+   Using the very latest HPO version <latest>
 
 HPO Workbench
 ~~~~~~~~~~~~~
 HPO Workbench is a Java app designed as a browser for HPO terms and annotated diseases. HPO Workbench
 has a series of functions that can be used by collaborators to review and make suggestions for extending,
 correcting, or otherwise revising the HPO or the disease annotations.
+
+
+GitHub repository
+~~~~~~~~~~~~~~~~~
+The HPO Workbench GitHub repository can be found here: https://github.com/TheJacksonLaboratory/HPOworkbench
 
 
  
