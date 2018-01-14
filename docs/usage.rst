@@ -7,12 +7,9 @@ HPO Workbench will display the ID, definition, comment, and synyonyms
 for the term. If any diseases in the HPO corpus are annotated to
 the term, a list of the diseases will be displayed.
 
-
-
-
-    .. figure:: img/HPOworkbench.png
-    :scale: 100 %
-    :alt: HPO Workbench - browsing
+.. figure:: img/HPOworkbench.png
+  :scale: 100 %
+  :alt: HPO Workbench - browsing
 
 
 Creating Excel files to revise or extend the HPO
@@ -47,9 +44,10 @@ Workbench will store the username and password for the duration of the session s
 entered once. The data is not written to disk.
 
 
-    .. figure:: img/GitHubNewIssue.png
-    :scale: 100 %
-    :alt: HPO Workbench - new issue
+.. figure:: img/GitHubNewIssue.png
+  :scale: 40 %
+  :align: center
+  :alt: HPO Workbench - new issue
 
 
 
@@ -61,9 +59,9 @@ browser. If desired, users can limit the diseases to one of the databases, Orpha
 To find the disease of interest, choose the radio button *diseases* and use the autocomplete field
 to find the disease, and click on the GO button.
 
-    .. figure:: img/HPOworkbenchDiseaseView.png
-    :scale: 100 %
-    :alt: HPO Workbench - disease view
+.. figure:: img/HPOworkbenchDiseaseView.png
+  :scale: 100 %
+  :alt: HPO Workbench - disease view
 
 
 Suggesting new annotations
