@@ -47,5 +47,14 @@ This will create a new version of ``hp.obo``.
 
 Using the new version of hp.obo in HPO Workbench
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+After you have created the up-to-date version of ``hp.obo``, import it using the ``Edit`` menu of
+HPO Workbench.
 
 
+    .. figure:: img/importLocalHpObo.png
+    :scale: 20 %
+    :alt: HPO Workbench - import local hp.obo
+
+
+After this, the browsing functions of HPO Workbench will use the new version of ``hp.obo`` (for the current session
+only).

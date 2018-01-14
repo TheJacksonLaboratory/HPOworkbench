@@ -185,11 +185,10 @@ public class PopUps {
 
 
 
-    public static void showException(String windowTitle, String header, String contentText, Exception exception) {
+    public static void showException(String windowTitle, String header, Exception exception) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(windowTitle);
         alert.setHeaderText(header);
-        alert.setContentText(contentText);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -206,15 +205,10 @@ public class PopUps {
         textArea.setMaxHeight(Double.MAX_VALUE);
         GridPane.setVgrow(textArea, Priority.ALWAYS);
         GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(label, 0, 0);
-        expContent.add(textArea, 0, 1);
-
         // Set expandable Exception into the dialog pane.
-        alert.getDialogPane().setExpandableContent(expContent);
-
+        alert.getDialogPane().setExpandableContent(textArea);
+        alert.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.showAndWait();
     }
 

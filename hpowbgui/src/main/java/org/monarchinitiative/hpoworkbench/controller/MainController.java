@@ -116,14 +116,20 @@ public class MainController {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HPO OBO file (*.obo)", "*.obo");
         chooser.getExtensionFilters().add(extFilter);
         File f = chooser.showOpenDialog(null);
-        if (f != null) {
-            String hpoOboPath = f.getAbsolutePath();
-            String pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
-            this.model=new Model(hpoOboPath,pathToAnnotationFile);
-        } else {
+        if (f == null) {
             logger.error("Unable to obtain path to local HPO OBO file");
-            PopUps.showInfoMessage("Unable to obtain path to local HPO OBO file","Error");
+            PopUps.showInfoMessage("Unable to obtain path to local HPO OBO file", "Error");
         }
+        String hpoOboPath = f.getAbsolutePath();
+        String pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
+        try {
+            this.model = new Model(hpoOboPath, pathToAnnotationFile);
+        } catch (Exception ex) {
+            PopUps.showException("Error",
+                    String.format("File at %s could not be opened",pathToAnnotationFile),
+                    ex);
+        }
+
        }
 
 
@@ -546,7 +552,7 @@ public class MainController {
         try {
             exporter.exportToExcel(f.getAbsolutePath());
         } catch (HPOException e) {
-            PopUps.showException("Error","Error in Excel export","could not export excel file",e);
+            PopUps.showException("Error","could not export excel file",e);
         }
     }
 
@@ -670,10 +676,10 @@ public class MainController {
         try {
             poster.postIssue();
         } catch (HPOWorkbenchException he) {
-            PopUps.showException("GitHub error","Bad Request (400)","Could not post issue", he);
+            PopUps.showException("GitHub error","Bad Request (400): Could not post issue", he);
         }
         catch (Exception ex) {
-            PopUps.showException("GitHub error","GitHub error","Could not post issue", ex);
+            PopUps.showException("GitHub error","GitHub error: Could not post issue", ex);
             return;
         }
         String response=poster.getHttpResponse();
