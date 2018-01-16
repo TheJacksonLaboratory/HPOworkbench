@@ -156,8 +156,8 @@ public class Commandline {
         final Options gnuOptions = new Options();
         gnuOptions.addOption("o", "out", true, "name/path of output file/directory")
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
-                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)");
-//                .addOption("b", "bowtie", true, "path to bowtie2")
+                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
+                .addOption("a", "annot", true, "path to HPO annotation file");
 //                .addOption("d", "digest", true, "path to diachromatic digest file")
 //                .addOption("s", "suffix", true, "suffix for output filenames")
 //                .addOption("i", "bowtieindex", true, "path to bowtie2 index")

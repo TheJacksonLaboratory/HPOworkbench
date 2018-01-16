@@ -48,7 +48,7 @@ public class CountFrequencyCommand extends HPOCommand {
         Set<TermId> descendents = getDescendents(ontology,termId);
         HashMap<TermId,Integer> hm = new HashMap<>();
         for (TermId t : descendents) {
-            hm.put(termId,0);
+            hm.put(t,0);
         }
         for (HpoDiseaseAnnotation annot : annotlist) {
             TermId hpoid = annot.getHpoId();
@@ -56,6 +56,7 @@ public class CountFrequencyCommand extends HPOCommand {
                 hm.put(termId,1 + hm.get(termId));
             }
         }
+        outputCounts(hm, ontology);
 
     }
 
@@ -63,7 +64,7 @@ public class CountFrequencyCommand extends HPOCommand {
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         return map.entrySet()
                 .stream()
-                .sorted(Map.Entry.comparingByValue(/*Collections.reverseOrder()*/))
+                .sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
@@ -72,12 +73,13 @@ public class CountFrequencyCommand extends HPOCommand {
                 ));
     }
 
-    private void outputCounts(HashMap<TermId,Integer> hm) {
+    private void outputCounts(HashMap<TermId,Integer> hm, Ontology ontology) {
         Map mp2 = sortByValue(hm);
         for (Object t: mp2.keySet()) {
             TermId tid = (TermId) t;
             Integer count = (Integer)mp2.get(t);
-            System.out.println(tid.getIdWithPrefix() + ": " + count);
+            String name =  ((HpoTerm)ontology.getTermMap().get(tid)).getName();
+            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count);
         }
     }
 

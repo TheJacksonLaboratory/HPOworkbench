@@ -36,6 +36,13 @@ public class HpoOntologyParser {
 
     public HpoOntologyParser(String path){
         hpoOntologyPath=path;
+        try {
+            parseOntology();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.fatal("Could not parse ontology, terminating");
+            System.exit(1);
+        }
     }
 
     /**
