@@ -8,7 +8,6 @@ import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
 import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.argparser.ArgumentParserException;
 import org.monarchinitiative.hpoworkbench.hpo.Disease;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
@@ -29,6 +28,8 @@ public class NeurologyCommand extends HPOCommand  {
     Set<TermId> neurologyDescendents=null;
     Set<TermId> adultOnset=null;
     Set<TermId> childhoodOnset=null;
+    /** Directory where hp.obo and phenptype_annoptation.tab have been downloaded. */
+    private final String datadirectory;
 
 
     Map<String,Disease> diseases =null;
@@ -39,11 +40,14 @@ public class NeurologyCommand extends HPOCommand  {
 
 
 
-    public NeurologyCommand() {
+    public NeurologyCommand(String directory) {
+        datadirectory=directory;
         diseases =new HashMap<>();
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();
         decipher=new ArrayList<>();
+        this.hpopath=String.format("%s%shp.obo",this.datadirectory, File.separator);
+        this.annotpath=String.format("%s%sphenotype_annotation.tab",this.datadirectory, File.separator);
     }
 
 
@@ -234,12 +238,4 @@ public class NeurologyCommand extends HPOCommand  {
     @Override
     public String getName() {return "neuro";}
 
-    @Override
-    public void setOptions(Map<String,String> mp) throws ArgumentParserException {
-        if (mp.containsKey("directory")) {
-            this.hpopath=String.format("%s%shp.obo",mp.get("directory"), File.separator);
-            this.annotpath=String.format("%s%sphenotype_annotation.tab",mp.get("directory"), File.separator);
-        }
-
-    }
 }

@@ -50,6 +50,7 @@
     </dependencies>
 
     <build>
+        <finalName>HPOWorkbench</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -81,6 +82,7 @@
                                 SNAPSHOT instead of the build number prefixed to the dependency -->
                             <useUniqueVersions>false</useUniqueVersions>
                             <mainClass>org.monarchinitiative.hpoworkbench.HpoWorkbench</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
 

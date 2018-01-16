@@ -30,26 +30,11 @@ public class RtfCommand extends HPOCommand  {
     Hpo2Rtf hpo2rtf=null;
 
 
-    public RtfCommand() {
-
+    public RtfCommand(String dir, String startTerm) {
+        hpopath=dir;
+        startTerm=startTerm;
     }
 
-
-
-    @Override
-    public void setOptions(Map<String,String> mp) {
-        if (mp.containsKey("directory")) {
-            this.hpopath=String.format("%s%shp.obo",mp.get("directory"), File.separator);
-        }
-        this.startTerm=mp.get("startterm");
-        if (startTerm==null) startTerm=IMMUNOLOGY_STAERT_TERM;
-        startTerm=IMMUNOLOGY_STAERT_TERM;
-        LOGGER.trace("set options, setartTerm="+startTerm);
-        for (String k:mp.keySet()) {
-            LOGGER.trace(k+": "+mp.get(k));
-        }
-
-    }
 
     @Override
     public void run() {

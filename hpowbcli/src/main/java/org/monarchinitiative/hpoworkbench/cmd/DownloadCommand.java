@@ -2,12 +2,10 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.argparser.ArgumentParserException;
 import org.monarchinitiative.hpoworkbench.io.FileDownloader;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Map;
 
 
 /**
@@ -21,21 +19,15 @@ import java.util.Map;
  */
 public final class DownloadCommand extends HPOCommand {
     private static Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
-    private String downloadDirectory=null;
+    private final String downloadDirectory;
 
     public String getName() { return "download"; }
-
-    public void setOptions(Map<String,String> mp) throws ArgumentParserException {
-        if (mp.containsKey("directory")) {
-            this.downloadDirectory=mp.get("directory");
-        }
-    }
 
     /**
 
      */
-    public DownloadCommand()  {
-
+    public DownloadCommand(String downloadDir)  {
+        this.downloadDirectory=downloadDir;
     }
 
     /**
@@ -43,28 +35,20 @@ public final class DownloadCommand extends HPOCommand {
      */
     @Override
     public void run()  {
-        if (downloadDirectory==null) {
-            downloadDirectory=defaults.get("directory");
-        }
         createDownloadDir(downloadDirectory);
-        String downloadLocation=String.format("%s%shp.obo",downloadDirectory, File.separator);
-        File f = new File(downloadLocation);
-        try {
-            URL url = new URL("https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo");
-            FileDownloader downloader = new FileDownloader();
-            boolean result = downloader.copyURLToFile(url,f);
-            if (result) {
-                LOGGER.trace("Downloaded hp.obo to "+ downloadLocation);
-            } else {
-                LOGGER.error("Could not download hp.obo to " + downloadLocation);
-            }
+        downloadHpObo();
+        downloadPhenotypeAnnotationDotTab();
+    }
 
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+
+    private void downloadPhenotypeAnnotationDotTab() {
         // Now the same for the phenotype_annotation.tab file
-        downloadLocation=String.format("%s%sphenotype_annotation.tab",downloadDirectory, File.separator);
-        f = new File(downloadLocation);
+        String downloadLocation=String.format("%s%sphenotype_annotation.tab",downloadDirectory, File.separator);
+        File f = new File(downloadLocation);
+        if (f.exists()) {
+            LOGGER.trace("cowardly refusing to download phenoptype_annotation.tab, since it is already there");
+            return;
+        }
         try {
             URL url = new URL("http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation.tab");
             FileDownloader downloader = new FileDownloader();
@@ -78,8 +62,33 @@ public final class DownloadCommand extends HPOCommand {
         } catch (Exception e){
             e.printStackTrace();
         }
-
     }
+
+
+    private void downloadHpObo() {
+        String downloadLocation=String.format("%s%shp.obo",downloadDirectory, File.separator);
+        File f = new File(downloadLocation);
+        if (f.exists()) {
+            LOGGER.trace("cowardly refusing to download hp.obo, since it is already there");
+            return;
+        }
+        try {
+            URL url = new URL("https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo");
+            FileDownloader downloader = new FileDownloader();
+            boolean result = downloader.copyURLToFile(url,f);
+            if (result) {
+                LOGGER.trace("Downloaded hp.obo to "+ downloadLocation);
+            } else {
+                LOGGER.error("Could not download hp.obo to " + downloadLocation);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
     /**
      * Todo make robust

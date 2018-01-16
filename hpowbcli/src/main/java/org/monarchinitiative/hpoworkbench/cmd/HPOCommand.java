@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 
-import org.monarchinitiative.hpoworkbench.argparser.ArgumentParserException;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 
 import java.util.HashMap;
@@ -48,7 +47,6 @@ public abstract class HPOCommand {
      */
     public abstract void run();
 
-    public abstract void setOptions(Map<String,String> mp) throws ArgumentParserException;
 
 
     public HPOCommand setDefaultValue(String key,String value) {

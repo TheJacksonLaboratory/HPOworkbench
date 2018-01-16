@@ -9,12 +9,9 @@ import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.exception.HPOException;
-import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.hpoworkbench.io.HpoAnnotationParser;
+import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 
-import java.io.*;
 import java.util.*;
 
 import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalHPOPath;
@@ -70,7 +67,7 @@ public class Model {
         }
         if (annotmap==null) {
             HpoOntology ontology = getOntology();
-            HpoAnnotationParser parser = new HpoAnnotationParser(this.pathToAnnotationFile,ontology);
+            DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(this.pathToAnnotationFile,ontology);
             annotmap=parser.parse();
             directAnnotMap=parser.getDirectannotmap();
         }

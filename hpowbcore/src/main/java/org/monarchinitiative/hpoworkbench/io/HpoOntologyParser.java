@@ -21,14 +21,14 @@ import java.util.Map;
  * (see <a href="http://human-phenotype-ontology.github.io/">HPO Homepage</a>).
  * @author Peter Robinson
  * @author Vida Ravanmehr
- * @version 0.1.1 (2017-11-15)
+ * @version 0.1.2 (2017-11-15)
  */
 public class HpoOntologyParser {
     private static final Logger logger = LogManager.getLogger();
     /** Path to the {@code hp.obo} file. */
     private String hpoOntologyPath=null;
 
-
+    private HpoOntology ontology=null;
     Ontology<HpoTerm, HpoTermRelation> inheritanceSubontology=null;
     Ontology<HpoTerm, HpoTermRelation> abnormalPhenoSubOntology=null;
     /** Map of all of the Phenotypic abnormality terms (i.e., not the inheritance terms). */
@@ -44,20 +44,18 @@ public class HpoOntologyParser {
      * @throws IOException
      */
     public void parseOntology() throws IOException {
-        HpoOntology hpo;
         TermPrefix pref = new ImmutableTermPrefix("HP");
         TermId inheritId = new ImmutableTermId(pref,"0000005");
         HpoOboParser hpoOboParser = new HpoOboParser(new File(hpoOntologyPath));
-        hpo = hpoOboParser.parse();
-        this.abnormalPhenoSubOntology = hpo.getPhenotypicAbnormalitySubOntology();
-        this.inheritanceSubontology = hpo.subOntology(inheritId);
+        this.ontology = hpoOboParser.parse();
+        this.abnormalPhenoSubOntology = ontology.getPhenotypicAbnormalitySubOntology();
+        this.inheritanceSubontology = ontology.subOntology(inheritId);
     }
 
     public Ontology<HpoTerm, HpoTermRelation> getPhenotypeSubontology() { return this.abnormalPhenoSubOntology; }
     public Ontology<HpoTerm, HpoTermRelation> getInheritanceSubontology() { return  this.inheritanceSubontology; }
 
-
-
-
-
+    public HpoOntology getOntology() {
+        return ontology;
+    }
 }

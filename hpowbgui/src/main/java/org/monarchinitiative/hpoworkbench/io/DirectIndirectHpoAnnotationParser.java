@@ -23,7 +23,7 @@ import java.util.*;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.13
  */
-public class HpoAnnotationParser {
+public class DirectIndirectHpoAnnotationParser {
     private static final Logger logger = LogManager.getLogger();
     private final String pathToPhenotypeAnnotationTab;
     private final HpoOntology ontology;
@@ -33,7 +33,7 @@ public class HpoAnnotationParser {
     private Map<TermId,List<DiseaseModel>> directannotmap=null;
     private Map<TermId,List<DiseaseModel>> indirectannotmap=null;
 
-    public HpoAnnotationParser(String path,HpoOntology onto) {
+    public DirectIndirectHpoAnnotationParser(String path, HpoOntology onto) {
         pathToPhenotypeAnnotationTab=path;
         ontology=onto;
     }

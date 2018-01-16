@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.monarchinitiative.hpoworkbench.argparser.ArgumentParserException;
+
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 
 /**
@@ -28,37 +28,17 @@ public class HPO2CSVCommand extends HPOCommand {
 
     public String getName() { return name; }
 
-    private String pathToHpObo=null;
+    private final String pathToHpObo;
 
 
     /**
      *
      */
-    public HPO2CSVCommand()  {
-        //this.options = new PhenotypeDownloadOptions();
-       // this.options.setFromArgs(args);
+    public HPO2CSVCommand(String hpOboPath)  {
+        this.pathToHpObo=hpOboPath;
     }
 
-    /** This function passes the options to the command
-     * and makes sure we have everything we need. It checks
-     * the default values if it doesnt find the values here.
-     * If it is missing something, it throws and exception.
-     * @param mp
-     */
-    public void setOptions(Map<String,String> mp) throws ArgumentParserException {
-        LOGGER.trace("setOptions CSV");
-        for (String s:mp.keySet()) {
-            LOGGER.trace("\t"+s+":"+mp.get(s));
-        }
-        if (mp.containsKey("input")) {
-            pathToHpObo=mp.get("input");
-        } else if (this.defaults.containsKey("input")) {
-            pathToHpObo=defaults.get("input");
-        } else {
-            throw new ArgumentParserException("--input option must be provided to run csv");
-        }
-        //todo -- output file path
-    }
+
 
 
     /**
