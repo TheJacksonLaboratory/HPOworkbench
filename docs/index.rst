@@ -13,7 +13,7 @@ HPO Workbench
    installation
    usage
    Using the very latest HPO version <latest>
-   Converting annotation files <convert>
+   HPO Workbench from the command line <command>
 
 HPO Workbench
 ~~~~~~~~~~~~~

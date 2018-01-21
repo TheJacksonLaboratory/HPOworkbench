@@ -86,11 +86,16 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             logger.fatal("Cannot start app, ontology path is null");
             System.exit(1);
         }
-        HpoOntologyParser parser = new HpoOntologyParser(path);
-        ontology=parser.getOntology();
-        inheritanceSubontology=parser.getInheritanceSubontology();
-        abnormalPhenoSubOntology=parser.getPhenotypeSubontology();
-        OldSmallFileEntry.setOntology(ontology,inheritanceSubontology,abnormalPhenoSubOntology);
+        try {
+            HpoOntologyParser parser = new HpoOntologyParser(path);
+            ontology = parser.getOntology();
+            inheritanceSubontology = parser.getInheritanceSubontology();
+            abnormalPhenoSubOntology = parser.getPhenotypeSubontology();
+            OldSmallFileEntry.setOntology(ontology, inheritanceSubontology, abnormalPhenoSubOntology);
+        } catch (Exception e) {
+            logger.fatal(String.format("Could not parse ontology file at %s",path));
+            logger.fatal(e.getMessage());
+        }
     }
 
     public void run() {

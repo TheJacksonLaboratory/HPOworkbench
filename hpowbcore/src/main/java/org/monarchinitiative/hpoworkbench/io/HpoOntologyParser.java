@@ -8,6 +8,7 @@ import com.github.phenomics.ontolib.io.obo.hpo.HpoOboParser;
 import com.github.phenomics.ontolib.ontology.data.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.exception.HPOException;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,15 +35,9 @@ public class HpoOntologyParser {
     /** Map of all of the Phenotypic abnormality terms (i.e., not the inheritance terms). */
     private Map<TermId,HpoTerm> termmap=null;
 
-    public HpoOntologyParser(String path){
+    public HpoOntologyParser(String path) throws HPOException{
         hpoOntologyPath=path;
-        try {
-            parseOntology();
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.fatal("Could not parse ontology, terminating");
-            System.exit(1);
-        }
+        parseOntology();
     }
 
     /**
@@ -50,13 +45,17 @@ public class HpoOntologyParser {
      * {@link #inheritanceSubontology}.
      * @throws IOException
      */
-    public void parseOntology() throws IOException {
+    public void parseOntology() throws HPOException {
         TermPrefix pref = new ImmutableTermPrefix("HP");
         TermId inheritId = new ImmutableTermId(pref,"0000005");
-        HpoOboParser hpoOboParser = new HpoOboParser(new File(hpoOntologyPath));
-        this.ontology = hpoOboParser.parse();
-        this.abnormalPhenoSubOntology = ontology.getPhenotypicAbnormalitySubOntology();
-        this.inheritanceSubontology = ontology.subOntology(inheritId);
+        try {
+            HpoOboParser hpoOboParser = new HpoOboParser(new File(hpoOntologyPath));
+            this.ontology = hpoOboParser.parse();
+            this.abnormalPhenoSubOntology = ontology.getPhenotypicAbnormalitySubOntology();
+            this.inheritanceSubontology = ontology.subOntology(inheritId);
+        } catch (Exception e) {
+            throw new HPOException(String.format("error trying to parse hp.obo file at %s",hpoOntologyPath));
+        }
     }
 
     public Ontology<HpoTerm, HpoTermRelation> getPhenotypeSubontology() { return this.abnormalPhenoSubOntology; }

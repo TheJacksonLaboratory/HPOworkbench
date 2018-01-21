@@ -7,6 +7,7 @@ import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.graph.data.Edge;
 import com.github.phenomics.ontolib.ontology.data.*;
 import org.apache.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HpoOntologyParser;
 
@@ -40,23 +41,28 @@ public class CountFrequencyCommand extends HPOCommand {
     }
 
     public void run() {
-
-        HpoOntologyParser oparser = new HpoOntologyParser(hpOboPath);
-        HpoOntology ontology = oparser.getOntology();
-        HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath);
-        List<HpoDiseaseAnnotation> annotlist = aparser.getAnnotations();
-        Set<TermId> descendents = getDescendents(ontology,termId);
-        HashMap<TermId,Integer> hm = new HashMap<>();
-        for (TermId t : descendents) {
-            hm.put(t,0);
-        }
-        for (HpoDiseaseAnnotation annot : annotlist) {
-            TermId hpoid = annot.getHpoId();
-            if (descendents.contains(hpoid)) {
-                hm.put(termId,1 + hm.get(termId));
+        try {
+            HpoOntologyParser oparser = new HpoOntologyParser(hpOboPath);
+            HpoOntology ontology = oparser.getOntology();
+            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath);
+            List<HpoDiseaseAnnotation> annotlist = aparser.getAnnotations();
+            Set<TermId> descendents = getDescendents(ontology, termId);
+            HashMap<TermId, Integer> hm = new HashMap<>();
+            for (TermId t : descendents) {
+                hm.put(t, 0);
             }
+            for (HpoDiseaseAnnotation annot : annotlist) {
+                TermId hpoid = annot.getHpoId();
+                if (descendents.contains(hpoid)) {
+                    hm.put(termId, 1 + hm.get(termId));
+                }
+            }
+            outputCounts(hm, ontology);
+        } catch (HPOException e) {
+            LOGGER.error(String.format("Could not input ontology: %s",e.getMessage()));
+            System.exit(1);
         }
-        outputCounts(hm, ontology);
+
 
     }
 

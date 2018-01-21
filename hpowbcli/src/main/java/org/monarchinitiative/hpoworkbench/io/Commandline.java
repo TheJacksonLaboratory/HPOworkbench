@@ -108,6 +108,8 @@ public class Commandline {
             this.command = new CountFrequencyCommand(this.hpoOboPath, this.annotationPath, this.termid);
         } else if (mycommand.equals("convert")) {
             this.command=new ConvertSmallFilesCommand(this.downloadDirectory,this.hpoOboPath);
+        }  else if (mycommand.equals("rtf")) {
+            this.command=new RtfCommand(this.downloadDirectory,this.hpoOboPath);
         } else {
             printUsage(String.format("Did not recognize command: %s", mycommand));
         }
@@ -194,6 +196,11 @@ public class Commandline {
         writer.println("\t<directory>: path to directory with RD annotation files");
         writer.println(String.format("\t<outfile>: optional name of output file (Default: \"%s.bam\")", DEFAULT_OUTPUT_BAM_NAME));
         writer.println();
+        writer.println();
+        writer.println("rtf:");
+        writer.println("\tjava -jar HPOWorkbench.jar rtf -h <hpo> -t <start-term> \\");
+        writer.println("\t<hpo>: path to hp.obo file");
+        writer.println("\t<start-term>: HPO term starting from which the RTF hierarchy document will be created");
         writer.close();
         System.exit(0);
     }
