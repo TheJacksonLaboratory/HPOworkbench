@@ -25,6 +25,53 @@ To run the demo program, enter the following command. ::
 Here, <path to rare-diseases/annotated> is the path to the ``annotated`` directory containing the original small files.
 
 
+The current output format for the new small files is as follows.
+
+
+
+
++--------+-----------------+--------------------------------+
+| Column |    Item         | Comment                        |
++========+=================+================================+
+| 1      | diseaseID       | OMIM, ORPHA, DECIPHER          |
++--------+-----------------+--------------------------------+
+| 2      | diseaseName     | e.g., Neurofibromatosis type 1 |
++--------+-----------------+--------------------------------+
+| 3      | phenotypeId     | e.g., HP:0000123               |
++--------+-----------------+--------------------------------+
+| 4      | phenotypeName   | e.g., Scoliosis                |
++--------+-----------------+--------------------------------+
+| 5      | ageOfOnsetId    | e.g., HP:0003581               |
++--------+-----------------+--------------------------------+
+| 6      | ageOfOnsetName  | e.g., Adult onset              |
++--------+-----------------+--------------------------------+
+| 7      | frequencyId     | e.g., HP:0040280               |
++--------+-----------------+--------------------------------+
+| 8      | frequencyString | e.g., 5/13                     |
++--------+-----------------+--------------------------------+
+| 9      | sex             | Male, Female                   |
++--------+-----------------+--------------------------------+
+| 10     | negation        | NOT or not                     |
++--------+-----------------+--------------------------------+
+| 11     | modifier        | semicolon sep list HPO terms   |
++--------+-----------------+--------------------------------+
+| 12     | description     | free text                      |
++--------+-----------------+--------------------------------+
+| 13     | publication     | e.g., PMID:123321              |
++--------+-----------------+--------------------------------+
+| 14     | assignedBy      | ORCID or HPO etc               |
++--------+-----------------+--------------------------------+
+| 15     | dateCreated     | e.g., 2017-01-15               |
++--------+-----------------+--------------------------------+
+
+
+
+
+
+
+
+
+
 Downloading HPO data
 ~~~~~~~~~~~~~~~~~~~~
 Most of the commands described in this section use the ``hp.obo`` or the

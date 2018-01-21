@@ -9,7 +9,6 @@ HPO Workbench
    :maxdepth: 2
    :caption: Contents:
 
-   index
    installation
    usage
    Using the very latest HPO version <latest>
