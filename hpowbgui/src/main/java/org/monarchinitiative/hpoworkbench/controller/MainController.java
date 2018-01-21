@@ -107,7 +107,10 @@ public class MainController {
         ensureUserDirectoryExists();
     }
 
-
+    /** This is called from the Edit menu and allows the user to import a local copy of
+     * hp.obo (usually because the local copy is newer than the official release version of hp.obo).
+     * @param e
+     */
     @FXML private void importLocalHpObo(ActionEvent e) {
         e.consume();
 
@@ -124,12 +127,12 @@ public class MainController {
         String pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
         try {
             this.model = new Model(hpoOboPath, pathToAnnotationFile);
+            initHpoData();
         } catch (Exception ex) {
             PopUps.showException("Error",
                     String.format("File at %s could not be opened",pathToAnnotationFile),
                     ex);
         }
-
        }
 
 
@@ -184,6 +187,7 @@ public class MainController {
             window.close();
             logger.trace(String.format("Successfully downloaded hpo to %s",dirpath));
             String fullpath=String.format("%s%shp.obo",dirpath,File.separator);
+            initHpoData();
         });
         hpodownload.setOnFailed(event -> {
             window.close();
@@ -223,6 +227,7 @@ public class MainController {
             window.close();
             logger.trace(String.format("Successfully downloaded %s to %s",BASENAME,dirpath));
             String fullpath=String.format("%s%s%s",dirpath,File.separator,BASENAME);
+            initHpoData();
         });
         hpodownload.setOnFailed(event -> {
             window.close();
@@ -275,24 +280,25 @@ public class MainController {
     @FXML
     private void initialize()
     {
-        logger.trace("initialize");
+        //logger.trace("initialize");
         // This action will be run after user approves a PhenotypeTerm in the ontologyTreePane
         Consumer<HpoTerm> addHook = (ph -> logger.trace(String.format("Hook for %s",ph.getName())));
+
+        browserlabel.setAlignment(Pos.BOTTOM_RIGHT);
+        String ver = getVersion();
+        browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
+        this.primarystage=Main.primarystage;
+        initRadioButtons();
+        initHpoData();
+    }
+
+    private void initHpoData() {
         if (model.getOntology()==null) {
             logger.error("Need to initialize ontology before we can start the application.");
             return;
         }
         initTree(model.getOntology(), addHook);
         logger.trace("Finished initilizing Human Phenotype Ontology");
-        browserlabel.setAlignment(Pos.BOTTOM_RIGHT);
-        String ver = getVersion();
-        browserlabel.setText("HPO Workbench, v. "+ver+", \u00A9 Monarch Initiative 2018");
-        this.primarystage=Main.primarystage;
-        initRadioButtons();
-        initDiseaseAutocomplete();
-    }
-
-    private void initDiseaseAutocomplete() {
         string2diseasemap = model.getDiseases();
     }
 

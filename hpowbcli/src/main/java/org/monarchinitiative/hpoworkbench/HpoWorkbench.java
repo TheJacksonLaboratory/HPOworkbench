@@ -19,7 +19,7 @@ public class HpoWorkbench {
         LOGGER.trace(String.format("running command %s",command));
         command.run();
 
-
+        LOGGER.trace("Done");
     }
 
     public static String getVersion() {

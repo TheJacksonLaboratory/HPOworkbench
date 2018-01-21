@@ -1,11 +1,9 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import org.apache.log4j.Logger;
-import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.rtf.Hpo2Rtf;
 
 /**
@@ -15,8 +13,7 @@ import org.monarchinitiative.hpoworkbench.rtf.Hpo2Rtf;
  * @version 0.1.0
  */
 public class RtfCommand extends HPOCommand  {
-    private static Logger LOGGER = Logger.getLogger(NeurologyCommand.class.getName());
-
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private String hpopath=null;
 
     private String DEFAULT_OUTPUTNAME="hpotest.rtf";
@@ -38,7 +35,7 @@ public class RtfCommand extends HPOCommand  {
 
     @Override
     public void run() {
-        LOGGER.trace("running RTF command");
+        logger.trace("running RTF command");
 
         try {
             this.hpo2rtf = new Hpo2Rtf(DEFAULT_OUTPUTNAME);
