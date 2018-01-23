@@ -110,7 +110,7 @@ public enum FieldType {
             case "Orthologs":
                 return ORTHOLOGS;
             default:
-                System.err.print("Did not recognize header fieled \"" + s + "\". Please see FieldType.java");
+                System.err.print("Did not recognize header field \"" + s + "\". Please see FieldType.java");
                 System.exit(1);
         }
         return null; // never reached

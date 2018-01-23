@@ -15,6 +15,7 @@ import java.util.*;
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.DECIPHER;
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.OMIM;
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.ORPHANET;
+import static org.monarchinitiative.hpoworkbench.util.DateUtil.convertToCanonicalDateFormat;
 
 /**
  * Created by peter on 1/20/2018.
@@ -447,5 +448,6 @@ public class OldSmallFileEntry {
     public String getDescription(){ return description;}
     public String getPub(){ return pub;}
     public String getAssignedBy() { return assignedBy;}
-    public String getDateCreated() { return dateCreated; }
+    /** Returns the date created, and transforms the date format to YYYY-MM-DD, e.g., 2009-03-23. */
+    public String getDateCreated() { return convertToCanonicalDateFormat(dateCreated); }
 }
