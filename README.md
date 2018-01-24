@@ -20,8 +20,8 @@ the first time you use HPO Workbench. Unfortunately it is necessary to restart H
 after downloading these files (we are working on a fix). 
 
 This is a "pre-release" that may contain bugs, although we have tested the code and it works.
-Please see the documetation at http://hpo-workbench.readthedocs.io/en/latest/ for further
-information on how to use HPO Workbench to nevigate the ontology and to submit
+Please see the documentation at http://hpo-workbench.readthedocs.io/en/latest/ for further
+information on how to use HPO Workbench to navigate the ontology and to submit
 suggestions for new terms or other comments to the HPO team.
 
 
