@@ -59,36 +59,47 @@ public class OldSmallFileEntry {
     private static final TermId OCCASIONAL = HpoFrequency.OCCASIONAL.toTermId();
     private static final TermId EXCLUDED = HpoFrequency.EXCLUDED.toTermId();
     private static final TermId VERY_RARE= HpoFrequency.VERY_RARE.toTermId();
-
+    /** If present, a limitation to MALE or FEMALE. */
     private String sexID=null;
-
+    /** Redundant with {@link #sexID}. */
     private String sexName=null;
 
     private String sex=null;
 
     private final static String MALE_CODE="Male";
     private final static String FEMALE_CODE="Female";
-
+    /** If present, "NOT" */
     private String negationID=null;
+    /** Redundant with {@link #negationID}. */
     private String negationName=null;
 
     private String description=null;
-
+    /** This was not present in the old small file but will be created here if possible from the Description field. */
     private TermId modifier=null;
-
+    /** The source of the assertion, often a string such as PMID:123 or OMIM:100123 */
     private String pub=null;
-
+    /** The biocurator */
     private String assignedBy=null;
+    /* The date the annotation was first created. */
     private String dateCreated=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String entityId=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String entityName=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String qualityId=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String qualityName=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String addlEntityName=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String addlEntityId=null;
-    /** SOme entries have just evidence rather than evidenceId and evidenceName */
+    /** Some entries have just evidence rather than evidenceId and evidenceName. We do the best we can to get one evidence code but
+     * looking at all three fields one after the other, with evidenceId being prefered, then evidenceName, then evidence */
     private String evidence=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String abnormalId=null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String abnormalName=null;
     private String othologs=null;
 
