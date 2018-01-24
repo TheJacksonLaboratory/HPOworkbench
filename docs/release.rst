@@ -25,4 +25,12 @@ The release should get the following tag (using the same version number).
 
     $ git tag v0.1.8
 
-After pushing this,
+After pushing this, create a release from the GitHub page and identify it with this tag. We will use launch4j (http://launch4j.sourceforge.net/) to create a Windows exectuble. This is
+largely self-explanatory.
+
+*  We call the output file HPOWorkbench.exe
+*  Choose the jar file for the gui
+*  Set the minimum JRE to 1.8.0
+
+Clicking on the gear icon will cause launch4j to ask you for a file name for the XML config file (Enter HPOWorkbench).
+It will then generate the exe file to the same location. Upload this to the GitHub release page. Also upload the JAR file.
