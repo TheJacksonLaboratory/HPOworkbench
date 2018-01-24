@@ -27,7 +27,7 @@ public class CountFrequencyCommand extends HPOCommand {
 
     private final String annotationPath;
 
-    TermId termId;
+    private final TermId termId;
 
     public CountFrequencyCommand(String hpoPath, String annotPath, String hpoTermId) {
         this.hpOboPath=hpoPath;
@@ -47,14 +47,15 @@ public class CountFrequencyCommand extends HPOCommand {
             HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath);
             List<HpoDiseaseAnnotation> annotlist = aparser.getAnnotations();
             Set<TermId> descendents = getDescendents(ontology, termId);
-            HashMap<TermId, Integer> hm = new HashMap<>();
+            HashMap<TermId, Double> hm = new HashMap<>();
             for (TermId t : descendents) {
-                hm.put(t, 0);
+                hm.put(t, 0D);
             }
             for (HpoDiseaseAnnotation annot : annotlist) {
                 TermId hpoid = annot.getHpoId();
+                double freq = annot.getFrequency().orElse(1.0F);
                 if (descendents.contains(hpoid)) {
-                    hm.put(termId, 1 + hm.get(termId));
+                    hm.put(termId, freq + hm.get(termId));
                 }
             }
             outputCounts(hm, ontology);
@@ -79,11 +80,11 @@ public class CountFrequencyCommand extends HPOCommand {
                 ));
     }
 
-    private void outputCounts(HashMap<TermId,Integer> hm, Ontology ontology) {
+    private void outputCounts(HashMap<TermId,Double> hm, Ontology ontology) {
         Map mp2 = sortByValue(hm);
         for (Object t: mp2.keySet()) {
             TermId tid = (TermId) t;
-            Integer count = (Integer)mp2.get(t);
+            double count = (double)mp2.get(t);
             String name =  ((HpoTerm)ontology.getTermMap().get(tid)).getName();
             System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count);
         }

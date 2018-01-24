@@ -62,7 +62,7 @@ public class Commandline {
         try {
             commandLine = cmdLineGnuParser.parse(gnuOptions, args);
             String category[] = commandLine.getArgs();
-            if (category.length != 1) {
+            if (category.length < 1) {
                 printUsage("command missing");
             } else {
                 mycommand = category[0];
