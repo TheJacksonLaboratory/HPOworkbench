@@ -103,6 +103,7 @@ public class SmallFileBuilder {
                     break;
                 case "Gene Symbol(s)":
                     entry.add(genesymbol);
+                    break;
                 case "Phenotype ID":
                     entry.add(phenotypeId);
                     break;
@@ -111,6 +112,7 @@ public class SmallFileBuilder {
                     break;
                 case "Age of Onset ID":
                     entry.add(ageOfOnsetId);
+                    break;
                 case "Age of Onset Name":
                     entry.add(ageOfOnsetName);
                     break;
@@ -122,10 +124,13 @@ public class SmallFileBuilder {
                     break;
                 case "Frequency":
                     entry.add(frequency);
+                    break;
                 case "Sex ID":
                     entry.add(sexID);
+                    break;
                 case "Sex Name":
                     entry.add(sexName);
+                    break;
                 case "Negation ID":
                     entry.add(negationID);
                     break;
@@ -149,7 +154,9 @@ public class SmallFileBuilder {
                     System.exit(1);
             }
         }
-        return entry.stream().collect(Collectors.joining("\t"));
+
+        return String.join("\t",entry);
+
     }
 }
 

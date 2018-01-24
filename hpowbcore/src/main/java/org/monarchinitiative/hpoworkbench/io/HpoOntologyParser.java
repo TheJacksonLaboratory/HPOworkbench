@@ -54,7 +54,7 @@ public class HpoOntologyParser {
             this.abnormalPhenoSubOntology = ontology.getPhenotypicAbnormalitySubOntology();
             this.inheritanceSubontology = ontology.subOntology(inheritId);
         } catch (Exception e) {
-            throw new HPOException(String.format("error trying to parse hp.obo file at %s",hpoOntologyPath));
+            throw new HPOException(String.format("error trying to parse hp.obo file at %s: %s",hpoOntologyPath,e.getMessage()));
         }
     }
 
