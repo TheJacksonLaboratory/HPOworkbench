@@ -1,4 +1,4 @@
-package org.monarchinitiative.hpoworkbench.rtf;
+package org.monarchinitiative.hpoworkbench.word;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.ontology.data.TermSynonym;

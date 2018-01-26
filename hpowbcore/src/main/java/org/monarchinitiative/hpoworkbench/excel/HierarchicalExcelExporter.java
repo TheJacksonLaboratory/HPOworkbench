@@ -14,7 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
-import org.monarchinitiative.hpoworkbench.rtf.Pair;
+import org.monarchinitiative.hpoworkbench.word.Pair;
 
 
 import java.io.FileNotFoundException;

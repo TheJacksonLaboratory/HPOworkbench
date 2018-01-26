@@ -4,7 +4,7 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
-import org.monarchinitiative.hpoworkbench.rtf.Hpo2Rtf;
+import org.monarchinitiative.hpoworkbench.word.Hpo2Word;
 
 /**
  * A command class to coordinate the production and output of an RTF file containing information about
@@ -12,11 +12,11 @@ import org.monarchinitiative.hpoworkbench.rtf.Hpo2Rtf;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.1.0
  */
-public class RtfCommand extends HPOCommand  {
+public class WordCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private String hpopath=null;
 
-    private String DEFAULT_OUTPUTNAME="hpotest.rtf";
+    private String DEFAULT_OUTPUTNAME="hpotest.word";
     private static String DEFAULT_START_TERM="HP:0000118";
 
 
@@ -24,10 +24,10 @@ public class RtfCommand extends HPOCommand  {
     private String IMMUNOLOGY_STAERT_TERM="HP:0002715";
 
 
-    Hpo2Rtf hpo2rtf=null;
+    Hpo2Word hpo2Word =null;
 
 
-    public RtfCommand(String dir, String startTerm) {
+    public WordCommand(String dir, String startTerm) {
         hpopath=dir;
         startTerm=startTerm;
     }
@@ -38,10 +38,7 @@ public class RtfCommand extends HPOCommand  {
         logger.trace("running RTF command");
 
         try {
-            this.hpo2rtf = new Hpo2Rtf(DEFAULT_OUTPUTNAME);
-            hpo2rtf.writeRtfHeader();
-            hpo2rtf.writeTableFromTerm(IMMUNOLOGY_STAERT_TERM);
-            hpo2rtf.close();
+            this.hpo2Word = new Hpo2Word(DEFAULT_OUTPUTNAME, startTerm);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,5 +60,5 @@ public class RtfCommand extends HPOCommand  {
 
 
     @Override
-    public String getName() { return "rtf";}
+    public String getName() { return "word";}
 }
