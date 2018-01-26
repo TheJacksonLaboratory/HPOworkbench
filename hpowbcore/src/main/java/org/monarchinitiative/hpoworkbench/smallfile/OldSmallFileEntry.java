@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.DECIPHER;
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.OMIM;
@@ -19,6 +20,7 @@ import static org.monarchinitiative.hpoworkbench.util.DateUtil.convertToCanonica
 
 /**
  * Created by peter on 1/20/2018.
+ * This class is inteded to take data from a single line of an "old" small file entry.
  */
 public class OldSmallFileEntry {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -75,7 +77,7 @@ public class OldSmallFileEntry {
 
     private String description=null;
     /** This was not present in the old small file but will be created here if possible from the Description field. */
-    private TermId modifier=null;
+    private Set<TermId> modifierset=new HashSet<>();
     /** The source of the assertion, often a string such as PMID:123 or OMIM:100123 */
     private String pub=null;
     /** The biocurator */
@@ -120,7 +122,10 @@ public class OldSmallFileEntry {
          findModifierTerms();
     }
 
-
+    /** Creates a map for all terms in the Clinical modifier subhierarchy (which
+     * starts from HP:0012823). The keys are lower-case versions of the Labels,
+     * and the values are the corresponding TermIds. See {@link #modifier2TermId}.
+     */
     private static void findModifierTerms() {
          TermId modifier = new ImmutableTermId(HP_PREFIX,"0012823");
          Stack<TermId> stack = new Stack<>();
@@ -132,8 +137,11 @@ public class OldSmallFileEntry {
              Set<TermId> kids = getChildren(parent);
              kids.stream().forEach(k -> stack.push(k));
          }
-         descendents.stream().forEach(d -> modifier2TermId.put(ontology.getTermMap().get(d).getName(),d));
 
+         for (TermId tid : descendents) {
+             String label = ontology.getTermMap().get(tid).getName().toLowerCase();
+             modifier2TermId.put(label,tid);
+         }
     }
 
     private static Set<TermId> getChildren(TermId parent) {
@@ -234,7 +242,7 @@ public class OldSmallFileEntry {
             LOGGER.fatal("Ontology is null");
             System.exit(1);
         }
-        // TODO run with iunheritance obnlyu
+        // TODO run with inheritance obnlyu
         if (! ontology.getTermMap().containsKey(tid)) {
             LOGGER.fatal("Term " + tid.getIdWithPrefix() + " was not a valid inheritance term");
             System.exit(1);
@@ -348,14 +356,33 @@ public class OldSmallFileEntry {
      * @param d
      */
      public void setDescription(String d) {
+         List<String> descriptionList=new ArrayList<>();
+         if (d.indexOf(";")>0) {
+             String A[]=d.split(";");
+             for (String a: A) {
+                 if (a.startsWith("MODIFIER:")) {
+                     String candidateModifier=a.substring(9).toLowerCase();
+                     if (modifier2TermId.containsKey(candidateModifier)) {
+                         modifierset.add(modifier2TermId.get(candidateModifier));
+                     } else {
+                         LOGGER.fatal("Could not identify modifer for "+ candidateModifier + ", terminating program....");
+                         //residual.append(a + ";");
+                         System.exit(1);
+                     }
+                 } else {
+                     descriptionList.add(a);
+                 }
+             }
+         }
+         LOGGER.info("Size of descriptionList "+ descriptionList.size());
+         LOGGER.info("Size of modifierset "+ modifierset.size());
         for (String s : modifier2TermId.keySet()) {
             if (s.equalsIgnoreCase(d)) {
-                this.modifier = modifier2TermId.get(d);
-               return;
+                modifierset.add( modifier2TermId.get(d));
             }
         }
         // if we get here, we could not find a modifier
-        description=d;
+        description=descriptionList.stream().collect(Collectors.joining(";"));
     }
      public void setPub(String p) { pub=p;}
 
@@ -455,10 +482,16 @@ public class OldSmallFileEntry {
         else if (negationName != null) return negationName;
         else return "";
     }
-    public TermId getModifier(){ return modifier; }
+    public Set<TermId> getModifierSet() { return modifierset; }
+    public String getModifierString(){
+        if (modifierset==null || modifierset.isEmpty()) return "";
+        else return modifierset.stream().map(TermId::getIdWithPrefix).collect(Collectors.joining(";"));
+    }
     public String getDescription(){ return description;}
     public String getPub(){ return pub;}
     public String getAssignedBy() { return assignedBy;}
     /** Returns the date created, and transforms the date format to YYYY-MM-DD, e.g., 2009-03-23. */
     public String getDateCreated() { return convertToCanonicalDateFormat(dateCreated); }
+
+
 }
