@@ -4,7 +4,6 @@ import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.formats.hpo.HpoTermRelation;
 import com.github.phenomics.ontolib.ontology.data.Ontology;
-import org.apache.commons.io.IOExceptionWithCause;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;

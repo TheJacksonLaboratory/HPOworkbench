@@ -1,4 +1,4 @@
-package org.monarchinitiative.hpoworkbench.rtf;
+package org.monarchinitiative.hpoworkbench.word;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

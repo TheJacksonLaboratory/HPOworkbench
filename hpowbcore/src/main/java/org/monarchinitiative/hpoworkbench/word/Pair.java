@@ -1,4 +1,4 @@
-package org.monarchinitiative.hpoworkbench.rtf;
+package org.monarchinitiative.hpoworkbench.word;
 
 
 
