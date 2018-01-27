@@ -173,6 +173,40 @@ public class OldSmallFileEntryTest {
         assertEquals("IEA", entry.getEvidenceID());
         assertEquals("HP:0012825", entry.getModifierString()); // code for Mild
         assertEquals("", entry.getDescription());
+    }
+
+    /**
+     * OMIM:608154	%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES
+     * HP:0000938	Osteopenia			IEA	IEA
+     * MODIFIER:PROGRESSIVE;OMIM-CS:SKELETAL > PROGRESSIVE OSTEOPENIA	OMIM:608154	HPO:skoehler	10.06.2013
+     * We should pull out the modifier, Progressive (HP:0003676)
+     */
+    @Test
+    public void testModification3() throws IOException {
+        File tempFile = testFolder.newFile("tempfile3.tab");
+        List<String> annots = new ArrayList<>();
+        annots.add(SmallFileBuilder.getHeader());
+        SmallFileBuilder builder = new SmallFileBuilder().
+                diseaseId("OMIM:608154").
+                diseaseName("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES").
+                hpoId("HP:0000938").
+                hpoName("Osteopenia").
+                description("MODIFIER:PROGRESSIVE;OMIM-CS:SKELETAL > PROGRESSIVE OSTEOPENIA");
+        String oldSmallFileLine = builder.build();
+        annots.add(oldSmallFileLine);
+        writeTmpFile(annots, tempFile);
+        OldSmallFile osm = new OldSmallFile(tempFile.getAbsolutePath());
+        List<OldSmallFileEntry> entries = osm.getEntrylist();
+        // we expect one entry, and the Modifer field should have "Episodic" (HP:0025303)
+        assertEquals(1, entries.size());
+        OldSmallFileEntry entry = entries.get(0);
+        assertEquals("OMIM:608154", entry.getDiseaseID());
+        assertEquals("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES", entry.getDiseaseName());
+        assertEquals("HP:0000938", entry.getPhenotypeId().getIdWithPrefix());
+        assertEquals("Osteopenia", entry.getPhenotypeName());
+        assertEquals("IEA", entry.getEvidenceID());
+        assertEquals("HP:0003676", entry.getModifierString()); // code for Progressive
+        assertEquals("OMIM-CS:SKELETAL > PROGRESSIVE OSTEOPENIA", entry.getDescription());
 
     }
 
