@@ -694,7 +694,11 @@ public class MainController {
 
     }
 
-
+    /** Show the help dialog */
+    @FXML private void helpWindow(ActionEvent e) {
+       HelpViewFactory.openBrowser();
+        e.consume();
+    }
 
     /** Show the about message */
     @FXML private void aboutWindow(ActionEvent e) {

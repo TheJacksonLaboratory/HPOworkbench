@@ -22,11 +22,15 @@ package org.monarchinitiative.hpoworkbench.gui;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.*;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
 
 
 /**
@@ -36,12 +40,14 @@ import org.apache.logging.log4j.Logger;
  */
 public class HelpViewFactory {
     private static final Logger logger = LogManager.getLogger();
+    private static final String READTHEDOCS_SITE = "http://hpo-workbench.readthedocs.io/en/latest/";
 
     private static String getHTML() {
         String sb = "<html><body>\n" +
                 inlineCSS() +
-                "<h1>LOINC2HPO Biocuration App Help</h1>" +
-                "<p><i>Loinc2Hpo</i> is designed to help curators create curations for LOINC code to HPO Term mappings.</p>" +
+                "<h1>HPO Workbench Help</h1>" +
+                "<p><i>HPO Workbench</i> is designed to help curators explore the HPO and suggest new terms, " +
+                "annotations, or corrections to current content.</p>" +
                 setup() +
                 openFile() +
                 "</body></html>";
@@ -62,22 +68,14 @@ public class HelpViewFactory {
 
     private static String setup() {
         return "<h2>Setup</h2>" +
-                "<p>When you use Loinc2Hpo for the first time, you need to download some files and tell Loinc2Hpo" +
-                "where you would like to store the annotation files. </p>" +
-                "<p><ol><li><b>Loinc Core Table file</b> This is a file from Loinc that contains the names of Loinc codes " +
-                "together with various information. Go to the LOINC download page (https://loinc.org/downloads/loinc/). You" +
-                "will need to register. Download the LOINC Core Table file. Use the <tt>Edit|Set path to LOINC Core Table file</tt>" +
-                " to tell Loinc2Hpo where you have stored this file.</li>" +
-                "<li><b>Download HPO</b> This will download the latest release of <tt>hp.obo</tt> from the HPO GitHub page.</li>" +
-                "<li><b>Set biocurator id</b> Enter whatever you would like be be nano-attributed by, e.g., MGM:rrabbit.</li>" +
-                "<li><b>Show settings</b> This item opens a window to show the current settings.</li>" +
-                "</ol></p>\n";
+                "<p>When you use HPO Workbench for the first time, you need to download the HPO ontology file" +
+                "and the disease annotations from the Edit menu. HPO will download these files to you user" +
+                "directory. To get an update simply download again.</p>\n";
     }
 
     private static String openFile() {
-        return "<h2>Working with LOINC</h2>" +
-                "<p>For the simple case, there is one LOINC entry for a lab test that can be understood in isolation. " +
-                "For instance, </p>\n";
+        return String.format("<h2>Working with HPO Workbench</h2>" +
+                "<p>A tutorial and detailed documentation for HPO Workbench can be found at readthedocs: %s</p>",READTHEDOCS_SITE);
     }
 
 
@@ -86,7 +84,7 @@ public class HelpViewFactory {
     /** Open a dialog that provides concise help for using PhenoteFX. */
     public static void openHelpDialog() {
         Stage window;
-        String windowTitle = "LOINC2HPO Biocuration App Help";
+        String windowTitle = "HPO Workbench Help";
         window = new Stage();
         window.setOnCloseRequest( event -> {window.close();} );
         window.setTitle(windowTitle);
@@ -107,14 +105,38 @@ public class HelpViewFactory {
         region.setPrefHeight(30);
         region.setPrefWidth(400);
         hbox.setHgrow(region, Priority.ALWAYS);
+
+
+        Button openRTDbutton = new Button("Open ReadTheDocs");
+        openRTDbutton.setOnAction( e-> openBrowser());
+
         Button button = new Button("Close");
         button.setOnAction( e->window.close());
-        hbox.getChildren().addAll(region,button);
+        hbox.getChildren().addAll(region,openRTDbutton,button);
         vbox.getChildren().addAll(wview,hbox);
         Scene scene = new Scene(pane, 800, 600);
 
         window.setScene(scene);
         window.showAndWait();
+    }
+
+
+    /**
+     * Open a JavaFW Webview window and confirmDialog our read the docs help documentation in it.
+     */
+    public static void openBrowser() {
+        try{
+            Stage window;
+            window = new Stage();
+            WebView web = new WebView();
+            web.getEngine().load(READTHEDOCS_SITE);
+            Scene scene = new Scene(web);
+            window.setScene(scene);
+            window.show();
+        } catch (Exception e){
+            logger.error(String.format("Could not open browser to show RTD: %s",e.toString()));
+            e.printStackTrace();
+        }
     }
 
 }

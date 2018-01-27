@@ -19,18 +19,18 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="1200.0" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
       <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
          <children>
-            <MenuBar minWidth="120.0" prefWidth="120.0" styleClass="mymenu" stylesheets="@../css/style.css" >
+            <MenuBar minHeight="30.0" minWidth="120.0" prefWidth="120.0" styleClass="mymenu" stylesheets="@../css/style.css">
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false"  text="Edit">
+                <Menu mnemonicParsing="false" text="Edit">
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
                         <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
@@ -39,11 +39,12 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <Region HBox.hgrow="ALWAYS" />
+            <Region minHeight="30.0" styleClass="fx-menubar" HBox.hgrow="ALWAYS" />
             <MenuBar minWidth="70.0" HBox.hgrow="NEVER">
               <menus>
                 <Menu mnemonicParsing="false" text="Help">
                   <items>
+                        <MenuItem mnemonicParsing="false" onAction="#helpWindow" text="Help" />
                     <MenuItem mnemonicParsing="false" onAction="#aboutWindow" text="About" />
                   </items>
                 </Menu>
@@ -55,7 +56,7 @@
    <left>
       <VBox BorderPane.alignment="CENTER">
          <children>
-            <HBox prefHeight="44.0" prefWidth="380.0">
+            <HBox prefHeight="44.0" prefWidth="400.0">
                <children>
                   <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse HPO Terms or Diseases">
                      <HBox.margin>
@@ -64,7 +65,7 @@
                   </Label>
                </children>
             </HBox>
-            <HBox prefHeight="39.0" prefWidth="380.0">
+            <HBox prefHeight="39.0" prefWidth="400.0">
                <children>
                   <RadioButton fx:id="hpoTermRadioButton" mnemonicParsing="false" text="HPO Terms" userData="hpo">
                      <HBox.margin>
@@ -83,7 +84,7 @@
                   </RadioButton>
                </children>
             </HBox>
-            <HBox maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
+            <HBox maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="400.0" VBox.vgrow="ALWAYS">
                <children>
                   <TextField fx:id="searchTextField" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" promptText="autocomplete HPO term...">
                      <HBox.margin>
@@ -100,7 +101,7 @@
                   </Button>
                </children>
             </HBox>
-            <TreeView fx:id="ontologyTreeView" maxHeight="1.7976931348623157E308" minWidth="300.0" VBox.vgrow="ALWAYS">
+            <TreeView fx:id="ontologyTreeView" maxHeight="1.7976931348623157E308" minWidth="300.0" prefHeight="527.0" prefWidth="400.0" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
@@ -111,7 +112,7 @@
    <center>
       <VBox minHeight="-Infinity" BorderPane.alignment="CENTER">
          <children>
-            <WebView fx:id="infoWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+            <WebView fx:id="infoWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="570.0" prefWidth="767.0" VBox.vgrow="ALWAYS" />
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <GridPane minWidth="-Infinity">
@@ -125,29 +126,29 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary">
+                        <Button minWidth="210.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#exportToExcel" styleClass="Button" stylesheets="@../css/style.css" text="Export ontology as Excel file" GridPane.rowIndex="1">
+                        <Button minWidth="210.0" mnemonicParsing="false" onAction="#exportToExcel" styleClass="Button" stylesheets="@../css/style.css" text="Export ontology as Excel file" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest correction " GridPane.columnIndex="1">
+                        <Button minWidth="210.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest correction " GridPane.columnIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Button minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new annotation" GridPane.rowIndex="2">
+                        <Button minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new annotation" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets right="5.0" />
                            </GridPane.margin></Button>
-                        <Button minWidth="195.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Button minWidth="210.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>

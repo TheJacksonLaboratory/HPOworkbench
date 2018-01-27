@@ -2,6 +2,7 @@
 
 ## v0.1.9
 * Support for Word export (discontinuing support for RTF export)
+* Adding help dialog
 
 
 ## v0.1.8
