@@ -132,7 +132,8 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             System.exit(1);
         }
         for (String s : descriptionCount.keySet()) {
-            System.out.println(descriptionCount.get(s)+": "+s );
+            if (s!=null && s.contains("MODIFIER"))
+                System.out.println(descriptionCount.get(s)+": "+s );
         }
        // convertToNewSmallFiles();
     }

@@ -278,12 +278,41 @@ public class OldSmallFileEntryTest {
         assertEquals("HP:0000486", entry.getPhenotypeId().getIdWithPrefix());
         assertEquals("Strabismus", entry.getPhenotypeName());
         assertEquals("TAS", entry.getEvidenceID());
-        TermId veryRare = ImmutableTermId.constructWithPrefix("HP:0040283");// HP:0040283 is Occasional
-        assertEquals(veryRare,entry.getFrequencyId()  );
+        TermId occasionalTermId = ImmutableTermId.constructWithPrefix("HP:0040283");// HP:0040283 is Occasional
+        assertEquals(occasionalTermId,entry.getFrequencyId()  );
         assertEquals("OMIM:608154",entry.getPub());
         assertEquals("OMIM-CS:HEAD AND NECK_EYES > STRABISMUS (IN SOME PATIENTS)", entry.getDescription());
-
     }
 
+    /** Test whether we assign this Free Text description the Hpo Frequency term Very rare and the modifer mild
+     * OMIM-CS:SKELETAL_SPINE > SCOLIOSIS, MILD (RARE)
+     */
+    @Test
+    public void testModification6() throws IOException {
+        File tempFile = testFolder.newFile("tempfile6.tab");
+        List<String> annots = new ArrayList<>();
+        annots.add(SmallFileBuilder.getHeader());
+        SmallFileBuilder builder = new SmallFileBuilder().
+                diseaseId("OMIM:608154").
+                diseaseName("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES").
+                hpoId("HP:0000486").
+                hpoName("Strabismus").
+                evidence("IEA").
+                pub("OMIM:608154").
+                description("OMIM-CS:SKELETAL_SPINE > SCOLIOSIS, MILD (RARE)");
+        String oldSmallFileLine = builder.build();
+        annots.add(oldSmallFileLine);
+        writeTmpFile(annots, tempFile);
+        OldSmallFile osm = new OldSmallFile(tempFile.getAbsolutePath());
+        List<OldSmallFileEntry> entries = osm.getEntrylist();
+        // we expect one entry, and the Modifer field should have "Episodic" (HP:0025303)
+        assertEquals(1, entries.size());
+        OldSmallFileEntry entry = entries.get(0);
+
+        assertEquals("OMIM:608154", entry.getDiseaseID());
+        TermId veryRare = ImmutableTermId.constructWithPrefix("HP:0040284");// HP:0040284 is Very rare
+        assertEquals(veryRare,entry.getFrequencyId()  );
+        assertEquals("TAS", entry.getEvidenceID());
+    }
 
 }

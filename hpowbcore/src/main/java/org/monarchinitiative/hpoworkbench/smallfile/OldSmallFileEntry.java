@@ -11,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.DECIPHER;
@@ -371,11 +373,15 @@ public class OldSmallFileEntry {
                 }
                 if (a.startsWith("MODIFIER:")) {
                     String candidateModifier = a.substring(9).toLowerCase();
+                    if (candidateModifier.contains("recurrent")) {
+                        LOGGER.warn("NEED TO IMPLEMENT RECURRENT");
+                        continue;
+                    }
                     if (modifier2TermId.containsKey(candidateModifier)) {
                         modifierset.add(modifier2TermId.get(candidateModifier));
                     } else {
-                        LOGGER.fatal("Could not identify modifer for " + candidateModifier + ", terminating program....");
-                        //System.exit(1); // if this happens we need to add the item to HPO or otherwise check the code!
+                        LOGGER.fatal("Could not identify modifer for " + candidateModifier + ", in description "+d+", terminating program....");
+                        System.exit(1); // if this happens we need to add the item to HPO or otherwise check the code!
                     }
                 } else if (a.contains("(RARE)")) {
                     if (this.frequencyId==null && this.frequencyString==null) {
@@ -389,10 +395,13 @@ public class OldSmallFileEntry {
                         this.frequencyString="Occasional";
                     }
                     descriptionList.add(a);
-                }  else if (a.matches("(\\d{1,5})?[/](\\d{1,3})?")) {
-//                    if (this.frequencyString==null && this.frequencyString==null) {
-//                        this.frequencyString=
-//                    }
+//                }  else if (a.matches("(\\d{1,5})?[/](\\d{1,3})?")) {
+//                    Pattern
+//                    Pattern pat = new Matcher("(\\d{1,5})?[/](\\d{1,3})?");
+//                    String numerator=a.matches("(\\d{1,5})?[/](\\d{1,3})?").
+////                    if (this.frequencyString==null && this.frequencyString==null) {
+////                        this.frequencyString=
+////                    }
                 } else if (modifier2TermId.containsKey(a.toLowerCase())) {  // exact match (except for capitalization).
                     TermId tid = modifier2TermId.get(a.toLowerCase());
                     modifierset.add(tid);
