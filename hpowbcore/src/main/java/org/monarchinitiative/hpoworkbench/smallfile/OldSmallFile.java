@@ -13,6 +13,13 @@ import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 
 /**
+ * The HPO asnotations are currently distribued acorss roughly 7000 "small files", which were created between 2009 and 2017.
+ * We want to unify and extend the format for these files. Thiu class represents a single "old" small file. THe app will
+ * transform these objects into {@link V2SmallFile} objects. Note that the "logic" for transformung small files has been
+ * coded in the {@link OldSmallFileEntry} class, and this class basically just identifies the column indices and splits up the
+ * lines into corresponding fields. THere is some variability in the nameing of columns (e.g., Sex and SexID), and this
+ * class tries to figure that out.
+ * @author Peter Robinson
  * Created by peter on 1/20/2018.
  */
 public class OldSmallFile {
@@ -54,11 +61,10 @@ public class OldSmallFile {
     private int ABNORMAL_NAME_INDEX=UNINITIALIZED;
     private int ORTHOLOGS_INDEX=UNINITIALIZED;
 
-    BiMap<FieldType,Integer> fields2index;
-
+    private BiMap<FieldType,Integer> fields2index;
+    /** A list of {@link org.monarchinitiative.hpoworkbench.smallfile.OldSmallFileEntry} objects, each of which corresponds
+     * to a line in the old small file (except for the header). */
     private List<OldSmallFileEntry> entrylist=new ArrayList<>();
-
-
     private final String pathToOldSmallFile;
 
     public OldSmallFile(String path) {
@@ -66,14 +72,12 @@ public class OldSmallFile {
         parse();
     }
 
-
-
     private void parse() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(pathToOldSmallFile));
             String line;
             line=br.readLine();// the header
-            processHeader(line);
+            processHeader(line); // identify the indices
             while ((line=br.readLine())!=null ){
                 if (line.trim().isEmpty()) continue; // skip empty lines
                 try {

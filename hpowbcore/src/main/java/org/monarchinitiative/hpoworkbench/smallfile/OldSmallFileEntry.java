@@ -20,44 +20,30 @@ import static org.monarchinitiative.hpoworkbench.util.DateUtil.convertToCanonica
 
 /**
  * Created by peter on 1/20/2018.
- * This class is inteded to take data from a single line of an "old" small file entry.
+ * This class is intended to take data from a single line of an "old" small file entry. Its main purpose os to map and
+ * transform the data to the new field formats so that we can transform it into a {@link V2SmallFileEntry} object.
+ * @author Peter Robinson
  */
 public class OldSmallFileEntry {
     private static final Logger LOGGER = LogManager.getLogger();
     private DiseaseDatabase database = null;
     private String diseaseID = null;
     private String diseaseName = null;
-    /**
-     * gene ID. We will delete this field for the new version.
-     */
+    /** gene ID. We will delete this field for the new version*/
     private String geneID = null;
-    /**
-     * Gene symbol. We will delete this field for the new version
-     */
+    /** Gene symbol. We will delete this field for the new version */
     private String geneName = null;
-    /**
-     * We will delete the genotype field.
-     */
+    /** We will delete the genotype field in the new version*/
     private String genotype = null;
-    /**
-     * We will delete the gene symbol.
-     */
+    /** We will delete the gene symbol in the new version*/
     private String genesymbol = null;
-    /**
-     * THe HPO id
-     */
+    /** THe HPO id */
     private TermId phenotypeId = null;
-    /**
-     * THe HPO label
-     */
+    /** THe HPO label */
     private String phenotypeName = null;
-    /**
-     * THis should be an HPO Id
-     */
+    /** THis should be an HPO Id */
     private TermId ageOfOnsetId = null;
-    /**
-     * Name of HPO age of onset term.
-     */
+    /** Corresponding Name of HPO age of onset term. */
     private String ageOfOnsetName = null;
 
     private String evidenceID = null;
@@ -81,88 +67,60 @@ public class OldSmallFileEntry {
      * If present, a limitation to MALE or FEMALE.
      */
     private String sexID = null;
-    /**
-     * Redundant with {@link #sexID}.
-     */
+    /** Redundant with {@link #sexID}. */
     private String sexName = null;
-
+    /** A previous verion of HPOA did not have the {@link #sexID} field but this shoudl also be MALE or FEMALE. */
     private String sex = null;
 
     private final static String MALE_CODE = "Male";
     private final static String FEMALE_CODE = "Female";
-    /**
-     * If present, "NOT"
-     */
+    /** If present, "NOT" */
     private String negationID = null;
-    /**
-     * Redundant with {@link #negationID}.
-     */
+    /** Redundant with {@link #negationID}. */
     private String negationName = null;
-
+    /** Free text, b ut may contain things we can turn into modifiers. */
     private String description = null;
-    /**
-     * This was not present in the old small file but will be created here if possible from the Description field.
-     */
+    /** This was not present in the old small file but will be created here if possible from the Description field. */
     private Set<TermId> modifierset = new HashSet<>();
-    /**
-     * The source of the assertion, often a string such as PMID:123 or OMIM:100123
-     */
+    /** The source of the assertion, often a string such as PMID:123 or OMIM:100123 */
     private String pub = null;
-    /**
-     * The biocurator
-     */
+    /** The biocurator */
     private String assignedBy = null;
     /* The date the annotation was first created. */
     private String dateCreated = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String entityId = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String entityName = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String qualityId = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String qualityName = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String addlEntityName = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String addlEntityId = null;
     /**
      * Some entries have just evidence rather than evidenceId and evidenceName. We do the best we can to get one evidence code but
      * looking at all three fields one after the other, with evidenceId being prefered, then evidenceName, then evidence
      */
     private String evidence = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
-    private String abnormalId = null;
-    /**
-     * Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.
-     */
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used.*/
+     private String abnormalId = null;
+    /** Added here for completeness. But we will be discarding this field in the v2 because it was hardly ever used. */
     private String abnormalName = null;
     private String othologs = null;
 
     private static HpoOntology ontology = null;
     private static Ontology<HpoTerm, HpoTermRelation> inheritanceSubontology = null;
     private static Ontology<HpoTerm, HpoTermRelation> abnormalPhenoSubOntology = null;
-
+    /** key -- all lower-case label of a modifer term. Value: corresponding TermId .*/
     private static Map<String, TermId> modifier2TermId = new HashMap<>();
 
 
     public OldSmallFileEntry() {
     }
-
+    /** This is called once by client code before we start parsing. Not pretty design but it woirks fine for thuis one-off app. */
     public static void setOntology(HpoOntology ont, Ontology<HpoTerm, HpoTermRelation> inh, Ontology<HpoTerm, HpoTermRelation> phe) {
         ontology = ont;
         inheritanceSubontology = inh;
@@ -186,7 +144,6 @@ public class OldSmallFileEntry {
             Set<TermId> kids = getChildren(parent);
             kids.stream().forEach(k -> stack.push(k));
         }
-
         for (TermId tid : descendents) {
             String label = ontology.getTermMap().get(tid).getName().toLowerCase();
             modifier2TermId.put(label, tid);
@@ -247,24 +204,15 @@ public class OldSmallFileEntry {
     public void setGenesymbol(String gs) {
         genesymbol = gs;
     }
-
+    /** Cherck the validating of the String id and crfeate the corresponding TermIKd in {@link #phenotypeId}. */
     public void setPhenotypeId(String id) throws HPOException {
-        if (!id.startsWith("HP:")) {
-            throw new HPOException("Bad phenotype id prefix: " + id);
-        }
-        if (!(id.length() == 10)) {
-            throw new HPOException("Bad length for phenotype id:  " + id);
-        }
-        if (!checkTermValid(id)) {
-            throw new HPOException("Term not valid TODO");
-        }
-        this.phenotypeId = getHpoTermId(id);
+        this.phenotypeId = createHpoTermIdFromString(id);
     }
-
+    /** Sets the name of the HPO term. */
     public void setPhenotypeName(String name) {
         phenotypeName = name;
     }
-
+    /** Sets the age of onset id (HPO term) and checks it is a valid term. */
     public void setAgeOfOnsetId(String id) throws HPOException {
         if (id == null || id.length() == 0) {
             return;
@@ -274,14 +222,14 @@ public class OldSmallFileEntry {
             System.exit(1);
         }
         if (!(id.length() == 10)) {
-            LOGGER.fatal("Bad length for phenotype id:  " + id);
+            LOGGER.fatal("Bad length for id:  " + id);
             System.exit(1);
         }
         if (!isValidInheritanceTerm(id)) {
             LOGGER.fatal("Not a valid inheritance term....terminating program");
             System.exit(1);
         }
-        ageOfOnsetId = getHpoTermId(id);
+        ageOfOnsetId = createHpoTermIdFromString(id);
     }
 
     public void setAgeOfOnsetName(String name) {
@@ -289,39 +237,36 @@ public class OldSmallFileEntry {
         this.ageOfOnsetName = name;
     }
 
-    private boolean isValidInheritanceTerm(String id) {
+    private boolean isValidInheritanceTerm(String id) throws HPOException {
+        TermId tid = createHpoTermIdFromString(id);
+        return true;
+    }
+
+    /** @return TermId e if this is a well-formed HPO term (starts with HP: and has ten characters).
+     * and is listed in the onrtology */
+    private TermId createHpoTermIdFromString(String id) throws HPOException  {
         if (!id.startsWith("HP:")) {
-            LOGGER.fatal("Invalid inhertiance term \"" + id + "\"");
-            System.exit(1);
+            throw new HPOException("Invalid HPO prefix for term id \"" + id + "\"");
         }
         id = id.substring(3);
         TermId tid = new ImmutableTermId(HP_PREFIX, id);
         if (tid == null) {
-            LOGGER.fatal("Could not create inheritance termid");
-            System.exit(1);
+            throw new HPOException("Could not create TermId object from id: \""+ id+"\"");
         }
         if (ontology == null) {
-            LOGGER.fatal("Ontology is null");
-            System.exit(1);
+            throw new HPOException("Ontology is null and thus we could not create TermId for " + id);
         }
-        // TODO run with inheritance obnlyu
         if (!ontology.getTermMap().containsKey(tid)) {
-            LOGGER.fatal("Term " + tid.getIdWithPrefix() + " was not a valid inheritance term");
-            System.exit(1);
+            throw new HPOException("Term " + tid.getIdWithPrefix() + " was not found in the HPO ontology");
         }
-        return true;
-    }
-
-    private boolean checkTermValid(String id) {
-        //TODO
-        return true;
+        return tid;
     }
 
     private void checkEvidence(String evi) throws
             HPOException {
         if ((!evi.equals("IEA")) && (!evi.equals("PCS")) &&
                 (!evi.equals("TAS"))) {
-            throw new HPOException("Bad evidence ID: " + evi);
+            throw new HPOException("Bad evidence ID: \"" + evi +"\"");
         }
     }
 
@@ -373,18 +318,6 @@ public class OldSmallFileEntry {
     }
 
 
-    private TermId getHpoTermId(String id) throws HPOException {
-        if (!(id.startsWith("HP:") && id.length() == 10)) {
-            throw new HPOException("Malformed HPO id \"" + id + "\"");
-        }
-        TermId tid = new ImmutableTermId(HP_PREFIX, id.substring(3));
-        if (!ontology.getTermMap().containsKey(tid)) {
-            throw new HPOException("Could not find tid in map " + tid.getIdWithPrefix());
-        }
-        return tid;
-    }
-
-
     public void setSexID(String id) throws HPOException {
         if (id == null || id.length() == 0) return;//oik, not required
         if (id.equalsIgnoreCase("MALE"))
@@ -419,6 +352,9 @@ public class OldSmallFileEntry {
         } else throw new HPOException("Malformed negation Name: \"" + name + "\"");
     }
 
+
+    //(IN 1/4 PATIENTS)
+    //1: OMIM-CS:RADIOLOGY > GENERALIZED OSTEOSCLEROSIS
     /**
      * In some case, the Description field will contain a modifier such as {@code Mild}. In  other cases,
      * Seb's pipeline will have added something like {@code MODIFIER:episodic}.
@@ -427,29 +363,46 @@ public class OldSmallFileEntry {
      */
     public void setDescription(String d) {
         List<String> descriptionList = new ArrayList<>();
-        if (d.indexOf(";") > 0) { // multiple items. Probably from Sebastian's text mining pipeline
+         // multiple items. Probably from Sebastian's text mining pipeline
             String A[] = d.split(";");
             for (String a : A) {
+                if (a.contains("OMIM-CS")) {
+                    this.evidenceID="TAS";
+                }
                 if (a.startsWith("MODIFIER:")) {
                     String candidateModifier = a.substring(9).toLowerCase();
                     if (modifier2TermId.containsKey(candidateModifier)) {
                         modifierset.add(modifier2TermId.get(candidateModifier));
                     } else {
                         LOGGER.fatal("Could not identify modifer for " + candidateModifier + ", terminating program....");
-                        System.exit(1); // if this happens we need to add the item to HPO or otherwise check the code!
+                        //System.exit(1); // if this happens we need to add the item to HPO or otherwise check the code!
                     }
+                } else if (a.contains("(RARE)")) {
+                    if (this.frequencyId==null && this.frequencyString==null) {
+                        this.frequencyId=VERY_RARE;
+                        this.frequencyString="Very rare";
+                    }
+                    descriptionList.add(a);
+                } else if (a.contains("(IN SOME PATIENTS)")) {
+                    if (this.frequencyId==null && this.frequencyString==null) {
+                        this.frequencyId=OCCASIONAL;
+                        this.frequencyString="Occasional";
+                    }
+                    descriptionList.add(a);
+                }  else if (a.matches("(\\d{1,5})?[/](\\d{1,3})?")) {
+//                    if (this.frequencyString==null && this.frequencyString==null) {
+//                        this.frequencyString=
+//                    }
+                } else if (modifier2TermId.containsKey(a.toLowerCase())) {  // exact match (except for capitalization).
+                    TermId tid = modifier2TermId.get(a.toLowerCase());
+                    modifierset.add(tid);
+
+
                 } else {
                     descriptionList.add(a);
                 }
             }
-        } else {  // Description consists of only one item
-            String lowerCaseD = d.toLowerCase();
-            if (modifier2TermId.containsKey(lowerCaseD)) {
-                modifierset.add(modifier2TermId.get(lowerCaseD));
-            } else {
-                descriptionList.add(d);
-            }
-        }
+
         description = descriptionList.stream().collect(Collectors.joining(";"));
     }
 

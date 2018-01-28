@@ -476,6 +476,8 @@ public class MainController {
             logger.error("could not retrieve diseases for " + termID);
         }
         String content = HpoHtmlPageGenerator.getHTML(term,annotatedDiseases);
+        //System.out.print(content);
+       // infoWebEngine=this.infoWebView.getEngine();
         infoWebEngine.loadContent(content);
     }
 

@@ -3,7 +3,9 @@ package smallfile;
 import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.formats.hpo.HpoTermRelation;
+import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.Ontology;
+import com.github.phenomics.ontolib.ontology.data.TermId;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -132,15 +134,10 @@ public class OldSmallFileEntryTest {
         assertEquals("#104290 ALTERNATING HEMIPLEGIA OF CHILDHOOD 1; AHC1", entry.getDiseaseName());
         assertEquals("HP:0002445", entry.getPhenotypeId().getIdWithPrefix());
         assertEquals("Tetraplegia", entry.getPhenotypeName());
-        assertEquals("IEA", entry.getEvidenceID());
+        assertEquals("TAS", entry.getEvidenceID()); // TAS because of OMIM-CS
         assertEquals("HP:0025303", entry.getModifierString());
         assertEquals("OMIM-CS:NEUROLOGIC_CENTRAL NERVOUS SYSTEM > QUADRIPLEGIA, EPISODIC", entry.getDescription());
 
-//        System.out.println("### OLD SMALL FILE  ###");
-//        System.out.println(oldSmallFileLine);
-//        System.out.println("### NEW SMALL FILE  ###");
-//        V2SmallFileEntry v2e=new V2SmallFileEntry(entry);
-//        System.out.println(v2e.getRow());
     }
 
 
@@ -204,10 +201,89 @@ public class OldSmallFileEntryTest {
         assertEquals("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES", entry.getDiseaseName());
         assertEquals("HP:0000938", entry.getPhenotypeId().getIdWithPrefix());
         assertEquals("Osteopenia", entry.getPhenotypeName());
-        assertEquals("IEA", entry.getEvidenceID());
+        assertEquals("TAS", entry.getEvidenceID()); // TAS because of OMIM-CS
         assertEquals("HP:0003676", entry.getModifierString()); // code for Progressive
         assertEquals("OMIM-CS:SKELETAL > PROGRESSIVE OSTEOPENIA", entry.getDescription());
+    }
+
+
+    /**
+     * Test whether we assign this Free Text description the Hpo Frequency term Very rare
+     * OMIM-CS:HEAD AND NECK_EYES > STRABISMUS (RARE)
+     */
+    @Test
+    public void testModification4() throws IOException {
+        File tempFile = testFolder.newFile("tempfile4.tab");
+        List<String> annots = new ArrayList<>();
+        annots.add(SmallFileBuilder.getHeader());
+        SmallFileBuilder builder = new SmallFileBuilder().
+                diseaseId("OMIM:608154").
+                diseaseName("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES").
+                hpoId("HP:0000486").
+                hpoName("Strabismus").
+                evidence("IEA").
+                pub("OMIM:608154").
+                description("OMIM-CS:HEAD AND NECK_EYES > STRABISMUS (RARE)");
+        String oldSmallFileLine = builder.build();
+        annots.add(oldSmallFileLine);
+        writeTmpFile(annots, tempFile);
+        OldSmallFile osm = new OldSmallFile(tempFile.getAbsolutePath());
+        List<OldSmallFileEntry> entries = osm.getEntrylist();
+        // we expect one entry, and the Modifer field should have "Episodic" (HP:0025303)
+        assertEquals(1, entries.size());
+        OldSmallFileEntry entry = entries.get(0);
+
+        assertEquals("OMIM:608154", entry.getDiseaseID());
+        assertEquals("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES", entry.getDiseaseName());
+        assertEquals("HP:0000486", entry.getPhenotypeId().getIdWithPrefix());
+        assertEquals("Strabismus", entry.getPhenotypeName());
+        assertEquals("TAS", entry.getEvidenceID());
+        TermId veryRare = ImmutableTermId.constructWithPrefix("HP:0040284");// HP:0040284 is Very rare
+        assertEquals(veryRare,entry.getFrequencyId()  );
+        assertEquals("OMIM:608154",entry.getPub());
+        assertEquals("OMIM-CS:HEAD AND NECK_EYES > STRABISMUS (RARE)", entry.getDescription());
 
     }
+
+
+
+    /**
+     * Test whether we assign this Free Text description the Hpo Frequency term Occasional
+     * OMIM-CS:HEAD AND NECK_EYES > STRABISMUS (IN SOME PATIENTS)
+     */
+    @Test
+    public void testModification5() throws IOException {
+        File tempFile = testFolder.newFile("tempfile5.tab");
+        List<String> annots = new ArrayList<>();
+        annots.add(SmallFileBuilder.getHeader());
+        SmallFileBuilder builder = new SmallFileBuilder().
+                diseaseId("OMIM:608154").
+                diseaseName("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES").
+                hpoId("HP:0000486").
+                hpoName("Strabismus").
+                evidence("IEA").
+                pub("OMIM:608154").
+                description("OMIM-CS:HEAD AND NECK_EYES > STRABISMUS (IN SOME PATIENTS)");
+        String oldSmallFileLine = builder.build();
+        annots.add(oldSmallFileLine);
+        writeTmpFile(annots, tempFile);
+        OldSmallFile osm = new OldSmallFile(tempFile.getAbsolutePath());
+        List<OldSmallFileEntry> entries = osm.getEntrylist();
+        // we expect one entry, and the Modifer field should have "Episodic" (HP:0025303)
+        assertEquals(1, entries.size());
+        OldSmallFileEntry entry = entries.get(0);
+
+        assertEquals("OMIM:608154", entry.getDiseaseID());
+        assertEquals("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES", entry.getDiseaseName());
+        assertEquals("HP:0000486", entry.getPhenotypeId().getIdWithPrefix());
+        assertEquals("Strabismus", entry.getPhenotypeName());
+        assertEquals("TAS", entry.getEvidenceID());
+        TermId veryRare = ImmutableTermId.constructWithPrefix("HP:0040283");// HP:0040283 is Occasional
+        assertEquals(veryRare,entry.getFrequencyId()  );
+        assertEquals("OMIM:608154",entry.getPub());
+        assertEquals("OMIM-CS:HEAD AND NECK_EYES > STRABISMUS (IN SOME PATIENTS)", entry.getDescription());
+
+    }
+
 
 }

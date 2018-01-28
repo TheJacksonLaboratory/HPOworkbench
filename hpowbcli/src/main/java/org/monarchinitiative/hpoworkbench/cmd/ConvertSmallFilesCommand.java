@@ -16,10 +16,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Created by peter on 1/20/2018.
@@ -102,6 +104,7 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
         logger.trace("We will convert the small files at " + pathToSmallFileDir);
         List<String> files=getListOfSmallFiles();
         logger.trace("We found " + files.size() + " small files");
+        Map<String,Integer> descriptionCount=new HashMap<>();
         try {
             out = new BufferedWriter(new FileWriter("small-file.log"));
             int c=1;
@@ -110,10 +113,17 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
                 else {
                     c++;
                     OldSmallFile osf = new OldSmallFile(path);
-                    osfList.add(osf);
-                    logger.error("Got total of " + osfList.size() + " small files");
+                   // osfList.add(osf);
+                   // logger.error("Got total of " + osfList.size() + " small files");
                     //System.exit(3);
-                   if (c>250)break;
+                  // if (c>250)break;
+                    List<OldSmallFileEntry> osfe = osf.getEntrylist();
+                    for (OldSmallFileEntry entry : osfe) {
+                        if (!descriptionCount.containsKey(entry.getDescription())) {
+                            descriptionCount.put(entry.getDescription(),0);
+                        }
+                        descriptionCount.put(entry.getDescription(),descriptionCount.get(entry.getDescription())+1);
+                    }
                 }
             }
             out.close();
@@ -121,8 +131,10 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             e.printStackTrace();
             System.exit(1);
         }
-
-        convertToNewSmallFiles();
+        for (String s : descriptionCount.keySet()) {
+            System.out.println(descriptionCount.get(s)+": "+s );
+        }
+       // convertToNewSmallFiles();
     }
 
     private void convertToNewSmallFiles() {
