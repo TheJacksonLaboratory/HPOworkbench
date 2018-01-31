@@ -20,23 +20,24 @@ package org.monarchinitiative.hpoworkbench.gui;
  * #L%
  */
 
+import com.google.common.base.Supplier;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.*;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Optional;
 
 
 /**
  * A helper class that displays the Help in a JavaFX webview browser
  * @author Peter Robinson
- * @version 0.1.3 (2017-11-12)
+ * @version 0.1.3 (2018-01-31)
  */
 public class HelpViewFactory {
     private static final Logger logger = LogManager.getLogger();
@@ -81,46 +82,6 @@ public class HelpViewFactory {
 
 
 
-    /** Open a dialog that provides concise help for using PhenoteFX. */
-    public static void openHelpDialog() {
-        Stage window;
-        String windowTitle = "HPO Workbench Help";
-        window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
-        window.setTitle(windowTitle);
-
-
-        Pane pane = new Pane();
-        VBox vbox =  new VBox();
-        vbox.setPrefHeight(600);
-        vbox.setPrefWidth(800);
-        WebView wview = new WebView();
-        wview.getEngine().loadContent(getHTML());
-
-        pane.getChildren().add(vbox);
-        HBox hbox = new HBox();
-        hbox.setPrefHeight(30);
-        hbox.setPrefWidth(800);
-        Region region=new Region();
-        region.setPrefHeight(30);
-        region.setPrefWidth(400);
-        hbox.setHgrow(region, Priority.ALWAYS);
-
-
-        Button openRTDbutton = new Button("Open ReadTheDocs");
-        openRTDbutton.setOnAction( e-> openBrowser());
-
-        Button button = new Button("Close");
-        button.setOnAction( e->window.close());
-        hbox.getChildren().addAll(region,openRTDbutton,button);
-        vbox.getChildren().addAll(wview,hbox);
-        Scene scene = new Scene(pane, 800, 600);
-
-        window.setScene(scene);
-        window.showAndWait();
-    }
-
-
     /**
      * Open a JavaFW Webview window and confirmDialog our read the docs help documentation in it.
      */
@@ -129,7 +90,11 @@ public class HelpViewFactory {
             Stage window;
             window = new Stage();
             WebView web = new WebView();
-            web.getEngine().load(READTHEDOCS_SITE);
+            WebEngine engine=web.getEngine();
+            engine.load(READTHEDOCS_SITE);
+            // ToDO show something if the RTD site cannot be loaded.
+//            engine.setOnError(e ->{System.out.println("Got Web Error");});
+//            engine.setOnStatusChanged(e->{System.out.println("Status");});
             Scene scene = new Scene(web);
             window.setScene(scene);
             window.show();
