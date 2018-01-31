@@ -24,6 +24,21 @@ import static org.monarchinitiative.hpoworkbench.util.DateUtil.convertToCanonica
  * Created by peter on 1/20/2018.
  * This class is intended to take data from a single line of an "old" small file entry. Its main purpose os to map and
  * transform the data to the new field formats so that we can transform it into a {@link V2SmallFileEntry} object.
+ * The transformations performed are
+ * <ol>
+ *     <li>Annotations to alt_id's are replaced wuth the current primary ud </li>
+ *     <li>The data format is unifed to YYYY-MM-DD</li>
+ *     <li>The fields geneId, geneName, genotype, and genesymbol are removed</li>
+ *     <li>A new modifier field is added. If possible, the free text in the Description field is used to put something
+ *     into the modifier field</li>
+ *     <li>The fields entityName,qualityId ,qualityName , addlEntityName, and addlEntityId are removed</li>
+ *     <li>The fields abnormalId and abnomralname are removed.</li>
+ *     <li>The field orthologs is removed</li>
+ *     <li>The current old file format has a single field for frequency. We try to make three separate fields from this
+ *     TODO discuss with Seb</li>
+ *     <li>The fields evidenceID, evidenceName, and evidence are reduced to one field "evidence" that is allow to have one
+ *     of four codes, IEA, ICE, TAS, PCS only.</li>
+ * </ol>
  * @author Peter Robinson
  */
 public class OldSmallFileEntry {
@@ -144,7 +159,7 @@ public class OldSmallFileEntry {
             TermId parent = stack.pop();
             descendents.add(parent);
             Set<TermId> kids = getChildren(parent);
-            kids.stream().forEach(k -> stack.push(k));
+            kids.forEach(k -> stack.push(k));
         }
         for (TermId tid : descendents) {
             String label = ontology.getTermMap().get(tid).getName().toLowerCase();
@@ -209,6 +224,10 @@ public class OldSmallFileEntry {
     /** Cherck the validating of the String id and crfeate the corresponding TermIKd in {@link #phenotypeId}. */
     public void setPhenotypeId(String id) throws HPOException {
         this.phenotypeId = createHpoTermIdFromString(id);
+        TermId primaryId = ontology.getTermMap().get(phenotypeId).getId();
+        if (! phenotypeId.equals(primaryId)) {
+            phenotypeId=primaryId; // replace alt_id with current primary id.
+        }
     }
     /** Sets the name of the HPO term. */
     public void setPhenotypeName(String name) {
@@ -283,7 +302,7 @@ public class OldSmallFileEntry {
     }
 
 
-    public void setFrequencyString(String freq) throws HPOException {
+    public void setFrequencyString(String freq) {
         if (freq == null || freq.length() == 0) return; // not required!
         this.frequencyString = freq.trim();
         if (frequencyString.length() == 0) return; //it ewas just a whitespace

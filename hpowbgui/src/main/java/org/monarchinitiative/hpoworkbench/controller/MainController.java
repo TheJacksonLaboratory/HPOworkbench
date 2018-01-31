@@ -55,7 +55,7 @@ public class MainController {
     private final static String HP_OBO_URL ="https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo";
     /** Download address for {@code phenotype_annotation.tab}. */
     private final static String PHENOTYPE_ANNOTATION_URL="http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation.tab";
-    private Model model=null;
+    private Model model;
     /** Ontology object containing {@link HpoTerm}s and their relationships. */
     private HpoOntology ontology;
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
@@ -388,22 +388,6 @@ public class MainController {
     }
 
 
-
-    /**
-     * Focus on the HPO term with given ID if the term is contained in the ontology.
-     *
-     * @param termId String with HPO term id (e.g. HP:0002527 for Falls)
-//     */
-//    void focusOnTerm(TermId termId) {
-//        HpoTerm term = ontology.getTermMap().get(termId);
-//        if (term == null) {
-//            logger.warn("Unable to focus on term with id {} because it is not defined in the ontology", termId);
-//            return;
-//        }
-//        expandUntilTerm(term);
-//    }
-
-
     /**
      * Find the path from the root term to given {@link HpoTerm}, expand the tree and set the selection model of the
      * TreeView to the term position.
@@ -491,7 +475,7 @@ public class MainController {
         String dbName = dmodel.getDiseaseDbAndId();
         String diseaseName = dmodel.getDiseaseName();
         List<HpoTerm> annotatingTerms=model.getAnnotationTermsForDisease(dmodel);
-        String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName,diseaseName,annotatingTerms);
+        String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName,diseaseName,annotatingTerms,ontology);
         infoWebEngine.loadContent(content);
     }
 

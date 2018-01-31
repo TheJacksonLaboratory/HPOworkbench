@@ -315,4 +315,78 @@ public class OldSmallFileEntryTest {
         assertEquals("TAS", entry.getEvidenceID());
     }
 
+
+    /**
+     * id: HP:0006315
+     name: Single median maxillary incisor
+     alt_id: HP:0001568
+     alt_id: HP:0001573
+     alt_id: HP:0006356
+     Check that an annotation with an alt_id gets updated to an annotation with the current primary id
+     * @throws IOException
+     */
+    @Test
+    public void updateAltIdAnnotation1() throws IOException {
+        File tempFile = testFolder.newFile("tempfile6.tab");
+        List<String> annots = new ArrayList<>();
+        annots.add(SmallFileBuilder.getHeader());
+        SmallFileBuilder builder = new SmallFileBuilder().
+                diseaseId("OMIM:608154").
+                diseaseName("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES").
+                hpoId("HP:0001568"). // out of date alt_id, should be replaced with the primary id.
+                hpoName("Single median maxillary incisor").
+                evidence("IEA").
+                pub("OMIM:608154").
+                description("OMIM-CS:SKELETAL_SPINE > SCOLIOSIS, MILD (RARE)");
+        String oldSmallFileLine = builder.build();
+        annots.add(oldSmallFileLine);
+        writeTmpFile(annots, tempFile);
+        OldSmallFile osm = new OldSmallFile(tempFile.getAbsolutePath());
+        List<OldSmallFileEntry> entries = osm.getEntrylist();
+        assertEquals(1, entries.size());
+        OldSmallFileEntry entry = entries.get(0);
+
+        assertEquals("OMIM:608154", entry.getDiseaseID());
+        TermId veryRare = ImmutableTermId.constructWithPrefix("HP:0040284");// HP:0040284 is Very rare
+        assertEquals(veryRare,entry.getFrequencyId()  );
+        assertEquals("TAS", entry.getEvidenceID());
+        TermId primaryId=ImmutableTermId.constructWithPrefix("HP:0006315");
+        assertEquals(primaryId,entry.getPhenotypeId());
+    }
+
+    /**
+     *  [Term]
+     id: HP:0006316
+     name: Irregularly spaced teeth
+     alt_id: HP:0009081
+     */
+    @Test
+    public void updateAltIdAnnotation2() throws IOException {
+        File tempFile = testFolder.newFile("tempfile6.tab");
+        List<String> annots = new ArrayList<>();
+        annots.add(SmallFileBuilder.getHeader());
+        SmallFileBuilder builder = new SmallFileBuilder().
+                diseaseId("OMIM:608154").
+                diseaseName("%608154 LIPODYSTROPHY, GENERALIZED, WITH MENTAL RETARDATION, DEAFNESS, SHORTSTATURE, AND SLENDER BONES").
+                hpoId("HP:0009081"). // out of date alt_id, should be replaced with the primary id.
+                hpoName("Irregularly spaced teeth").
+                evidence("IEA").
+                pub("OMIM:608154").
+                description("OMIM-CS:SKELETAL_SPINE > SCOLIOSIS, MILD (RARE)");
+        String oldSmallFileLine = builder.build();
+        annots.add(oldSmallFileLine);
+        writeTmpFile(annots, tempFile);
+        OldSmallFile osm = new OldSmallFile(tempFile.getAbsolutePath());
+        List<OldSmallFileEntry> entries = osm.getEntrylist();
+        assertEquals(1, entries.size());
+        OldSmallFileEntry entry = entries.get(0);
+
+        assertEquals("OMIM:608154", entry.getDiseaseID());
+        TermId veryRare = ImmutableTermId.constructWithPrefix("HP:0040284");// HP:0040284 is Very rare
+        assertEquals(veryRare,entry.getFrequencyId()  );
+        assertEquals("TAS", entry.getEvidenceID());
+        TermId primaryId=ImmutableTermId.constructWithPrefix("HP:0006316");
+        assertEquals(primaryId,entry.getPhenotypeId());
+    }
+
 }
