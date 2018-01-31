@@ -9,15 +9,15 @@ import com.github.phenomics.ontolib.ontology.data.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
+import org.monarchinitiative.hpoworkbench.util.DateUtil;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.DECIPHER;
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.OMIM;
 import static org.monarchinitiative.hpoworkbench.smallfile.DiseaseDatabase.ORPHANET;
+import static org.monarchinitiative.hpoworkbench.smallfile.SmallFileQCCode.*;
 import static org.monarchinitiative.hpoworkbench.util.DateUtil.convertToCanonicalDateFormat;
 
 /**
@@ -134,8 +134,10 @@ public class OldSmallFileEntry {
     /** key -- all lower-case label of a modifer term. Value: corresponding TermId .*/
     private static Map<String, TermId> modifier2TermId = new HashMap<>();
 
+    private Set<SmallFileQCCode> QCissues;
 
     public OldSmallFileEntry() {
+        QCissues = new HashSet<>();
     }
     /** This is called once by client code before we start parsing. Not pretty design but it woirks fine for thuis one-off app. */
     public static void setOntology(HpoOntology ont, Ontology<HpoTerm, HpoTermRelation> inh, Ontology<HpoTerm, HpoTermRelation> phe) {
@@ -207,18 +209,25 @@ public class OldSmallFileEntry {
     public void addGeneId(String id) {
         if (id == null) return;
         LOGGER.trace("Adding gene id: " + id);
+        this.QCissues.add(GOT_GENE_DATA);
         geneID = id;
     }
-
+    /** Record that we are adding gene data because we will be discarding it. */
     public void setGeneName(String name) {
+        if (name==null || name.isEmpty()) return;
+        this.QCissues.add(GOT_GENE_DATA);
         geneName = name;
     }
 
     public void setGenotype(String gt) {
+        if (gt==null || gt.isEmpty()) return;
+        this.QCissues.add(GOT_GENE_DATA);
         genotype = gt;
     }
 
     public void setGenesymbol(String gs) {
+        if (gs==null || gs.isEmpty()) return;
+        this.QCissues.add(GOT_GENE_DATA);
         genesymbol = gs;
     }
     /** Cherck the validating of the String id and crfeate the corresponding TermIKd in {@link #phenotypeId}. */
@@ -227,6 +236,7 @@ public class OldSmallFileEntry {
         TermId primaryId = ontology.getTermMap().get(phenotypeId).getId();
         if (! phenotypeId.equals(primaryId)) {
             phenotypeId=primaryId; // replace alt_id with current primary id.
+            this.QCissues.add(UPDATING_ALT_ID);
         }
     }
     /** Sets the name of the HPO term. */
@@ -283,23 +293,63 @@ public class OldSmallFileEntry {
         return tid;
     }
 
-    private void checkEvidence(String evi) throws
-            HPOException {
+    private boolean evidenceCodeWellFormed(String evi) {
+        if (evi==null || evi.isEmpty()) return false;
         if ((!evi.equals("IEA")) && (!evi.equals("PCS")) &&
-                (!evi.equals("TAS"))) {
-            throw new HPOException("Bad evidence ID: \"" + evi +"\"");
+                (!evi.equals("TAS") && (!evi.equals("ICE")))) {
+            return false;
+        } else {
+            return true;
         }
     }
 
     public void setEvidenceId(String id) throws HPOException {
         this.evidenceID = id;
-        checkEvidence(evidenceID);
+
     }
 
     public void setEvidenceName(String name) throws HPOException {
         this.evidenceName = name;
-        checkEvidence(evidenceName);
+        evidenceCodeWellFormed(evidenceName);
     }
+
+    public boolean hasQCissues() {
+        if (QCissues.size()==0) return false;
+        else if (QCissues.size()==1 && QCissues.contains(UPDATED_DATE_FORMAT)) return false;
+        else return true;
+    }
+
+    /**
+     * This method is called after all of the data have been entered. We return a List of error codes so that
+     * we can list up what we had to do to convert the filesd and do targeted manual checking.
+     */
+    public Set<SmallFileQCCode> doQCcheck() {
+
+        // check the vidence codes. At least one of the three fields
+        // has to have one of the correct codes, in order for the V2small file  entry to be ok
+        boolean evidenceOK=false;
+        if (evidenceID!=null) {
+            if (evidenceCodeWellFormed(evidenceID) ) { evidenceOK=true; }
+        }
+        if (!evidenceOK && evidenceName!=null) {
+            if (evidenceCodeWellFormed(evidenceName)) {evidenceOK=true; }
+        }
+        if (!evidenceOK && evidence!=null) {
+            if (evidenceCodeWellFormed(evidence)) {evidenceOK=true; }
+        }
+        if (!evidenceOK) { QCissues.add(DID_NOT_FIND_EVIDENCE_CODE);}
+        // check whether the primary label needs to be updated.
+        if (! this.phenotypeName.equals(ontology.getTermMap().get(this.phenotypeId).getName())) {
+            this.QCissues.add(UPDATING_HPO_LABEL);
+            this.phenotypeName=ontology.getTermMap().get(this.phenotypeId).getName();
+        }
+
+        return QCissues;
+
+    }
+
+
+
 
 
     public void setFrequencyString(String freq) {
@@ -414,18 +464,10 @@ public class OldSmallFileEntry {
                         this.frequencyString="Occasional";
                     }
                     descriptionList.add(a);
-//                }  else if (a.matches("(\\d{1,5})?[/](\\d{1,3})?")) {
-//                    Pattern
-//                    Pattern pat = new Matcher("(\\d{1,5})?[/](\\d{1,3})?");
-//                    String numerator=a.matches("(\\d{1,5})?[/](\\d{1,3})?").
-////                    if (this.frequencyString==null && this.frequencyString==null) {
-////                        this.frequencyString=
-////                    }
                 } else if (modifier2TermId.containsKey(a.toLowerCase())) {  // exact match (except for capitalization).
                     TermId tid = modifier2TermId.get(a.toLowerCase());
+                    this.QCissues.add(CREATED_MODIFER);
                     modifierset.add(tid);
-
-
                 } else {
                     descriptionList.add(a);
                 }
@@ -445,7 +487,10 @@ public class OldSmallFileEntry {
 
     public void setDateCreated(String dc) {
         // TODO make all dates look like 2018-01-23
-        this.dateCreated = dc;
+        this.dateCreated = DateUtil.convertToCanonicalDateFormat(dc);
+        if (!dc.equals(this.dateCreated)) {
+            QCissues.add(UPDATED_DATE_FORMAT);
+        }
     }
 
     public void setAddlEntityName(String n) {
@@ -461,14 +506,20 @@ public class OldSmallFileEntry {
     }
 
     public void setEntityName(String name) {
+        if (name ==null || name.isEmpty()) return;
+        QCissues.add(GOT_EQ_ITEM);
         entityName = name;
     }
 
     public void setQualityId(String id) {
+        if (id ==null || id.isEmpty()) return;
+        QCissues.add(GOT_EQ_ITEM);
         qualityId = id;
     }
 
     public void setQualityName(String name) {
+        if (name ==null || name.isEmpty()) return;
+        QCissues.add(GOT_EQ_ITEM);
         qualityName = name;
     }
 
@@ -477,10 +528,14 @@ public class OldSmallFileEntry {
     }
 
     public void setAbnormalId(String id) {
+        if (id ==null || id.isEmpty()) return;
+        QCissues.add(GOT_EQ_ITEM);
         abnormalId = id;
     }
 
     public void setAbnormalName(String name) {
+        if (name ==null || name.isEmpty()) return;
+        QCissues.add(GOT_EQ_ITEM);
         abnormalName = name;
     }
 
@@ -503,21 +558,7 @@ public class OldSmallFileEntry {
         return diseaseName;
     }
 
-    public String getGeneID() {
-        return geneID;
-    }
 
-    public String getGeneName() {
-        return geneName;
-    }
-
-    public String getGenotype() {
-        return genotype;
-    }
-
-    public String getGenesymbol() {
-        return genesymbol;
-    }
 
     public TermId getPhenotypeId() {
         return phenotypeId;

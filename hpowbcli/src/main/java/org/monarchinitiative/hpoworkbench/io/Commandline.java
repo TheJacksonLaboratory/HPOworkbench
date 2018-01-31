@@ -127,21 +127,16 @@ public class Commandline {
      * @return Options expected from command-line of GNU form.
      */
     public static Options constructGnuOptions() {
-        final Options gnuOptions = new Options();
-        gnuOptions.addOption("o", "out", true, "name/path of output file/directory")
+        final Options options = new Options();
+        options.addOption("o", "out", true, "name/path of output file/directory")
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
                 .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
                 .addOption("a", "annot", true, "path to HPO annotation file")
                 .addOption("h", "hpo", true, "path to hp.obo");
-//                .addOption("s", "suffix", true, "suffix for output filenames")
-//                .addOption("i", "bowtieindex", true, "path to bowtie2 index")
-//                .addOption("outdir", "outdir", true, "path to output directory")
-//                .addOption("q", "q", true, "path to forward FASTQ input file")
-//                .addOption("r", "r", true, "path to reverse FASTQ input file")
 //                .addOption("b", "bad", false, "output bad (rejected) reads to separated file")
 //                .addOption(Option.builder("f1").longOpt("file1").desc("path to fastq file 1").hasArg(true).argName("file1").build())
 //                .addOption(Option.builder("f2").longOpt("file2").desc("path to fastq file 2").hasArg(true).argName("file2").build());
-        return gnuOptions;
+        return options;
     }
 
     public static String getVersion() {

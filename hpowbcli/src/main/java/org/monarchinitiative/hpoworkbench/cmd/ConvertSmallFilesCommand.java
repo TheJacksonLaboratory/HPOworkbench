@@ -62,6 +62,15 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
     private int ASSIGNED_BY_INDEX;
     private int DATE_CREATED_INDEX;
 
+    private int n_corrected_date=0;
+    private int n_no_evidence=0;
+    private int n_gene_data=0;
+    private int n_alt_id=0;
+    private int n_update_label=0;
+    private int n_created_modifier=0;
+    private int n_EQ_item=0;
+
+
     private HpoOntology ontology=null;
     private Ontology<HpoTerm, HpoTermRelation> inheritanceSubontology=null;
     private Ontology<HpoTerm, HpoTermRelation> abnormalPhenoSubOntology=null;
@@ -113,10 +122,6 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
                 else {
                     c++;
                     OldSmallFile osf = new OldSmallFile(path);
-                   // osfList.add(osf);
-                   // logger.error("Got total of " + osfList.size() + " small files");
-                    //System.exit(3);
-                  // if (c>250)break;
                     List<OldSmallFileEntry> osfe = osf.getEntrylist();
                     for (OldSmallFileEntry entry : osfe) {
                         if (!descriptionCount.containsKey(entry.getDescription())) {
@@ -141,6 +146,7 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
     private void convertToNewSmallFiles() {
         osfList.stream().forEach(old -> {
             V2SmallFile v2 = new V2SmallFile(old);
+
             v2sfList.add(v2);
         });
 

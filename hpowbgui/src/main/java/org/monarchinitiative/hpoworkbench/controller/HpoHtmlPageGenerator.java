@@ -101,7 +101,8 @@ class HpoHtmlPageGenerator {
         List<HpoCategory> hpocatlist = hpocatmap.getActiveCategoryList();
         StringBuilder sb = new StringBuilder();
         for (HpoCategory cat : hpocatlist) {
-            String title = String.format("%s (%d annotations)", cat.getLabel(), cat.getNumberOfAnnotations());
+            String template=cat.getNumberOfAnnotations()>1?"%s (%d annotations)":"%s (%d annotation)";
+            String title = String.format(template, cat.getLabel(), cat.getNumberOfAnnotations());
             sb.append(String.format("  <table class=\"zebra\">\n" +
                     "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">%s</caption>\n" +
                     "    <thead>\n" +
