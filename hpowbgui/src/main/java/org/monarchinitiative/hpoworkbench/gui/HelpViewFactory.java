@@ -21,6 +21,8 @@ package org.monarchinitiative.hpoworkbench.gui;
  */
 
 import com.google.common.base.Supplier;
+import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -51,6 +53,16 @@ public class HelpViewFactory {
                 "annotations, or corrections to current content.</p>" +
                 setup() +
                 openFile() +
+                "</body></html>";
+        return sb;
+
+    }
+
+    private static String getHTMLError() {
+        String sb = "<html><body>\n" +
+                inlineCSS() +
+                "<h1>HPO Workbench: Connection error</h1>" +
+                "<p><Unable to conect to the internet.</p>" +
                 "</body></html>";
         return sb;
 
@@ -92,9 +104,11 @@ public class HelpViewFactory {
             WebView web = new WebView();
             WebEngine engine=web.getEngine();
             engine.load(READTHEDOCS_SITE);
-            // ToDO show something if the RTD site cannot be loaded.
-//            engine.setOnError(e ->{System.out.println("Got Web Error");});
-//            engine.setOnStatusChanged(e->{System.out.println("Status");});
+            engine.getLoadWorker().stateProperty().addListener((observable, oldvalue,newvalue)->{
+                if (newvalue== Worker.State.FAILED) {
+                    engine.loadContent(getHTMLError());
+                }
+            });
             Scene scene = new Scene(web);
             window.setScene(scene);
             window.show();
