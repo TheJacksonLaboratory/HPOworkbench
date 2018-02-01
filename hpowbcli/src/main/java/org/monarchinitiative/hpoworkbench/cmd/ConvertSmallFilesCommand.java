@@ -42,28 +42,6 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
 
     private BufferedWriter out;
 
-    private int DISEASE_ID_INDEX;
-    private int DISEASE_NAME_INDEX;
-    private int GENE_ID_INDEX;
-    private int GENE_NAME_INDEX;
-    private int GENOTYPE_INDEX;
-    private int GENE_SYMBOL_INDEX;
-    private int PHENOTYPE_ID_INDEX;
-    private int PHENOTYPE_NAME_INDEX;
-    private int AGE_OF_ONSET_ID_INDEX;
-    private int AGE_OF_ONSET_NAME_INDEX;
-    private int EVIDENCE_ID_INDEX;
-    private int EVIDENCE_NAME_INDEX;
-    private int FREQUENCY_INDEX;
-    private int SEX_ID_INDEX;
-    private int SEX_NAME_INDEX;
-    private int NEGATION_ID_INDEX;
-    private int NEGATION_NAME_INDEX;
-    private int DESCRIPTION_INDEX;
-    private int PUB_INDEX;
-    private int ASSIGNED_BY_INDEX;
-    private int DATE_CREATED_INDEX;
-
     private int n_corrected_date=0;
     private int n_no_evidence=0;
     private int n_gene_data=0;
@@ -116,38 +94,32 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             logger.fatal("We were unable to initialize the Ontology object and will terminate this program...");
             System.exit(1);
         }
-        logger.trace("We will convert the small files at " + pathToSmallFileDir);
         List<String> files=getListOfSmallFiles();
-        logger.trace("We found " + files.size() + " small files");
-        Map<String,Integer> descriptionCount=new HashMap<>();
+        logger.trace("We found " + files.size() + " small files at " + pathToSmallFileDir);
+        Map<String, Integer> descriptionCount = new HashMap<>();
         try {
             out = new BufferedWriter(new FileWriter("small-file.log"));
-            int c=1;
-            for (String path : files ) {
-                if (c==0) {/*getFirstEntry(path); TODO */ }
-                else {
-                    c++;
-                    OldSmallFile osf = new OldSmallFile(path);
-                    List<OldSmallFileEntry> osfe = osf.getEntrylist();
-                    for (OldSmallFileEntry entry : osfe) {
-                        if (!descriptionCount.containsKey(entry.getDescription())) {
-                            descriptionCount.put(entry.getDescription(),0);
-                        }
-                        descriptionCount.put(entry.getDescription(),descriptionCount.get(entry.getDescription())+1);
-                    }
-                }
+            int c = 1;
+            for (String path : files) {
+                OldSmallFile osf = new OldSmallFile(path);
+                this.n_alt_id += osf.getN_alt_id();
+                this.n_corrected_date += osf.getN_corrected_date();
+                n_no_evidence+= osf.getN_no_evidence();
+                n_gene_data+= osf.getN_gene_data();
+                n_update_label += osf.getN_update_label();
+                n_created_modifier += osf.getN_created_modifier();
+                n_EQ_item+= osf.getN_EQ_item();
+
+                osfList.add(osf);
             }
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
-//        for (String s : descriptionCount.keySet()) {
-//            if (s!=null && s.contains("MODIFIER"))
-//                System.out.println(descriptionCount.get(s)+": "+s );
-//        }
 
        convertToNewSmallFiles();
+        dumpQCtoShell();
     }
 
     private void convertToNewSmallFiles() {
@@ -163,7 +135,25 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             e.printStackTrace();
             System.exit(1);
         }
+    }
 
+
+    private void dumpQCtoShell() {
+        System.out.println("\n\n################################################\n\n");
+        System.out.println(String.format("We converted %d \"old\" small files into %d new (V2) small files",
+                osfList.size(),v2sfList.size()));
+        System.out.println();
+        System.out.println("Summary of Q/C results:");
+        System.out.println("\tNumber of lines with corrected date formats: " + n_corrected_date);
+        System.out.println("\tNumber of lines with \"Gene\" data that was discarded for the V2 files: " + n_gene_data);
+        System.out.println("\tNumber of lines with \"E/Q\" data that was discarded for the V2 files: " + n_EQ_item);
+        System.out.println("\tNumber of lines with alt_ids updated to current ids: " + n_alt_id);
+        System.out.println("\tNumber of lines with labels updated to current labels: " + n_update_label);
+        System.out.println("\tNumber of lines for which no Evidence code was found: "+ n_no_evidence);
+        System.out.println("\tNumber of lines for which a Clinical modifer was extracted: "+n_created_modifier);
+       System.out.println();
+        System.out.println("Lines that were Q/C'd or updated have been written to the log (before/after)");
+        System.out.println();
     }
 
 
@@ -175,6 +165,7 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
         String filename = String.format("%s%s%s",outdir,File.separator,v2.getBasename());
         logger.trace("Writing v2 to file " + filename);
         BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+        writer.write(V2SmallFileEntry.getHeader()+"\n");
         List<V2SmallFileEntry> entryList = v2.getEntryList();
         for (V2SmallFileEntry v2e:entryList) {
             writer.write(v2e.getRow() + "\n");

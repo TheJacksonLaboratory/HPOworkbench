@@ -4,6 +4,8 @@ import com.github.phenomics.ontolib.ontology.data.TermId;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,7 +86,25 @@ public class V2SmallFileEntry {
 
 
 
-
+    public static String getHeader() {
+        String []fields={"DiseaseID",
+                "DiseaseName",
+                "HpoId",
+                "HpoName",
+                "ageOfOnsetId",
+                "ageOfOnsetName",
+                "evidenceCode",
+                "frequencyId",
+                "frequencyString",
+                "sex",
+                "negation",
+                "modifier",
+                "description",
+                "publication",
+                "assignedBy",
+                "dateCreated"};
+        return Arrays.stream(fields).collect(Collectors.joining("\t"));
+    }
 
 
     public String getRow() {
