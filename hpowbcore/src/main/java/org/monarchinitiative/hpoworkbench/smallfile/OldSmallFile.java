@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.smallfile;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,6 +75,12 @@ public class OldSmallFile {
         pathToOldSmallFile=path;
         parse();
     }
+
+    public String getBasename() {
+        return new File(pathToOldSmallFile).getName();
+    }
+
+
 
     private void parse() {
         try {
@@ -520,8 +527,8 @@ public class OldSmallFile {
                 case "Orthologs":
                     ORTHOLOGS_INDEX=i;break;
                 default:
-                    System.out.println("Did not recognize header field \""+A[i]+"\"");
-                    System.out.println("Terminating, please check OldSmallFile");
+                    LOGGER.fatal("Did not recognize header field \""+A[i]+"\"");
+                    LOGGER.fatal("Terminating, please check OldSmallFile");
                     System.exit(1);
             }
             this.fields2index=builder.build();

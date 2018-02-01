@@ -10,8 +10,10 @@ import org.monarchinitiative.hpoworkbench.io.HpoOntologyParser;
 import org.monarchinitiative.hpoworkbench.smallfile.OldSmallFile;
 import org.monarchinitiative.hpoworkbench.smallfile.OldSmallFileEntry;
 import org.monarchinitiative.hpoworkbench.smallfile.V2SmallFile;
+import org.monarchinitiative.hpoworkbench.smallfile.V2SmallFileEntry;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -110,6 +112,10 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
     }
 
     public void run() {
+        if (ontology==null) {
+            logger.fatal("We were unable to initialize the Ontology object and will terminate this program...");
+            System.exit(1);
+        }
         logger.trace("We will convert the small files at " + pathToSmallFileDir);
         List<String> files=getListOfSmallFiles();
         logger.trace("We found " + files.size() + " small files");
@@ -136,21 +142,49 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             e.printStackTrace();
             System.exit(1);
         }
-        for (String s : descriptionCount.keySet()) {
-            if (s!=null && s.contains("MODIFIER"))
-                System.out.println(descriptionCount.get(s)+": "+s );
-        }
-       // convertToNewSmallFiles();
+//        for (String s : descriptionCount.keySet()) {
+//            if (s!=null && s.contains("MODIFIER"))
+//                System.out.println(descriptionCount.get(s)+": "+s );
+//        }
+
+       convertToNewSmallFiles();
     }
 
     private void convertToNewSmallFiles() {
         osfList.stream().forEach(old -> {
             V2SmallFile v2 = new V2SmallFile(old);
-
             v2sfList.add(v2);
         });
+        try {
+            for (V2SmallFile v2 : v2sfList) {
+                outputV2file(v2);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
 
     }
+
+
+    private void outputV2file(V2SmallFile v2) throws IOException {
+        String outdir="v2files";
+        if (! new File(outdir).exists()) {
+            new File(outdir).mkdir();
+        }
+        String filename = String.format("%s%s%s",outdir,File.separator,v2.getBasename());
+        logger.trace("Writing v2 to file " + filename);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+        List<V2SmallFileEntry> entryList = v2.getEntryList();
+        for (V2SmallFileEntry v2e:entryList) {
+            writer.write(v2e.getRow() + "\n");
+        }
+        writer.close();
+
+    }
+
+
+
 
     /** The purpose of this function is to set up an "archetype" of the OldEntries. We will compare all
      * other small files against this one. If all is well, then all files with be compatible.

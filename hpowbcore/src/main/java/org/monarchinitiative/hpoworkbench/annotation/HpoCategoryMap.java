@@ -170,41 +170,6 @@ public class HpoCategoryMap {
     }
 
 
-//    public Map<TermId, List<TermId>> sortTerms(HpoOntology ontology, List<TermId> termlist) {
-//        Map<TermId, List<TermId>> mp = new HashMap<>();
-//        TermId phenotypicAbnormalty = ImmutableTermId.constructWithPrefix("HP:0000118");
-//        for (TermId tid : termlist) {
-//            Set<TermId> ancestors = new HashSet<>();
-//            for (TermId candidate : categorymap.keySet()) {
-//                if (existsPath(ontology, candidate, tid)) {
-//                    ancestors.add(tid);
-//                }
-//            }
-//            if (ancestors.isEmpty()) {
-//                if (!mp.containsKey(phenotypicAbnormalty)) {
-//                    mp.put(phenotypicAbnormalty, new ArrayList<>());
-//                }
-//                List<TermId> lst = mp.get(phenotypicAbnormalty);
-//                lst.add(tid);
-//            } else if (ancestors.size() == 1) {
-//                TermId anc = ancestors.iterator().next();
-//                if (!mp.containsKey(anc)) {
-//                    mp.put(anc, new ArrayList<>());
-//                }
-//                List<TermId> lst = mp.get(anc);
-//                lst.add(tid);
-//            } else {
-//                TermId primaryTid = getPrioritizedTid(ancestors);
-//                if (!mp.containsKey(primaryTid)) {
-//                    mp.put(primaryTid, new ArrayList<>());
-//                }
-//                List<TermId> lst = mp.get(primaryTid);
-//                lst.add(tid);
-//            }
-//        }
-//        return mp;
-//    }
-
     public void addAnnotatedTerm(TermId tid, HpoOntology ontology) {
         try {
             HpoCategory cat = getCategory(tid, ontology);
@@ -258,27 +223,27 @@ public class HpoCategoryMap {
 
 
 
-
-    public static boolean existsPath2(Ontology ontology, final TermId sourceID, TermId destID){
-        // special case -- a term cannot have a path to itself in an ontology (DAG)
-        if (sourceID.equals(destID)) return false;
-        final DirectedGraph<TermId, ImmutableEdge<TermId>> graph=ontology.getGraph();
-        List<TermId> visited = new ArrayList<>();
-        BreadthFirstSearch<TermId, ImmutableEdge<TermId>> bfs = new BreadthFirstSearch<>();
-        bfs.startFromForward(graph, sourceID, (g, termId) -> {
-            visited.add(termId);
-            System.out.println("visited "+termId.getIdWithPrefix());
-            return true;
-        });
-        return visited.contains(destID);
-    }
-
+//
+//    public static boolean existsPath2(Ontology ontology, final TermId sourceID, TermId destID){
+//        // special case -- a term cannot have a path to itself in an ontology (DAG)
+//        if (sourceID.equals(destID)) return false;
+//        final DirectedGraph<TermId, ImmutableEdge<TermId>> graph=ontology.getGraph();
+//        List<TermId> visited = new ArrayList<>();
+//        BreadthFirstSearch<TermId, ImmutableEdge<TermId>> bfs = new BreadthFirstSearch<>();
+//        bfs.startFromForward(graph, sourceID, (g, termId) -> {
+//            visited.add(termId);
+//            System.out.println("visited "+termId.getIdWithPrefix());
+//            return true;
+//        });
+//        return visited.contains(destID);
+//    }
+//
 
 
 
     /** Identify the category that best matches the term id (usually just fine the category that represents a parent term. */
     private HpoCategory getCategory(TermId tid, HpoOntology ontology) {
-        logger.trace(String.format("GetCategory for %s[%s]",ontology.getTermMap().get(tid).getName(),tid.getIdWithPrefix()));
+        //logger.trace(String.format("GetCategory for %s[%s]",ontology.getTermMap().get(tid).getName(),tid.getIdWithPrefix()));
         List<HpoCategory> activeCategoryList = new ArrayList<>();
         if (tid==null) {
             logger.error("Warning, tid was null...");
