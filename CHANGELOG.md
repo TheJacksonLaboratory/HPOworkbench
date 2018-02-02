@@ -1,5 +1,11 @@
 # HPO Workbench Changelog
 
+## v0.1.10
+### hpowbgui
+* hyperlinks between HPO and disease pages
+### hpowbcore
+* bug fix-adding Inheritance as first HpoCategory to display
+
 ## v0.1.9
 
 ### hpowbcore

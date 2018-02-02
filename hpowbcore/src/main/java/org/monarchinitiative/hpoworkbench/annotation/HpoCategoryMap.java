@@ -35,6 +35,7 @@ public class HpoCategoryMap {
      */
     private ImmutableMap<TermId, HpoCategory> categorymap;
 
+    private static final TermId INHERITANCE_ID = ImmutableTermId.constructWithPrefix("HP:0000005");
     private static final TermId ABNORMAL_CELLULAR_ID = ImmutableTermId.constructWithPrefix("HP:0025354");
     private static final TermId BLOOD_ID = ImmutableTermId.constructWithPrefix("HP:0001871");
     private static final TermId CONNECTIVE_TISSUE_ID = ImmutableTermId.constructWithPrefix("HP:0003549");
@@ -70,7 +71,7 @@ public class HpoCategoryMap {
 
 
     private void initializeOrderedArray() {
-        termIdList = new TermId[]{ABNORMAL_CELLULAR_ID,BLOOD_ID,CONNECTIVE_TISSUE_ID,HEAD_AND_NECK_ID,
+        termIdList = new TermId[]{INHERITANCE_ID,ABNORMAL_CELLULAR_ID,BLOOD_ID,CONNECTIVE_TISSUE_ID,HEAD_AND_NECK_ID,
                 LIMBS_ID,METABOLISM_ID,PRENATAL_ID,BREAST_ID,CARDIOVASCULAR_ID,DIGESTIVE_ID,
                 EAR_ID,ENDOCRINE_ID,EYE_ID,GENITOURINARY_ID,IMMUNOLOGY_ID,INTEGUMENT_ID,
                 MUSCLE_ID,NERVOUS_SYSTEM_ID,RESPIRATORY_ID,SKELETAL_ID,THORACIC_CAVITY_ID,
@@ -82,6 +83,9 @@ public class HpoCategoryMap {
 
     private void initializeMap() {
         ImmutableMap.Builder<TermId, HpoCategory> mapbuilder = new ImmutableMap.Builder<>();
+        // Inheritance
+        HpoCategory inheritanceCategory = new HpoCategory.Builder(INHERITANCE_ID,"Inheritance").build();
+        mapbuilder.put(INHERITANCE_ID,inheritanceCategory);
         // Abn cellular phenotype
         HpoCategory abnCellCategory = new HpoCategory.Builder(ABNORMAL_CELLULAR_ID, "Cellular phenotype").build();
         mapbuilder.put(ABNORMAL_CELLULAR_ID, abnCellCategory);

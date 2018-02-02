@@ -28,3 +28,4 @@ Disease annotations are arranged according to organ system.
   :scale: 100 %
   :alt: HPO Workbench - disease view
 
+Users can navigate between Disease and HPO Term pages using the hyperlinks.

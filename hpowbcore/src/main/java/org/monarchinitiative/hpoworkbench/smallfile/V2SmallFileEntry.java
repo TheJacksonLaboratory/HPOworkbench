@@ -85,9 +85,11 @@ public class V2SmallFileEntry {
     }
 
 
-
+    /**
+     * @return Header line for the new V2 small files.
+     */
     public static String getHeader() {
-        String []fields={"DiseaseID",
+        String []fields={"#DiseaseID",
                 "DiseaseName",
                 "HpoId",
                 "HpoName",

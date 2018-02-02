@@ -4,17 +4,22 @@ import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.graph.data.DirectedGraph;
 import com.github.phenomics.ontolib.graph.data.Edge;
+import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
 import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 
-import com.github.phenomics.ontolib.ontology.data.TermSynonym;
+
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
+
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,10 +43,20 @@ import org.monarchinitiative.hpoworkbench.io.Downloader;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+
+import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventException;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
+
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+
 
 import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalPhenotypeAnnotationPath;
 
@@ -68,7 +83,7 @@ public class MainController {
     enum mode {BROWSE_HPO,BROWSE_DISEASE,NEW_ANNOTATION}
     /** Current behavior of HPO Workbench. See {@link mode}. */
     private mode currentMode=mode.BROWSE_HPO;
-    /** ToDo key=?; value= corresponding {@link DiseaseModel}. */
+    /** key=the disease name, e.g., "Marfan syndrome"; value= corresponding {@link DiseaseModel}. */
     private Map<String,DiseaseModel> string2diseasemap=null;
     /** Approved {@link HpoTerm} is submitted here. */
     private Consumer<HpoTerm> addHook;
@@ -95,6 +110,10 @@ public class MainController {
     @FXML private RadioButton diseaseRadioButton;
     @FXML private RadioButton newAnnotationRadioButton;
 
+    private static final String EVENT_TYPE_CLICK = "click";
+    private static final String EVENT_TYPE_MOUSEOVER = "mouseover";
+    private static final String EVENT_TYPE_MOUSEOUT = "mouseclick";
+
 
     public MainController() {
         this.model=new Model();
@@ -103,7 +122,7 @@ public class MainController {
 
     /** This is called from the Edit menu and allows the user to import a local copy of
      * hp.obo (usually because the local copy is newer than the official release version of hp.obo).
-     * @param e
+     * @param e event
      */
     @FXML private void importLocalHpObo(ActionEvent e) {
         e.consume();
@@ -371,6 +390,10 @@ public class MainController {
         ontologyTreeView.setRoot(root);
         ontologyTreeView.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
+            if (newValue==null) {
+                logger.error("New value is null");
+                return;
+            }
             HpoTermWrapper w =newValue.getValue();
             TreeItem item = new HpoTermTreeItem(w);
             updateDescription(item);
@@ -394,7 +417,7 @@ public class MainController {
      * @param term {@link HpoTerm} to be displayed
      */
     private void expandUntilTerm(HpoTerm term) {
-        logger.trace("expand until term " + term.toString());
+       // logger.trace("expand until term " + term.toString());
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
             Stack<HpoTerm> termStack = new Stack<>();
@@ -463,6 +486,47 @@ public class MainController {
         //System.out.print(content);
        // infoWebEngine=this.infoWebView.getEngine();
         infoWebEngine.loadContent(content);
+        infoWebEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+            @Override
+            public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                if (newState == Worker.State.SUCCEEDED) {
+                    org.w3c.dom.events.EventListener listener = new EventListener() {
+                        @Override
+                        public void handleEvent(org.w3c.dom.events.Event ev) {
+                            String domEventType = ev.getType();
+                            //System.err.println("EventType: " + domEventType);
+                            if (domEventType.equals(EVENT_TYPE_CLICK)) {
+                                String href = ((Element)ev.getTarget()).getAttribute("href");
+                               // System.out.println("HREF "+href);
+                                if (href.equals("http://www.human-phenotype-ontology.org")) {
+                                    return; // the external link is taken care of by the Webengine
+                                    // therefore, we do not need to do anything special here
+                                }
+                                DiseaseModel dmod = string2diseasemap.get(href);
+                                if (dmod==null) {
+                                    logger.error("Link to disease model for " + href + " was null");
+                                    return;
+                                }
+                                updateDescriptionToDiseaseModel(dmod);
+                                selectedDisease=dmod;
+                                searchTextField.clear();
+                                currentMode=mode.BROWSE_DISEASE;
+                                diseaseRadioButton.setSelected(true);
+                            }
+                        }
+                    };
+
+                    Document doc = infoWebView.getEngine().getDocument();
+                    NodeList nodeList = doc.getElementsByTagName("a");
+                    for (int i = 0; i < nodeList.getLength(); i++) {
+                        ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
+                        //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
+                        //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
+                    }
+                }
+            }
+        });
+
     }
 
 
@@ -477,6 +541,53 @@ public class MainController {
         List<HpoTerm> annotatingTerms=model.getAnnotationTermsForDisease(dmodel);
         String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName,diseaseName,annotatingTerms,ontology);
         infoWebEngine.loadContent(content);
+        infoWebEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+            @Override
+            public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                if (newState == Worker.State.SUCCEEDED) {
+                    org.w3c.dom.events.EventListener listener = new EventListener() {
+                        @Override
+                        public void handleEvent(org.w3c.dom.events.Event ev) {
+                            String domEventType = ev.getType();
+                            //System.err.println("EventType: " + domEventType);
+                            if (domEventType.equals(EVENT_TYPE_CLICK)) {
+                                String href = ((Element)ev.getTarget()).getAttribute("href");
+                                //System.out.println("HREF "+href);
+                                if (href.equals("http://www.human-phenotype-ontology.org")) {
+                                    return; // the external link is taken care of by the Webengine
+                                    // therefore, we do not need to do anything special here
+                                }
+                                TermId tid= ImmutableTermId.constructWithPrefix(href);
+                                if (tid==null) {
+                                    logger.error(String.format("Could not construct term id from \"%s\"",href));
+                                    return;
+                                }
+                                HpoTerm term = ontology.getTermMap().get(tid);
+                                if (term==null) {
+                                    logger.error(String.format("Could not construct term  from termid \"%s\"",tid.getIdWithPrefix()));
+                                    return;
+                                }
+                                // set the tree on the left to our new term
+                                expandUntilTerm(term);
+                                // update the Webview browser
+                                updateDescription(new HpoTermTreeItem(new HpoTermWrapper(term)));
+                                searchTextField.clear();
+                                currentMode=mode.BROWSE_HPO;
+                                hpoTermRadioButton.setSelected(true);
+                            }
+                        }
+                    };
+
+                    Document doc = infoWebView.getEngine().getDocument();
+                    NodeList nodeList = doc.getElementsByTagName("a");
+                    for (int i = 0; i < nodeList.getLength(); i++) {
+                        ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
+                        //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
+                        //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
+                    }
+                }
+            }
+        });
     }
 
 

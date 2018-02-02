@@ -58,9 +58,9 @@ class HpoHtmlPageGenerator {
         StringBuilder sb = new StringBuilder();
         for (DiseaseModel s : diseases) {
             String row = String.format("<tr>\n" +
+                    "        <td><a href=\"%s\">%s</a></td>\n" +
                     "        <td>%s</td>\n" +
-                    "        <td>%s</td>\n" +
-                    "      </tr>", s.getDiseaseDbAndId(), s.getDiseaseName());
+                    "      </tr>", s.getDiseaseName(), s.getDiseaseDbAndId(), s.getDiseaseName());
             sb.append(row);
         }
         return String.format("%s<tbody>%s</tbody></table></div>", header, sb.toString());
@@ -119,10 +119,12 @@ class HpoHtmlPageGenerator {
             for (TermId tid : termIdList) {
                 HpoTerm term = ontology.getTermMap().get(tid);
                 String row = String.format("<tr>\n" +
+                                "        <td><a href=\"%s\">%s</a></td>\n" +
                                 "        <td>%s</td>\n" +
                                 "        <td>%s</td>\n" +
-                                "        <td>%s</td>\n" +
-                                "      </tr>\n", term.getId().getIdWithPrefix(),
+                                "      </tr>\n",
+                        term.getId().getIdWithPrefix(),
+                        term.getId().getIdWithPrefix(),
                         term.getName(),
                         term.getDefinition() != null ? term.getDefinition() : "");
                 sb.append(row);
