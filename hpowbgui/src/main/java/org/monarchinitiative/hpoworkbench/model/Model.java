@@ -9,43 +9,43 @@ import com.github.phenomics.ontolib.ontology.data.TermPrefix;
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 
-import java.util.*;
-
-import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalHPOPath;
-import static org.monarchinitiative.hpoworkbench.gui.PlatformUtil.getLocalPhenotypeAnnotationPath;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Model {
     private static final Logger logger = LogManager.getLogger();
     /** We save a few settings in a file that we store in ~/.loinc2hpo/loinc2hpo.settings. This variable should
      * be initialized to the absolute path of the file. */
-    private String pathToSettingsFile=null;
-    /** Path to {@code hp.obo}. */
-    private String pathToHpoOboFile=null;
+//    private String pathToSettingsFile=null;
+//    /** Path to {@code hp.obo}. */
+//    private String pathToHpoOboFile=null;
     /** Path to the file we are creating with LOINC code to HPO annotations. */
-    private String pathToAnnotationFile=null;
+//    private String pathToAnnotationFile=null;
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
     /** Ontology model for full HPO ontology (all subhierarchies). */
-    private HpoOntology ontology=null;
+    private final HpoOntology ontology;
     /** List of annotated diseases (direct annotations) */
-    private Map<TermId,List<DiseaseModel>> annotmap=null;
+    private final Map<TermId,List<DiseaseModel>> annotmap;
     /** List of all indirected annotations (by annotation propagation rule). */
-    private Map<TermId,List<DiseaseModel>> directAnnotMap=null;
+    private final Map<TermId,List<DiseaseModel>> directAnnotMap;
 
     private List<String> githublabels=new ArrayList<>();
 
-    public Model(){
-        initPaths();
-        importData();
-    }
+//    public Model(){
+//        initPaths();
+//        importData();
+//    }
 
-
-    public Model(String hpoOboPath, String phenoAnnotationPath) {
-        this.pathToHpoOboFile=hpoOboPath;
-        this.pathToAnnotationFile=phenoAnnotationPath;
-        importData();
+    public Model(HpoOntology ontology, Map<TermId, List<DiseaseModel>> annotMap,
+                 Map<TermId, List<DiseaseModel>> directAnnotMap) {
+        this.ontology = ontology;
+        this.annotmap = annotMap;
+        this.directAnnotMap = directAnnotMap;
+//        this.pathToAnnotationFile=phenoAnnotationPath;
+//        importData();
     }
 
     public void setGithublabels(List<String> lab) { this.githublabels=lab; }
@@ -54,27 +54,29 @@ public class Model {
 
     public boolean hasLabels(){ return githublabels!=null && githublabels.size()>0; }
 
+    @Deprecated
     private void initPaths() {
-        this.pathToHpoOboFile=getLocalHPOPath();
-        this.pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
+//        this.pathToHpoOboFile=getLocalHPOPath();
+//        this.pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
     }
 
+    @Deprecated
     private void importData() {
-        if (ontology==null) {
-            if (pathToHpoOboFile==null) {
-                logger.error("Path to hp.obo was not initialized");
-                return;
-            }
-            HPOParser parser = new HPOParser(pathToHpoOboFile);
-            this.ontology=parser.getHPO();
-        }
-        if (annotmap==null) {
-            HpoOntology ontology = getOntology();
-            DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(this.pathToAnnotationFile,ontology);
-            annotmap=parser.parse();
-            directAnnotMap=parser.getDirectannotmap();
-        }
-        logger.trace("Ingested annot map with size="+annotmap.size());
+//        if (ontology==null) {
+//            if (pathToHpoOboFile==null) {
+//                logger.error("Path to hp.obo was not initialized");
+//                return;
+//            }
+//            HPOParser parser = new HPOParser(pathToHpoOboFile);
+//            this.ontology=parser.getHPO();
+//        }
+//        if (annotmap==null) {
+//            HpoOntology ontology = getOntology();
+//            DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(this.pathToAnnotationFile,ontology);
+//            annotmap=parser.parse();
+//            directAnnotMap=parser.getDirectannotmap();
+//        }
+//        logger.trace("Ingested annot map with size="+annotmap.size());
 
     }
 
@@ -144,14 +146,14 @@ public class Model {
 
 
     public HpoOntology getOntology() {
-        if (ontology==null) {
-            if (pathToHpoOboFile==null) {
-                logger.error("Path to hp.obo was not initialized");
-                return null;
-            }
-            HPOParser parser = new HPOParser(pathToHpoOboFile);
-            this.ontology=parser.getHPO();
-        }
+//        if (ontology==null) {
+//            if (pathToHpoOboFile==null) {
+//                logger.error("Path to hp.obo was not initialized");
+//                return null;
+//            }
+//            HPOParser parser = new HPOParser(pathToHpoOboFile);
+//            this.ontology=parser.getHPO();
+//        }
         return ontology;
     }
 

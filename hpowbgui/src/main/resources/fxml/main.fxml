@@ -1,25 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.TreeView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.web.WebView?>
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="1200.0" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
         <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
@@ -126,32 +110,32 @@
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
-                                <Button minWidth="210.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary">
+                                <Button fx:id="exportHierarchicalSummaryButton" minWidth="210.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary">
                                     <GridPane.margin>
                                         <Insets right="5.0" />
                                     </GridPane.margin>
                                 </Button>
-                                <Button minWidth="210.0" mnemonicParsing="false" onAction="#exportToExcel" styleClass="Button" stylesheets="@../css/style.css" text="Export ontology as Excel file" GridPane.rowIndex="1">
+                                <Button fx:id="exportToExcelButton" minWidth="210.0" mnemonicParsing="false" onAction="#exportToExcel" styleClass="Button" stylesheets="@../css/style.css" text="Export ontology as Excel file" GridPane.rowIndex="1">
                                     <GridPane.margin>
                                         <Insets right="5.0" />
                                     </GridPane.margin>
                                 </Button>
-                                <Button minWidth="210.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest correction " GridPane.columnIndex="1">
+                                <Button fx:id="suggestCorrectionToTermButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest correction " GridPane.columnIndex="1">
                                     <GridPane.margin>
                                         <Insets left="5.0" right="5.0" />
                                     </GridPane.margin>
                                 </Button>
-                                <Button minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <Button fx:id="suggestNewChildTermButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                     <GridPane.margin>
                                         <Insets left="5.0" right="5.0" />
                                     </GridPane.margin>
                                 </Button>
-                                <Button minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new annotation" GridPane.rowIndex="2">
+                                <Button fx:id="suggestNewAnnotationButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new annotation" GridPane.rowIndex="2">
                                     <GridPane.margin>
                                         <Insets right="5.0" />
                                     </GridPane.margin>
                                 </Button>
-                                <Button minWidth="210.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <Button fx:id="reportMistakenAnnotationButton" minWidth="210.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                     <GridPane.margin>
                                         <Insets left="5.0" right="5.0" />
                                     </GridPane.margin>

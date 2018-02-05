@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.io;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
@@ -31,6 +30,8 @@ public class DirectIndirectHpoAnnotationParser {
 
 
     private Map<TermId,List<DiseaseModel>> directannotmap=null;
+
+
     private Map<TermId,List<DiseaseModel>> indirectannotmap=null;
 
     public DirectIndirectHpoAnnotationParser(String path, HpoOntology onto) {
@@ -39,7 +40,14 @@ public class DirectIndirectHpoAnnotationParser {
     }
 
 
-    public Map<TermId,List<DiseaseModel>> getDirectannotmap() { return directannotmap; }
+    public Map<TermId,List<DiseaseModel>> getDirectannotmap() {
+        return directannotmap;
+    }
+
+    public Map<TermId, List<DiseaseModel>> getIndirectannotmap() {
+        return indirectannotmap;
+        // TODO(ielis) - is this correct?
+    }
 
     private TermId string2TermId(String termstring) {
         if (termstring.startsWith("HP:")) {
@@ -58,6 +66,11 @@ public class DirectIndirectHpoAnnotationParser {
     }
 
     public  Map<TermId,List<DiseaseModel>> parse() {
+        if (ontology == null) {
+            logger.warn("Ontology unset, cannot parse annotations file");
+            return null;
+        }
+
         indirectannotmap=new HashMap<>();
         directannotmap=new HashMap<>();
         Map<TermId,Set<DiseaseModel>> tempmap=new HashMap<>();
