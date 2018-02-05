@@ -110,6 +110,8 @@ public class Commandline {
             this.command=new ConvertSmallFilesCommand(this.downloadDirectory,this.hpoOboPath);
         }  else if (mycommand.equals("word")) {
             this.command=new WordCommand(this.downloadDirectory,this.hpoOboPath);
+        } else if (mycommand.equals("git")) {
+            this.command=new GitCommand();
         } else {
             printUsage(String.format("Did not recognize command: %s", mycommand));
         }
