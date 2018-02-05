@@ -5,10 +5,10 @@ package org.monarchinitiative.hpoworkbench.resources;
  * it is used in GUI.
  *
  * @author <a href="mailto:daniel.danis@jax.org">Daniel Danis</a>
- * @version 0.2.1
+ * @version 0.1.10
  * @see OptionalResources
  * @see ResourceValidators
- * @since 0.2
+ * @since 0.1
  */
 @FunctionalInterface
 public interface ResourceValidator<T> {
