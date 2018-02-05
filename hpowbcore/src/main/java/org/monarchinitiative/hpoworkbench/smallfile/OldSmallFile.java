@@ -1,10 +1,12 @@
 package org.monarchinitiative.hpoworkbench.smallfile;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -12,7 +14,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 
+import static org.monarchinitiative.hpoworkbench.smallfile.SmallFileQCCode.*;
+
 /**
+ * The HPO asnotations are currently distribued acorss roughly 7000 "small files", which were created between 2009 and 2017.
+ * We want to unify and extend the format for these files. Thiu class represents a single "old" small file. THe app will
+ * transform these objects into {@link V2SmallFile} objects. Note that the "logic" for transformung small files has been
+ * coded in the {@link OldSmallFileEntry} class, and this class basically just identifies the column indices and splits up the
+ * lines into corresponding fields. THere is some variability in the nameing of columns (e.g., Sex and SexID), and this
+ * class tries to figure that out.
+ * @author Peter Robinson
  * Created by peter on 1/20/2018.
  */
 public class OldSmallFile {
@@ -54,16 +65,19 @@ public class OldSmallFile {
     private int ABNORMAL_NAME_INDEX=UNINITIALIZED;
     private int ORTHOLOGS_INDEX=UNINITIALIZED;
 
-    BiMap<FieldType,Integer> fields2index;
-
+    private BiMap<FieldType,Integer> fields2index;
+    /** A list of {@link org.monarchinitiative.hpoworkbench.smallfile.OldSmallFileEntry} objects, each of which corresponds
+     * to a line in the old small file (except for the header). */
     private List<OldSmallFileEntry> entrylist=new ArrayList<>();
-
-
     private final String pathToOldSmallFile;
 
     public OldSmallFile(String path) {
         pathToOldSmallFile=path;
         parse();
+    }
+
+    public String getBasename() {
+        return new File(pathToOldSmallFile).getName();
     }
 
 
@@ -73,7 +87,7 @@ public class OldSmallFile {
             BufferedReader br = new BufferedReader(new FileReader(pathToOldSmallFile));
             String line;
             line=br.readLine();// the header
-            processHeader(line);
+            processHeader(line); // identify the indices
             while ((line=br.readLine())!=null ){
                 if (line.trim().isEmpty()) continue; // skip empty lines
                 try {
@@ -91,6 +105,34 @@ public class OldSmallFile {
 
     public List<OldSmallFileEntry> getEntrylist() {
         return entrylist;
+    }
+
+    public int getN_corrected_date() {
+        return n_corrected_date;
+    }
+
+    public int getN_no_evidence() {
+        return n_no_evidence;
+    }
+
+    public int getN_gene_data() {
+        return n_gene_data;
+    }
+
+    public int getN_alt_id() {
+        return n_alt_id;
+    }
+
+    public int getN_update_label() {
+        return n_update_label;
+    }
+
+    public int getN_created_modifier() {
+        return n_created_modifier;
+    }
+
+    public int getN_EQ_item() {
+        return n_EQ_item;
     }
 
     private void processContentLine(String line) throws HPOException {
@@ -203,8 +245,78 @@ public class OldSmallFile {
                     System.exit(1);
             }
         }
+        // When we get here, we have added all of the fields of the OLD file. We will do a Q/C check and
+        // record any "repair" jobs that needed to be performed.
+        Set<SmallFileQCCode> qcItemList = entry.doQCcheck();
+
+        tallyQCitems(qcItemList,line);
+        if (entry.hasQCissues()) {
+            // if there was a QC issue, then the old line will have been output to the LOG together
+            // with an indication of the issue. Therefore, we output the corresponding new line to LOG
+            // so we can perform checking.
+            // Note that the actual output of the new lines is done by thbe V2SmallFile class and not here.
+            V2SmallFileEntry v2entry = new V2SmallFileEntry(entry);
+            LOGGER.trace("V2 entry: " + v2entry.getRow());
+
+        }
         entrylist.add(entry);
     }
+
+
+    private boolean hasQCissue=false;
+
+    private int n_corrected_date=0;
+    private int n_no_evidence=0;
+    private int n_gene_data=0;
+    private int n_alt_id=0;
+    private int n_update_label=0;
+    private int n_created_modifier=0;
+    private int n_EQ_item=0;
+
+
+    public boolean hasQCissue() {
+        return hasQCissue;
+    }
+
+    private void tallyQCitems(Set<SmallFileQCCode> qcitems, String line) {
+        if (qcitems.size()==0)return;
+        for (SmallFileQCCode qcode : qcitems) {
+            if (! qcode.equals(UPDATED_DATE_FORMAT)) this.hasQCissue=true;
+
+            switch (qcode) {
+                case UPDATED_DATE_FORMAT:
+                    n_corrected_date++;
+                    break;// do not output log entry about date format
+                case DID_NOT_FIND_EVIDENCE_CODE:
+                   n_no_evidence++;
+                    LOGGER.error(String.format("%s:%s",DID_NOT_FIND_EVIDENCE_CODE.name(),line));
+                    break;
+                case GOT_GENE_DATA:
+                    n_gene_data++;
+                    LOGGER.trace(String.format("%s:%s",GOT_GENE_DATA.name(),line));
+                    break;
+                case UPDATING_ALT_ID:
+                    n_alt_id++;
+                    LOGGER.trace(String.format("%s:%s",UPDATING_ALT_ID.name(),line));
+                    break;
+                case UPDATING_HPO_LABEL:
+                    n_update_label++;
+                    LOGGER.trace(String.format("%s:%s",UPDATING_HPO_LABEL.name(),line));
+                    break;
+                case CREATED_MODIFER:
+                    n_created_modifier++;
+                    LOGGER.trace(String.format("%s:%s",CREATED_MODIFER.name(),line));
+                    break;
+                case GOT_EQ_ITEM:
+                    n_EQ_item++;
+                    LOGGER.trace(String.format("%s:%s",GOT_EQ_ITEM.name(),line));
+                    break;
+            }
+        }
+
+
+    }
+
 
 
 
@@ -415,8 +527,8 @@ public class OldSmallFile {
                 case "Orthologs":
                     ORTHOLOGS_INDEX=i;break;
                 default:
-                    System.out.println("Did not recognize header field \""+A[i]+"\"");
-                    System.out.println("Terminating, please check OldSmallFile");
+                    LOGGER.fatal("Did not recognize header field \""+A[i]+"\"");
+                    LOGGER.fatal("Terminating, please check OldSmallFile");
                     System.exit(1);
             }
             this.fields2index=builder.build();

@@ -28,6 +28,15 @@ public class GitHubPoster {
     private int responsecode;
     /** THe response message of the GitHub server. */
     private String response=null;
+
+    private String githubLabel=null;
+
+    private String githubTitle=null;
+
+    private String githubBody=null;
+
+
+
     /**  @return the response of the GitHub server following our attempt to create a new issue*/
     public String getHttpResponse() { return String.format("%s [code: %d]",response,responsecode);}
 
@@ -35,12 +44,33 @@ public class GitHubPoster {
     public GitHubPoster(String uname, String passw, String title, String messagebody) {
         this.password = passw;
         this.username = uname;
+        githubTitle=title;
+        githubBody=messagebody;
         this.payload=formatPayload(title,messagebody);
     }
+
+    public void setLabel(String l) {
+        this.githubLabel=l;
+        reformatPayloadWithLabel(githubLabel);
+    }
+
+
 
     /** TODO create our won escape formated (new line, quotation mark etc. */
     private String jsonFormat(String s) {
         return JSONValue.escape(s);
+    }
+
+
+
+    private void reformatPayloadWithLabel(String label) {
+        this.payload = String.format("{\n" +
+                        "\"title\": \"%s\",\n" +
+                        "\"body\": \"%s\",\n" +
+                        "\"labels\": [ \"%s\"] }",
+                JSONValue.escape(this.githubTitle),
+                JSONValue.escape(this.githubBody),
+                JSONValue.escape(this.githubLabel));
     }
 
 

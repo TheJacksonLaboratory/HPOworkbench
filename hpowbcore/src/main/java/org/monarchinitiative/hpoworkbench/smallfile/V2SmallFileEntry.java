@@ -4,6 +4,11 @@ import com.github.phenomics.ontolib.ontology.data.TermId;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Created by peter on 1/20/2018.
  */
@@ -67,8 +72,11 @@ public class V2SmallFileEntry {
         frequencyString=oldEntry.getFrequencyString();
         sex=oldEntry.getSex();
         negation=oldEntry.getNegation();
-        TermId modifierId=oldEntry.getModifier();
-        if (modifierId==null) {modifier="";} else {modifier=modifierId.getIdWithPrefix(); }
+        Set<TermId> modifierSet=oldEntry.getModifierSet();
+        if (modifierSet==null || modifierSet.isEmpty()) {
+            modifier="";
+        } else {
+            modifier=modifierSet.stream().map(TermId::getIdWithPrefix).collect(Collectors.joining(";")); }
         description=oldEntry.getDescription();
         publication=oldEntry.getPub();
         assignedBy=oldEntry.getAssignedBy();
@@ -77,8 +85,28 @@ public class V2SmallFileEntry {
     }
 
 
-
-
+    /**
+     * @return Header line for the new V2 small files.
+     */
+    public static String getHeader() {
+        String []fields={"#DiseaseID",
+                "DiseaseName",
+                "HpoId",
+                "HpoName",
+                "ageOfOnsetId",
+                "ageOfOnsetName",
+                "evidenceCode",
+                "frequencyId",
+                "frequencyString",
+                "sex",
+                "negation",
+                "modifier",
+                "description",
+                "publication",
+                "assignedBy",
+                "dateCreated"};
+        return Arrays.stream(fields).collect(Collectors.joining("\t"));
+    }
 
 
     public String getRow() {

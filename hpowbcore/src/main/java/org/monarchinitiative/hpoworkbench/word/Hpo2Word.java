@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,7 +73,7 @@ public class Hpo2Word {
         subTitle.setAlignment(ParagraphAlignment.CENTER);
 
         XWPFRun subTitleRun = subTitle.createRun();
-        subTitleRun.setText("This document is for suggestion revisions to the HPO");
+        subTitleRun.setText("This document is for suggesting revisions to the HPO");
         subTitleRun.setColor("00CC44");
         subTitleRun.setFontFamily("Courier");
         subTitleRun.setFontSize(16);
@@ -123,16 +124,21 @@ public class Hpo2Word {
 
 
         XWPFTableRow rowOne = table.getRow(0);
-                XWPFParagraph paragraph = rowOne.getCell(0).addParagraph();
-                setRun(paragraph.createRun() , "Calibre LIght" , 10, "2b5079" , "Some string" , false, false);
+//                XWPFParagraph paragraph = rowOne.getCell(0).addParagraph();
+//                setRun(paragraph.createRun() , "Calibre LIght" ,
+//                        10,
+//                        "2b5079" ,
+//                        "Some string" ,
+//                        false,
+//                        false);
+//
+//        XWPFParagraph para = document.createParagraph();
+//        XWPFRun run        = para.createRun();
+//        run.setFontSize(9);
 
-        XWPFParagraph para = document.createParagraph();
-        XWPFRun run        = para.createRun();
-        run.setFontSize(9);
 
 
-
-        run.setText("Excerpt of HPO from Term " + id);
+       // run.setText("Excerpt of HPO from Term " + id);
 
         //create first row
         XWPFTableRow tableRowOne = table.getRow(0);
@@ -163,7 +169,7 @@ public class Hpo2Word {
             Integer level=pair.second;
             HpoTerm hterm = termmap.get(termId);
             LOGGER.info("Adding row for " + termId.getIdWithPrefix());
-            if (c++>10)break;
+           // if (c++>10)break;
             if (! previouslyseen.contains(termId)) {
                 // we have not yet output this term!
                 XWPFTableRow tableRow = table.createRow();
@@ -192,8 +198,17 @@ public class Hpo2Word {
 
         }
 
-        run.setText("End of table");
+        //run.setText("End of table");
+        int[] cols = {2000, 2000, 2000, 2000, 2000};
 
+        for (int i = 0; i < table.getNumberOfRows(); i++) {
+            XWPFTableRow row = table.getRow(i);
+            int numCells = row.getTableCells().size();
+            for (int j = 0; j < numCells; j++) {
+                XWPFTableCell cell = row.getCell(j);
+                cell.getCTTc().addNewTcPr().addNewTcW().setW(BigInteger.valueOf(2000));
+            }
+        }
 
     }
 

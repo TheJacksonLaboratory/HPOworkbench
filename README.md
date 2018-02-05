@@ -10,7 +10,7 @@ Please see the [full documentation](http://hpo-workbench.readthedocs.io/en/lates
 
 A Windows executable (HPOWorkbench.exe) can be downloaded here.
 
-https://github.com/TheJacksonLaboratory/HPOworkbench/releases/tag/v0.1.8
+https://github.com/TheJacksonLaboratory/HPOworkbench/releases/tag/v0.1.10
 
 A Jar file is provided for Macintosh and linux platforms.
 

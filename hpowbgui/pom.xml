@@ -5,9 +5,9 @@
     <parent>
         <artifactId>HPOworkbench</artifactId>
         <groupId>org.monarchinitiative</groupId>
-        <version>0.1.9</version>
+        <version>0.1.10</version>
     </parent>
-    <version>0.1.9</version>
+    <version>0.1.10</version>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hpowbgui</artifactId>
@@ -37,15 +37,9 @@
         <dependency>
             <groupId>org.monarchinitiative</groupId>
             <artifactId>hpowbcore</artifactId>
-            <version>0.1.9</version>
+            <version>0.1.10</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-        </dependency>
 
 
     </dependencies>

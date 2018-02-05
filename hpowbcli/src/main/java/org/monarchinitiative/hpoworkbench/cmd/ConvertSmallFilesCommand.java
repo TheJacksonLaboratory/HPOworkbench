@@ -10,16 +10,20 @@ import org.monarchinitiative.hpoworkbench.io.HpoOntologyParser;
 import org.monarchinitiative.hpoworkbench.smallfile.OldSmallFile;
 import org.monarchinitiative.hpoworkbench.smallfile.OldSmallFileEntry;
 import org.monarchinitiative.hpoworkbench.smallfile.V2SmallFile;
+import org.monarchinitiative.hpoworkbench.smallfile.V2SmallFileEntry;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Created by peter on 1/20/2018.
@@ -38,27 +42,14 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
 
     private BufferedWriter out;
 
-    private int DISEASE_ID_INDEX;
-    private int DISEASE_NAME_INDEX;
-    private int GENE_ID_INDEX;
-    private int GENE_NAME_INDEX;
-    private int GENOTYPE_INDEX;
-    private int GENE_SYMBOL_INDEX;
-    private int PHENOTYPE_ID_INDEX;
-    private int PHENOTYPE_NAME_INDEX;
-    private int AGE_OF_ONSET_ID_INDEX;
-    private int AGE_OF_ONSET_NAME_INDEX;
-    private int EVIDENCE_ID_INDEX;
-    private int EVIDENCE_NAME_INDEX;
-    private int FREQUENCY_INDEX;
-    private int SEX_ID_INDEX;
-    private int SEX_NAME_INDEX;
-    private int NEGATION_ID_INDEX;
-    private int NEGATION_NAME_INDEX;
-    private int DESCRIPTION_INDEX;
-    private int PUB_INDEX;
-    private int ASSIGNED_BY_INDEX;
-    private int DATE_CREATED_INDEX;
+    private int n_corrected_date=0;
+    private int n_no_evidence=0;
+    private int n_gene_data=0;
+    private int n_alt_id=0;
+    private int n_update_label=0;
+    private int n_created_modifier=0;
+    private int n_EQ_item=0;
+
 
     private HpoOntology ontology=null;
     private Ontology<HpoTerm, HpoTermRelation> inheritanceSubontology=null;
@@ -99,22 +90,27 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
     }
 
     public void run() {
-        logger.trace("We will convert the small files at " + pathToSmallFileDir);
+        if (ontology==null) {
+            logger.fatal("We were unable to initialize the Ontology object and will terminate this program...");
+            System.exit(1);
+        }
         List<String> files=getListOfSmallFiles();
-        logger.trace("We found " + files.size() + " small files");
+        logger.trace("We found " + files.size() + " small files at " + pathToSmallFileDir);
+        Map<String, Integer> descriptionCount = new HashMap<>();
         try {
             out = new BufferedWriter(new FileWriter("small-file.log"));
-            int c=1;
-            for (String path : files ) {
-                if (c==0) {/*getFirstEntry(path); TODO */ }
-                else {
-                    c++;
-                    OldSmallFile osf = new OldSmallFile(path);
-                    osfList.add(osf);
-                    logger.error("Got total of " + osfList.size() + " small files");
-                    //System.exit(3);
-                   if (c>250)break;
-                }
+            int c = 1;
+            for (String path : files) {
+                OldSmallFile osf = new OldSmallFile(path);
+                this.n_alt_id += osf.getN_alt_id();
+                this.n_corrected_date += osf.getN_corrected_date();
+                n_no_evidence+= osf.getN_no_evidence();
+                n_gene_data+= osf.getN_gene_data();
+                n_update_label += osf.getN_update_label();
+                n_created_modifier += osf.getN_created_modifier();
+                n_EQ_item+= osf.getN_EQ_item();
+
+                osfList.add(osf);
             }
             out.close();
         } catch (IOException e) {
@@ -122,7 +118,8 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             System.exit(1);
         }
 
-        convertToNewSmallFiles();
+       convertToNewSmallFiles();
+        dumpQCtoShell();
     }
 
     private void convertToNewSmallFiles() {
@@ -130,8 +127,55 @@ public class ConvertSmallFilesCommand  extends HPOCommand {
             V2SmallFile v2 = new V2SmallFile(old);
             v2sfList.add(v2);
         });
+        try {
+            for (V2SmallFile v2 : v2sfList) {
+                outputV2file(v2);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+
+    private void dumpQCtoShell() {
+        System.out.println("\n\n################################################\n\n");
+        System.out.println(String.format("We converted %d \"old\" small files into %d new (V2) small files",
+                osfList.size(),v2sfList.size()));
+        System.out.println();
+        System.out.println("Summary of Q/C results:");
+        System.out.println("\tNumber of lines with corrected date formats: " + n_corrected_date);
+        System.out.println("\tNumber of lines with \"Gene\" data that was discarded for the V2 files: " + n_gene_data);
+        System.out.println("\tNumber of lines with \"E/Q\" data that was discarded for the V2 files: " + n_EQ_item);
+        System.out.println("\tNumber of lines with alt_ids updated to current ids: " + n_alt_id);
+        System.out.println("\tNumber of lines with labels updated to current labels: " + n_update_label);
+        System.out.println("\tNumber of lines for which no Evidence code was found: "+ n_no_evidence);
+        System.out.println("\tNumber of lines for which a Clinical modifer was extracted: "+n_created_modifier);
+       System.out.println();
+        System.out.println("Lines that were Q/C'd or updated have been written to the log (before/after)");
+        System.out.println();
+    }
+
+
+    private void outputV2file(V2SmallFile v2) throws IOException {
+        String outdir="v2files";
+        if (! new File(outdir).exists()) {
+            new File(outdir).mkdir();
+        }
+        String filename = String.format("%s%s%s",outdir,File.separator,v2.getBasename());
+        logger.trace("Writing v2 to file " + filename);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+        writer.write(V2SmallFileEntry.getHeader()+"\n");
+        List<V2SmallFileEntry> entryList = v2.getEntryList();
+        for (V2SmallFileEntry v2e:entryList) {
+            writer.write(v2e.getRow() + "\n");
+        }
+        writer.close();
 
     }
+
+
+
 
     /** The purpose of this function is to set up an "archetype" of the OldEntries. We will compare all
      * other small files against this one. If all is well, then all files with be compatible.

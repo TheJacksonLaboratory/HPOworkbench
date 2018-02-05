@@ -2,6 +2,7 @@ package org.monarchinitiative.hpoworkbench.smallfile;
 
 /**
  * Created by peter on 1/20/2018.
+ * This is an enumeration of the various fields we find in the "old" Small File Format.
  */
 public enum FieldType {
     DISEASE_ID("Disease ID"),

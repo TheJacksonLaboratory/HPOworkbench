@@ -82,6 +82,31 @@ public class SmallFileBuilder {
         return this;
     }
 
+    public SmallFileBuilder description(String d) {
+        this.description=d;
+        return this;
+    }
+
+    public SmallFileBuilder hpoId(String id) {
+        this.phenotypeId=id;
+        return this;
+    }
+
+    public SmallFileBuilder hpoName(String name) {
+        this.phenotypeName=name;
+        return this;
+    }
+
+    public SmallFileBuilder pub(String pb) {
+        this.pub=pb;
+        return this;
+    }
+
+    public SmallFileBuilder evidence(String e) {
+        this.evidenceID=e;
+        return this;
+    }
+
     public String build() {
         List<String> entry = new ArrayList<>();
         for (String f : headerFields) {

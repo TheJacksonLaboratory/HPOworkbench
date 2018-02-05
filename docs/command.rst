@@ -23,6 +23,8 @@ To run the demo program, enter the following command. ::
     $ java -jar HPOworkbench.jar convert -h <path to hp.obo> -d <path to rare-diseases/annotated>
 
 Here, <path to rare-diseases/annotated> is the path to the ``annotated`` directory containing the original small files.
+If you run the command as above, it will create a new directory called ``v2files`` with the new files (one for each old
+file). Also, the log file will contain a list of
 
 
 The current output format for the new small files is as follows.
@@ -80,7 +82,8 @@ both files (the default download directory is ``data``, which can also be used b
 following commands). ::
 
     $ java -jar HPOWorkbench.jar download  [-d <directory>]
-	<directory>: name of directory to which HPO data will be downloaded (default:"data")
+
+``directory`` is the name of directory to which HPO data will be downloaded (default:"data")
 
 
 
@@ -90,7 +93,8 @@ This command makes a comma-separated value file that contains all of the terms i
 creation of an Excel file from the main app, and in the future, it will be offered as an option in the app. ::
 
     $ java -jar HPOWorkbench.jar csv [-h <hpo>]
-	<hpo>: path to hp.obo file
+
+``hpo`` is the path to hp.obo file
 
 
 Rich Text Format (RTF) Output
@@ -112,3 +116,4 @@ a smaller selection of annotations) and an HPO term. We would like to find out t
 to the term or any of its ancestors. ::
 
     $ java -jar HPOWorkbench.jar countfreq [-h <hpo.obo>] [-a <pheno_annot.tab>] -t <term id>
+

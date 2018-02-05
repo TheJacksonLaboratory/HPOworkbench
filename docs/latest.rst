@@ -13,7 +13,7 @@ To do so, you will need to download the HPO github repository as well as the rep
 owltools. The following text assumes that you download both repositories to the same place, e.g.,
 to some directory called GIT on your local drive.
 
-Donwloading the HPO github repository
+Downloading the HPO github repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The HPO GitHub repository can be found here: https://github.com/obophenotype/human-phenotype-ontology.
 Clone the repository with the following command. ::
