@@ -2,6 +2,7 @@ package org.monarchinitiative.hpoworkbench.gui;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.ontology.data.TermSynonym;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,6 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class GitHubPopup {
@@ -35,7 +38,10 @@ public class GitHubPopup {
     private String pword = null;
     /** Will be set to true if the user clicks the cancel button. */
     private boolean wasCancelled=false;
+    /** GitHub labels the user can choose from. */
+    private List<String> labels=new ArrayList<>();
 
+    private String chosenLabel=null;
 
     /**
      * True if our new GitHub issue is to suggest a new child term for an existing HPO Term.
@@ -86,6 +92,11 @@ public class GitHubPopup {
     }
 
 
+    public void setLabels(List<String> labels){
+        this.labels=labels;
+    }
+
+
     public void displayWindow(Stage ownerWindow) {
         Stage window = new Stage();
         window.setResizable(false);
@@ -93,6 +104,9 @@ public class GitHubPopup {
         window.setTitle("New github issue");
         window.initStyle(StageStyle.UTILITY);
         window.initModality(Modality.APPLICATION_MODAL);
+
+        ObservableList<String> options = FXCollections.observableArrayList(labels);
+        final ComboBox comboBox = new ComboBox(options);
 
         VBox root = new VBox();
         root.setPadding(new Insets(10));
@@ -131,10 +145,20 @@ public class GitHubPopup {
         grid.add(pw, 0, 1);
         PasswordField pwBox = new PasswordField();
         grid.add(pwBox, 1, 1);
+        Label ghlabel = new Label("Label:");
+        grid.add(ghlabel,0,2);
+        grid.add(comboBox,1,2);
+
         okButton.setOnAction(e -> {
             githubIssueText = textArea.getText();
             uname = userTextField.getText();
             pword = pwBox.getText();
+            if (comboBox.getSelectionModel().getSelectedItem()!=null) {
+                String item = comboBox.getSelectionModel().getSelectedItem().toString();
+                if (item!=null && !item.isEmpty()) {
+                    this.chosenLabel=item;
+                }
+            }
             window.close();
         });
         if (pword != null) {
@@ -220,6 +244,8 @@ public class GitHubPopup {
     public String getGitHubPassWord() {
         return pword;
     }
+
+    public String getGitHubLabel() { return chosenLabel; }
 
 
     /**

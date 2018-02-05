@@ -38,6 +38,7 @@ import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
+import org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever;
 import org.monarchinitiative.hpoworkbench.gui.*;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
@@ -639,6 +640,26 @@ public class MainController {
         }
     }
 
+
+    /** For the GitHub new issues, we want to allow the user to choose a pre-existing label for the issue.
+     * For this, we first go to GitHub and retrieve the labels with
+     * {@link org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever}. We only do this
+     * once per session though. */
+    private void initializeGitHubLabels() {
+        if (model.hasLabels()) { return; }
+        GitHubLabelRetriever retriever = new GitHubLabelRetriever();
+        List<String> labels = retriever.getLabels();
+        if (labels==null) {
+            labels=new ArrayList<>();
+        }
+        if (labels.size()==0) {
+            labels.add("new term request");
+        }
+        model.setGithublabels(labels);
+    }
+
+
+
     @FXML private void suggestCorrectionToTerm(ActionEvent e) {
         if (getSelectedTerm()==null) {
             logger.error("Select a term before creating GitHub issue");
@@ -650,6 +671,8 @@ public class MainController {
         }
         selectedTerm=getSelectedTerm().getValue().term;
         GitHubPopup popup = new GitHubPopup(selectedTerm);
+        initializeGitHubLabels();
+        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername,githubPassword);
         popup.displayWindow(primarystage);
         String githubissue=popup.retrieveGitHubIssue();
@@ -661,7 +684,7 @@ public class MainController {
             return;
         }
         String title=String.format("Correction to term %s",selectedTerm.getName());
-        postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord());
+        postGitHubIssue(githubissue,title,popup.getGitHubUserName(),popup.getGitHubPassWord(),popup.getGitHubLabel());
     }
 
     @FXML private void suggestNewChildTerm(ActionEvent e) {
@@ -753,6 +776,28 @@ public class MainController {
         GitHubPoster poster = new GitHubPoster(uname,pword,title,message);
         this.githubUsername=uname;
         this.githubPassword=pword;
+        try {
+            poster.postIssue();
+        } catch (HPOWorkbenchException he) {
+            PopUps.showException("GitHub error","Bad Request (400): Could not post issue", he);
+        }
+        catch (Exception ex) {
+            PopUps.showException("GitHub error","GitHub error: Could not post issue", ex);
+            return;
+        }
+        String response=poster.getHttpResponse();
+        PopUps.showInfoMessage(
+                String.format("Created issue for %s\nServer response: %s",selectedTerm.getName(),response),"Created new issue");
+
+    }
+
+    @FXML private void postGitHubIssue(String message,String title, String uname, String pword, String label) {
+        GitHubPoster poster = new GitHubPoster(uname,pword,title,message);
+        this.githubUsername=uname;
+        this.githubPassword=pword;
+        if (label!=null) {
+            poster.setLabel(label);
+        }
         try {
             poster.postIssue();
         } catch (HPOWorkbenchException he) {

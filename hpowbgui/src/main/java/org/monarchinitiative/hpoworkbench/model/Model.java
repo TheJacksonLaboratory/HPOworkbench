@@ -34,7 +34,7 @@ public class Model {
     /** List of all indirected annotations (by annotation propagation rule). */
     private Map<TermId,List<DiseaseModel>> directAnnotMap=null;
 
-
+    private List<String> githublabels=new ArrayList<>();
 
     public Model(){
         initPaths();
@@ -48,8 +48,11 @@ public class Model {
         importData();
     }
 
+    public void setGithublabels(List<String> lab) { this.githublabels=lab; }
 
+    public List<String> getGithublabels() { return githublabels; }
 
+    public boolean hasLabels(){ return githublabels!=null && githublabels.size()>0; }
 
     private void initPaths() {
         this.pathToHpoOboFile=getLocalHPOPath();
