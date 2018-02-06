@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.controller.MainController;
+import org.monarchinitiative.hpoworkbench.controller.StatusController;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
@@ -29,7 +30,7 @@ import java.util.concurrent.Executors;
 /**
  * Here, the Guice module is defined. The module contains dependencies, which are used in construction of classes
  * managed by Guice injector (dependency injection container).
- *
+ * <p>
  * As defined in {@link Main}, Guice is used to create dependencies of the {@link MainController}.
  *
  * @author <a href="mailto:daniel.danis@jax.org">Daniel Danis</a>
@@ -72,7 +73,9 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
 
         // ------ CONTROLLERS ------
         // We bind the controller in order to inject the dependencies to the controller's constructor
-        bind(MainController.class);
+        bind(MainController.class).asEagerSingleton();
+
+        bind(StatusController.class).asEagerSingleton();
 
         // ------ CONTROLLERS ------
     }
@@ -84,20 +87,20 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
 
         // load ontology & annotation file, if available
         String obofile = properties.getProperty("hpo.obo.path");
-        if (obofile != null) {
+        if (obofile != null && new File(obofile).isFile()) {
             LOGGER.trace("Loading HPO ontology from {}", obofile);
             HPOParser parser = new HPOParser(obofile);
             optionalResources.setOntology(parser.getHPO());
         }
 
         String annots = properties.getProperty("hpo.annotations.path");
-        if (annots != null) {
+        if (annots != null && new File(annots).isFile()) {
             LOGGER.trace("Loading HPO annotations file from {}", annots);
             DirectIndirectHpoAnnotationParser parser =
                     new DirectIndirectHpoAnnotationParser(annots, optionalResources.getOntology());
-            parser.parse();
-            optionalResources.setDirectAnnotMap(parser.getDirectannotmap());
-            optionalResources.setAnnotmap(parser.getIndirectannotmap());
+            parser.doParse();
+            optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
+            optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
         }
 
         return optionalResources;
@@ -147,7 +150,6 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
     private File codeHomeDir() {
         File codeHomeDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile())
                 .getParentFile();
-        System.out.println("Code home dir: " + codeHomeDir);
         if (codeHomeDir.exists() || codeHomeDir.mkdirs()) // ensure that the home dir exists
             return codeHomeDir;
 

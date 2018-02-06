@@ -29,13 +29,21 @@ import java.util.stream.Stream;
  */
 public final class OptionalResources {
 
+    private final BooleanBinding someResourceIsMissing;
+
     private final ObjectProperty<HpoOntology> ontology = new SimpleObjectProperty<>(this, "ontology", null);
 
-    private final ObjectProperty<Map<TermId, List<DiseaseModel>>> annotmap =
-            new SimpleObjectProperty<>(this, "annotmap", null);
+    private final ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMap =
+            new SimpleObjectProperty<>(this, "indirectAnnotMap", null);
 
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> directAnnotMap =
             new SimpleObjectProperty<>(this, "directAnnotMap", null);
+
+    public OptionalResources() {
+        someResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(ontologyProperty(), indirectAnnotMapProperty(),
+                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
+                ontologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
+    }
 
     /**
      * This binding evaluates to false, if any of ontology, annotMap or directAnnotMap are missing/null.
@@ -43,21 +51,19 @@ public final class OptionalResources {
      * @return {@link BooleanBinding}
      */
     public BooleanBinding someResourceMissing() {
-        return Bindings.createBooleanBinding(() -> Stream.of(ontologyProperty(), annotmapProperty(),
-                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
-                ontologyProperty(), annotmapProperty(), directAnnotMapProperty());
+        return someResourceIsMissing;
     }
 
-    public Map<TermId, List<DiseaseModel>> getAnnotmap() {
-        return annotmap.get();
+    public Map<TermId, List<DiseaseModel>> getIndirectAnnotMap() {
+        return indirectAnnotMap.get();
     }
 
-    public void setAnnotmap(Map<TermId, List<DiseaseModel>> annotmap) {
-        this.annotmap.set(annotmap);
+    public void setIndirectAnnotMap(Map<TermId, List<DiseaseModel>> indirectAnnotMap) {
+        this.indirectAnnotMap.set(indirectAnnotMap);
     }
 
-    public ObjectProperty<Map<TermId, List<DiseaseModel>>> annotmapProperty() {
-        return annotmap;
+    public ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMapProperty() {
+        return indirectAnnotMap;
     }
 
     public Map<TermId, List<DiseaseModel>> getDirectAnnotMap() {
@@ -87,7 +93,7 @@ public final class OptionalResources {
     @Override
     public int hashCode() {
 
-        return Objects.hash(ontology, annotmap, directAnnotMap);
+        return Objects.hash(ontology, indirectAnnotMap, directAnnotMap);
     }
 
     @Override
@@ -96,7 +102,7 @@ public final class OptionalResources {
         if (o == null || getClass() != o.getClass()) return false;
         OptionalResources that = (OptionalResources) o;
         return Objects.equals(ontology, that.ontology) &&
-                Objects.equals(annotmap, that.annotmap) &&
+                Objects.equals(indirectAnnotMap, that.indirectAnnotMap) &&
                 Objects.equals(directAnnotMap, that.directAnnotMap);
     }
 

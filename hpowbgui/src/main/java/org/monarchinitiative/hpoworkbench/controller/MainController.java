@@ -19,10 +19,10 @@ import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
@@ -75,6 +75,9 @@ public class MainController {
 
     private final OptionalResources optionalResources;
 
+    /**
+     * Unused, but still required
+     */
     private final File hpoWorkbenchDir;
 
     /**
@@ -103,6 +106,10 @@ public class MainController {
 
     @FXML
     public Button reportMistakenAnnotationButton;
+
+    /** Place at the bottom of the window controlled by {@link StatusController} for showing messages to user */
+    @FXML
+    public StackPane statusStackPane;
 
     private Model model;
 
@@ -147,9 +154,6 @@ public class MainController {
 
     @FXML
     private Button goButton;
-
-    @FXML
-    private Label browserlabel;
 
     @FXML
     private RadioButton allDatabaseButton, orphanetButton, omimButton, decipherButton;
@@ -286,15 +290,15 @@ public class MainController {
             String hpoAnnotationsFileName = dirpath + File.separator + PlatformUtil.HPO_ANNOTATIONS_FILENAME;
             DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(hpoAnnotationsFileName, optionalResources
                     .getOntology());
-            parser.parse();
-            optionalResources.setDirectAnnotMap(parser.getDirectannotmap());
-            optionalResources.setAnnotmap(parser.getIndirectannotmap()); //TODO(ielis) is annotmap the indirectannotmap?
+            parser.doParse();
+            optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
+            optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
             properties.setProperty("hpo.annotations.path", hpoAnnotationsFileName);
         });
         hpodownload.setOnFailed(event -> {
             window.close();
             logger.error("Unable to download phenotype_annotation.tab file");
-            optionalResources.setAnnotmap(null);
+            optionalResources.setIndirectAnnotMap(null);
             optionalResources.setDirectAnnotMap(null);
             properties.setProperty("hpo.annotations.path", null);
         });
@@ -332,9 +336,6 @@ public class MainController {
         //logger.trace("initialize");
         // This action will be run after user approves a PhenotypeTerm in the ontologyTreePane
         Consumer<HpoTerm> addHook = (ph -> logger.trace(String.format("Hook for %s", ph.getName())));
-        browserlabel.setAlignment(Pos.BOTTOM_RIGHT);
-        String ver = getVersion();
-        browserlabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2018");
 
         initRadioButtons();
 
@@ -377,7 +378,7 @@ public class MainController {
 
     private void activate() {
         initTree(optionalResources.getOntology(), k -> System.out.println("Consumed " + k));
-        this.model = new Model(optionalResources.getOntology(), optionalResources.getAnnotmap(),
+        this.model = new Model(optionalResources.getOntology(), optionalResources.getIndirectAnnotMap(),
                 optionalResources.getDirectAnnotMap());
     }
 
