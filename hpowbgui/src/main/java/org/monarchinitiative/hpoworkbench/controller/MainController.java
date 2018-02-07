@@ -189,7 +189,7 @@ public class MainController {
         } catch (Exception e) {
             // do nothing
         }
-        if (version == null) version = "0.1.7"; // this works on a maven build but needs to be reassigned in intellij
+        if (version == null) version = "0.1.11"; // this works on a maven build but needs to be reassigned in intellij
         return version;
     }
 
@@ -771,9 +771,9 @@ public class MainController {
      * {@link org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever}. We only do this
      * once per session though.
      */
-    private void initializeGitHubLabels() {
+    private void initializeGitHubLabelsIfNecessary() {
         if (model.hasLabels()) {
-            return;
+            return; // we only need to retrieve the labels from the server once per session!
         }
         GitHubLabelRetriever retriever = new GitHubLabelRetriever();
         List<String> labels = retriever.getLabels();
@@ -798,7 +798,7 @@ public class MainController {
         }
         selectedTerm = getSelectedTerm().getValue().term;
         GitHubPopup popup = new GitHubPopup(selectedTerm);
-        initializeGitHubLabels();
+        initializeGitHubLabelsIfNecessary();
         popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(primarystage);
@@ -825,11 +825,13 @@ public class MainController {
             selectedTerm = getSelectedTerm().getValue().term;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm, true);
+        initializeGitHubLabelsIfNecessary();
+        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(primarystage);
         String githubissue = popup.retrieveGitHubIssue();
         if (githubissue == null) {
-            logger.trace("got back null githuib issue");
+            logger.trace("got back null github issue");
             return;
         }
         String title = String.format("Suggesting new child term of \"%s\"", selectedTerm.getName());
@@ -858,6 +860,8 @@ public class MainController {
             return;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm, selectedDisease);
+        initializeGitHubLabelsIfNecessary();
+        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(primarystage);
         String githubissue = popup.retrieveGitHubIssue();
@@ -891,6 +895,8 @@ public class MainController {
             return;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm, selectedDisease, true);
+        initializeGitHubLabelsIfNecessary();
+        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(primarystage);
         String githubissue = popup.retrieveGitHubIssue();

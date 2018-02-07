@@ -1,5 +1,13 @@
 # HPO Workbench Changelog
 
+## v.0.1.11
+### hpowebgui
+* controls greyed out at first use to indicate hp.obo and phenotype_annotation.tab must be downloaded
+* bug fixes in inter-app links
+* labels shown for GitHub requests
+### hpowbcore
+* download GitHub labels and open issues
+
 ## v0.1.10
 ### hpowbgui
 * hyperlinks between HPO and disease pages
