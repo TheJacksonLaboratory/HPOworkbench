@@ -12,6 +12,12 @@ import java.io.File;
  */
 public class PlatformUtil {
 
+    public static final String HPO_OBO_FILENAME = "hp.obo";
+
+    public static final String HPO_ANNOTATIONS_FILENAME = "phenotype_annotation.tab";
+
+    public static final String HPO_WORKBENCH_SETTINGS_FILENAME = "application.properties";
+
     /**
      * Get path to directory where HRMD-gui stores global settings.
      * The path depends on underlying operating system. Linux, Windows and OSX
@@ -43,7 +49,7 @@ public class PlatformUtil {
 
     public static String getLocalHPOPath() {
         File dir = getHpoWorkbenchDir();
-        return new String(dir + File.separator + "hp.obo");
+        return dir + File.separator + HPO_OBO_FILENAME;
     }
 
     /** Return the absolute path to the settings file, which is kept in the .loinc2hpo directory in the
@@ -52,7 +58,7 @@ public class PlatformUtil {
      */
     public static String getLocalPhenotypeAnnotationPath() {
         File dir = getHpoWorkbenchDir();
-        return new String(dir + File.separator + "phenotype_annotation.tab");
+        return dir + File.separator + HPO_ANNOTATIONS_FILENAME;
     }
 
     /**
@@ -70,7 +76,7 @@ public class PlatformUtil {
      */
     public static String getPathToSettingsFile() {
         File dir = getHpoWorkbenchDir();
-        return new String(dir + File.separator + "hpoworkbench.settings");
+        return dir + File.separator + HPO_WORKBENCH_SETTINGS_FILENAME;
     }
 
     /* Based on this post: http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/ */
