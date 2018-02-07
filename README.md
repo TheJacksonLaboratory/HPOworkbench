@@ -10,18 +10,10 @@ Please see the [full documentation](http://hpo-workbench.readthedocs.io/en/lates
 
 A Windows executable (HPOWorkbench.exe) can be downloaded here.
 
-https://github.com/TheJacksonLaboratory/HPOworkbench/releases/tag/v0.1.10
+https://github.com/TheJacksonLaboratory/HPOworkbench/releases/tag/v0.1.11
 
 A Jar file is provided for Macintosh and linux platforms.
 
-A double click on these files should start the program. Please do not forget to
+A double click on these files should start the program. The app will remind you to
 download the HPO ontology file (hp.obo) and the HPO annotations from the edit menu
-the first time you use HPO Workbench. Unfortunately it is necessary to restart HPO Workbench 
-after downloading these files (we are working on a fix). 
-
-This is a "pre-release" that may contain bugs, although we have tested the code and it works.
-Please see the documentation at http://hpo-workbench.readthedocs.io/en/latest/ for further
-information on how to use HPO Workbench to navigate the ontology and to submit
-suggestions for new terms or other comments to the HPO team.
-
-
+the first time you use HPO Workbench. 
