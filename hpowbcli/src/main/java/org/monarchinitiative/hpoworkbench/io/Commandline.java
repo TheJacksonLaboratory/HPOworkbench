@@ -42,6 +42,8 @@ public class Commandline {
     private String annotationPath = null;
     private String termid = null;
 
+    private String gitHubIssueLabel=null;
+
 
     private String outputFilePath = null;
     private String outputDirectory = null;
@@ -87,6 +89,9 @@ public class Commandline {
             } else {
                 annotationPath =  DEFAULT_ANNOTATION_OBOPATH;
             }
+            if (commandLine.hasOption("g")) {
+                gitHubIssueLabel=commandLine.getOptionValue("g");
+            }
             if (commandLine.hasOption("t")) {
                 this.termid = commandLine.getOptionValue("t");
             }
@@ -111,7 +116,10 @@ public class Commandline {
         }  else if (mycommand.equals("word")) {
             this.command=new WordCommand(this.downloadDirectory,this.hpoOboPath);
         } else if (mycommand.equals("git")) {
-            this.command=new GitCommand();
+            if (gitHubIssueLabel==null) {
+                printUsage("-g (github issue) required for git command");
+            }
+            this.command=new GitCommand(gitHubIssueLabel);
         } else {
             printUsage(String.format("Did not recognize command: %s", mycommand));
         }
@@ -134,6 +142,7 @@ public class Commandline {
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
                 .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
                 .addOption("a", "annot", true, "path to HPO annotation file")
+                .addOption("g","github-issue",true,"GitHub issue label")
                 .addOption("h", "hpo", true, "path to hp.obo");
 //                .addOption("b", "bad", false, "output bad (rejected) reads to separated file")
 //                .addOption(Option.builder("f1").longOpt("file1").desc("path to fastq file 1").hasArg(true).argName("file1").build())

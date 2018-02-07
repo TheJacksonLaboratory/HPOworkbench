@@ -16,6 +16,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Note: Apparently there is no way to retrieve more than 30 labels at a time, and so we cannot reliably
+ * retrieve all of the open issues for some label. This may be useful for labels with less than 30 issues
+ * to create a word doc, but this will not yet be reliable in general. Keep this class at the experimental/
+ * command-line only stage for now.
+ */
 public class GitHubIssueRetriever {
     private static final Logger logger = LogManager.getLogger();
 
@@ -23,16 +29,13 @@ public class GitHubIssueRetriever {
 
     private HttpURLConnection httpconnection=null;
 
+    private final String issue;
 
-    public GitHubIssueRetriever() {
-        int page=1;
-        logger.trace("GitHubIssueRetriever CTOR");
-        for (int i=1;i<20;i++) {
-        //while (retrieveIssues(page) ) {
-            boolean response = retrieveIssues(i);
-            System.out.println("got page "+i);
-           if (! response) break;
-        }
+
+    public GitHubIssueRetriever(String myIssue) {
+        issue=myIssue;
+        int responsecode = retrieveIssues();
+        logger.error(String.format("We retrieved %d issues for %s with response code %d", issues.size(),issue,responsecode));
     }
 
 
@@ -44,18 +47,14 @@ public class GitHubIssueRetriever {
         String title = jsonObject.get("title").toString();
         String body = jsonObject.get("body").toString();
         String label = jsonObject.get("label")==null?"none":jsonObject.get("label").toString();
-        GitHubIssue.Builder builder = new GitHubIssue.Builder(title).body(body).label(label);
-//        JSONObject comments = (JSONObject) jsonObject.get("comments");
-//        if (comments != null) {
-//
-//        }
-
-        //System.out.println(jsonObject.toString() +"\n");
+        String number = jsonObject.get("number")==null?"?":jsonObject.get("number").toString();
+        GitHubIssue.Builder builder = new GitHubIssue.Builder(title).body(body).label(label).number(number);
         issues.add(builder.build());
     }
 
 
     private void decodeJSON(String s) {
+        System.out.println(s);
         Object obj= JSONValue.parse(s);
         JSONArray jsonArray = (JSONArray) obj;
         Iterator<String> iterator = jsonArray.iterator();
@@ -64,43 +63,31 @@ public class GitHubIssueRetriever {
 
 
 
-    private boolean retrieveIssues(int page)  {
+    private int retrieveIssues()  {
         try {
-            URL url = new URL(String.format("https://api.github.com/repos/obophenotype/human-phenotype-ontology/issues?state=all",page));
+            URL url = new URL(String.format("https://api.github.com/repos/obophenotype/human-phenotype-ontology/issues?labels=%s",issue));
             if (httpconnection==null) {
                 httpconnection = (HttpURLConnection) url.openConnection();
                 httpconnection.setRequestMethod("GET");
                 httpconnection.connect();
-                httpconnection.setDoOutput(true);
             }
             Scanner scanner = new Scanner(url.openStream());String response = scanner.useDelimiter("\\Z").next();
             scanner.close();
             decodeJSON(response);
             int responsecode=httpconnection.getResponseCode();
-            //httpconnection.disconnect();
-            return responsecode==400;
+            return responsecode;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (httpconnection!=null) {
+                httpconnection.disconnect();
+            }
         }
-        return false; // we should never get here with a good response.
+        return -1; // we should never get here with a good response.
     }
 
 
-    private void retrieveIssuesOLD(int page)  {
-        try {
-            URL url = new URL("https://api.github.com/repos/obophenotype/human-phenotype-ontology/issues?state=open");
-            URLConnection con = url.openConnection();
-            con.setDoOutput(true);
-            Scanner scanner = new Scanner(url.openStream());
-            String response = scanner.useDelimiter("\\Z").next();
-            scanner.close();
-            decodeJSON(response);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 }

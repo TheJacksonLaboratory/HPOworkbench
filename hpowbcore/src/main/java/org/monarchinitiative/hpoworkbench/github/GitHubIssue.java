@@ -13,12 +13,39 @@ public class GitHubIssue {
     private final String body;
     private final String label;
     private final List<String> comments;
+    private final String issueNumber;
 
-    GitHubIssue(String title,String body, String label, List<String> comments){
+    public String getTitle() {
+        return title;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public List<String> getComments() {
+        return comments;
+    }
+
+    public String getIssueNumber() {
+        return issueNumber;
+    }
+
+    public boolean hasValidIssueNumber(){
+        return this.issueNumber!=null && !this.issueNumber.startsWith("?");
+    }
+
+    GitHubIssue(String title, String body, String label, List<String> comments, String number){
         this.title=title;
         this.body=body;
         this.label=label;
         this.comments=comments;
+        issueNumber=number;
+
     }
 
 
@@ -33,6 +60,7 @@ public class GitHubIssue {
         private final String title;
         private String body="";
         private String label="none";
+        private String issueNumber="";
         List<String> comments = new ArrayList<>();
 
         public Builder(String title){
@@ -59,8 +87,13 @@ public class GitHubIssue {
             return this;
         }
 
+        public Builder number(String number) {
+            issueNumber=number;
+            return this;
+        }
+
         public GitHubIssue build() {
-            return new GitHubIssue(title,body,label,comments);
+            return new GitHubIssue(title,body,label,comments,issueNumber);
         }
 
     }
