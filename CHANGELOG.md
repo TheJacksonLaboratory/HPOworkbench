@@ -7,6 +7,7 @@
 * labels shown for GitHub requests
 ### hpowbcore
 * download GitHub labels and open issues
+* open git issues for label written to Word doc
 
 ## v0.1.10
 ### hpowbgui
