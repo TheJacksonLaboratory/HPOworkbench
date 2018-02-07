@@ -54,6 +54,11 @@ import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.BROWSE_DISEASE;
+import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.BROWSE_HPO;
+import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.NEW_ANNOTATION;
+
+
 /**
  * Controller for HPO Workbench
  *
@@ -312,7 +317,7 @@ public class MainController {
      */
     @FXML
     private void goButtonAction() {
-        if (currentMode.equals(mode.BROWSE_DISEASE)) {
+        if (currentMode.equals(BROWSE_DISEASE)) {
             DiseaseModel dmod = model.getDiseases().get(searchTextField.getText());
             if (dmod == null) return;
             updateDescriptionToDiseaseModel(dmod);
@@ -444,14 +449,14 @@ public class MainController {
                     logger.error("Attempt to init autocomplete with null list of HPO terms");
                 }
             } else if (userdata.equals("disease")){
-                currentMode=mode.BROWSE_DISEASE;
+                currentMode= BROWSE_DISEASE;
                 if (this.model.getDiseases()!=null) {
                     WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField,model.getDiseases().keySet());
                 } else {
                     logger.warn("Attempt to init autocomplete with null list of diseases");
                 }
             } else if (userdata.equals("newannotation")) {
-                currentMode=mode.NEW_ANNOTATION;
+                currentMode=NEW_ANNOTATION;
                 if (labels !=null) {
                     WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
                 } else {
@@ -459,6 +464,19 @@ public class MainController {
                 }
             }
         });
+    }
+
+
+    private void switchToMode(mode Mode) {
+        if(Mode.equals( mode.BROWSE_HPO) ) {
+            hpoTermRadioButton.setSelected(true);
+            currentMode = mode.BROWSE_HPO;
+        } else if (Mode.equals(BROWSE_DISEASE)) {
+            diseaseRadioButton.setSelected(true);
+            currentMode = mode.BROWSE_DISEASE;
+        } else if (Mode.equals(NEW_ANNOTATION)) {
+            currentMode = mode.NEW_ANNOTATION;
+        }
     }
 
 
@@ -516,6 +534,7 @@ public class MainController {
      */
     private void expandUntilTerm(HpoTerm term) {
         // logger.trace("expand until term " + term.toString());
+        switchToMode(BROWSE_HPO);
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
             Stack<HpoTerm> termStack = new Stack<>();
@@ -592,7 +611,7 @@ public class MainController {
                         @Override
                         public void handleEvent(org.w3c.dom.events.Event ev) {
                             String domEventType = ev.getType();
-                            //System.err.println("EventType: " + domEventType);
+                           // System.err.println("EventType FROM updateHPO: " + domEventType);
                             if (domEventType.equals(EVENT_TYPE_CLICK)) {
                                 String href = ((Element) ev.getTarget()).getAttribute("href");
                                 // System.out.println("HREF "+href);
@@ -600,6 +619,9 @@ public class MainController {
                                     return; // the external link is taken care of by the Webengine
                                     // therefore, we do not need to do anything special here
                                 }
+                                // The following line is necessary because sometimes multiple events are triggered
+                                // and we get a "stray" HPO-related link that does not belong here.
+                                if (href.startsWith("HP:")) return;
                                 DiseaseModel dmod = model.getDiseases().get(href);
                                 if (dmod == null) {
                                     logger.error("Link to disease model for " + href + " was null");
@@ -608,7 +630,7 @@ public class MainController {
                                 updateDescriptionToDiseaseModel(dmod);
                                 selectedDisease = dmod;
                                 searchTextField.clear();
-                                currentMode = mode.BROWSE_DISEASE;
+                                currentMode = BROWSE_DISEASE;
                                 diseaseRadioButton.setSelected(true);
                             }
                         }
@@ -629,6 +651,8 @@ public class MainController {
 
     /**
      * Update content of the {@link #infoWebView} with currently selected {@link HpoTerm}.
+     * The function is called when the user is on an HPO Term page and selects a link to
+     * a disease.
      *
      * @param dmodel currently selected {@link TreeItem} containing {@link HpoTerm}
      */
@@ -647,14 +671,16 @@ public class MainController {
                         @Override
                         public void handleEvent(org.w3c.dom.events.Event ev) {
                             String domEventType = ev.getType();
-                            //System.err.println("EventType: " + domEventType);
+                            //System.err.println("EventType from updateToDisease: " + domEventType);
                             if (domEventType.equals(EVENT_TYPE_CLICK)) {
                                 String href = ((Element) ev.getTarget()).getAttribute("href");
-                                //System.out.println("HREF "+href);
                                 if (href.equals("http://www.human-phenotype-ontology.org")) {
                                     return; // the external link is taken care of by the Webengine
                                     // therefore, we do not need to do anything special here
                                 }
+                                // The following line is needed because sometimes we get multiple click events
+                                // if the user clicks once and some appear to be for the "wrong" link type.
+                                if (!href.startsWith("HP:")) { return; }
                                 TermId tid = ImmutableTermId.constructWithPrefix(href);
                                 if (tid == null) {
                                     logger.error(String.format("Could not construct term id from \"%s\"", href));
