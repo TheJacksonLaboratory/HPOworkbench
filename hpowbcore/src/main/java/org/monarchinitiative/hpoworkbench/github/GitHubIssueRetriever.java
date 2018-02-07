@@ -54,7 +54,7 @@ public class GitHubIssueRetriever {
 
 
     private void decodeJSON(String s) {
-        System.out.println(s);
+       // System.out.println(s);
         Object obj= JSONValue.parse(s);
         JSONArray jsonArray = (JSONArray) obj;
         Iterator<String> iterator = jsonArray.iterator();
