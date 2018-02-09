@@ -3,9 +3,8 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssueRetriever;
-import org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever;
 import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
-import org.monarchinitiative.hpoworkbench.word.GitIssue2Word;
+
 
 import java.util.List;
 
@@ -35,5 +34,5 @@ public class GitCommand  extends HPOCommand {
         gi2w.outputFile(filename);
     }
 
-    public String getName(){ return "git";};
+    public String getName(){ return "git";}
 }

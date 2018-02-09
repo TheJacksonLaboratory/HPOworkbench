@@ -69,6 +69,10 @@ public class HpoCategory {
 
   public int getNumberOfAnnotations() { return annotatedTerms.size(); }
 
+  public boolean containsTerm(TermId tid) {
+      return annotatedTerms.contains(tid);
+  }
+
 
   public void addAnnotatedTerm(TermId tid, Ontology ontology){
         annotatedTerms.add(tid);
@@ -101,6 +105,8 @@ public class HpoCategory {
     }
 
   }
+
+
 
 
 }

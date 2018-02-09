@@ -1,11 +1,11 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoDiseaseAnnotation;
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
+import com.github.phenomics.ontolib.formats.hpo.*;
 import com.github.phenomics.ontolib.graph.data.Edge;
+import com.github.phenomics.ontolib.io.obo.hpo.HpoAnnotation2DiseaseParser;
 import com.github.phenomics.ontolib.ontology.data.*;
 import org.apache.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.annotation.Hpo2Hpo;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HpoOntologyParser;
@@ -29,6 +29,10 @@ public class Hpo2HpoCommand extends HPOCommand {
     private List<HpoDiseaseAnnotation> annotlist=null;
 
     private HpoOntology ontology=null;
+    private  Ontology<HpoTerm, HpoTermRelation > phenotypeOntology;
+    private Ontology<HpoTerm, HpoTermRelation> inheritanceOntology;
+
+    private Map<String,HpoDiseaseWithMetadata> diseasemap=null;
 
 
     public Hpo2HpoCommand(String hpoPath, String annotPath, String hpoTermId) {
@@ -47,10 +51,12 @@ public class Hpo2HpoCommand extends HPOCommand {
         /**
          * Function for the execution of the command.
          *
-         * @throws HPOException on problems executing the command.
          */
     @Override public  void run() {
         inputHpoData();
+        inputHpoDiseaseAnnotations();
+        Hpo2Hpo h2h = new Hpo2Hpo(termId, ontology,diseasemap);
+        h2h.calculateHpo2Hpo();
     }
 
     /** input the hp.obo and the annotations. */
@@ -58,9 +64,8 @@ public class Hpo2HpoCommand extends HPOCommand {
         try {
             HpoOntologyParser oparser = new HpoOntologyParser(hpOboPath);
             this.ontology = oparser.getOntology();
-            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath);
-            this.annotlist = aparser.getAnnotations();
-            this.descendents = getDescendents(ontology, termId);
+            inheritanceOntology = oparser.getInheritanceSubontology();
+            phenotypeOntology = oparser.getPhenotypeSubontology();
         } catch (HPOException e) {
             LOGGER.error(String.format("Could not input ontology: %s",e.getMessage()));
             System.exit(1);
@@ -68,57 +73,15 @@ public class Hpo2HpoCommand extends HPOCommand {
     }
 
 
+    private void inputHpoDiseaseAnnotations() {
+         HpoAnnotation2DiseaseParser parser = new HpoAnnotation2DiseaseParser(annotationPath,
+                 phenotypeOntology,inheritanceOntology);
+         this.diseasemap = parser.getDiseaseMap();
 
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-        return map.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
-    }
-
-    private void outputCounts(HashMap<TermId,Double> hm, Ontology ontology) {
-        Map mp2 = sortByValue(hm);
-        for (Object t: mp2.keySet()) {
-            TermId tid = (TermId) t;
-            double count = (double)mp2.get(t);
-            String name =  ((HpoTerm)ontology.getTermMap().get(tid)).getName();
-            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count);
         }
-    }
 
 
 
-    /** Get the immediate children of a Term. Do not include the original term in the returned set. */
-    private  Set<TermId> getTermChildren(Ontology ontology, TermId id) {
-        Set<TermId> kids = new HashSet<>();
 
-        Iterator it =  ontology.getGraph().inEdgeIterator(id);
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId sourceId=edge.getSource();
-            kids.add(sourceId);
-        }
-        return kids;
-    }
-
-    public Set<TermId> getDescendents(Ontology ontology, TermId parent) {
-        Set<TermId> descset = new HashSet<>();
-        Stack<TermId> stack = new Stack<>();
-        stack.push(parent);
-        while (! stack.empty() ) {
-            TermId tid = stack.pop();
-            descset.add(tid);
-            Set<TermId> directChildrenSet = getTermChildren(ontology,tid);
-            directChildrenSet.stream().forEach(t -> stack.push(t));
-        }
-        return descset;
-    }
-
-
-    @Override public String getName() { return "hpo2hpo"; };
+    @Override public String getName() { return "hpo2hpo"; }
 }
