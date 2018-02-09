@@ -111,8 +111,11 @@ public class Commandline {
                 printUsage("-t HP:0000123 option required for countfreq");
             }
             this.command = new CountFrequencyCommand(this.hpoOboPath, this.annotationPath, this.termid);
-        } else if (mycommand.equals("convert")) {
-            this.command=new ConvertSmallFilesCommand(this.downloadDirectory,this.hpoOboPath);
+        }  else if (mycommand.equals("hpo2hpo") ) {
+            if (this.termid == null) {
+                printUsage("-t HP:0000123 option required for hpo2hpo");
+            }
+            this.command = new Hpo2HpoCommand(this.hpoOboPath, this.annotationPath, this.termid);
         }  else if (mycommand.equals("word")) {
             this.command=new WordCommand(this.downloadDirectory,this.hpoOboPath);
         } else if (mycommand.equals("git")) {
@@ -188,6 +191,12 @@ public class Commandline {
         writer.println();
         writer.println("countfreq:");
         writer.println("\tjava -jar HPOWorkbench.jar countfreq [-h <hpo.obo>] [-a <pheno_annot.tab>] -t <term id> \\");
+        writer.println("\t<hp.obo>: path to hp.obo file (default: \"data/hp.obo\")");
+        writer.println("\t<pheno_annot.tab>: path to annotation file (default \"data/phenotype_annotation.tab\")");
+        writer.println("\t<term>: HPO term id (e.g., HP:0000123)");
+        writer.println();
+        writer.println("hpo2hpo:");
+        writer.println("\tjava -jar HPOWorkbench.jar hpo2hpo [-h <hpo.obo>] [-a <pheno_annot.tab>] -t <term id> \\");
         writer.println("\t<hp.obo>: path to hp.obo file (default: \"data/hp.obo\")");
         writer.println("\t<pheno_annot.tab>: path to annotation file (default \"data/phenotype_annotation.tab\")");
         writer.println("\t<term>: HPO term id (e.g., HP:0000123)");
