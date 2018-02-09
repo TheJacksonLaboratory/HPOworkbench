@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.io;
 
 import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
 import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
 import com.github.phenomics.ontolib.ontology.data.TermId;
@@ -20,93 +19,126 @@ import java.util.*;
 /**
  * The purpose of this class is to parse the phenotype_annotation.tab file in order to give the user
  * and overview of the diseases annotated to any given HPO term.
+ *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.13
  */
 public class DirectIndirectHpoAnnotationParser {
+
     private static final Logger logger = LogManager.getLogger();
+
     private final String pathToPhenotypeAnnotationTab;
+
     private final HpoOntology ontology;
+
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
 
 
-    private Map<TermId,List<DiseaseModel>> directannotmap=null;
-    private Map<TermId,List<DiseaseModel>> indirectannotmap=null;
+    private Map<TermId, List<DiseaseModel>> directAnnotMap = null;
+
+
+    private Map<TermId, List<DiseaseModel>> indirectAnnotMap = null;
 
     public DirectIndirectHpoAnnotationParser(String path, HpoOntology onto) {
-        pathToPhenotypeAnnotationTab=path;
-        ontology=onto;
+        this.pathToPhenotypeAnnotationTab = path;
+        this.ontology = onto;
     }
 
 
-    public Map<TermId,List<DiseaseModel>> getDirectannotmap() { return directannotmap; }
+    /**
+     * Get map with direct annotations. The map will be <code>null</code>, if the {@link #doParse()} method have not been
+     * invoked.
+     *
+     * @return {@link Map} mapping {@link TermId}s to {@link List} of their {@link DiseaseModel}s
+     */
+    public Map<TermId, List<DiseaseModel>> getDirectAnnotMap() {
+        return directAnnotMap;
+    }
+
+    /**
+     * Get map with indirect annotations. The map will be <code>null</code>, if the {@link #doParse()} method have not been
+     * invoked.
+     *
+     * @return {@link Map} mapping {@link TermId}s to {@link List} of their {@link DiseaseModel}s
+     */
+    public Map<TermId, List<DiseaseModel>> getIndirectAnnotMap() {
+        return indirectAnnotMap;
+    }
 
     private TermId string2TermId(String termstring) {
         if (termstring.startsWith("HP:")) {
-            termstring=termstring.substring(3);
+            termstring = termstring.substring(3);
         }
-        if (termstring.length()!=7) {
-            logger.error("Malformed termstring: "+termstring);
+        if (termstring.length() != 7) {
+            logger.error("Malformed termstring: " + termstring);
             return null;
         }
-        TermId tid = new ImmutableTermId(HP_PREFIX,termstring);
-        if (! ontology.getAllTermIds().contains(tid)) {
-            logger.error("Unknown TermId "+tid.getIdWithPrefix());
+        TermId tid = new ImmutableTermId(HP_PREFIX, termstring);
+        if (!ontology.getAllTermIds().contains(tid)) {
+            logger.error("Unknown TermId " + tid.getIdWithPrefix());
             return null;
         }
         return tid;
     }
 
-    public  Map<TermId,List<DiseaseModel>> parse() {
-        indirectannotmap=new HashMap<>();
-        directannotmap=new HashMap<>();
-        Map<TermId,Set<DiseaseModel>> tempmap=new HashMap<>();
+    /**
+     * Parse annotations file and populate maps containing direct and indirect annotations.
+     */
+    public void doParse() {
+        if (ontology == null) {
+            logger.warn("Ontology unset, cannot parse annotations file");
+            return;
+        }
+
+        indirectAnnotMap = new HashMap<>();
+        directAnnotMap = new HashMap<>();
+        Map<TermId, Set<DiseaseModel>> tempmap = new HashMap<>();
 
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(pathToPhenotypeAnnotationTab));
             String line;
-            int c=0;
-            while ((line=br.readLine())!=null) {
-                String A[]= line.split("\t");
-                if (A.length<5) {
-                    logger.error(String.format("Annotation line with less than 5 fields, \n%s",line));
+            int c = 0;
+            while ((line = br.readLine()) != null) {
+                String A[] = line.split("\t");
+                if (A.length < 5) {
+                    logger.error(String.format("Annotation line with less than 5 fields, \n%s", line));
                     continue;
                 }
-                String db=A[0];
-                String dbId=A[1];
-                String diseasename=A[2];
+                String db = A[0];
+                String dbId = A[1];
+                String diseasename = A[2];
                 int i = diseasename.indexOf(";");
-                if (i>0) diseasename=diseasename.substring(0,i); // other synonyms follow the first ";"
-                DiseaseModel dis = new DiseaseModel(db,dbId,diseasename);
-                String HPOid=A[4];
-                TermId id=string2TermId(HPOid);
-                if (!directannotmap.containsKey(id)) {
-                    directannotmap.put(id,new ArrayList<>());
+                if (i > 0) diseasename = diseasename.substring(0, i); // other synonyms follow the first ";"
+                DiseaseModel dis = new DiseaseModel(db, dbId, diseasename);
+                String HPOid = A[4];
+                TermId id = string2TermId(HPOid);
+                if (!directAnnotMap.containsKey(id)) {
+                    directAnnotMap.put(id, new ArrayList<>());
 
                 }
-                directannotmap.get(id).add(dis);
-                Set<TermId> ancs =ontology.getAncestorTermIds(id);
-                for (TermId t:ancs) {
+                directAnnotMap.get(id).add(dis);
+                Set<TermId> ancs = ontology.getAncestorTermIds(id);
+                for (TermId t : ancs) {
                     if (!tempmap.containsKey(t)) {
                         tempmap.put(t, new HashSet<>());
                     }
-                    Set<DiseaseModel> diseaseset=tempmap.get(t);
+                    Set<DiseaseModel> diseaseset = tempmap.get(t);
                     diseaseset.add(dis);
                 }
-               // logger.trace(String.format("Adding disease %s [%s:%s] to term %s",diseasename,db,dbId,id.getIdWithPrefix()));
+                // logger.trace(String.format("Adding disease %s [%s:%s] to term %s",diseasename,db,dbId,id.getIdWithPrefix()));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         // When we get here, we transform the sets into an immutable, sorted list
-        ImmutableMap.Builder<TermId,List<DiseaseModel>> mapbuilder= new ImmutableMap.Builder();
+        ImmutableMap.Builder<TermId, List<DiseaseModel>> mapbuilder = new ImmutableMap.Builder();
         for (TermId key : tempmap.keySet()) {
             ImmutableList.Builder<DiseaseModel> listbuilder = new ImmutableList.Builder();
             listbuilder.addAll(tempmap.get(key));
-            mapbuilder.put(key,listbuilder.build());
+            mapbuilder.put(key, listbuilder.build());
         }
-        return mapbuilder.build();
+        this.indirectAnnotMap = mapbuilder.build();
     }
 
 }

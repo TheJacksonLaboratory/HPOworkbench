@@ -42,6 +42,8 @@ public class Commandline {
     private String annotationPath = null;
     private String termid = null;
 
+    private String gitHubIssueLabel=null;
+
 
     private String outputFilePath = null;
     private String outputDirectory = null;
@@ -87,6 +89,9 @@ public class Commandline {
             } else {
                 annotationPath =  DEFAULT_ANNOTATION_OBOPATH;
             }
+            if (commandLine.hasOption("g")) {
+                gitHubIssueLabel=commandLine.getOptionValue("g");
+            }
             if (commandLine.hasOption("t")) {
                 this.termid = commandLine.getOptionValue("t");
             }
@@ -106,12 +111,18 @@ public class Commandline {
                 printUsage("-t HP:0000123 option required for countfreq");
             }
             this.command = new CountFrequencyCommand(this.hpoOboPath, this.annotationPath, this.termid);
-        } else if (mycommand.equals("convert")) {
-            this.command=new ConvertSmallFilesCommand(this.downloadDirectory,this.hpoOboPath);
+        }  else if (mycommand.equals("hpo2hpo") ) {
+            if (this.termid == null) {
+                printUsage("-t HP:0000123 option required for hpo2hpo");
+            }
+            this.command = new Hpo2HpoCommand(this.hpoOboPath, this.annotationPath, this.termid);
         }  else if (mycommand.equals("word")) {
             this.command=new WordCommand(this.downloadDirectory,this.hpoOboPath);
         } else if (mycommand.equals("git")) {
-            this.command=new GitCommand();
+            if (gitHubIssueLabel==null) {
+                printUsage("-g (github issue) required for git command");
+            }
+            this.command=new GitCommand(gitHubIssueLabel);
         } else {
             printUsage(String.format("Did not recognize command: %s", mycommand));
         }
@@ -134,6 +145,7 @@ public class Commandline {
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
                 .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
                 .addOption("a", "annot", true, "path to HPO annotation file")
+                .addOption("g","github-issue",true,"GitHub issue label")
                 .addOption("h", "hpo", true, "path to hp.obo");
 //                .addOption("b", "bad", false, "output bad (rejected) reads to separated file")
 //                .addOption(Option.builder("f1").longOpt("file1").desc("path to fastq file 1").hasArg(true).argName("file1").build())
@@ -179,6 +191,12 @@ public class Commandline {
         writer.println();
         writer.println("countfreq:");
         writer.println("\tjava -jar HPOWorkbench.jar countfreq [-h <hpo.obo>] [-a <pheno_annot.tab>] -t <term id> \\");
+        writer.println("\t<hp.obo>: path to hp.obo file (default: \"data/hp.obo\")");
+        writer.println("\t<pheno_annot.tab>: path to annotation file (default \"data/phenotype_annotation.tab\")");
+        writer.println("\t<term>: HPO term id (e.g., HP:0000123)");
+        writer.println();
+        writer.println("hpo2hpo:");
+        writer.println("\tjava -jar HPOWorkbench.jar hpo2hpo [-h <hpo.obo>] [-a <pheno_annot.tab>] -t <term id> \\");
         writer.println("\t<hp.obo>: path to hp.obo file (default: \"data/hp.obo\")");
         writer.println("\t<pheno_annot.tab>: path to annotation file (default \"data/phenotype_annotation.tab\")");
         writer.println("\t<term>: HPO term id (e.g., HP:0000123)");

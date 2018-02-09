@@ -51,10 +51,11 @@ public class GitHubLabelRetriever {
 
 
     private void retrieveLabels()  {
+        HttpURLConnection httpconnection=null;
         try {
             URL url = new URL("https://api.github.com/repos/obophenotype/human-phenotype-ontology/labels");
-            URLConnection con = url.openConnection();
-            con.setDoOutput(true);
+            httpconnection= (HttpURLConnection) url.openConnection();
+            httpconnection.setDoOutput(true);
             Scanner scanner = new Scanner(url.openStream());
             String response = scanner.useDelimiter("\\Z").next();
             scanner.close();
@@ -63,6 +64,11 @@ public class GitHubLabelRetriever {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if(httpconnection != null)
+            {
+                httpconnection.disconnect();
+            }
         }
     }
 }

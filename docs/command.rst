@@ -7,70 +7,6 @@ with low-level files.
 
 
 
-Converting old "small files" to new format
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-See Google doc that was sent around the phenotype list for background.
-The HPO project is updating the rare disease annotation files to add some new features. This document is intended
-to explain the process, but we note it is intended for internal use and will be deleted after the conversion has been
-carried out.
-
-
-Running HPO Workbench to perform the conversion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To run the demo program, enter the following command. ::
-
-    $ java -jar HPOworkbench.jar convert -h <path to hp.obo> -d <path to rare-diseases/annotated>
-
-Here, <path to rare-diseases/annotated> is the path to the ``annotated`` directory containing the original small files.
-If you run the command as above, it will create a new directory called ``v2files`` with the new files (one for each old
-file). Also, the log file will contain a list of
-
-
-The current output format for the new small files is as follows.
-
-
-
-
-+--------+-----------------+--------------------------------+
-| Column |    Item         | Comment                        |
-+========+=================+================================+
-| 1      | diseaseID       | OMIM, ORPHA, DECIPHER          |
-+--------+-----------------+--------------------------------+
-| 2      | diseaseName     | e.g., Neurofibromatosis type 1 |
-+--------+-----------------+--------------------------------+
-| 3      | phenotypeId     | e.g., HP:0000123               |
-+--------+-----------------+--------------------------------+
-| 4      | phenotypeName   | e.g., Scoliosis                |
-+--------+-----------------+--------------------------------+
-| 5      | ageOfOnsetId    | e.g., HP:0003581               |
-+--------+-----------------+--------------------------------+
-| 6      | ageOfOnsetName  | e.g., Adult onset              |
-+--------+-----------------+--------------------------------+
-| 7      | frequencyId     | e.g., HP:0040280               |
-+--------+-----------------+--------------------------------+
-| 8      | frequencyString | e.g., 5/13                     |
-+--------+-----------------+--------------------------------+
-| 9      | sex             | Male, Female                   |
-+--------+-----------------+--------------------------------+
-| 10     | negation        | NOT or not                     |
-+--------+-----------------+--------------------------------+
-| 11     | modifier        | semicolon sep list HPO terms   |
-+--------+-----------------+--------------------------------+
-| 12     | description     | free text                      |
-+--------+-----------------+--------------------------------+
-| 13     | publication     | e.g., PMID:123321              |
-+--------+-----------------+--------------------------------+
-| 14     | assignedBy      | ORCID or HPO etc               |
-+--------+-----------------+--------------------------------+
-| 15     | dateCreated     | e.g., 2017-01-15               |
-+--------+-----------------+--------------------------------+
-
-
-
-
-
-
 
 
 
@@ -86,6 +22,21 @@ following commands). ::
 ``directory`` is the name of directory to which HPO data will be downloaded (default:"data")
 
 
+Printing open issues to Word
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We may want to send a summary of all open issues with our questions to our clinical collaborators in
+the form of a Word document. For instance, this would be the command to get a list of all issues
+with the label ``cardiovascular``. ::
+
+    $ java -jar HPOWorkbench.jar git -g cardiovascular
+
+We are using the `Apache POI <https://poi.apache.org/>` Java library to create the word documents, and the overall
+formatting could probably be made nicer.
+
+Currently, the GitHub API seems to limit the number of issues that can be requested to 30, so this function will only
+work for up to 30 open issues.
+
+
 
 CSV
 ~~~
@@ -99,6 +50,8 @@ creation of an Excel file from the main app, and in the future, it will be offer
 
 Rich Text Format (RTF) Output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This function is currently not complete!
+
 We are working on an RTF output format that puts all HPO terms into an RTF table that can be imported into
 Word and used to make corrections using Word's ``track changesd`` tool. The RTF format is currently not
 tested. ::

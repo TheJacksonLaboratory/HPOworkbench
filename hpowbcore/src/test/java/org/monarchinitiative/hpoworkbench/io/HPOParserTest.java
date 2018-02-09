@@ -1,7 +1,8 @@
+package org.monarchinitiative.hpoworkbench.io;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.monarchinitiative.hpoworkbench.io.HPOParser;
 
 public class HPOParserTest {
 
