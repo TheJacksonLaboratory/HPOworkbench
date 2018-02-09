@@ -43,6 +43,8 @@ public class Commandline {
     private String termid = null;
 
     private String gitHubIssueLabel=null;
+    /** Identifier of a disease */
+    private String disease=null;
 
 
     private String outputFilePath = null;
@@ -95,6 +97,9 @@ public class Commandline {
             if (commandLine.hasOption("t")) {
                 this.termid = commandLine.getOptionValue("t");
             }
+            if (commandLine.hasOption("s")) {
+                this.disease = commandLine.getOptionValue("s");
+            }
         } catch (ParseException parseException)  // checked exception
         {
             String msg = String.format("Could not parse options %s [%s]", clstring, parseException.toString());
@@ -123,7 +128,13 @@ public class Commandline {
                 printUsage("-g (github issue) required for git command");
             }
             this.command=new GitCommand(gitHubIssueLabel);
-        } else {
+        }else if (mycommand.equals("disease-profile")) {
+            if (disease==null) {
+                printUsage("-s (disease) required for disease-profile command");
+            }
+            this.command = new DiseaseProfileCommand(this.hpoOboPath, this.annotationPath,disease);
+        }
+        else {
             printUsage(String.format("Did not recognize command: %s", mycommand));
         }
 
@@ -146,15 +157,13 @@ public class Commandline {
                 .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
                 .addOption("a", "annot", true, "path to HPO annotation file")
                 .addOption("g","github-issue",true,"GitHub issue label")
+                .addOption("s", "disease",true, "identifier of disease")
                 .addOption("h", "hpo", true, "path to hp.obo");
-//                .addOption("b", "bad", false, "output bad (rejected) reads to separated file")
-//                .addOption(Option.builder("f1").longOpt("file1").desc("path to fastq file 1").hasArg(true).argName("file1").build())
-//                .addOption(Option.builder("f2").longOpt("file2").desc("path to fastq file 2").hasArg(true).argName("file2").build());
         return options;
     }
 
     public static String getVersion() {
-        String version = "0.0.0";// default, should be overwritten by the following.
+        String version = "0.1.11";// default, should be overwritten by the following.
         try {
             Package p = Commandline.class.getPackage();
             version = p.getImplementationVersion();
