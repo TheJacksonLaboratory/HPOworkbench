@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.5</log4j.version>
-        <ontolib.version>0.3</ontolib.version>
+        <ontolib.version>0.1.3</ontolib.version>
     </properties>
 
     <modules>

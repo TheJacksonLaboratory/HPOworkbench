@@ -5,7 +5,7 @@ import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssueRetriever;
 import org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever;
 import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
-import org.monarchinitiative.hpoworkbench.word.GitIssue2Word;
+//import org.monarchinitiative.hpoworkbench.word.GitIssue2Word;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class GitCommand  extends HPOCommand {
      * Create a word document with up to 30 open issues for the label. This is intended to be used
      * to make a summary of open documents for collaborators but unfortunately is limited to up to
      * 30 GitHub issues.
-     * @param label
+     * @param label GitHub label
      */
     public GitCommand(String label) {
         issueLabel=label;
@@ -35,5 +35,5 @@ public class GitCommand  extends HPOCommand {
         gi2w.outputFile(filename);
     }
 
-    public String getName(){ return "git";};
+    public String getName(){ return "git";}
 }
