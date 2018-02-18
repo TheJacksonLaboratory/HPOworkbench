@@ -52,21 +52,26 @@ public class CountFrequencyCommand extends HPOCommand {
             HpoOntology ontology = oparser.getOntology();
             HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath);
             List<HpoDiseaseAnnotation> annotlist = aparser.getAnnotations();
+            LOGGER.error("Annotation count total " + annotlist.size());
             Set<TermId> descendents = getDescendents(ontology, termId);
             descendentTermCount = descendents.size();
-            HashMap<TermId, Double> hm = new HashMap<>();
+            LOGGER.error("Desc endet s size " + descendentTermCount);
+            HashMap<TermId, Integer> annotationCounts = new HashMap<>();
+            HashMap<TermId,Double> weightedAnnotationCounts=new HashMap<>();
             for (TermId t : descendents) {
-                hm.put(t, 0D);
+                annotationCounts.put(t, 0);
+                weightedAnnotationCounts.put(t,0D);
             }
             for (HpoDiseaseAnnotation annot : annotlist) {
                 TermId hpoid = annot.getHpoId();
                 double freq = annot.getFrequency().orElse(0.0F);
                 if (descendents.contains(hpoid)) {
-                    hm.put(termId, freq + hm.get(termId));
+                    annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
+                    weightedAnnotationCounts.put(hpoid,freq+weightedAnnotationCounts.get(hpoid));
                     totalAnnotationCount++;
                 }
             }
-            outputCounts(hm, ontology);
+            outputCounts(annotationCounts, weightedAnnotationCounts,ontology);
         } catch (HPOException e) {
             e.printStackTrace();
             LOGGER.error("Could not input ontology: {}",e);
@@ -96,8 +101,8 @@ public class CountFrequencyCommand extends HPOCommand {
                 ));
     }
 
-    private void outputCounts(HashMap<TermId,Double> hm, Ontology ontology) {
-        Map mp2 = sortByValue(hm);
+    private void outputCounts(HashMap<TermId,Integer> hm, Map<TermId,Double> weightedmap,Ontology ontology) {
+        Map<TermId,Integer> mp2 = sortByValue(hm);
         String termS=String.format("%s [%s]",((HpoTerm)ontology.getTermMap().get(termId)).getName(),termId.getIdWithPrefix());
         System.out.println();
         System.out.println("Annotation counts for " + termS);
@@ -107,9 +112,9 @@ public class CountFrequencyCommand extends HPOCommand {
 
         for (Object t: mp2.keySet()) {
             TermId tid = (TermId) t;
-            double count = (double)mp2.get(t);
+            int count = mp2.get(t);
             String name =  ((HpoTerm)ontology.getTermMap().get(tid)).getName();
-            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count);
+            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count + " (" + weightedmap.get(tid)+")");
         }
     }
 
