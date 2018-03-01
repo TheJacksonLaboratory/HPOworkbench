@@ -43,6 +43,13 @@ public class Commandline {
     private String termid = null;
 
     private String gitHubIssueLabel=null;
+    private String gitHubUsername=null;
+    private String gitHubPassword;
+    private String csvFilePath=null;
+
+    private boolean postToGit=false;
+
+
     /** Identifier of a disease */
     private String disease=null;
 
@@ -81,6 +88,15 @@ public class Commandline {
             } else {
                 this.downloadDirectory = DEFAULT_DOWNLOAD_DIRECTORY;
             }
+            if (commandLine.hasOption("u")) {
+                this.gitHubUsername=commandLine.getOptionValue("u");
+            }
+            if (commandLine.hasOption("p")) {
+                this.gitHubPassword=commandLine.getOptionValue("p");
+            }
+            if (commandLine.hasOption("c")) {
+                this.csvFilePath=commandLine.getOptionValue("c");
+            }
             if (commandLine.hasOption("h")) {
                 this.hpoOboPath = commandLine.getOptionValue("h");
             } else {
@@ -91,14 +107,17 @@ public class Commandline {
             } else {
                 annotationPath =  DEFAULT_ANNOTATION_OBOPATH;
             }
-            if (commandLine.hasOption("g")) {
-                gitHubIssueLabel=commandLine.getOptionValue("g");
+            if (commandLine.hasOption("l")) {
+                gitHubIssueLabel=commandLine.getOptionValue("l");
             }
             if (commandLine.hasOption("t")) {
                 this.termid = commandLine.getOptionValue("t");
             }
             if (commandLine.hasOption("s")) {
                 this.disease = commandLine.getOptionValue("s");
+            }
+            if (commandLine.hasOption("git")) {
+                postToGit=true;
             }
         } catch (ParseException parseException)  // checked exception
         {
@@ -133,6 +152,21 @@ public class Commandline {
                 printUsage("-s (disease) required for disease-profile command");
             }
             this.command = new DiseaseProfileCommand(this.hpoOboPath, this.annotationPath,disease);
+        }else if (mycommand.equals("csv2git")) {
+            if (gitHubPassword==null) {
+                printUsage("-p (github password) required for csv2git command");
+            }
+            if (gitHubUsername==null) {
+                printUsage("-u (github username) required for csv2git command");
+            }
+            if (csvFilePath==null) {
+                printUsage("-c (github CSV file) required for csv2git command");
+            }
+            if (gitHubIssueLabel==null) {
+                printUsage("-l (github label) required for csv2git command");
+            }
+//String csvpath, String label, String user, String pw, boolean forreal)
+            this.command=new Csv2GitCommand(this.csvFilePath,this.gitHubIssueLabel,this.gitHubUsername,this.gitHubPassword,postToGit);
         }
         else {
             printUsage(String.format("Did not recognize command: %s", mycommand));
@@ -150,20 +184,24 @@ public class Commandline {
      *
      * @return Options expected from command-line of GNU form.
      */
-    public static Options constructGnuOptions() {
+    private static Options constructGnuOptions() {
         final Options options = new Options();
         options.addOption("o", "out", true, "name/path of output file/directory")
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
                 .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
                 .addOption("a", "annot", true, "path to HPO annotation file")
-                .addOption("g","github-issue",true,"GitHub issue label")
+                .addOption("l","github-issue",true,"GitHub issue label")
+                .addOption("u","github-user",true,"GitHub user name")
+                .addOption("g","git",false,"Post to GitHub for real")
+                .addOption("p","github-pass",true,"GitHub password")
+                .addOption("c","csv",true,"GitHub csv input file")
                 .addOption("s", "disease",true, "identifier of disease")
                 .addOption("h", "hpo", true, "path to hp.obo");
         return options;
     }
 
-    public static String getVersion() {
-        String version = "0.1.11";// default, should be overwritten by the following.
+    private static String getVersion() {
+        String version = "0.1.12";// default, should be overwritten by the following.
         try {
             Package p = Commandline.class.getPackage();
             version = p.getImplementationVersion();
@@ -176,7 +214,7 @@ public class Commandline {
     /**
      * Print usage information to provided OutputStream.
      */
-    public static void printUsage(String message) {
+    private static void printUsage(String message) {
 
 
         String version = getVersion();

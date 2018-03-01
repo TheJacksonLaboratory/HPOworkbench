@@ -1,7 +1,11 @@
 # HPO Workbench Changelog
 
+## v.0.1.12
+### hpowbcli
+* Improved git scripting
+
 ## v.0.1.11
-### hpowebgui
+### hpowbgui
 * controls greyed out at first use to indicate hp.obo and phenotype_annotation.tab must be downloaded
 * bug fixes in inter-app links
 * labels shown for GitHub requests
@@ -16,7 +20,6 @@
 * bug fix-adding Inheritance as first HpoCategory to display
 
 ## v0.1.9
-
 ### hpowbcore
 * Support for Word export (discontinuing support for RTF export)
 
@@ -27,8 +30,6 @@
 
 
 ## v0.1.8
-
 ### hpowbgui
-
 * info/error dialogs added
 * RTD documentation

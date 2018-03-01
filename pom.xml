@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.monarchinitiative</groupId>
     <artifactId>HPOworkbench</artifactId>
-    <version>0.1.11</version>
+    <version>0.1.12</version>
     <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
     <name>HPOworkbench</name>
 
@@ -266,21 +266,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.9</version>
                 <reportSets>
                     <reportSet>
                         <reports />
                     </reportSet>
                 </reportSets>
             </plugin>
-            <plugin>
-                <groupId>org.tomdz.maven</groupId>
-                <artifactId>sphinx-maven-plugin</artifactId>
-                <version>1.0.2</version>
-                <configuration>
-                    <sourceDirectory>${basedir}/manual</sourceDirectory>
-                </configuration>
-            </plugin>
+
+
         </plugins>
     </reporting>
 

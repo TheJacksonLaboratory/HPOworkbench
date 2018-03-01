@@ -82,6 +82,10 @@ public class GitHubPoster {
                 JSONValue.escape(title),JSONValue.escape(messagebody));
     }
 
+    public String dryRun() {
+        return payload;
+    }
+
 
 
     public void postIssue() throws Exception {
@@ -92,7 +96,7 @@ public class GitHubPoster {
         HttpURLConnection http = (HttpURLConnection)con;
         http.setRequestMethod("POST"); // PUT is another valid option
         http.setDoOutput(true);
-        byte[] out = payload.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] out = payload.getBytes(StandardCharsets.UTF_8);
         int length = out.length;
         http.setFixedLengthStreamingMode(length);
         http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
