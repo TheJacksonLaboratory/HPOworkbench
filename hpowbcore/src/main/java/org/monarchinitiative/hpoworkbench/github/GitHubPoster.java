@@ -7,6 +7,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -31,6 +33,8 @@ public class GitHubPoster {
 
     private String githubLabel=null;
 
+    private List<String> githubLabels = null;
+
     private String githubTitle=null;
 
     private String githubBody=null;
@@ -49,9 +53,15 @@ public class GitHubPoster {
         this.payload=formatPayload(title,messagebody);
     }
 
+    @Deprecated
     public void setLabel(String l) {
         this.githubLabel=l;
         reformatPayloadWithLabel(githubLabel);
+    }
+
+    public void setLabel(List<String> labels) {
+        this.githubLabels = labels.stream().map(JSONValue::escape).collect(Collectors.toList());
+        reformatPayloadWithLabel(this.githubLabels);
     }
 
 
@@ -62,6 +72,30 @@ public class GitHubPoster {
     }
 
 
+    /**
+     * Change a list of string into a Json array
+     * @param labels
+     * @return
+     */
+    private String labelsArray4Json(List<String> labels) {
+
+        if (labels.size() == 1) {
+            return "\"" + labels.get(0) + "\"";
+        }
+
+        if (labels.size() > 1) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("\"" + labels.get(0) + "\"");
+            for (int i = 1; i < labels.size(); i++) {
+                sb.append(", \"" + labels.get(i) + "\"");
+            }
+            return sb.toString();
+        }
+
+        return null;
+
+    }
+
 
     private void reformatPayloadWithLabel(String label) {
         this.payload = String.format("{\n" +
@@ -71,6 +105,16 @@ public class GitHubPoster {
                 JSONValue.escape(this.githubTitle),
                 JSONValue.escape(this.githubBody),
                 JSONValue.escape(this.githubLabel));
+    }
+
+    private void reformatPayloadWithLabel(List<String> labels) {
+        this.payload = String.format("{\n" +
+                        "\"title\": \"%s\",\n" +
+                        "\"body\": \"%s\",\n" +
+                        "\"labels\": [ %s] }",
+                JSONValue.escape(this.githubTitle),
+                JSONValue.escape(this.githubBody),
+                labelsArray4Json(this.githubLabels));
     }
 
 
