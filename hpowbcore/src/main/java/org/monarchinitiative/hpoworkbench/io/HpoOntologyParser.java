@@ -27,11 +27,11 @@ import java.util.Map;
 public class HpoOntologyParser {
     private static final Logger logger = LogManager.getLogger();
     /** Path to the {@code hp.obo} file. */
-    private String hpoOntologyPath=null;
+    private final String hpoOntologyPath;
 
     private HpoOntology ontology=null;
-    Ontology<HpoTerm, HpoTermRelation> inheritanceSubontology=null;
-    Ontology<HpoTerm, HpoTermRelation> abnormalPhenoSubOntology=null;
+    private Ontology<HpoTerm, HpoTermRelation> inheritanceSubontology=null;
+    private Ontology<HpoTerm, HpoTermRelation> abnormalPhenoSubOntology=null;
     /** Map of all of the Phenotypic abnormality terms (i.e., not the inheritance terms). */
     private Map<TermId,HpoTerm> termmap=null;
 
@@ -43,9 +43,9 @@ public class HpoOntologyParser {
     /**
      * Parse the HP ontology file and place the data in {@link #abnormalPhenoSubOntology} and
      * {@link #inheritanceSubontology}.
-     * @throws IOException
+     * @throws HPOException if hp.obo file cannot be parsed
      */
-    public void parseOntology() throws HPOException {
+    private void parseOntology() throws HPOException {
         TermPrefix pref = new ImmutableTermPrefix("HP");
         TermId inheritId = new ImmutableTermId(pref,"0000005");
         try {
@@ -54,6 +54,7 @@ public class HpoOntologyParser {
             this.abnormalPhenoSubOntology = ontology.getPhenotypicAbnormalitySubOntology();
             this.inheritanceSubontology = ontology.subOntology(inheritId);
         } catch (Exception e) {
+            logger.error("Error parsing hp.obo file: {}",e);
             throw new HPOException(String.format("error trying to parse hp.obo file at %s: %s",hpoOntologyPath,e.getMessage()));
         }
     }

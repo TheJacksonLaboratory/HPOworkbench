@@ -811,7 +811,7 @@ public class MainController {
             return;
         }
         String title = String.format("Correction to term %s", selectedTerm.getName());
-        postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord(), popup.getGitHubLabel());
+        postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord(), popup.getGitHubLabels());
     }
 
     @FXML
@@ -835,7 +835,7 @@ public class MainController {
             return;
         }
         String title = String.format("Suggesting new child term of \"%s\"", selectedTerm.getName());
-        postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord());
+        postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord(), popup.getGitHubLabels());
     }
 
     @FXML
@@ -870,7 +870,7 @@ public class MainController {
             return;
         }
         String title = String.format("New annotation suggestion for %s", selectedDisease.getDiseaseName());
-        postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord());
+        postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord(), popup.getGitHubLabels());
     }
 
     @FXML
@@ -928,12 +928,12 @@ public class MainController {
     }
 
     @FXML
-    private void postGitHubIssue(String message, String title, String uname, String pword, String label) {
+    private void postGitHubIssue(String message, String title, String uname, String pword, List<String> labels) {
         GitHubPoster poster = new GitHubPoster(uname, pword, title, message);
         this.githubUsername = uname;
         this.githubPassword = pword;
-        if (label != null) {
-            poster.setLabel(label);
+        if (labels != null && !labels.isEmpty()) {
+            poster.setLabel(labels);
         }
         try {
             poster.postIssue();

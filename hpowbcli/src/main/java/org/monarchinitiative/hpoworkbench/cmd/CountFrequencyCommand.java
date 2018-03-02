@@ -29,6 +29,12 @@ public class CountFrequencyCommand extends HPOCommand {
 
     private final TermId termId;
 
+    private int descendentTermCount;
+    /** County of annotations to any descendent of {@link #termId}. */
+    private int totalAnnotationCount=0;
+
+    private int TERMS_TO_SHOW=10;
+
     public CountFrequencyCommand(String hpoPath, String annotPath, String hpoTermId) {
         this.hpOboPath=hpoPath;
         this.annotationPath=annotPath;
@@ -46,32 +52,47 @@ public class CountFrequencyCommand extends HPOCommand {
             HpoOntology ontology = oparser.getOntology();
             HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath);
             List<HpoDiseaseAnnotation> annotlist = aparser.getAnnotations();
+            LOGGER.error("Annotation count total " + annotlist.size());
             Set<TermId> descendents = getDescendents(ontology, termId);
-            HashMap<TermId, Double> hm = new HashMap<>();
+            descendentTermCount = descendents.size();
+            LOGGER.error("Desc endet s size " + descendentTermCount);
+            HashMap<TermId, Integer> annotationCounts = new HashMap<>();
+            HashMap<TermId,Double> weightedAnnotationCounts=new HashMap<>();
             for (TermId t : descendents) {
-                hm.put(t, 0D);
+                annotationCounts.put(t, 0);
+                weightedAnnotationCounts.put(t,0D);
             }
             for (HpoDiseaseAnnotation annot : annotlist) {
                 TermId hpoid = annot.getHpoId();
-                double freq = annot.getFrequency().orElse(1.0F);
+                double freq = annot.getFrequency().orElse(0.0F);
                 if (descendents.contains(hpoid)) {
-                    hm.put(termId, freq + hm.get(termId));
+                    annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
+                    weightedAnnotationCounts.put(hpoid,freq+weightedAnnotationCounts.get(hpoid));
+                    totalAnnotationCount++;
                 }
             }
-            outputCounts(hm, ontology);
+            outputCounts(annotationCounts, weightedAnnotationCounts,ontology);
         } catch (HPOException e) {
-            LOGGER.error(String.format("Could not input ontology: %s",e.getMessage()));
+            e.printStackTrace();
+            LOGGER.error("Could not input ontology: {}",e);
             System.exit(1);
         }
 
 
     }
 
-
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+    /**
+     * Sort a map by values and return a sorted map with the top {@link #TERMS_TO_SHOW} items.
+     * @param map Here, keys are terms and values are disease annotations
+     * @param <K> key
+     * @param <V> value
+     * @return sorted map with top TERMS_TO_SHOW entries
+     */
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         return map.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+                .limit(TERMS_TO_SHOW)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
@@ -80,13 +101,20 @@ public class CountFrequencyCommand extends HPOCommand {
                 ));
     }
 
-    private void outputCounts(HashMap<TermId,Double> hm, Ontology ontology) {
-        Map mp2 = sortByValue(hm);
+    private void outputCounts(HashMap<TermId,Integer> hm, Map<TermId,Double> weightedmap,Ontology ontology) {
+        Map<TermId,Integer> mp2 = sortByValue(hm);
+        String termS=String.format("%s [%s]",((HpoTerm)ontology.getTermMap().get(termId)).getName(),termId.getIdWithPrefix());
+        System.out.println();
+        System.out.println("Annotation counts for " + termS);
+        System.out.println("\tNumber of descendent terms: " + descendentTermCount);
+        System.out.print(String.format("\tTotal annotations to any descendent of %s: %d ",termS, totalAnnotationCount));
+        System.out.println();
+
         for (Object t: mp2.keySet()) {
             TermId tid = (TermId) t;
-            double count = (double)mp2.get(t);
+            int count = mp2.get(t);
             String name =  ((HpoTerm)ontology.getTermMap().get(tid)).getName();
-            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count);
+            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count + " (" + weightedmap.get(tid)+")");
         }
     }
 
@@ -105,7 +133,7 @@ public class CountFrequencyCommand extends HPOCommand {
         return kids;
     }
 
-    public Set<TermId> getDescendents(Ontology ontology, TermId parent) {
+    private Set<TermId> getDescendents(Ontology ontology, TermId parent) {
         Set<TermId> descset = new HashSet<>();
         Stack<TermId> stack = new Stack<>();
         stack.push(parent);
@@ -113,7 +141,7 @@ public class CountFrequencyCommand extends HPOCommand {
             TermId tid = stack.pop();
             descset.add(tid);
             Set<TermId> directChildrenSet = getTermChildren(ontology,tid);
-            directChildrenSet.stream().forEach(t -> stack.push(t));
+            directChildrenSet.forEach(t -> stack.push(t));
         }
         return descset;
     }
