@@ -190,6 +190,12 @@ public class HpoCategoryMap {
 
 
 
+    public HpoCategory getCategoryForTerm(TermId tid, HpoOntology ontology) {
+        return getCategory(tid,ontology);
+    }
+
+
+
     /** Find all of the direct parents of childTermId (do not include "grandchildren" and other descendents).
      * @param ontology The ontology to which parentTermId belongs
      * @param childTermId The term whose parents were are seeking

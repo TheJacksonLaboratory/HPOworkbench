@@ -1,22 +1,17 @@
 package org.monarchinitiative.hpoworkbench.word;
 
-import jdk.internal.org.xml.sax.SAXParseException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.xwpf.usermodel.XWPFAbstractNum;
-import org.apache.poi.xwpf.usermodel.XWPFNumbering;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STNumberFormat;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 
 public class GitIssue2Doc4J {
@@ -44,13 +39,11 @@ public class GitIssue2Doc4J {
             ife.printStackTrace();
         } catch (JAXBException jbe) {
             jbe.printStackTrace();
-        } catch (SAXParseException se) {
-            se.printStackTrace();
         }
     }
 
 
-    private void introductoryParagraph(MainDocumentPart document) throws JAXBException,SAXParseException {
+    private void introductoryParagraph(MainDocumentPart document) throws JAXBException {
         document.addStyledParagraphOfText("Title", String.format("Human Phenotype Ontology Issues for %s",githubLabel));
            document.addParagraphOfText("This document is for suggesting revisions to the HPO.");
         document.addParagraphOfText(" Please add your comments and adivce directly to this document."+
@@ -59,7 +52,7 @@ public class GitIssue2Doc4J {
 
 
     private void writeGitIssueAsParagraph(GitHubIssue gitissue,MainDocumentPart document) throws JAXBException  {
-        String myTitle=null;
+        String myTitle;
         if (gitissue.hasValidIssueNumber()) {
             myTitle=String.format("%s) %s",gitissue.getIssueNumber(),gitissue.getTitle());
         } else {

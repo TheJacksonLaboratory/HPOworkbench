@@ -70,3 +70,18 @@ to the term or any of its ancestors. ::
 
     $ java -jar HPOWorkbench.jar countfreq [-h <hpo.obo>] [-a <pheno_annot.tab>] -t <term id>
 
+
+
+Scripting GitHub issues
+~~~~~~~~~~~~~~~~~~~~~~~
+This command is for automating the creation of GitHub issues in cases where we receive an Excel file from collaborators.
+It is probably not 100% possible to standardize these files, and so it seems best to use a Perl or Python script to
+transform whatever input file we get to a TSV file with two columns. Please code newlines as ``\\n`` in this file, and it
+will be transformed into a real new line in the GitHub issue. Once you have made this file (which we will show as issues.tsv in the following),
+you can script the GitHub issues as follows. ::
+
+    $ java -jar hpowbcli/target/HPOWorkbench.jar csv2git -u <username> -p <password> -c issues.tsv -l <label>
+
+Obviously, replace <username> and <password> with valid items. <label> denotes the GitHub label. This feature is intended
+for use by the HPO Team, but we show this code here in case it is useful to others. If external collaborators would like to
+make use of scripting capabilities, they are requested to contact the HPO team.

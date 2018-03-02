@@ -1,63 +1,72 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 import com.github.phenomics.ontolib.formats.hpo.*;
-import com.github.phenomics.ontolib.graph.data.Edge;
 import com.github.phenomics.ontolib.io.obo.hpo.HpoAnnotation2DiseaseParser;
 import com.github.phenomics.ontolib.ontology.data.*;
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.annotation.Hpo2Hpo;
+import org.monarchinitiative.hpoworkbench.annotation.DiseaseProfile;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
-import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HpoOntologyParser;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * This class drives the HPO term "cross-correlation" analysis.
- */
-public class Hpo2HpoCommand extends HPOCommand {
+public class DiseaseProfileCommand extends HPOCommand {
     private static Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
     private final String hpOboPath;
 
     private final String annotationPath;
 
-    private final TermId termId;
-    /** All of the ancestor terms of {@link #termId}. */
+    /** All of the ancestor terms of . */
     private Set<TermId> descendents=null;
     /** Annotations of all of the diseases in the HPO corpus. */
     private List<HpoDiseaseAnnotation> annotlist=null;
 
     private HpoOntology ontology=null;
-    private  Ontology<HpoTerm, HpoTermRelation > phenotypeOntology;
+    private Ontology<HpoTerm, HpoTermRelation > phenotypeOntology;
     private Ontology<HpoTerm, HpoTermRelation> inheritanceOntology;
 
     private Map<String,HpoDiseaseWithMetadata> diseasemap=null;
 
+    private HpoDiseaseWithMetadata diseaseWithMetadata=null;
 
-    public Hpo2HpoCommand(String hpoPath, String annotPath, String hpoTermId) {
+    private final String diseaseString;
+
+
+    public DiseaseProfileCommand(String hpoPath, String annotPath, String disease) {
         this.hpOboPath = hpoPath;
         this.annotationPath = annotPath;
+        diseaseString = disease;
 
-        if (hpoTermId.startsWith("HP:")) {
-            hpoTermId = hpoTermId.substring(3);
-        }
-        TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
-        termId = new ImmutableTermId(HP_PREFIX, hpoTermId);
     }
 
 
 
-        /**
-         * Function for the execution of the command.
-         *
-         */
-    @Override public  void run() {
+
+
+
+
+
+
+    public void run() {
+        LOGGER.trace("Running profile command...");
         inputHpoData();
         inputHpoDiseaseAnnotations();
-        Hpo2Hpo h2h = new Hpo2Hpo(termId, ontology,diseasemap);
-        h2h.calculateHpo2Hpo();
+        HpoDiseaseWithMetadata disease = diseasemap.get(diseaseString);
+        if (disease == null) {
+            LOGGER.error("Could not find disease object for " + diseaseString);
+            LOGGER.error("Sorry, but we will terminate....");
+
+            System.exit(1);
+        }
+        DiseaseProfile profile = new DiseaseProfile(ontology,disease);
+        profile.dumpProfileToShell();
+//        for (String name : diseasemap.keySet()) {
+//            System.out.println(name);
+//        }
     }
+
 
     /** input the hp.obo and the annotations. */
     private void inputHpoData() {
@@ -74,14 +83,12 @@ public class Hpo2HpoCommand extends HPOCommand {
 
 
     private void inputHpoDiseaseAnnotations() {
-         HpoAnnotation2DiseaseParser parser = new HpoAnnotation2DiseaseParser(annotationPath,
-                 phenotypeOntology,inheritanceOntology);
-         this.diseasemap = parser.getDiseaseMap();
+        HpoAnnotation2DiseaseParser parser = new HpoAnnotation2DiseaseParser(annotationPath,
+                phenotypeOntology,inheritanceOntology);
+        this.diseasemap = parser.getDiseaseMap();
 
-        }
-
-
+    }
 
 
-    @Override public String getName() { return "hpo2hpo"; }
+    public String getName(){return "disease-profile";}
 }
