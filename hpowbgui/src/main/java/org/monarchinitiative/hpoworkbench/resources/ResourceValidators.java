@@ -1,8 +1,8 @@
 package org.monarchinitiative.hpoworkbench.resources;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 
 
 /**

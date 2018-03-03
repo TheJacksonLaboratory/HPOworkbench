@@ -1,11 +1,6 @@
 package org.monarchinitiative.hpoworkbench.excel;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.graph.data.Edge;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
-import com.github.phenomics.ontolib.ontology.data.TermId;
-import com.github.phenomics.ontolib.ontology.data.TermPrefix;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -15,6 +10,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.word.Pair;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.graph.data.Edge;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
+import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 
 
 import java.io.FileNotFoundException;
@@ -38,7 +39,7 @@ public class HierarchicalExcelExporter {
     /** Ordered list of terms and their attributes for all terms that descend from {@link #subhierarchyRoot}.
      * The {@link TermRow} objects have all of the data we need to export one row in Excel.
      */
-    ArrayList<TermRow> termRowList=new ArrayList<>();
+    private ArrayList<TermRow> termRowList=new ArrayList<>();
     /** The maximum depth of the hierarchy that we will export. */
     private int maxlevel=0;
 
@@ -109,7 +110,6 @@ public class HierarchicalExcelExporter {
     /**
      * Create a set of rows that will be displayed as an RTF table. Noting that the HPO has multiple parentage,
      * only show any one subhierarchy once. This function fills the list {@link #termRowList}.
-     * @return
      */
     private void calculateRowHierarchy() {
         Set<TermId> previouslyseen=new HashSet<>();

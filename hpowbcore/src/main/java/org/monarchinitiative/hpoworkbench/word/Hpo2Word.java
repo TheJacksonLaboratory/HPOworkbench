@@ -1,13 +1,14 @@
 package org.monarchinitiative.hpoworkbench.word;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.graph.data.Edge;
-import com.github.phenomics.ontolib.ontology.data.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.xwpf.usermodel.*;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.graph.data.Edge;
+import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;

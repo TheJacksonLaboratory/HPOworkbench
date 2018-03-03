@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
+
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 
 /** This class will be used to display {@link HpoTerm} objects in a tree view. The TreeView uses to
  * toString method of the objects to create the label, and the HpoTerm's toString object unfortunately
@@ -8,10 +9,10 @@ import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
  */
 public class HpoTermWrapper {
 
-    public final HpoTerm term;
+    final HpoTerm term;
 
 
-    public HpoTermWrapper(HpoTerm trm) {
+    HpoTermWrapper(HpoTerm trm) {
         this.term=trm;
     }
     @Override
