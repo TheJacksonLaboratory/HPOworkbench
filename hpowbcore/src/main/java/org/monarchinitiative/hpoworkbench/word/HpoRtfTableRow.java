@@ -1,13 +1,15 @@
 package org.monarchinitiative.hpoworkbench.word;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.ontology.data.TermSynonym;
+
+
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HpoRtfTableRow {
+class HpoRtfTableRow {
     /** The level with respect to the initial term in the subhierarchy we are showing (which is defined as 1) */
     private final int level;
     /** HPO Term id as a String */
@@ -22,19 +24,19 @@ public class HpoRtfTableRow {
     private  String synonyms;
 
 
-    public HpoRtfTableRow(int lev, HpoTerm term) {
+    HpoRtfTableRow(int lev, HpoTerm term) {
         level=lev;
         id=term.getId().getIdWithPrefix();
         label=term.getName();
         definition=term.getDefinition()!=null?term.getDefinition():"\\b \\i needs definition! \\i0 \\b0";
         comment=term.getComment()!=null?term.getComment():"-";
         List<TermSynonym> synlist = term.getSynonyms();
-        synonyms = synlist.stream().map(s -> s.getValue()).collect(Collectors.joining("; "));
-        if (synonyms.isEmpty() || synonyms.length()==0) synonyms=" ";
+        synonyms = synlist.stream().map(TermSynonym::getValue).collect(Collectors.joining("; "));
+        if (synonyms.isEmpty()) synonyms=" ";
     }
 
 
-    public HpoRtfTableRow(int lev, HpoTerm term, String explanation) {
+    HpoRtfTableRow(int lev, HpoTerm term, String explanation) {
         this(lev,term);
         definition=explanation;
         comment="not showing descendants here";
@@ -48,7 +50,7 @@ public class HpoRtfTableRow {
     /**
      * @return A Table header for showing HPO terms.
      */
-    public static String header() {
+    static String header() {
         return "\\trowd\n" +
                 "\\cellx1000\n" +
                 "\\cellx3000\n" +
@@ -65,7 +67,7 @@ public class HpoRtfTableRow {
      *
      * @return One RTF table row corresponding to an HPO term.
      */
-    public String row() {
+    String row() {
         String levelAndId = getLevelAndId();
         return String.format("\\trowd\n" +
                 "\\cellx1000\n" +
@@ -81,7 +83,7 @@ public class HpoRtfTableRow {
 
     /**
      * Create the contents of the first cell of the table row, something like ------- label [id].
-     * @return
+     * @return level of term in hierarchy starting from reference term.
      */
     private String getLevelAndId() {
         char[] chars = new char[3 * level];

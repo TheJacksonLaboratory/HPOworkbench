@@ -1,16 +1,17 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoDiseaseAnnotation;
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
-import com.github.phenomics.ontolib.ontology.data.TermId;
-import com.github.phenomics.ontolib.ontology.data.TermPrefix;
+
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.hpo.Disease;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.phenol.formats.hpo.HpoDiseaseAnnotation;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
+import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 
 import java.io.File;
 import java.util.*;

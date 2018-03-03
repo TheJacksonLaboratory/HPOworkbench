@@ -1,14 +1,15 @@
 package org.monarchinitiative.hpoworkbench.model;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
-import com.github.phenomics.ontolib.ontology.data.TermId;
-import com.github.phenomics.ontolib.ontology.data.TermPrefix;
+
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
+import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,13 +18,6 @@ import java.util.Map;
 
 public class Model {
     private static final Logger logger = LogManager.getLogger();
-    /** We save a few settings in a file that we store in ~/.loinc2hpo/loinc2hpo.settings. This variable should
-     * be initialized to the absolute path of the file. */
-//    private String pathToSettingsFile=null;
-//    /** Path to {@code hp.obo}. */
-//    private String pathToHpoOboFile=null;
-    /** Path to the file we are creating with LOINC code to HPO annotations. */
-//    private String pathToAnnotationFile=null;
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
     /** Ontology model for full HPO ontology (all subhierarchies). */
     private final HpoOntology ontology;

@@ -1,9 +1,12 @@
 package org.monarchinitiative.hpoworkbench.hpo;
 
-import com.github.phenomics.ontolib.ontology.data.TermId;
+
+
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Simple container for a Disease and its HPO annotationxs.

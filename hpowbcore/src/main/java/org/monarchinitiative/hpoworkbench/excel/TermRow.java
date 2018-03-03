@@ -1,7 +1,9 @@
 package org.monarchinitiative.hpoworkbench.excel;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.ontology.data.TermSynonym;
+
+
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,8 +30,8 @@ public class TermRow {
         definition=term.getDefinition()!=null?term.getDefinition():"currently no definition!";
         comment=term.getComment()!=null?term.getComment():"-";
         List<TermSynonym> synlist = term.getSynonyms();
-        synonyms = synlist.stream().map(s -> s.getValue()).collect(Collectors.joining("; "));
-        if (synonyms.isEmpty() || synonyms.length()==0) synonyms=" ";
+        synonyms = synlist.stream().map(TermSynonym::getValue).collect(Collectors.joining("; "));
+        if (synonyms.isEmpty()) synonyms=" ";
     }
 
 

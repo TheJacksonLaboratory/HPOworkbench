@@ -1,12 +1,13 @@
 package org.monarchinitiative.hpoworkbench.resources;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.ontology.data.TermId;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;
 import java.util.Map;

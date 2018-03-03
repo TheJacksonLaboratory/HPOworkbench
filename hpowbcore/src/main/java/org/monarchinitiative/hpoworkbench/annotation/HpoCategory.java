@@ -1,10 +1,11 @@
 package org.monarchinitiative.hpoworkbench.annotation;
 
-import com.github.phenomics.ontolib.ontology.data.Ontology;
-import com.github.phenomics.ontolib.ontology.data.TermId;
+
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class HpoCategory {
     annotatedTerms=new ArrayList<>();
   }
 
-  public String getAnnotationString() {
+  String getAnnotationString() {
       StringBuilder sb = new StringBuilder();
       sb.append(label +"\n");
       for (TermId tid : annotatedTerms) {
@@ -53,7 +54,7 @@ public class HpoCategory {
     this.subcatlist=sublist;
   }
   /** @return true if at least one annotated term belongs to this category. */
-  public boolean hasAnnotation() { return annotatedTerms.size()>0;}
+  boolean hasAnnotation() { return annotatedTerms.size()>0;}
 
   public TermId getTid() {
     return tid;
@@ -70,7 +71,7 @@ public class HpoCategory {
   public int getNumberOfAnnotations() { return annotatedTerms.size(); }
 
 
-  public void addAnnotatedTerm(TermId tid, Ontology ontology){
+  void addAnnotatedTerm(TermId tid, Ontology ontology){
         annotatedTerms.add(tid);
   }
 
@@ -87,7 +88,7 @@ public class HpoCategory {
       this.label=labl;
     }
 
-    public Builder subcategory(TermId id , String label) {
+    Builder subcategory(TermId id , String label) {
       HpoCategory subcat=new HpoCategory(id,label);
       builder.add(subcat);
       return this;

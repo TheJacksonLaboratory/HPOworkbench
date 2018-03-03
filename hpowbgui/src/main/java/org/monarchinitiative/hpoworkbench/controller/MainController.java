@@ -1,13 +1,6 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.graph.data.DirectedGraph;
-import com.github.phenomics.ontolib.graph.data.Edge;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermPrefix;
-import com.github.phenomics.ontolib.ontology.data.TermId;
-import com.github.phenomics.ontolib.ontology.data.TermPrefix;
+
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
@@ -42,6 +35,14 @@ import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.graph.data.DirectedGraph;
+import org.monarchinitiative.phenol.graph.data.Edge;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
+import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

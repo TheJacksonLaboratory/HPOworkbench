@@ -1,8 +1,6 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.ontology.data.TermId;
+
 import org.apache.log4j.Logger;
 
 
@@ -15,6 +13,9 @@ import java.util.stream.Collectors;
 
 
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 /**
  * Make a CSV file representing the HPO hp.obo file

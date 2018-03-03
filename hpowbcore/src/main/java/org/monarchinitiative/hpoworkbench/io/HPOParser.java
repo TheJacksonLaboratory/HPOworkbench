@@ -1,8 +1,9 @@
 package org.monarchinitiative.hpoworkbench.io;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.io.obo.hpo.HpoOboParser;
+
 import org.apache.log4j.Logger;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
 
 import java.io.File;
 import java.io.IOException;

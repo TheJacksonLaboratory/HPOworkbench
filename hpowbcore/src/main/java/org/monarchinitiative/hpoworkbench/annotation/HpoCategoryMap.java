@@ -1,17 +1,14 @@
 package org.monarchinitiative.hpoworkbench.annotation;
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.graph.algo.BreadthFirstSearch;
-import com.github.phenomics.ontolib.graph.data.DirectedGraph;
-import com.github.phenomics.ontolib.graph.data.Edge;
-import com.github.phenomics.ontolib.graph.data.ImmutableEdge;
-import com.github.phenomics.ontolib.ontology.data.ImmutableTermId;
-import com.github.phenomics.ontolib.ontology.data.Ontology;
-import com.github.phenomics.ontolib.ontology.data.TermId;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.graph.data.Edge;
+import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.*;
 

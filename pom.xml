@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.5</log4j.version>
-        <ontolib.version>0.4</ontolib.version>
+        <phenol.version>0.1.5</phenol.version>
     </properties>
 
     <modules>
@@ -91,25 +91,20 @@
 
         <dependency>
             <groupId>com.github.phenomics</groupId>
-            <artifactId>ontolib-core</artifactId>
-            <version>${ontolib.version}</version>
+            <artifactId>phenol-core</artifactId>
+            <version>${phenol.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.phenomics</groupId>
-            <artifactId>ontolib-cli</artifactId>
-            <version>${ontolib.version}</version>
+            <artifactId>phenol-cli</artifactId>
+            <version>${phenol.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.phenomics</groupId>
-            <artifactId>ontolib-io</artifactId>
-            <version>${ontolib.version}</version>
+            <artifactId>phenol-io</artifactId>
+            <version>${phenol.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.15</version>
-        </dependency>
 
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -270,28 +265,5 @@
         </plugins>
     </build>
 
-    <!-- Sphinx Manual, build with "mvn site". -->
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.4</version>
-                <reportSets>
-                    <reportSet>
-                        <reports />
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.tomdz.maven</groupId>
-                <artifactId>sphinx-maven-plugin</artifactId>
-                <version>1.0.2</version>
-                <configuration>
-                    <sourceDirectory>${basedir}/manual</sourceDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 
 </project>

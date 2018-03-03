@@ -1,12 +1,7 @@
 package org.monarchinitiative.hpoworkbench.excel;
 
 
-import com.github.phenomics.ontolib.formats.hpo.HpoOntology;
-import com.github.phenomics.ontolib.formats.hpo.HpoTerm;
-import com.github.phenomics.ontolib.graph.data.Edge;
 
-import com.github.phenomics.ontolib.io.obo.DbXref;
-import com.github.phenomics.ontolib.ontology.data.TermId;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,6 +9,12 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.graph.data.Edge;
+import org.monarchinitiative.phenol.ontology.data.Dbxref;
+import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -75,7 +76,7 @@ public class Hpo2ExcelExporter {
         //ouputHPO();
     }
 
-    public String getParents(TermId childId){
+    private String getParents(TermId childId){
         Set<String> parents = new HashSet<>();
         if (childId==null) {
             logger.error("attempt to getParents with null childId");
@@ -113,20 +114,20 @@ public class Hpo2ExcelExporter {
     }
 
 
-    public String getXrefs(HpoTerm term) {
-        List<com.github.phenomics.ontolib.ontology.data.Dbxref> dbxlst =  term.getXrefs();
-        return dbxlst.stream().map(d -> d.getName()).collect(Collectors.joining("; "));
+    private String getXrefs(HpoTerm term) {
+        List<Dbxref> dbxlst =  term.getXrefs();
+        return dbxlst.stream().map(Dbxref::getName).collect(Collectors.joining("; "));
     }
 
 
-    public String[] getHeader() {
+    private String[] getHeader() {
         String header[]={"Label","id","definition","comment","synonyms","xrefs","parents"};
 
         return header;
     }
 
 
-    public String[] getRow(TermId tid) {
+    private String[] getRow(TermId tid) {
         HpoTerm term = ontology.getTermMap().get(tid);
         String row[] = new String[7];
         if (term == null) {
@@ -137,7 +138,7 @@ public class Hpo2ExcelExporter {
         row[1]=tid.getIdWithPrefix(); // 2. term id
         row[2]=term.getDefinition()!=null?term.getDefinition():"[no definition]";
         row[3]=term.getComment()!=null?term.getComment():"-";
-        row[4]=term.getSynonyms().stream().map(s->s.getValue()).collect(Collectors.joining("; "));
+        row[4]=term.getSynonyms().stream().map(TermSynonym::getValue).collect(Collectors.joining("; "));
         row[5]=getXrefs(term);
         row[6]=getParents(tid);
         return row;
