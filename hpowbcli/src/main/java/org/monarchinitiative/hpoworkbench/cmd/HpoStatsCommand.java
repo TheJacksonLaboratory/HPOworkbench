@@ -1,8 +1,7 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.hpo.Disease;
+import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.formats.hpo.*;
@@ -19,7 +18,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDe
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class HpoStatsCommand extends HPOCommand  {
-    private static Logger LOGGER = Logger.getLogger(HpoStatsCommand.class.getName());
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
     private final String hpopath;
     private final String annotpath;
     private HpoOntology hpoOntology=null;
@@ -42,11 +41,13 @@ public class HpoStatsCommand extends HPOCommand  {
     public HpoStatsCommand(String hpo,String annotations,String term) {
         this.hpopath=hpo;
         this.annotpath=annotations;
+        LOGGER.trace(String.format("HPO path: %s, annotations: %s",hpopath,annotpath ));
         if (! term.startsWith("HP:")) {
             LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",term ));
             System.exit(1);
         }
         this.termOfInterest=ImmutableTermId.constructWithPrefix(term);
+        LOGGER.trace("Term of interest: "+termOfInterest.getIdWithPrefix());
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();
         decipher=new ArrayList<>();
@@ -57,14 +58,15 @@ public class HpoStatsCommand extends HPOCommand  {
     public  void run() {
         getDescendentsOfTermOfInterest();
         filterDiseasesAccordingToDatabase();
-        initializeAdultOnsetTerms();
+        /*initializeAdultOnsetTerms();
         initializeChildhoodOnsetTerms();
         LOGGER.trace("Getting OMIM diseases according to onset");
-        filterNeuroDiseasesAccordingToOnset(this.omim);
+        filterDiseasesAccordingToOnset(this.omim);
         LOGGER.trace("Getting ORPHANET diseases according to onset");
-        filterNeuroDiseasesAccordingToOnset(this.orphanet);
+        filterDiseasesAccordingToOnset(this.orphanet);
         LOGGER.trace("Getting DECIPER diseases according to onset");
-        filterNeuroDiseasesAccordingToOnset(this.decipher);
+        filterDiseasesAccordingToOnset(this.decipher);
+        */
     }
 
 
@@ -87,8 +89,9 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
     private void getDescendentsOfTermOfInterest() {
+        String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termOfInterest).getName(),termOfInterest.getIdWithPrefix() );
         descendentsOfTheTermOfInterest = getDescendents(hpoOntology,termOfInterest);
-        LOGGER.trace(String.format("We found a total of %d neurology terms", descendentsOfTheTermOfInterest.size()));
+        LOGGER.trace(String.format("We found a total of %d terms annotated to %s or descendents", descendentsOfTheTermOfInterest.size(), name));
     }
 
 
@@ -129,7 +132,7 @@ public class HpoStatsCommand extends HPOCommand  {
             if (!diseaseAnnotatedToTermOfInterest(d)) {
                 continue;
             }
-            String database=d.getDiseaseDatabaseId();
+            String database=d.getDatabase();
             if (database.startsWith("OMIM")) {
                 omim.add(d);
             } else if (database.startsWith("ORPHA")){
@@ -138,12 +141,13 @@ public class HpoStatsCommand extends HPOCommand  {
                 decipher.add(d);
             } else {
                 LOGGER.error("Did not recognize data base"+ database);
-                System.exit(1);
+                continue;
             }
         }
-        LOGGER.trace(String.format("We found %d neurological diseases in OMIM",omim.size()));
-        LOGGER.trace(String.format("We found %d neurological diseases in Orphanet",orphanet.size()));
-        LOGGER.trace(String.format("We found %d neurological diseases in DECIPHER",decipher.size()));
+        String termname=hpoOntology.getTermMap().get(termOfInterest).getName();
+        LOGGER.trace(String.format("We found %d diseases in OMIM annotated to %s or descendents",omim.size(),termname));
+        LOGGER.trace(String.format("We found %d diseases in Orphanet annotated to %s or descendents",orphanet.size(),termname));
+        LOGGER.trace(String.format("We found %d diseases in DECIPHER annotated to %s or descendents",decipher.size(),termname));
     }
 
 
@@ -167,7 +171,7 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
 
-    private void filterNeuroDiseasesAccordingToOnset(List<HpoDiseaseWithMetadata> diseases) {
+    private void filterDiseasesAccordingToOnset(List<HpoDiseaseWithMetadata> diseases) {
         int no_onset=0;
         int early_onset=0;
         int adult_onset=0;
