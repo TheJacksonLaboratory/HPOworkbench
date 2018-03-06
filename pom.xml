@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.monarchinitiative</groupId>
     <artifactId>HPOworkbench</artifactId>
-    <version>0.1.11</version>
+    <version>0.1.12</version>
     <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
     <name>HPOworkbench</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.5</log4j.version>
-        <phenol.version>0.1.5</phenol.version>
+        <phenol.version>0.1.6</phenol.version>
     </properties>
 
     <modules>
@@ -65,14 +65,14 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.24</version>
         </dependency>
 
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.24</version>
         </dependency>
 
         <dependency>
@@ -90,27 +90,27 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.phenomics</groupId>
+            <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-core</artifactId>
             <version>${phenol.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.phenomics</groupId>
+            <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-cli</artifactId>
             <version>${phenol.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.phenomics</groupId>
+            <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-io</artifactId>
             <version>${phenol.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.controlsfx</groupId>
-            <artifactId>controlsfx</artifactId>
-            <version>9.0.0</version>
-        </dependency>
     </dependencies>
 
     <dependencyManagement>

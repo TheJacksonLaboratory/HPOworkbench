@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.monarchinitiative</groupId>
         <artifactId>HPOworkbench</artifactId>
-        <version>0.1.11</version>
+        <version>0.1.12</version>
     </parent>
 
     <properties>
@@ -21,12 +21,6 @@
 
     <dependencies>
 
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
@@ -36,7 +30,7 @@
         <dependency>
             <groupId>org.monarchinitiative</groupId>
             <artifactId>hpowbcore</artifactId>
-            <version>0.1.11</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
