@@ -8,11 +8,9 @@ Please see the [full documentation](http://hpo-workbench.readthedocs.io/en/lates
 
 ## Download current release
 
-A Windows executable (HPOWorkbench.exe) can be downloaded here.
+A cross-platform executable Jar file (HPOWorkbench.jar) is recommended for most users. Assuming you have Java 8 or higher installed on your computer, you should be able to start HPOWorkbench by double-clicking on this file. A Windows executable (HPOWorkbench.exe) is also available.
 
-https://github.com/TheJacksonLaboratory/HPOworkbench/releases/tag/v0.1.11
-
-A Jar file is provided for Macintosh and linux platforms.
+https://github.com/TheJacksonLaboratory/HPOworkbench/releases/
 
 A double click on these files should start the program. The app will remind you to
 download the HPO ontology file (hp.obo) and the HPO annotations from the edit menu
