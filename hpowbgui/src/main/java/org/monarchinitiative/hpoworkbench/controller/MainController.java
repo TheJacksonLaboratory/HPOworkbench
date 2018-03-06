@@ -77,7 +77,7 @@ public class MainController {
 
     private static final String EVENT_TYPE_MOUSEOUT = "mouseclick";
 
-    private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
+    //private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
 
     private final OptionalResources optionalResources;
 
@@ -737,7 +737,10 @@ public class MainController {
 
     @FXML
     private void exportHierarchicalSummary(ActionEvent event) {
-        if (selectedTerm == null) {
+        if (selectedTerm==null) {
+            selectedTerm = getSelectedTerm().getValue().term;
+        }
+        if (selectedTerm == null) { // should only happen if the user hasn't selected anything at all.
             logger.error("Select a term before exporting hierarchical summary TODO show error window");
             PopUps.showInfoMessage("Please select an HPO term in order to export a term with its subhierarchy",
                     "Error: No HPO Term selected");
