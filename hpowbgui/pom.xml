@@ -5,9 +5,9 @@
     <parent>
         <artifactId>HPOworkbench</artifactId>
         <groupId>org.monarchinitiative</groupId>
-        <version>0.1.11</version>
+        <version>0.1.12</version>
     </parent>
-    <version>0.1.11</version>
+    <version>0.1.12</version>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hpowbgui</artifactId>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>8.40.12</version>
+            <version>8.40.14</version>
         </dependency>
         <!-- The following is for the Max eawt code:
           com.apple.eawt.Application.getApplication().setDockIconImage(macimage); -->
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>org.monarchinitiative</groupId>
             <artifactId>hpowbcore</artifactId>
-            <version>0.1.11</version>
+            <version>${project.version}</version>
         </dependency>
 
 

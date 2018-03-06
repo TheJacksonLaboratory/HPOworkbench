@@ -102,8 +102,8 @@ public class Commandline {
         }
         if (mycommand.equals("download")) {
             this.command = new DownloadCommand(this.downloadDirectory);
-        } else if (mycommand.equals("neuro")) {
-            this.command = new NeurologyCommand(this.downloadDirectory);
+        } else if (mycommand.equals("stats")) {
+            this.command = new HpoStatsCommand(this.hpoOboPath,this.annotationPath,this.termid);
         } else if (mycommand.equals("csv") ) {
             this.command = new HPO2CSVCommand(this.hpoOboPath);
         } else if (mycommand.equals("countfreq") ) {
@@ -139,7 +139,7 @@ public class Commandline {
      *
      * @return Options expected from command-line of GNU form.
      */
-    public static Options constructGnuOptions() {
+    private static Options constructGnuOptions() {
         final Options options = new Options();
         options.addOption("o", "out", true, "name/path of output file/directory")
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
@@ -153,7 +153,7 @@ public class Commandline {
         return options;
     }
 
-    public static String getVersion() {
+    private static String getVersion() {
         String version = "0.0.0";// default, should be overwritten by the following.
         try {
             Package p = Commandline.class.getPackage();
@@ -167,7 +167,7 @@ public class Commandline {
     /**
      * Print usage information to provided OutputStream.
      */
-    public static void printUsage(String message) {
+    private static void printUsage(String message) {
 
 
         String version = getVersion();
@@ -211,11 +211,17 @@ public class Commandline {
         writer.println("\t<directory>: path to directory with RD annotation files");
         writer.println(String.format("\t<outfile>: optional name of output file (Default: \"%s.bam\")", DEFAULT_OUTPUT_BAM_NAME));
         writer.println();
-        writer.println();
         writer.println("word:");
         writer.println("\tjava -jar HPOWorkbench.jar word -h <hpo> -t <start-term> \\");
         writer.println("\t<hpo>: path to hp.obo file");
         writer.println("\t<start-term>: HPO start term for the Word document");
+        writer.println();
+        writer.println("stats:");
+        writer.println("\tjava -jar HPOWorkbench.jar stats -h <hpo> -a <pheno_annot.tab> -t <start-term> \\");
+        writer.println("\t<hpo>: path to hp.obo file");
+        writer.println("\t<pheno_annot.tab>: path to annotation file (default \"data/phenotype_annotation.tab\")");
+        writer.println("\t<start-term>: HPO term of interest");
+        writer.println();
         writer.close();
         System.exit(0);
     }

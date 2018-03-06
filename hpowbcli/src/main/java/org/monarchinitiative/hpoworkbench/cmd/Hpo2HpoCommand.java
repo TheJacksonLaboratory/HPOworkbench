@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class drives the HPO term "cross-correlation" analysis.
+ * TODO REFACTOR ME FOR PHENOL
  */
 public class Hpo2HpoCommand extends HPOCommand {
     private static Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
@@ -47,8 +48,6 @@ public class Hpo2HpoCommand extends HPOCommand {
 
         /**
          * Function for the execution of the command.
-         *
-         * @throws HPOException on problems executing the command.
          */
     @Override public  void run() {
         inputHpoData();
@@ -59,9 +58,10 @@ public class Hpo2HpoCommand extends HPOCommand {
         try {
             HpoOntologyParser oparser = new HpoOntologyParser(hpOboPath);
             this.ontology = oparser.getOntology();
-            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath);
-            this.annotlist = aparser.getAnnotations();
-            this.descendents = getDescendents(ontology, termId);
+            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath,ontology);
+            //this.annotlist = aparser.getAnnotations();
+            throw new UnsupportedOperationException();
+           // this.descendents = getDescendents(ontology, termId);
         } catch (HPOException e) {
             LOGGER.error(String.format("Could not input ontology: %s",e.getMessage()));
             System.exit(1);
@@ -70,7 +70,7 @@ public class Hpo2HpoCommand extends HPOCommand {
 
 
 
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+    private static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         return map.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
