@@ -103,6 +103,9 @@ public class Commandline {
         if (mycommand.equals("download")) {
             this.command = new DownloadCommand(this.downloadDirectory);
         } else if (mycommand.equals("stats")) {
+            if (termid==null) {
+                printUsage("[ERROR] stats command requires -t option");
+            }
             this.command = new HpoStatsCommand(this.hpoOboPath,this.annotationPath,this.termid);
         } else if (mycommand.equals("csv") ) {
             this.command = new HPO2CSVCommand(this.hpoOboPath);

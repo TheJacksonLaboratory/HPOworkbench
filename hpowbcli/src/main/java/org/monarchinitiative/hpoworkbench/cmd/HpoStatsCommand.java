@@ -42,7 +42,7 @@ public class HpoStatsCommand extends HPOCommand  {
         this.hpopath=hpo;
         this.annotpath=annotations;
         LOGGER.trace(String.format("HPO path: %s, annotations: %s",hpopath,annotpath ));
-        if (! term.startsWith("HP:")) {
+        if (! term.startsWith("HP:") || term.length()!=10) {
             LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",term ));
             System.exit(1);
         }
