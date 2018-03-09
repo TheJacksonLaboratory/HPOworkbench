@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 class HpoHtmlPageGenerator {
 
-    static String getHTML(HpoTerm term, List<DiseaseModel> annotatedDiseases) {
+    static String getHTML(HpoTerm term, int n_descendents, List<DiseaseModel> annotatedDiseases) {
 
         String termID = term.getId().getIdWithPrefix();
         String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
@@ -28,7 +28,13 @@ class HpoHtmlPageGenerator {
         String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
         String comment = (term.getComment() == null) ? "-" : term.getComment();
         String diseaseTable = getDiseaseTableHTML(annotatedDiseases, termID);
-        return String.format(HTML_TEMPLATE, CSS, term.getName(), termID, definition, comment, synonyms, diseaseTable);
+        List<TermId> altIdList = term.getAltTermIds();
+        String altIds;
+        if (altIdList.isEmpty())
+            altIds="no alternate IDs";
+        else
+            altIds=altIdList.stream().map(s -> s.getIdWithPrefix()).collect(Collectors.joining("; "));
+        return String.format(HTML_TEMPLATE, CSS, term.getName(), termID, altIds,definition, comment, synonyms, (n_descendents-1),diseaseTable);
     }
 
     /**
@@ -142,10 +148,13 @@ class HpoHtmlPageGenerator {
             "<meta charset=\"UTF-8\"><title>HPO tree browser</title></head>" +
             "<body>" +
             "<h1>%s</h1>" +
-            "<p><b>ID:</b> %s</p>" +
+            "<p><b>ID:</b> <div class=\"tooltip\">%s" +
+            "  <span class=\"tooltiptext\">%s</span>" +
+            "</div></p>" +
             "<p><b>Definition:</b> %s</p>" +
             "<p><b>Comment:</b> %s</p>" +
             "<p><b>Synonyms:</b> %s</p>" +
+            "<p>Number of descendents:</b> %d</p>" +
             "%s" +
             "</body></html>";
 
@@ -164,7 +173,47 @@ class HpoHtmlPageGenerator {
             "}\n" +
             "tbody tr:nth-child(odd) {\n" +
             "  background: #eee;\n" +
-            "}";
+            "}\n" +
+             /* Tooltip container */
+             "      .tooltip {\n" +
+                     "position: relative;\n" +
+                     " display: inline-block;\n" +
+                     " border-bottom: 1px dotted black; /* If you want dots under the hoverable text */\n" +
+                     " }\n" +
+                     ".tooltip .tooltiptext {\n" +
+                     "  visibility: hidden;\n" +
+                     " width: 120px;\n" +
+                     " background-color: #555;\n" +
+                     " color: #fff;\n" +
+                     " text-align: center;\n" +
+                     " padding: 5px 0;\n" +
+                     " border-radius: 6px;\n" +
+    /* Position the tooltip text */
+                     "  position: absolute;\n" +
+                     " z-index: 1;\n" +
+                     "  bottom: 125%;\n" +
+                     "   left: 50%;\n" +
+                     "  margin-left: -60px;\n" +
+    /* Fade in tooltip */
+                     " opacity: 0;\n" +
+                     " transition: opacity 0.3s;\n" +
+            "}\n" +
+/* Tooltip arrow */
+".tooltip .tooltiptext::after {\n" +
+        "   content: \"\";\n" +
+        "  position: absolute;\n" +
+        "  top: 100%;\n" +
+        " left: 50%;\n" +
+        " margin-left: -5px;\n" +
+        "border-width: 5px;\n" +
+        " border-style: solid;\n" +
+        "border-color: #555 transparent transparent transparent;\n" +
+    "}\n" +
+/* Show the tooltip text when you mouse over the tooltip container */
+            ".tooltip:hover .tooltiptext {\n" +
+            "      visibility: visible;\n" +
+            "      opacity: 1;\n" +
+            "  }\n";
 
 
 }

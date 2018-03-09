@@ -40,9 +40,10 @@ import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.graph.data.DirectedGraph;
 import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermPrefix;
+
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDescendents;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -600,7 +601,8 @@ public class MainController {
         if (annotatedDiseases == null) {
             logger.error("could not retrieve diseases for " + termID);
         }
-        String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
+        int n_descendents = getDescendents(model.getOntology(),term.getId()).size();
+        String content = HpoHtmlPageGenerator.getHTML(term, n_descendents,annotatedDiseases);
         //System.out.print(content);
         // infoWebEngine=this.infoWebView.getEngine();
         infoWebEngine.loadContent(content);
