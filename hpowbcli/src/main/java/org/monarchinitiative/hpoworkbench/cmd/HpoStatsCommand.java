@@ -91,8 +91,29 @@ public class HpoStatsCommand extends HPOCommand  {
     private void getDescendentsOfTermOfInterest() {
         String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termOfInterest).getName(),termOfInterest.getIdWithPrefix() );
         descendentsOfTheTermOfInterest = getDescendents(hpoOntology,termOfInterest);
+        int n_textual_def = getNumberOfTermsWithDefinition(hpoOntology,descendentsOfTheTermOfInterest);
+        int n_synonyms = getTotalNumberOfSynonyms(hpoOntology,descendentsOfTheTermOfInterest);
         LOGGER.trace(String.format("We found a total of %d terms annotated to %s or descendents", descendentsOfTheTermOfInterest.size(), name));
+        LOGGER.trace(String.format("Of these terms, %d has a textual definition. There were a total of %d synonyms.",n_textual_def,n_synonyms));
     }
+
+    private int getTotalNumberOfSynonyms(HpoOntology ontology, Set<TermId> terms) {
+        int n=0;
+        for (TermId tid : terms) {
+            n+=ontology.getTermMap().get(tid).getSynonyms().size();
+        }
+        return n;
+    }
+
+    private int getNumberOfTermsWithDefinition(HpoOntology ontology, Set<TermId> terms) {
+        int n=0;
+        for (TermId tid : terms) {
+            String def=ontology.getTermMap().get(tid).getDefinition();
+            if (def!=null && def.length()>0) n++;
+        }
+        return n;
+    }
+
 
 
     private void initializeAdultOnsetTerms() {
