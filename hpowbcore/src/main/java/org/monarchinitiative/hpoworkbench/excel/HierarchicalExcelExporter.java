@@ -12,7 +12,6 @@ import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.word.Pair;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermPrefix;
@@ -24,6 +23,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.monarchinitiative.hpoworkbench.excel.TermRow.getHeader;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
+
 /**
  * The purpose of this class is to export a portion of the HPO file as an excel sheet suggests the hierarchy of the
  * HPO by using a different column for each level.
@@ -90,23 +91,6 @@ public class HierarchicalExcelExporter {
     }
 
 
-
-    /**
-     * Get all the direct children terms of a term
-     * @param tid HPO term for which we want to get the children
-     * @return set of children term ids of tid.
-     */
-    private Set<TermId> getChildren(TermId tid) {
-        Set<TermId> st = new HashSet<>() ;
-        Iterator it = ontology.getGraph().inEdgeIterator(tid);
-        while (it.hasNext()) {
-            Edge<TermId> egde = (Edge<TermId>) it.next();
-            TermId source = egde.getSource();
-            st.add(source);
-        }
-        return st;
-    }
-
     /**
      * Create a set of rows that will be displayed as an RTF table. Noting that the HPO has multiple parentage,
      * only show any one subhierarchy once. This function fills the list {@link #termRowList}.
@@ -132,7 +116,7 @@ public class HierarchicalExcelExporter {
             } else {
                 previouslyseen.add(termId);
             }
-            Set<TermId> children = getChildren(termId);
+            Set<TermId> children = getChildTerms(ontology,tid,false);
             for (TermId t:children) {
                 stack.push(new Pair<>(t,level+1));
             }

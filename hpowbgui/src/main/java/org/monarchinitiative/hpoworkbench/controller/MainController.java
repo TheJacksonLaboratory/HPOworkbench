@@ -37,12 +37,8 @@ import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.graph.data.DirectedGraph;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -58,6 +54,9 @@ import java.util.function.Consumer;
 import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.BROWSE_DISEASE;
 import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.BROWSE_HPO;
 import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.NEW_ANNOTATION;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.existsPath;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getParentTerms;
 
 
 /**
@@ -67,7 +66,7 @@ import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.
  */
 public class MainController {
 
-    public static final String HPO_OBO_FILENAME = "hp.obo";
+   // public static final String HPO_OBO_FILENAME = "hp.obo";
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -190,7 +189,7 @@ public class MainController {
         } catch (Exception e) {
             // do nothing
         }
-        if (version == null) version = "0.1.11"; // this works on a maven build but needs to be reassigned in intellij
+        if (version == null) version = "0.1.12"; // this works on a maven build but needs to be reassigned in intellij
         return version;
     }
 
@@ -253,7 +252,6 @@ public class MainController {
             String hpoOboPath = dirpath + File.separator + PlatformUtil.HPO_OBO_FILENAME;
             optionalResources.setOntology(new HPOParser(hpoOboPath).getHPO());
             properties.setProperty("hpo.obo.path", hpoOboPath);
-
         });
         hpodownload.setOnFailed(event -> {
             window.close();
@@ -340,8 +338,8 @@ public class MainController {
     @FXML
     public void initialize() {
         //logger.trace("initialize");
-        // This action will be run after user approves a PhenotypeTerm in the ontologyTreePane
-        Consumer<HpoTerm> addHook = (ph -> logger.trace(String.format("Hook for %s", ph.getName())));
+//        // This action will be run after user approves a PhenotypeTerm in the ontologyTreePane
+//        Consumer<HpoTerm> addHook = (ph -> logger.trace(String.format("Hook for %s", ph.getName())));
 
         initRadioButtons();
 
@@ -376,10 +374,6 @@ public class MainController {
         if (!someResourceMissing.get()) {
             activate();
         }
-
-
-//        initTree(ontology, addHook);
-//        string2diseasemap = model.getDiseases();
     }
 
     private void activate() {
@@ -401,7 +395,6 @@ public class MainController {
         }
         initTree(model.getOntology(), addHook);
         logger.trace("Finished initilizing Human Phenotype Ontology");
-//        string2diseasemap = model.getDiseases();
     }
 
     private void initRadioButtons() {
@@ -488,8 +481,6 @@ public class MainController {
      * @param addHook  function hook (currently unused)
      */
     private void initTree(HpoOntology ontology, Consumer<HpoTerm> addHook) {
-//        this.ontology=ontology;
-//        this.addHook = addHook;
         // populate the TreeView with top-level elements from ontology hierarchy
         if (ontology == null) {
             ontologyTreeView.setRoot(null);
@@ -540,11 +531,11 @@ public class MainController {
             // find root -> term path through the tree
             Stack<HpoTerm> termStack = new Stack<>();
             termStack.add(term);
-            Set<HpoTerm> parents = getTermParents(term);//ontology.getTermParents(term);
+            Set<HpoTerm> parents = getTermParents(term);
             while (parents.size() != 0) {
                 HpoTerm parent = parents.iterator().next();
                 termStack.add(parent);
-                parents = getTermParents(parent);//ontology.getTermParents(parent);
+                parents = getTermParents(parent);
             }
 
             // expand tree nodes in top -> down direction
@@ -588,6 +579,7 @@ public class MainController {
      * @param treeItem currently selected {@link TreeItem} containing {@link HpoTerm}
      */
     private void updateDescription(TreeItem<HpoTermWrapper> treeItem) {
+        logger.trace("TOP OF UPDATE DESCRIPTION");
         if (currentMode.equals(mode.NEW_ANNOTATION)) {
             return;
         }
@@ -607,6 +599,7 @@ public class MainController {
         infoWebEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
             @Override
             public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                logger.trace("TOP OF CHANGED  UPDATE DESCRIPTION");
                 if (newState == Worker.State.SUCCEEDED) {
                     org.w3c.dom.events.EventListener listener = new EventListener() {
                         @Override
@@ -658,6 +651,7 @@ public class MainController {
      * @param dmodel currently selected {@link TreeItem} containing {@link HpoTerm}
      */
     private void updateDescriptionToDiseaseModel(DiseaseModel dmodel) {
+        logger.trace("TOP OF updateDescriptionToDiseaseModel");
         String dbName = dmodel.getDiseaseDbAndId();
         String diseaseName = dmodel.getDiseaseName();
         List<HpoTerm> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
@@ -667,6 +661,7 @@ public class MainController {
         infoWebEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
             @Override
             public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                logger.trace("TOP OF CHANGED updateDescriptionToDiseaseModel");
                 if (newState == Worker.State.SUCCEEDED) {
                     org.w3c.dom.events.EventListener listener = new EventListener() {
                         @Override
@@ -683,10 +678,6 @@ public class MainController {
                                 // if the user clicks once and some appear to be for the "wrong" link type.
                                 if (!href.startsWith("HP:")) { return; }
                                 TermId tid = ImmutableTermId.constructWithPrefix(href);
-                                if (tid == null) {
-                                    logger.error(String.format("Could not construct term id from \"%s\"", href));
-                                    return;
-                                }
                                 HpoTerm term = optionalResources.getOntology().getTermMap().get(tid);
                                 if (term == null) {
                                     logger.error(String.format("Could not construct term  from termid \"%s\"", tid.getIdWithPrefix()));
@@ -695,6 +686,7 @@ public class MainController {
                                 // set the tree on the left to our new term
                                 expandUntilTerm(term);
                                 // update the Webview browser
+                                logger.trace("ABOUT TO UPDATE DESCRIPTION FOR " + term.getName());
                                 updateDescription(new HpoTermTreeItem(new HpoTermWrapper(term)));
                                 searchTextField.clear();
                                 currentMode = mode.BROWSE_HPO;
@@ -972,49 +964,50 @@ public class MainController {
         e.consume();
     }
 
+    /**
+     * Get the children of "term"
+     * @param term HPO Term of interest
+     * @return children of term (not including term itself).
+     */
     private Set<HpoTerm> getTermChildren(HpoTerm term) {
-        Set<HpoTerm> kids = new HashSet<>();
-        Iterator it = optionalResources.getOntology().getGraph().inEdgeIterator(term.getId());
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId sourceId = edge.getSource();
-            HpoTerm sourceTerm = optionalResources.getOntology().getTermMap().get(sourceId);
-            kids.add(sourceTerm);
+        HpoOntology ontology = optionalResources.getOntology();
+        if (ontology==null) {
+            PopUps.showInfoMessage("Error: Could not initialize HPO Ontology","ERROR");
+            return new HashSet<>(); // return empty set
         }
+        TermId parentTermId = term.getId();
+        Set<TermId> childrenIds = getChildTerms(ontology,parentTermId,false);
+        Set<HpoTerm> kids = new HashSet<>();
+        childrenIds.forEach(tid ->{HpoTerm ht = ontology.getTermMap().get(tid); kids.add(ht);});
         return kids;
     }
 
+    /**
+     * Get the parents of "term"
+     * @param term HPO Term of interest
+     * @return parents of term (not including term itself).
+     */
     private Set<HpoTerm> getTermParents(HpoTerm term) {
-        Set<HpoTerm> eltern = new HashSet<>();
-        Iterator it = optionalResources.getOntology().getGraph().outEdgeIterator(term.getId());
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId destId = edge.getDest();
-            HpoTerm destTerm = optionalResources.getOntology().getTermMap().get(destId);
-            eltern.add(destTerm);
+        HpoOntology ontology = optionalResources.getOntology();
+        if (ontology==null) {
+            PopUps.showInfoMessage("Error: Could not initialize HPO Ontology","ERROR");
+            return new HashSet<>(); // return empty set
         }
+        Set<TermId> parentIds = getParentTerms(ontology,term.getId(),false);
+        Set<HpoTerm> eltern = new HashSet<>();
+        parentIds.forEach(tid ->{HpoTerm ht = ontology.getTermMap().get(tid); eltern.add(ht);});
         return eltern;
     }
 
     private boolean existsPathFromRoot(HpoTerm term) {
-        TermId rootId = optionalResources.getOntology().getRootTermId();
-        TermId tid = term.getId();
-        DirectedGraph dag = optionalResources.getOntology().getGraph();
-        Stack<TermId> stack = new Stack<>();
-        stack.push(rootId);
-        while (!stack.empty()) {
-            TermId id = stack.pop();
-            Iterator it = dag.inEdgeIterator(id);
-            while (it.hasNext()) {
-                Edge<TermId> edge = (Edge<TermId>) it.next();
-                TermId source = edge.getSource();
-                if (source.equals(tid)) {
-                    return true;
-                }
-                stack.push(source);
-            }
+        HpoOntology ontology = optionalResources.getOntology();
+        if (ontology==null) {
+            PopUps.showInfoMessage("Error: Could not initialize HPO Ontology","ERROR");
+            return false;
         }
-        return false; // if we get here, there was no path.
+        TermId rootId = ontology.getRootTermId();
+        TermId tid = term.getId();
+        return existsPath(ontology,tid,rootId);
     }
 
     /** Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations? */

@@ -6,11 +6,12 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.*;
+
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getParentTerms;
 
 /**
  * Model of the upper-level HPO classes. This allows a canonical view of HPO Annotation per disease
@@ -186,30 +187,13 @@ public class HpoCategoryMap {
     }
 
 
-
-    /** Find all of the direct parents of childTermId (do not include "grandchildren" and other descendents).
-     * @param ontology The ontology to which parentTermId belongs
-     * @param childTermId The term whose parents were are seeking
-     * @return A set of all parent terms of childTermId
-     */
-    private Set<TermId> getParentTerms(HpoOntology ontology, TermId childTermId) {
-        ImmutableSet.Builder<TermId> anccset = new ImmutableSet.Builder<>();
-        Iterator it =  ontology.getGraph().outEdgeIterator(childTermId);
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId destId=edge.getDest();
-            anccset.add(destId);
-        }
-        return anccset.build();
-    }
-
     private Set<TermId> getAncestorCategories(HpoOntology ontology, TermId childTermId) {
         ImmutableSet.Builder<TermId> anccset = new ImmutableSet.Builder<>();
         Stack<TermId> stack = new Stack<>();
         stack.push(childTermId);
         while (! stack.empty()) {
             TermId tid = stack.pop();
-            Set<TermId> parents = getParentTerms(ontology,tid);
+            Set<TermId> parents = getParentTerms(ontology,tid,false);
             for (TermId p : parents) {
                 if (this.categorymap.containsKey(p)) {
                     anccset.add(p);
@@ -220,26 +204,6 @@ public class HpoCategoryMap {
         }
         return anccset.build();
     }
-
-
-
-
-//
-//    public static boolean existsPath2(Ontology ontology, final TermId sourceID, TermId destID){
-//        // special case -- a term cannot have a path to itself in an ontology (DAG)
-//        if (sourceID.equals(destID)) return false;
-//        final DirectedGraph<TermId, ImmutableEdge<TermId>> graph=ontology.getGraph();
-//        List<TermId> visited = new ArrayList<>();
-//        BreadthFirstSearch<TermId, ImmutableEdge<TermId>> bfs = new BreadthFirstSearch<>();
-//        bfs.startFromForward(graph, sourceID, (g, termId) -> {
-//            visited.add(termId);
-//            System.out.println("visited "+termId.getIdWithPrefix());
-//            return true;
-//        });
-//        return visited.contains(destID);
-//    }
-//
-
 
 
     /** Identify the category that best matches the term id (usually just fine the category that represents a parent term. */
@@ -261,6 +225,7 @@ public class HpoCategoryMap {
                 return categorymap.get(hpocat);
         }
         // if we get here there was no prioritized category
+        // return the first item.
         for (TermId c : catlist) {
             return  categorymap.get(c);
         }

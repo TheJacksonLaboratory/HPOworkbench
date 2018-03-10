@@ -5,13 +5,11 @@ package org.monarchinitiative.hpoworkbench.excel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.Dbxref;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
@@ -21,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getParentTerms;
 
 
 public class Hpo2ExcelExporter {
@@ -77,40 +77,18 @@ public class Hpo2ExcelExporter {
     }
 
     private String getParents(TermId childId){
-        Set<String> parents = new HashSet<>();
         if (childId==null) {
             logger.error("attempt to getParents with null childId");
             return " ";
-        }
-        if (ontology==null) {
+        }  else if (ontology==null) {
             logger.error("Attempt to getParents with null ontology object");
             return " ";
-        }
-        if (ontology.getGraph()==null) {
-            logger.error("Graph object is null (should never happen)");
+        } else if (ontology.isRootTerm(childId)) {
             return " ";
         }
-        if (ontology.isRootTerm(childId)) return " ";
-        Iterator it = null;
-        try {
-            ontology.getGraph().outEdgeIterator(childId);
-        } catch (Exception e) {
-            logger.error(String.format("Null ptr for %s [%s]",ontology.getTermMap().get(childId).getName(),childId.getIdWithPrefix()));
-            return " ";
-        }
-        if (it==null) {
-            logger.error(String.format("Attempt to use null iterator in getParents for %s [%s]",ontology.getTermMap().get(childId).getName(),childId.getIdWithPrefix()));
-            return " ";
-
-        }
-        if (it==null) return " ";
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>)it.next();
-            TermId par = edge.getDest();
-            parents.add(ontology.getTermMap().get(par).getName());
-        }
+        Set<TermId> parents = getParentTerms(ontology,childId);
         if (parents.isEmpty()) return " ";
-        else return parents.stream().collect(Collectors.joining("; "));
+        else return parents.stream().map(TermId::getIdWithPrefix).collect(Collectors.joining("; "));
     }
 
 
@@ -122,7 +100,6 @@ public class Hpo2ExcelExporter {
 
     private String[] getHeader() {
         String header[]={"Label","id","definition","comment","synonyms","xrefs","parents"};
-
         return header;
     }
 

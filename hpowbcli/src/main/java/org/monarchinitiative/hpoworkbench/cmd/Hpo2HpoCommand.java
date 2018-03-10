@@ -2,21 +2,22 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
-import org.monarchinitiative.hpoworkbench.io.HpoOntologyParser;
 import org.monarchinitiative.phenol.formats.hpo.HpoDiseaseAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.graph.data.Edge;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
+
 /**
  * This class drives the HPO term "cross-correlation" analysis.
- * TODO REFACTOR ME FOR PHENOL
  */
 public class Hpo2HpoCommand extends HPOCommand {
     private static Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
@@ -56,13 +57,13 @@ public class Hpo2HpoCommand extends HPOCommand {
     /** input the hp.obo and the annotations. */
     private void inputHpoData() {
         try {
-            HpoOntologyParser oparser = new HpoOntologyParser(hpOboPath);
-            this.ontology = oparser.getOntology();
+            HpoOboParser oparser = new HpoOboParser(new File(hpOboPath));
+            this.ontology = oparser.parse();
             HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath,ontology);
             //this.annotlist = aparser.getAnnotations();
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException(); // TODO REFACTOR!!!!
            // this.descendents = getDescendents(ontology, termId);
-        } catch (HPOException e) {
+        } catch (IOException e) {
             LOGGER.error(String.format("Could not input ontology: %s",e.getMessage()));
             System.exit(1);
         }
@@ -93,20 +94,6 @@ public class Hpo2HpoCommand extends HPOCommand {
     }
 
 
-
-    /** Get the immediate children of a Term. Do not include the original term in the returned set. */
-    private  Set<TermId> getTermChildren(Ontology ontology, TermId id) {
-        Set<TermId> kids = new HashSet<>();
-
-        Iterator it =  ontology.getGraph().inEdgeIterator(id);
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId sourceId=edge.getSource();
-            kids.add(sourceId);
-        }
-        return kids;
-    }
-
     public Set<TermId> getDescendents(Ontology ontology, TermId parent) {
         Set<TermId> descset = new HashSet<>();
         Stack<TermId> stack = new Stack<>();
@@ -114,12 +101,12 @@ public class Hpo2HpoCommand extends HPOCommand {
         while (! stack.empty() ) {
             TermId tid = stack.pop();
             descset.add(tid);
-            Set<TermId> directChildrenSet = getTermChildren(ontology,tid);
-            directChildrenSet.stream().forEach(t -> stack.push(t));
+            Set<TermId> directChildrenSet = getChildTerms(ontology,tid,false);
+            directChildrenSet.forEach(t -> stack.push(t));
         }
         return descset;
     }
 
 
-    @Override public String getName() { return "hpo2hpo"; };
+    @Override public String getName() { return "hpo2hpo"; }
 }
