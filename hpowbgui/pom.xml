@@ -7,7 +7,7 @@
         <groupId>org.monarchinitiative</groupId>
         <version>0.1.13</version>
     </parent>
-    <version>${project.version}</version>
+    <version>${parent.version}</version>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hpowbgui</artifactId>

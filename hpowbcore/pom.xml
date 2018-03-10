@@ -13,7 +13,7 @@
         <artifactId>HPOworkbench</artifactId>
         <version>0.1.13</version>
     </parent>
-    <version>${project.version}</version>
+    <version>${parent.version}</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

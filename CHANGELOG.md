@@ -1,5 +1,8 @@
 # HPO Workbench Changelog
 
+## v.0.1.12
+* Refactoring to use phenol library v0.1.7
+
 ## v.0.1.11
 ### hpowebgui
 * controls greyed out at first use to indicate hp.obo and phenotype_annotation.tab must be downloaded
