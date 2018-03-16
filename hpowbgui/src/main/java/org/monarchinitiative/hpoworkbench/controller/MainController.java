@@ -140,7 +140,7 @@ public class MainController {
     private DiseaseModel selectedDisease = null;
 
     /** Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}. */
-    private Map<String, TermId> labels = new HashMap<>();
+    private Map<String, TermId> labelsAndHpoIds = new HashMap<>();
 
     /** Tree hierarchy of the ontology is presented here. */
     @FXML
@@ -323,12 +323,12 @@ public class MainController {
             selectedDisease = dmod;
             searchTextField.clear();
         } else if (currentMode.equals(mode.BROWSE_HPO)) {
-            TermId id = labels.get(searchTextField.getText());
+            TermId id = labelsAndHpoIds.get(searchTextField.getText());
             if (id == null) return; // button was clicked while field was empty, no need to do anything
             expandUntilTerm(optionalResources.getOntology().getTermMap().get(id));
             searchTextField.clear();
         } else if (currentMode == mode.NEW_ANNOTATION) {
-            TermId id = labels.get(searchTextField.getText());
+            TermId id = labelsAndHpoIds.get(searchTextField.getText());
             if (id == null) return; // button was clicked while field was empty, no need to do anything
             expandUntilTerm(optionalResources.getOntology().getTermMap().get(id));
             searchTextField.clear();
@@ -437,8 +437,8 @@ public class MainController {
             String userdata=(String)newval.getUserData();
             if (userdata.equals("hpo")) {
                 currentMode=mode.BROWSE_HPO;
-                if (labels !=null) {
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
+                if (labelsAndHpoIds !=null) {
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
                 } else {
                     logger.error("Attempt to init autocomplete with null list of HPO terms");
                 }
@@ -451,8 +451,8 @@ public class MainController {
                 }
             } else if (userdata.equals("newannotation")) {
                 currentMode=NEW_ANNOTATION;
-                if (labels !=null) {
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
+                if (labelsAndHpoIds !=null) {
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
                 } else {
                     logger.error("Attempt to init autocomplete with null list of HPO terms");
                 }
@@ -507,8 +507,11 @@ public class MainController {
                     updateDescription(item);
                 });
         // create Map for lookup of the terms in the ontology based on their Name
-        ontology.getTermMap().values().forEach(term -> labels.put(term.getName(), term.getId()));
-        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labels.keySet());
+        ontology.getTermMap().values().forEach(term -> {
+            labelsAndHpoIds.put(term.getName(), term.getId());
+            labelsAndHpoIds.put(term.getId().getIdWithPrefix(),term.getId());
+        });
+        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
 
         // show intro message in the infoWebView
         Platform.runLater(() -> {
@@ -763,13 +766,13 @@ public class MainController {
 
     /**
      * For the GitHub new issues, we want to allow the user to choose a pre-existing label for the issue.
-     * For this, we first go to GitHub and retrieve the labels with
+     * For this, we first go to GitHub and retrieve the labelsAndHpoIds with
      * {@link org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever}. We only do this
      * once per session though.
      */
     private void initializeGitHubLabelsIfNecessary() {
         if (model.hasLabels()) {
-            return; // we only need to retrieve the labels from the server once per session!
+            return; // we only need to retrieve the labelsAndHpoIds from the server once per session!
         }
         GitHubLabelRetriever retriever = new GitHubLabelRetriever();
         List<String> labels = retriever.getLabels();

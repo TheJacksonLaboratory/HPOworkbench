@@ -3,8 +3,8 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
+import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
 import org.monarchinitiative.phenol.ontology.data.*;
@@ -49,12 +49,17 @@ public class CountFrequencyCommand extends HPOCommand {
         termId = new ImmutableTermId(HP_PREFIX,hpoTermId);
     }
 
-    public void run() {
+    public void run()  {
         try {
             HpoOboParser oparser = new HpoOboParser(new File(hpOboPath));
             HpoOntology ontology = oparser.parse();
-            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath,ontology);
-            Map<String,HpoDiseaseWithMetadata> annotationMap = aparser.getAnnotationMap();
+            HPOAnnotationParser aparser=null;
+            try {
+                aparser = new HPOAnnotationParser(annotationPath, ontology);
+            } catch (PhenolException pe ) {
+                pe.printStackTrace(); //todo refacgtor
+            }
+            Map<String,HpoDisease> annotationMap = aparser.getDisdeaseMap();
             LOGGER.error("Annotation count total " + annotationMap.size());
             Set<TermId> descendents = getDescendents(ontology, termId);
             descendentTermCount = descendents.size();
@@ -65,11 +70,11 @@ public class CountFrequencyCommand extends HPOCommand {
                 annotationCounts.put(t, 0);
                 weightedAnnotationCounts.put(t,0D);
             }
-            for (HpoDiseaseWithMetadata d : annotationMap.values()) {
-                List<TermIdWithMetadata> ids=d.getPhenotypicAbnormalities();
-                for (TermIdWithMetadata tiwm : ids){
+            for (HpoDisease d : annotationMap.values()) {
+                List<HpoTermId> ids=d.getPhenotypicAbnormalities();
+                for (HpoTermId tiwm : ids){
                 TermId hpoid = tiwm.getTermId();
-                double freq = tiwm.getFrequency().mean();
+                double freq = tiwm.getFrequency();
                 if (descendents.contains(hpoid)) {
                     annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
                     weightedAnnotationCounts.put(hpoid,freq+weightedAnnotationCounts.get(hpoid));

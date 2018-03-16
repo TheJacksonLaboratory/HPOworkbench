@@ -3,7 +3,7 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
-import org.monarchinitiative.phenol.formats.hpo.HpoDiseaseAnnotation;
+import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
@@ -29,7 +29,7 @@ public class Hpo2HpoCommand extends HPOCommand {
     /** All of the ancestor terms of {@link #termId}. */
     private Set<TermId> descendents=null;
     /** Annotations of all of the diseases in the HPO corpus. */
-    private List<HpoDiseaseAnnotation> annotlist=null;
+    //private List<HpoDiseaseAnnotation> annotlist=null;
 
     private HpoOntology ontology=null;
 
@@ -59,7 +59,11 @@ public class Hpo2HpoCommand extends HPOCommand {
         try {
             HpoOboParser oparser = new HpoOboParser(new File(hpOboPath));
             this.ontology = oparser.parse();
-            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath,ontology);
+            try {
+                HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath, ontology);
+            } catch (PhenolException pe) {
+                pe.printStackTrace(); // todo refactor
+            }
             //this.annotlist = aparser.getAnnotations();
             throw new UnsupportedOperationException(); // TODO REFACTOR!!!!
            // this.descendents = getDescendents(ontology, termId);

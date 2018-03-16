@@ -4,6 +4,7 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -23,7 +24,7 @@ public class HpoStatsCommand extends HPOCommand  {
     private final String annotpath;
     private HpoOntology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
-    private Map<String,HpoDiseaseWithMetadata> annotationMap=null;
+    private Map<String,HpoDisease> diseaseMap =null;
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
     private TermId termOfInterest;
     /** Set of all HPO terms that are descencents of {@link #termOfInterest}. */
@@ -32,9 +33,9 @@ public class HpoStatsCommand extends HPOCommand  {
     private Set<TermId> childhoodOnset=null;
 
 
-    private List<HpoDiseaseWithMetadata> omim;
-    private List<HpoDiseaseWithMetadata> orphanet;
-    private List<HpoDiseaseWithMetadata> decipher;
+    private List<HpoDisease> omim;
+    private List<HpoDisease> orphanet;
+    private List<HpoDisease> decipher;
 
 
 
@@ -84,8 +85,12 @@ public class HpoStatsCommand extends HPOCommand  {
         LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
-        HPOAnnotationParser annotparser=new HPOAnnotationParser(annotpath,hpoOntology);
-        annotationMap=annotparser.getAnnotationMap();
+        try {
+            HPOAnnotationParser annotparser = new HPOAnnotationParser(annotpath, hpoOntology);
+            diseaseMap = annotparser.getDisdeaseMap();
+        } catch (PhenolException pe) {
+            pe.printStackTrace();
+        }
     }
 
     private void getDescendentsOfTermOfInterest() {
@@ -138,9 +143,9 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
 
-    boolean diseaseAnnotatedToTermOfInterest(HpoDiseaseWithMetadata d) {
-        List<TermIdWithMetadata> tiwmlist= d.getPhenotypicAbnormalities();
-        for (TermIdWithMetadata id:tiwmlist) {
+    boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
+        List<HpoTermId> tiwmlist= d.getPhenotypicAbnormalities();
+        for (HpoTermId id:tiwmlist) {
           if (this.descendentsOfTheTermOfInterest.contains(id.getTermId()))
               return true;
         }
@@ -149,7 +154,7 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
     private void filterDiseasesAccordingToDatabase() {
-        for (HpoDiseaseWithMetadata d:this.annotationMap.values()) {
+        for (HpoDisease d:this.diseaseMap.values()) {
             if (!diseaseAnnotatedToTermOfInterest(d)) {
                 continue;
             }
@@ -172,18 +177,18 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
 
-    private boolean hasAdultOnset(HpoDiseaseWithMetadata d) {
-        List<TermIdWithMetadata> ids=d.getPhenotypicAbnormalities();
-        for (TermIdWithMetadata id:ids) {
+    private boolean hasAdultOnset(HpoDisease d) {
+        List<HpoTermId> ids=d.getPhenotypicAbnormalities();
+        for (HpoTermId id:ids) {
             if (this.adultOnset.contains(id.getTermId()))
                 return  true;
         }
         return false;
     }
 
-    private boolean hasChildhoodOnset(HpoDiseaseWithMetadata d) {
-        List<TermIdWithMetadata> ids=d.getPhenotypicAbnormalities();
-        for (TermIdWithMetadata id:ids) {
+    private boolean hasChildhoodOnset(HpoDisease d) {
+        List<HpoTermId> ids=d.getPhenotypicAbnormalities();
+        for (HpoTermId id:ids) {
             if (this.childhoodOnset.contains(id.getTermId()))
                 return  true;
         }
@@ -192,11 +197,11 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
 
-    private void filterDiseasesAccordingToOnset(List<HpoDiseaseWithMetadata> diseases) {
+    private void filterDiseasesAccordingToOnset(List<HpoDisease> diseases) {
         int no_onset=0;
         int early_onset=0;
         int adult_onset=0;
-        for (HpoDiseaseWithMetadata d:diseases) {
+        for (HpoDisease d:diseases) {
             if (hasAdultOnset(d))
                 adult_onset++;
             else if (hasChildhoodOnset(d))
