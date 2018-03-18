@@ -144,8 +144,8 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
     boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
-        List<HpoTermId> tiwmlist= d.getPhenotypicAbnormalities();
-        for (HpoTermId id:tiwmlist) {
+        List<HpoAnnotation> tiwmlist= d.getPhenotypicAbnormalities();
+        for (HpoAnnotation id:tiwmlist) {
           if (this.descendentsOfTheTermOfInterest.contains(id.getTermId()))
               return true;
         }
@@ -178,8 +178,8 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
     private boolean hasAdultOnset(HpoDisease d) {
-        List<HpoTermId> ids=d.getPhenotypicAbnormalities();
-        for (HpoTermId id:ids) {
+        List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
+        for (HpoAnnotation id:ids) {
             if (this.adultOnset.contains(id.getTermId()))
                 return  true;
         }
@@ -187,8 +187,8 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
     private boolean hasChildhoodOnset(HpoDisease d) {
-        List<HpoTermId> ids=d.getPhenotypicAbnormalities();
-        for (HpoTermId id:ids) {
+        List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
+        for (HpoAnnotation id:ids) {
             if (this.childhoodOnset.contains(id.getTermId()))
                 return  true;
         }
