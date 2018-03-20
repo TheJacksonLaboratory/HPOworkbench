@@ -7,16 +7,15 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.*;
 
-import java.io.BufferedWriter;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
 
 /**
  * This class coordinates the production and output of an RTF file that contains a table with all of the terms
@@ -194,7 +193,6 @@ public class Hpo2Word {
                 tableRow.addNewTableCell().setText("Term previously shown (dependent on another parent)");
                 tableRow.addNewTableCell().setText("");
                 tableRow.addNewTableCell().setText("");
-                continue; // skipping means we do not add children again
             }
 
         }
@@ -221,20 +219,13 @@ public class Hpo2Word {
      * @return set of children term ids of tid.
      */
     private Set<TermId> getChildren(TermId tid) {
-        Set<TermId> st = new HashSet<>() ;
-        Iterator it = hpoOntology.getGraph().inEdgeIterator(tid);
-        while (it.hasNext()) {
-            Edge<TermId> egde = (Edge<TermId>) it.next();
-            TermId source = egde.getSource();
-            st.add(source);
-        }
-        return st;
+        return getChildTerms(hpoOntology,tid,false);
     }
 
     /**
      * Create a set of rows that will be displayed as an RTF table. Noting that the HPO has multiple parentage,
      * only show any one subhierarchy once.
-     * @return
+     * @return a table with rows with HPO data
      */
     private RtfTable createTable() {
         Map<TermId,HpoTerm> termmap = hpoOntology.getTermMap();
@@ -273,10 +264,7 @@ public class Hpo2Word {
             HpoRtfTableRow hrow = new HpoRtfTableRow(level, hterm);
             rtfrows.add(hrow);
         }
-
-        RtfTable table = new RtfTable(rtfrows);
-        return table;
-
+        return new RtfTable(rtfrows);
     }
 
 

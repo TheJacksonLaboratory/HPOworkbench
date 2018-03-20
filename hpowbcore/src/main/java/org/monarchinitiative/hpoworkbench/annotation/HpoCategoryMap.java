@@ -6,11 +6,12 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.*;
+
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getParentTerms;
 
 /**
  * Model of the upper-level HPO classes. This allows a canonical view of HPO Annotation per disease
@@ -192,16 +193,13 @@ public class HpoCategoryMap {
      * @param childTermId The term whose parents were are seeking
      * @return A set of all parent terms of childTermId
      */
-    private Set<TermId> getParentTerms(HpoOntology ontology, TermId childTermId) {
-        ImmutableSet.Builder<TermId> anccset = new ImmutableSet.Builder<>();
-        Iterator it =  ontology.getGraph().outEdgeIterator(childTermId);
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId destId=edge.getDest();
-            anccset.add(destId);
-        }
-        return anccset.build();
-    }
+//    private Set<TermId> getParentsTerms(HpoOntology ontology, TermId childTermId) {
+//
+//        Set<TermId> parentTids=  getParentTerms(ontology,childTermId, false);
+//
+//
+//
+//    }
 
     private Set<TermId> getAncestorCategories(HpoOntology ontology, TermId childTermId) {
         ImmutableSet.Builder<TermId> anccset = new ImmutableSet.Builder<>();
@@ -209,7 +207,7 @@ public class HpoCategoryMap {
         stack.push(childTermId);
         while (! stack.empty()) {
             TermId tid = stack.pop();
-            Set<TermId> parents = getParentTerms(ontology,tid);
+            Set<TermId> parents = getParentTerms(ontology,childTermId, false);
             for (TermId p : parents) {
                 if (this.categorymap.containsKey(p)) {
                     anccset.add(p);

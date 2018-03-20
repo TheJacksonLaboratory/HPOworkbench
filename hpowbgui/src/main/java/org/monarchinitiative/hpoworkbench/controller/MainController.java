@@ -37,12 +37,8 @@ import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.graph.data.DirectedGraph;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-
-import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDescendents;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,6 +55,7 @@ import java.util.function.Consumer;
 import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.BROWSE_DISEASE;
 import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.BROWSE_HPO;
 import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.NEW_ANNOTATION;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
 
 
 /**
@@ -120,6 +117,7 @@ public class MainController {
 
     private Model model;
 
+    private static final TermId PHENOTYPE_ABNORMALITY_ROOT=ImmutableTermId.constructWithPrefix("HP:0000118");
 
     /** Users can create a github issue. Username and password will be stored for the current session only. */
     private String githubUsername = null;
@@ -513,7 +511,7 @@ public class MainController {
                         return;
                     }
                     HpoTermWrapper w = newValue.getValue();
-                    TreeItem item = new HpoTermTreeItem(w);
+                    TreeItem<HpoTermWrapper> item = new HpoTermTreeItem(w);
                     updateDescription(item);
                 });
         // create Map for lookup of the terms in the ontology based on their Name
@@ -541,11 +539,11 @@ public class MainController {
             // find root -> term path through the tree
             Stack<HpoTerm> termStack = new Stack<>();
             termStack.add(term);
-            Set<HpoTerm> parents = getTermParents(term);//ontology.getTermParents(term);
+            Set<HpoTerm> parents = getTermParents(term);
             while (parents.size() != 0) {
                 HpoTerm parent = parents.iterator().next();
                 termStack.add(parent);
-                parents = getTermParents(parent);//ontology.getTermParents(parent);
+                parents = getTermParents(parent);
             }
 
             // expand tree nodes in top -> down direction
@@ -974,49 +972,40 @@ public class MainController {
         e.consume();
     }
 
+    /**
+     *
+     * @param term current HPO term
+     * @return set of children of term (not including term itself)
+     */
     private Set<HpoTerm> getTermChildren(HpoTerm term) {
+        HpoOntology ontology = optionalResources.getOntology();
+        Set<TermId> childTids=  getChildTerms(ontology,term.getId(),false);
         Set<HpoTerm> kids = new HashSet<>();
-        Iterator it = optionalResources.getOntology().getGraph().inEdgeIterator(term.getId());
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId sourceId = edge.getSource();
-            HpoTerm sourceTerm = optionalResources.getOntology().getTermMap().get(sourceId);
-            kids.add(sourceTerm);
+        for (TermId childTid : childTids) {
+            kids.add(ontology.getTermMap().get(childTid));
         }
         return kids;
     }
 
+    /**
+     *
+     * @param term current HPO term
+     * @return set of direct parents of term (not including term itself)
+     */
     private Set<HpoTerm> getTermParents(HpoTerm term) {
         Set<HpoTerm> eltern = new HashSet<>();
-        Iterator it = optionalResources.getOntology().getGraph().outEdgeIterator(term.getId());
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId destId = edge.getDest();
-            HpoTerm destTerm = optionalResources.getOntology().getTermMap().get(destId);
-            eltern.add(destTerm);
+        HpoOntology ontology = optionalResources.getOntology();
+        Set<TermId> parentTids=  getParentTerms(ontology,term.getId(), false);
+        for (TermId parentId : parentTids) {
+            eltern.add(ontology.getTermMap().get(parentId));
         }
         return eltern;
     }
 
     private boolean existsPathFromRoot(HpoTerm term) {
-        TermId rootId = optionalResources.getOntology().getRootTermId();
+        HpoOntology ontology = optionalResources.getOntology();
         TermId tid = term.getId();
-        DirectedGraph dag = optionalResources.getOntology().getGraph();
-        Stack<TermId> stack = new Stack<>();
-        stack.push(rootId);
-        while (!stack.empty()) {
-            TermId id = stack.pop();
-            Iterator it = dag.inEdgeIterator(id);
-            while (it.hasNext()) {
-                Edge<TermId> edge = (Edge<TermId>) it.next();
-                TermId source = edge.getSource();
-                if (source.equals(tid)) {
-                    return true;
-                }
-                stack.push(source);
-            }
-        }
-        return false; // if we get here, there was no path.
+       return existsPath(ontology,tid,PHENOTYPE_ABNORMALITY_ROOT);
     }
 
     /** Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations? */

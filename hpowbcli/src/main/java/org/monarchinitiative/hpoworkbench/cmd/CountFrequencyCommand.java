@@ -5,13 +5,17 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
-import org.monarchinitiative.hpoworkbench.io.HpoOntologyParser;
 import org.monarchinitiative.phenol.formats.hpo.*;
-import org.monarchinitiative.phenol.graph.data.Edge;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
+import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
 
 /**
  * The situation is that we have a list of disease annotations (which could be {@code phenotype_annotation.tab} or
@@ -47,10 +51,10 @@ public class CountFrequencyCommand extends HPOCommand {
 
     public void run() {
         try {
-            HpoOntologyParser oparser = new HpoOntologyParser(hpOboPath);
-            HpoOntology ontology = oparser.getOntology();
+            HpoOboParser oparser = new HpoOboParser(new File(hpOboPath));
+            HpoOntology ontology = oparser.parse();
             HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath,ontology);
-            Map<String,HpoDiseaseWithMetadata> annotationMap = aparser.getAnnotationMap();
+            Map<String,HpoDisease> annotationMap = aparser.getAnnotationMap();
             LOGGER.error("Annotation count total " + annotationMap.size());
             Set<TermId> descendents = getDescendents(ontology, termId);
             descendentTermCount = descendents.size();
@@ -61,11 +65,11 @@ public class CountFrequencyCommand extends HPOCommand {
                 annotationCounts.put(t, 0);
                 weightedAnnotationCounts.put(t,0D);
             }
-            for (HpoDiseaseWithMetadata d : annotationMap.values()) {
-                List<TermIdWithMetadata> ids=d.getPhenotypicAbnormalities();
-                for (TermIdWithMetadata tiwm : ids){
+            for (HpoDisease d : annotationMap.values()) {
+                List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
+                for (HpoAnnotation tiwm : ids){
                 TermId hpoid = tiwm.getTermId();
-                double freq = tiwm.getFrequency().mean();
+                double freq = tiwm.getFrequency();
                 if (descendents.contains(hpoid)) {
                     annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
                     weightedAnnotationCounts.put(hpoid,freq+weightedAnnotationCounts.get(hpoid));
@@ -74,7 +78,7 @@ public class CountFrequencyCommand extends HPOCommand {
                 }
             }
             outputCounts(annotationCounts, weightedAnnotationCounts,ontology);
-        } catch (HPOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             LOGGER.error("Could not input ontology: {}",e);
             System.exit(1);
@@ -124,28 +128,11 @@ public class CountFrequencyCommand extends HPOCommand {
 
     /** Get the immediate children of a Term. Do not include the original term in the returned set. */
     private  Set<TermId> getTermChildren(Ontology ontology, TermId id) {
-        Set<TermId> kids = new HashSet<>();
-
-        Iterator it =  ontology.getGraph().inEdgeIterator(id);
-        while (it.hasNext()) {
-            Edge<TermId> edge = (Edge<TermId>) it.next();
-            TermId sourceId=edge.getSource();
-            kids.add(sourceId);
-        }
-        return kids;
+        return getChildTerms(ontology,id,false);
     }
 
     private Set<TermId> getDescendents(Ontology ontology, TermId parent) {
-        Set<TermId> descset = new HashSet<>();
-        Stack<TermId> stack = new Stack<>();
-        stack.push(parent);
-        while (! stack.empty() ) {
-            TermId tid = stack.pop();
-            descset.add(tid);
-            Set<TermId> directChildrenSet = getTermChildren(ontology,tid);
-            directChildrenSet.forEach(t -> stack.push(t));
-        }
-        return descset;
+        return OntologyAlgorithm.getDescendents(ontology,parent);
     }
 
 

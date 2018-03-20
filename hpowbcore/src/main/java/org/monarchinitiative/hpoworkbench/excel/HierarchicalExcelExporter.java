@@ -12,7 +12,6 @@ import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.word.Pair;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.graph.data.Edge;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermPrefix;
@@ -24,6 +23,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.monarchinitiative.hpoworkbench.excel.TermRow.getHeader;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
+
 /**
  * The purpose of this class is to export a portion of the HPO file as an excel sheet suggests the hierarchy of the
  * HPO by using a different column for each level.
@@ -97,14 +98,7 @@ public class HierarchicalExcelExporter {
      * @return set of children term ids of tid.
      */
     private Set<TermId> getChildren(TermId tid) {
-        Set<TermId> st = new HashSet<>() ;
-        Iterator it = ontology.getGraph().inEdgeIterator(tid);
-        while (it.hasNext()) {
-            Edge<TermId> egde = (Edge<TermId>) it.next();
-            TermId source = egde.getSource();
-            st.add(source);
-        }
-        return st;
+        return getChildTerms(ontology,tid,false);
     }
 
     /**

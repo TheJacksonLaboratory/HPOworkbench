@@ -42,6 +42,9 @@ public final class DownloadCommand extends HPOCommand {
 
 
     private void downloadPhenotypeAnnotationDotTab() {
+        LOGGER.warn("phenotype_annotation.tab has been superceded by phenotype.hpoa");
+
+
         // Now the same for the phenotype_annotation.tab file
         String downloadLocation=String.format("%s%sphenotype_annotation.tab",downloadDirectory, File.separator);
         File f = new File(downloadLocation);
@@ -91,8 +94,7 @@ public final class DownloadCommand extends HPOCommand {
 
 
     /**
-     * Todo make robust
-     * @param dir
+     * @param dir path of the directory to be created.
      */
     private void createDownloadDir(String dir) {
         LOGGER.trace("creating download dir (and deleting previous version) at "+ dir);

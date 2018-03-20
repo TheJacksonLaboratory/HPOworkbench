@@ -23,7 +23,7 @@ public class HpoStatsCommand extends HPOCommand  {
     private final String annotpath;
     private HpoOntology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
-    private Map<String,HpoDiseaseWithMetadata> annotationMap=null;
+    private Map<String,HpoDisease> annotationMap=null;
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
     private TermId termOfInterest;
     /** Set of all HPO terms that are descencents of {@link #termOfInterest}. */
@@ -32,9 +32,9 @@ public class HpoStatsCommand extends HPOCommand  {
     private Set<TermId> childhoodOnset=null;
 
 
-    private List<HpoDiseaseWithMetadata> omim;
-    private List<HpoDiseaseWithMetadata> orphanet;
-    private List<HpoDiseaseWithMetadata> decipher;
+    private List<HpoDisease> omim;
+    private List<HpoDisease> orphanet;
+    private List<HpoDisease> decipher;
 
 
 
@@ -117,9 +117,9 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
 
-    boolean diseaseAnnotatedToTermOfInterest(HpoDiseaseWithMetadata d) {
-        List<TermIdWithMetadata> tiwmlist= d.getPhenotypicAbnormalities();
-        for (TermIdWithMetadata id:tiwmlist) {
+    private boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
+        List<HpoAnnotation> tiwmlist= d.getPhenotypicAbnormalities();
+        for (HpoAnnotation id:tiwmlist) {
           if (this.descendentsOfTheTermOfInterest.contains(id.getTermId()))
               return true;
         }
@@ -128,7 +128,7 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
     private void filterDiseasesAccordingToDatabase() {
-        for (HpoDiseaseWithMetadata d:this.annotationMap.values()) {
+        for (HpoDisease d:this.annotationMap.values()) {
             if (!diseaseAnnotatedToTermOfInterest(d)) {
                 continue;
             }
@@ -141,7 +141,6 @@ public class HpoStatsCommand extends HPOCommand  {
                 decipher.add(d);
             } else {
                 LOGGER.error("Did not recognize data base"+ database);
-                continue;
             }
         }
         String termname=hpoOntology.getTermMap().get(termOfInterest).getName();
@@ -151,18 +150,18 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
 
-    private boolean hasAdultOnset(HpoDiseaseWithMetadata d) {
-        List<TermIdWithMetadata> ids=d.getPhenotypicAbnormalities();
-        for (TermIdWithMetadata id:ids) {
+    private boolean hasAdultOnset(HpoDisease d) {
+        List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
+        for (HpoAnnotation id:ids) {
             if (this.adultOnset.contains(id.getTermId()))
                 return  true;
         }
         return false;
     }
 
-    private boolean hasChildhoodOnset(HpoDiseaseWithMetadata d) {
-        List<TermIdWithMetadata> ids=d.getPhenotypicAbnormalities();
-        for (TermIdWithMetadata id:ids) {
+    private boolean hasChildhoodOnset(HpoDisease d) {
+        List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
+        for (HpoAnnotation id:ids) {
             if (this.childhoodOnset.contains(id.getTermId()))
                 return  true;
         }
@@ -171,11 +170,11 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
 
-    private void filterDiseasesAccordingToOnset(List<HpoDiseaseWithMetadata> diseases) {
+    private void filterDiseasesAccordingToOnset(List<HpoDisease> diseases) {
         int no_onset=0;
         int early_onset=0;
         int adult_onset=0;
-        for (HpoDiseaseWithMetadata d:diseases) {
+        for (HpoDisease d:diseases) {
             if (hasAdultOnset(d))
                 adult_onset++;
             else if (hasChildhoodOnset(d))
