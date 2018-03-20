@@ -38,6 +38,7 @@ public final class DownloadCommand extends HPOCommand {
         createDownloadDir(downloadDirectory);
         downloadHpObo();
         downloadPhenotypeAnnotationDotTab();
+        downloadMondo();
     }
 
 
@@ -83,6 +84,28 @@ public final class DownloadCommand extends HPOCommand {
                 LOGGER.trace("Downloaded hp.obo to "+ downloadLocation);
             } else {
                 LOGGER.error("Could not download hp.obo to " + downloadLocation);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    private void downloadMondo() {
+        String downloadLocation= String.format("%s%smondo.obo",downloadDirectory,File.separator);
+        File f = new File(downloadLocation);
+        if (f.exists()) {
+            LOGGER.trace("cowardly refusing to download mondo.obo, since it is already there");
+            return;
+        }
+        try {
+            URL url = new URL("https://osf.io/e87hn/download");
+            FileDownloader downloader = new FileDownloader();
+            boolean result = downloader.copyURLToFile(url,f);
+            if (result) {
+                LOGGER.trace("Downloaded mondo.obo to "+ downloadLocation);
+            } else {
+                LOGGER.error("Could not download mondo.obo to " + downloadLocation);
             }
         } catch (Exception e){
             e.printStackTrace();

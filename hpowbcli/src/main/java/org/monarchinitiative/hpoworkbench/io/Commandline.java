@@ -29,6 +29,9 @@ public class Commandline {
     private final static String DEFAULT_HPO_OBOPATH = String.format("%s%s%s",
             DEFAULT_DOWNLOAD_DIRECTORY, File.separator,"hp.obo");
 
+    private final static String DEFAULT_MONDO_OBOPATH = String.format("%s%s%s",
+            DEFAULT_DOWNLOAD_DIRECTORY, File.separator,"mondo.obo");
+
     private final static String DEFAULT_ANNOTATION_OBOPATH = String.format("%s%s%s",
             DEFAULT_DOWNLOAD_DIRECTORY, File.separator,"phenotype_annotation.tab");
 
@@ -39,6 +42,7 @@ public class Commandline {
 
     private String downloadDirectory;
     private String hpoOboPath = null;
+    private String mondoOboPath = null;
     private String annotationPath = null;
     private String termid = null;
 
@@ -74,23 +78,28 @@ public class Commandline {
                 printUsage("no arguments passed");
                 return;
             }
+            if (commandLine.hasOption("a")) {
+                annotationPath = commandLine.getOptionValue("a");
+            } else {
+                annotationPath =  DEFAULT_ANNOTATION_OBOPATH;
+            }
             if (commandLine.hasOption("d")) {
                 this.downloadDirectory = commandLine.getOptionValue("d");
             } else {
                 this.downloadDirectory = DEFAULT_DOWNLOAD_DIRECTORY;
+            }
+            if (commandLine.hasOption("g")) {
+                gitHubIssueLabel=commandLine.getOptionValue("g");
             }
             if (commandLine.hasOption("h")) {
                 this.hpoOboPath = commandLine.getOptionValue("h");
             } else {
                 this.hpoOboPath=DEFAULT_HPO_OBOPATH;
             }
-            if (commandLine.hasOption("a")) {
-                annotationPath = commandLine.getOptionValue("a");
+            if (commandLine.hasOption("m")) {
+                mondoOboPath=commandLine.getOptionValue("m");
             } else {
-                annotationPath =  DEFAULT_ANNOTATION_OBOPATH;
-            }
-            if (commandLine.hasOption("g")) {
-                gitHubIssueLabel=commandLine.getOptionValue("g");
+                mondoOboPath=DEFAULT_MONDO_OBOPATH;
             }
             if (commandLine.hasOption("t")) {
                 this.termid = commandLine.getOptionValue("t");
@@ -106,7 +115,9 @@ public class Commandline {
             this.command = new HpoStatsCommand(this.hpoOboPath,this.annotationPath,this.termid);
         } else if (mycommand.equals("csv") ) {
             this.command = new HPO2CSVCommand(this.hpoOboPath);
-        } else if (mycommand.equals("countfreq") ) {
+        }else if (mycommand.equals("mondo") ) {
+            this.command = new MondoCommand(this.mondoOboPath);
+        }  else if (mycommand.equals("countfreq") ) {
             if (this.termid == null) {
                 printUsage("-t HP:0000123 option required for countfreq");
             }
@@ -141,15 +152,13 @@ public class Commandline {
      */
     private static Options constructGnuOptions() {
         final Options options = new Options();
-        options.addOption("o", "out", true, "name/path of output file/directory")
+        options .addOption("a", "annot", true, "path to HPO annotation file")
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
-                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
-                .addOption("a", "annot", true, "path to HPO annotation file")
                 .addOption("g","github-issue",true,"GitHub issue label")
-                .addOption("h", "hpo", true, "path to hp.obo");
-//                .addOption("b", "bad", false, "output bad (rejected) reads to separated file")
-//                .addOption(Option.builder("f1").longOpt("file1").desc("path to fastq file 1").hasArg(true).argName("file1").build())
-//                .addOption(Option.builder("f2").longOpt("file2").desc("path to fastq file 2").hasArg(true).argName("file2").build());
+                .addOption("h", "hpo", true, "path to hp.obo")
+                .addOption("o", "out", true, "name/path of output file/directory")
+                .addOption("m", "mondo", true, "path to mondo.obo file")
+                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)");
         return options;
     }
 
