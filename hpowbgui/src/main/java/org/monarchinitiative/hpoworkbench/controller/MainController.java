@@ -666,6 +666,8 @@ public class MainController {
         if (annotatedDiseases == null) {
             logger.error("could not retrieve diseases for " + termID);
         }
+        int n_descendents = 42;//getDescendents(model.getOntology(),term.getId()).size();
+        //todo--add number of descendents to HTML
         String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
         //System.out.print(content);
         // infoWebEngine=this.infoWebView.getEngine();
