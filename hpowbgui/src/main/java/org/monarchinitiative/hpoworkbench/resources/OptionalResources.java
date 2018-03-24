@@ -6,7 +6,10 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
+import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;
@@ -17,7 +20,7 @@ import java.util.stream.Stream;
 /**
  * The aim of this class is to group the optional resources required for GUI. An optional resource is a resource which
  * may or may not be available during the start of the GUI. If the resource is not available, some functions of GUI
- * should be disabled (e.g. ontology tree view should be disabled, if ontology OBO file has not been downloaded yet).
+ * should be disabled (e.g. hpoOntology tree view should be disabled, if hpoOntology OBO file has not been downloaded yet).
  * <p>
  * Controllers of GUI that depend on optional resource should create listeners in their <code>initialize</code>
  * methods, such that the listeners will disable controls if the resource is <code>null</code>.
@@ -32,7 +35,9 @@ public final class OptionalResources {
 
     private final BooleanBinding someResourceIsMissing;
 
-    private final ObjectProperty<HpoOntology> ontology = new SimpleObjectProperty<>(this, "ontology", null);
+    private final ObjectProperty<HpoOntology> hpoOntology = new SimpleObjectProperty<>(this, "hpoOntology", null);
+
+    private final ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntology = new SimpleObjectProperty<>(this,"mondoOntology", null);
 
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMap =
             new SimpleObjectProperty<>(this, "indirectAnnotMap", null);
@@ -41,13 +46,14 @@ public final class OptionalResources {
             new SimpleObjectProperty<>(this, "directAnnotMap", null);
 
     public OptionalResources() {
-        someResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(ontologyProperty(), indirectAnnotMapProperty(),
+        someResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(hpoOntologyProperty(),
+                indirectAnnotMapProperty(),
                 directAnnotMapProperty()).anyMatch(op -> op.get() == null),
-                ontologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
+                hpoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
     }
 
     /**
-     * This binding evaluates to false, if any of ontology, annotMap or directAnnotMap are missing/null.
+     * This binding evaluates to false, if any of hpoOntology, annotMap or directAnnotMap are missing/null.
      *
      * @return {@link BooleanBinding}
      */
@@ -79,22 +85,32 @@ public final class OptionalResources {
         return directAnnotMap;
     }
 
-    public HpoOntology getOntology() {
-        return ontology.get();
+    public HpoOntology getHpoOntology() {
+        return hpoOntology.get();
     }
 
-    public void setOntology(HpoOntology ontology) {
-        this.ontology.set(ResourceValidators.ontologyResourceValidator().isValid(ontology) ? ontology : null);
+    public Ontology<GenericTerm, GenericRelationship> getMondoOntology() { return mondoOntology.get(); }
+
+    public void setHpoOntology(HpoOntology hpoOntology) {
+        this.hpoOntology.set(ResourceValidators.ontologyResourceValidator().isValid(hpoOntology) ? hpoOntology : null);
     }
 
-    public ObjectProperty<HpoOntology> ontologyProperty() {
-        return ontology;
+    public ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntologyProperty() {
+        return mondoOntology;
+    }
+
+    public void setMondoOntology(Ontology mondoOntology) {
+        this.mondoOntology.set(ResourceValidators.mondoResourceValidator().isValid(mondoOntology) ? mondoOntology : null);
+    }
+
+    public ObjectProperty<HpoOntology> hpoOntologyProperty() {
+        return hpoOntology;
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(ontology, indirectAnnotMap, directAnnotMap);
+        return Objects.hash(hpoOntology, indirectAnnotMap, directAnnotMap);
     }
 
     @Override
@@ -102,7 +118,7 @@ public final class OptionalResources {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OptionalResources that = (OptionalResources) o;
-        return Objects.equals(ontology, that.ontology) &&
+        return Objects.equals(hpoOntology, that.hpoOntology) &&
                 Objects.equals(indirectAnnotMap, that.indirectAnnotMap) &&
                 Objects.equals(directAnnotMap, that.directAnnotMap);
     }

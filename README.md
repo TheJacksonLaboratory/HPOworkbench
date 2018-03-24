@@ -13,5 +13,5 @@ A cross-platform executable Jar file (HPOWorkbench.jar) is recommended for most 
 https://github.com/TheJacksonLaboratory/HPOworkbench/releases/
 
 A double click on these files should start the program. The app will remind you to
-download the HPO ontology file (hp.obo) and the HPO annotations from the edit menu
+download the HPO hpoOntology file (hp.obo) and the HPO annotations from the edit menu
 the first time you use HPO Workbench. 

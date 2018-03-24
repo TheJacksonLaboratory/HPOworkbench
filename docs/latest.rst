@@ -15,10 +15,10 @@ to some directory called GIT on your local drive.
 
 Downloading the HPO github repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The HPO GitHub repository can be found here: https://github.com/obophenotype/human-phenotype-ontology.
+The HPO GitHub repository can be found here: https://github.com/obophenotype/human-phenotype-hpoOntology.
 Clone the repository with the following command. ::
 
-    $ git clone https://github.com/obophenotype/human-phenotype-ontology
+    $ git clone https://github.com/obophenotype/human-phenotype-hpoOntology
 
 
 Building owltools
@@ -34,11 +34,11 @@ Clone the repository and build it as follows. ::
 
 Building hp.obo
 ~~~~~~~~~~~~~~~
-In order to build hp.edit, we will use the Makefile located in ``human-phenotype-ontology/src/ontology/``. This makefile
+In order to build hp.edit, we will use the Makefile located in ``human-phenotype-hpoOntology/src/hpoOntology/``. This makefile
 needs access to owltools. You can either add the paths to your environment (e.g., using the ``.bashrc`` file) or you can
 add the path to the environment of your current shell. The latter solution is shown here. ::
 
-    $ cd src/ontology
+    $ cd src/hpoOntology
     $ export PATH=${PATH}:../../../owltools/OWLTools-Oort/bin/:../../../owltools/OWLTools-Runner/bin/
     $ make
 

@@ -1,5 +1,5 @@
 Using GitHub from  HPO Workbench
-=====================================
+================================
 GitHub is widely used by developers to manage projects together with versioning, bug reports and other issues, and
 many other features. We use it to host the main HPO file, and we use the GitHub issue tracker to manage suggestions.
 Users can post a new issue and suggest a new term or revisions to existing terms. If we have a question, we will
@@ -37,7 +37,7 @@ Suggesting new annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 First navigate to a disease of interest as above. Then, click on the ``New annotation`` radio button. Then
-use the autocomplete field or the HPO ontology hierarchy on the left to find the term you would like to
+use the autocomplete field or the HPO hpoOntology hierarchy on the left to find the term you would like to
 propose as a new annotation for the disease. Then, click on the ``Suggest new annotation`` button to
 open a new GitHub issue as above. Again, please modify the text to provide information to support the suggestion.
 Use the *Report mistaken annotation* if you have found an error in the annotations for some disease.

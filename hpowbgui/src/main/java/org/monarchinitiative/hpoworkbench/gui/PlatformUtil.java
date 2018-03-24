@@ -14,6 +14,8 @@ public class PlatformUtil {
 
     public static final String HPO_OBO_FILENAME = "hp.obo";
 
+    public static final String MONDO_OBO_FILENAME = "mondo.obo";
+
     public static final String HPO_ANNOTATIONS_FILENAME = "phenotype_annotation.tab";
 
     public static final String HPO_WORKBENCH_SETTINGS_FILENAME = "application.properties";
@@ -54,7 +56,7 @@ public class PlatformUtil {
 
     /** Return the absolute path to the settings file, which is kept in the .loinc2hpo directory in the
      * user's home directory. For simplicity assume one user per account etc. The file is a simple key:value file.
-     * @return
+     * @return path to the local copy of the HPO annotation file
      */
     public static String getLocalPhenotypeAnnotationPath() {
         File dir = getHpoWorkbenchDir();
@@ -74,20 +76,20 @@ public class PlatformUtil {
      * user's home directory. For simplicity assume one user per account etc. The file is a simple key:value file.
      * @return
      */
-    public static String getPathToSettingsFile() {
-        File dir = getHpoWorkbenchDir();
-        return dir + File.separator + HPO_WORKBENCH_SETTINGS_FILENAME;
-    }
+//    public static String getPathToSettingsFile() {
+//        File dir = getHpoWorkbenchDir();
+//        return dir + File.separator + HPO_WORKBENCH_SETTINGS_FILENAME;
+//    }
 
     /* Based on this post: http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/ */
     private static CurrentPlatform figureOutPlatform() {
         String osName = System.getProperty("os.name").toLowerCase();
 
-        if (osName.indexOf("nix") >= 0 || osName.indexOf("nux") >= 0 || osName.indexOf("aix") >= 0) {
+        if (osName.contains("nix") || osName.contains("nux")  || osName.contains("aix") ) {
             return CurrentPlatform.LINUX;
-        } else if (osName.indexOf("win") >= 0) {
+        } else if (osName.contains("win")) {
             return CurrentPlatform.WINDOWS;
-        } else if (osName.indexOf("mac") >= 0) {
+        } else if (osName.contains("mac") ) {
             return CurrentPlatform.OSX;
         } else {
             return CurrentPlatform.UNKNOWN;

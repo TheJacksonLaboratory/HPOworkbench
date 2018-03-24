@@ -8,7 +8,7 @@ synonymtypedef: HP:0045077 "abbreviation"
 synonymtypedef: HP:0045078 "plural form"
 synonymtypedef: layperson "layperson term"
 default-namespace: human_phenotype
-ontology: hp
+hpoOntology: hp
 property_value: http://purl.org/dc/elements/1.1/contributor "Chris Mungall" xsd:string
 property_value: http://purl.org/dc/elements/1.1/contributor "Courtney Hum" xsd:string
 property_value: http://purl.org/dc/elements/1.1/contributor "Joie Davis" xsd:string
@@ -20,7 +20,7 @@ property_value: http://purl.org/dc/elements/1.1/creator "Peter N Robinson" xsd:s
 property_value: http://purl.org/dc/elements/1.1/creator "Sebastian Koehler" xsd:string
 property_value: http://purl.org/dc/elements/1.1/creator "The Human Phenotype Ontology Consortium" xsd:string
 property_value: http://purl.org/dc/elements/1.1/creator "The Monarch Initiative" xsd:string
-property_value: http://purl.org/dc/elements/1.1/license "see http://www.human-phenotype-ontology.org" xsd:string
+property_value: http://purl.org/dc/elements/1.1/license "see http://www.human-phenotype-hpoOntology.org" xsd:string
 property_value: http://purl.org/dc/elements/1.1/rights "Peter Robinson, Sebastian Koehler, The Human Phenotype Ontology Consortium, and The Monarch Initiative" xsd:string
 property_value: http://purl.org/dc/elements/1.1/subject "Phenotypic abnormalities encountered in human disease" xsd:string
 owl-axioms: Prefix(owl:=<http://www.w3.org/2002/07/owl#>)\nPrefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)\nPrefix(xml:=<http://www.w3.org/XML/1998/namespace>)\nPrefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)\nPrefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)\n\n\nOntology(\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> <http://purl.obolibrary.org/obo/HP_0000510> \"\")\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#hasOBONamespace> <http://purl.obolibrary.org/obo/HP_0030243> \"\")\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#hasOBONamespace> <http://purl.obolibrary.org/obo/HP_0030370> \"\")\nAnnotationAssertion(rdfs:comment <http://purl.obolibrary.org/obo/HP_0040081> \"\")\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> <http://purl.obolibrary.org/obo/HP_0012377> \"\"^^xsd:string)\n)

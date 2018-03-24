@@ -48,7 +48,7 @@ public final class StatusController {
 
         ChangeListener<? super Object> listener = (obs, oldval, newval) -> checkAll();
 
-        optionalResources.ontologyProperty().addListener(listener);
+        optionalResources.hpoOntologyProperty().addListener(listener);
         optionalResources.indirectAnnotMapProperty().addListener(listener);
         optionalResources.directAnnotMapProperty().addListener(listener);
 
@@ -59,7 +59,7 @@ public final class StatusController {
      * Check availability of tracked resources and publish an appropriate message.
      */
     private void checkAll() {
-        if (optionalResources.getOntology() == null) { // hpo obo file is missing
+        if (optionalResources.getHpoOntology() == null) { // hpo obo file is missing
             publishMessage(resourceBundle.getString("status.download.hpo"), MessageType.ERROR);
         } else if (optionalResources.getDirectAnnotMap() == null || // annotations file is missing
                 optionalResources.getIndirectAnnotMap() == null) {
@@ -84,7 +84,7 @@ public final class StatusController {
      * @param msg  String with message to be displayed
      * @param type message type
      */
-    void publishMessage(String msg, MessageType type) {
+    private void publishMessage(String msg, MessageType type) {
         if (statusHBox.getChildren().size() == MAX_MESSAGES) {
             statusHBox.getChildren().remove(MAX_MESSAGES - 1);
         }

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 HPO Workbench
-===============================
+=============
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -22,7 +22,7 @@ HPO Workbench is a Java app designed as a browser for HPO terms and annotated di
 has a series of functions that can be used by collaborators to review and make suggestions for extending,
 correcting, or otherwise revising the HPO or the disease annotations.
 
-HPO Workbench can be used to browser the HPO ontology; information about each term is shown including the
+HPO Workbench can be used to browser the HPO hpoOntology; information about each term is shown including the
 definition, comments, and synonyms (if any). If the term is used to annotate diseases in the HPO database,
 then a list of diseases is shown. Additionally, diseases can be visualized, and all HPO terms that annotate
 that disease are shown according to affected system.

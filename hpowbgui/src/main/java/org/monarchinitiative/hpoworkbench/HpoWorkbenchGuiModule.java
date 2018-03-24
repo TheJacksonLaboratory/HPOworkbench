@@ -8,12 +8,15 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.controller.MainController;
+import org.monarchinitiative.hpoworkbench.controller.MondoController;
 import org.monarchinitiative.hpoworkbench.controller.StatusController;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.io.UTF8Control;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.phenol.base.PhenolException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -77,6 +80,8 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
 
         bind(StatusController.class).asEagerSingleton();
 
+        bind(MondoController.class).asEagerSingleton();
+
         // ------ CONTROLLERS ------
     }
 
@@ -90,17 +95,27 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
         if (obofile != null && new File(obofile).isFile()) {
             LOGGER.trace("Loading HPO ontology from {}", obofile);
             HPOParser parser = new HPOParser(obofile);
-            optionalResources.setOntology(parser.getHPO());
+            optionalResources.setHpoOntology(parser.getHPO());
         }
 
         String annots = properties.getProperty("hpo.annotations.path");
         if (annots != null && new File(annots).isFile()) {
             LOGGER.trace("Loading HPO annotations file from {}", annots);
             DirectIndirectHpoAnnotationParser parser =
-                    new DirectIndirectHpoAnnotationParser(annots, optionalResources.getOntology());
+                    new DirectIndirectHpoAnnotationParser(annots, optionalResources.getHpoOntology());
             parser.doParse();
             optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
             optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
+        }
+        String mondoOboFile = properties.getProperty("mono.obo.path");
+        if (mondoOboFile!=null && new File(mondoOboFile).isFile()) {
+            LOGGER.trace("Loading MONDO ontology from {}",mondoOboFile);
+            try {
+                MondoParser mparser = new MondoParser(mondoOboFile);
+                optionalResources.setMondoOntology(mparser.getMondo());
+            } catch (PhenolException pe) {
+                pe.printStackTrace();
+            }
         }
 
         return optionalResources;

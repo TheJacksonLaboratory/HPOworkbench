@@ -32,9 +32,11 @@ import org.monarchinitiative.hpoworkbench.gui.*;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.Downloader;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
@@ -65,9 +67,6 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getPa
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class MainController {
-
-   // public static final String HPO_OBO_FILENAME = "hp.obo";
-
     private static final Logger logger = LogManager.getLogger();
 
     private static final String EVENT_TYPE_CLICK = "click";
@@ -75,8 +74,6 @@ public class MainController {
     private static final String EVENT_TYPE_MOUSEOVER = "mouseover";
 
     private static final String EVENT_TYPE_MOUSEOUT = "mouseclick";
-
-    //private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
 
     private final OptionalResources optionalResources;
 
@@ -93,6 +90,15 @@ public class MainController {
 
     /** Reference to the primary stage of the App. */
     private final Stage primarystage;
+
+    @com.google.inject.Inject
+    private MondoController mondoController;
+
+
+    @FXML
+    private TabPane tabPane;
+    @FXML private Tab hpoTab;
+    @FXML private Tab mondoTab;
 
     @FXML
     public Button exportHierarchicalSummaryButton;
@@ -189,7 +195,7 @@ public class MainController {
         } catch (Exception e) {
             // do nothing
         }
-        if (version == null) version = "0.1.12"; // this works on a maven build but needs to be reassigned in intellij
+        if (version == null) version = "0.1.14"; // this works on a maven build but needs to be reassigned in intellij
         return version;
     }
 
@@ -212,7 +218,7 @@ public class MainController {
         String hpoOboPath = f.getAbsolutePath();
 
         HPOParser parser = new HPOParser(hpoOboPath);
-        optionalResources.setOntology(parser.getHPO());
+        optionalResources.setHpoOntology(parser.getHPO());
         properties.setProperty("hpo.obo.path", hpoOboPath);
 
     }
@@ -250,16 +256,66 @@ public class MainController {
             window.close();
             logger.trace(String.format("Successfully downloaded hpo to %s", dirpath));
             String hpoOboPath = dirpath + File.separator + PlatformUtil.HPO_OBO_FILENAME;
-            optionalResources.setOntology(new HPOParser(hpoOboPath).getHPO());
+            optionalResources.setHpoOntology(new HPOParser(hpoOboPath).getHPO());
             properties.setProperty("hpo.obo.path", hpoOboPath);
         });
         hpodownload.setOnFailed(event -> {
             window.close();
             logger.error("Unable to download HPO obo file");
-            optionalResources.setOntology(null);
+            optionalResources.setHpoOntology(null);
             properties.setProperty("hpo.obo.path", null);
         });
         Thread thread = new Thread(hpodownload);
+        thread.start();
+        e.consume();
+    }
+
+    @FXML
+    private void downloadMondo(ActionEvent e) {
+        String dirpath = PlatformUtil.getHpoWorkbenchDir().getAbsolutePath();
+        File f = new File(dirpath);
+        if (!(f.exists() && f.isDirectory())) {
+            logger.trace("Cannot download mondo.obo, because directory does not exist at " + f.getAbsolutePath());
+            return;
+        }
+
+        ProgressIndicator pb = new ProgressIndicator();
+        javafx.scene.control.Label label = new javafx.scene.control.Label("downloading mondo.obo...");
+        FlowPane root = new FlowPane();
+        root.setPadding(new Insets(10));
+        root.setHgap(10);
+        root.getChildren().addAll(label, pb);
+        Scene scene = new Scene(root, 400, 100);
+        Stage window = new Stage();
+        window.initOwner(primarystage);
+        window.setTitle("MONDO download");
+        window.setScene(scene);
+        if (properties.getProperty("mondo.obo.url")==null) { //TODO WHY ISNT THIS BEING SET?
+            properties.setProperty("mondo.obo.url","https://osf.io/e87hn/download");
+        }
+        Task mondodownload = new Downloader(dirpath, properties.getProperty("mondo.obo.url"), PlatformUtil.MONDO_OBO_FILENAME, pb);
+
+        logger.trace("mondo url = " +  properties.getProperty("mondo.obo.url"));
+        logger.trace("mondo FN = " +  PlatformUtil.MONDO_OBO_FILENAME);
+        window.show();
+        mondodownload.setOnSucceeded(event -> {
+            window.close();
+            logger.trace(String.format("Successfully downloaded mondo to %s", dirpath));
+            String mondoOboPath = dirpath + File.separator + PlatformUtil.MONDO_OBO_FILENAME;
+            try {
+                optionalResources.setMondoOntology(new MondoParser(mondoOboPath).getMondo());
+                properties.setProperty("mondo.obo.path", mondoOboPath);
+            } catch (PhenolException pe) {
+                PopUps.showException("ERROR","Could not parse Mondo obo file", pe);
+            }
+        });
+        mondodownload.setOnFailed(event -> {
+            window.close();
+            logger.error("Unable to download MONDO obo file");
+            optionalResources.setMondoOntology(null);
+            properties.setProperty("mondo.obo.path", null);
+        });
+        Thread thread = new Thread(mondodownload);
         thread.start();
         e.consume();
     }
@@ -293,7 +349,7 @@ public class MainController {
                     PlatformUtil.HPO_ANNOTATIONS_FILENAME, dirpath));
             String hpoAnnotationsFileName = dirpath + File.separator + PlatformUtil.HPO_ANNOTATIONS_FILENAME;
             DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(hpoAnnotationsFileName, optionalResources
-                    .getOntology());
+                    .getHpoOntology());
             parser.doParse();
             optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
             optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
@@ -325,12 +381,12 @@ public class MainController {
         } else if (currentMode.equals(mode.BROWSE_HPO)) {
             TermId id = labelsAndHpoIds.get(searchTextField.getText());
             if (id == null) return; // button was clicked while field was empty, no need to do anything
-            expandUntilTerm(optionalResources.getOntology().getTermMap().get(id));
+            expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
             searchTextField.clear();
         } else if (currentMode == mode.NEW_ANNOTATION) {
             TermId id = labelsAndHpoIds.get(searchTextField.getText());
             if (id == null) return; // button was clicked while field was empty, no need to do anything
-            expandUntilTerm(optionalResources.getOntology().getTermMap().get(id));
+            expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
             searchTextField.clear();
         }
     }
@@ -374,11 +430,26 @@ public class MainController {
         if (!someResourceMissing.get()) {
             activate();
         }
+
+        tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+
+                if(newValue.equals(hpoTab)) {
+                    // ?? What
+                } else if (newValue.equals(mondoTab)) {
+                    //
+                    mondoController.initialize();
+                }
+
+
+            }
+        });
     }
 
     private void activate() {
-        initTree(optionalResources.getOntology(), k -> System.out.println("Consumed " + k));
-        this.model = new Model(optionalResources.getOntology(), optionalResources.getIndirectAnnotMap(),
+        initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
+        this.model = new Model(optionalResources.getHpoOntology(), optionalResources.getIndirectAnnotMap(),
                 optionalResources.getDirectAnnotMap());
     }
 
@@ -559,8 +630,8 @@ public class MainController {
             ontologyTreeView.getSelectionModel().select(target);
             ontologyTreeView.scrollTo(ontologyTreeView.getSelectionModel().getSelectedIndex());
         } else {
-            TermId rootId = optionalResources.getOntology().getRootTermId();
-            HpoTerm rootTerm = optionalResources.getOntology().getTermMap().get(rootId);
+            TermId rootId = optionalResources.getHpoOntology().getRootTermId();
+            HpoTerm rootTerm = optionalResources.getHpoOntology().getTermMap().get(rootId);
             logger.warn(String.format("Unable to find the path from %s to %s", rootTerm.toString(), term.getName()));
         }
         selectedTerm = term;
@@ -659,7 +730,7 @@ public class MainController {
         String diseaseName = dmodel.getDiseaseName();
         List<HpoTerm> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
         String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName, diseaseName, annotatingTerms, optionalResources
-                .getOntology());
+                .getHpoOntology());
         infoWebEngine.loadContent(content);
         infoWebEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
             @Override
@@ -681,7 +752,7 @@ public class MainController {
                                 // if the user clicks once and some appear to be for the "wrong" link type.
                                 if (!href.startsWith("HP:")) { return; }
                                 TermId tid = ImmutableTermId.constructWithPrefix(href);
-                                HpoTerm term = optionalResources.getOntology().getTermMap().get(tid);
+                                HpoTerm term = optionalResources.getHpoOntology().getTermMap().get(tid);
                                 if (term == null) {
                                     logger.error(String.format("Could not construct term  from termid \"%s\"", tid.getIdWithPrefix()));
                                     return;
@@ -973,7 +1044,7 @@ public class MainController {
      * @return children of term (not including term itself).
      */
     private Set<HpoTerm> getTermChildren(HpoTerm term) {
-        HpoOntology ontology = optionalResources.getOntology();
+        HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology==null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology","ERROR");
             return new HashSet<>(); // return empty set
@@ -991,7 +1062,7 @@ public class MainController {
      * @return parents of term (not including term itself).
      */
     private Set<HpoTerm> getTermParents(HpoTerm term) {
-        HpoOntology ontology = optionalResources.getOntology();
+        HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology==null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology","ERROR");
             return new HashSet<>(); // return empty set
@@ -1003,7 +1074,7 @@ public class MainController {
     }
 
     private boolean existsPathFromRoot(HpoTerm term) {
-        HpoOntology ontology = optionalResources.getOntology();
+        HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology==null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology","ERROR");
             return false;

@@ -3,6 +3,7 @@ package org.monarchinitiative.hpoworkbench.resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 
 
 /**
@@ -25,6 +26,13 @@ public final class ResourceValidators {
      * @return <code>true</code> if the {@link HpoOntology} is valid
      */
     static ResourceValidator<HpoOntology> ontologyResourceValidator() {
+        return ontology -> {
+            // TODO - validate ontology here, if necessary
+            return true;
+        };
+    }
+
+    static ResourceValidator<Ontology> mondoResourceValidator() {
         return ontology -> {
             // TODO - validate ontology here, if necessary
             return true;

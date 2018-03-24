@@ -17,8 +17,8 @@ create an Excel file to work with. We recommend using the "Create hierarchical s
 option. To do so, first navigate to the area of the HPO you would like to
 work with (e.g., Abnormality of thyroid physiology). Clicking
 on the "Create hierarchical summary" button will create an Excel file that
-contains only the portion of the ontology that starts from this term.
-It will suggest the hierarchy of the ontology by indenting child, grandchild,
+contains only the portion of the hpoOntology that starts from this term.
+It will suggest the hierarchy of the hpoOntology by indenting child, grandchild,
 great-grandchild (etc) terms in columns located further to the right ("indentation by column").
 Please create a new column or columns in this file that will contain your comments
 and suggestions. You are welcome to contact the HPO team to
@@ -71,4 +71,4 @@ to enter. Add your columns directly after the final column produced by HPO Workb
 send the file to the HPO team. It is highly recommended to contact the HPO team before beginning to work with
 Excel files for biocuration. We would be glad to check your work for one or two terms in order to ensure that
 all information is being faithfully transmitte4d in the Excel file before you do a lot of work. If you do not know
-who to contact, please consult the Team page of the Hpo Website at https://www.human-phenotype-ontology.org.
+who to contact, please consult the Team page of the Hpo Website at https://www.human-phenotype-hpoOntology.org.

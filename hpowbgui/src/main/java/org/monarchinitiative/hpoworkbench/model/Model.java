@@ -65,7 +65,7 @@ public class Model {
 //            this.ontology=parser.getHPO();
 //        }
 //        if (annotmap==null) {
-//            HpoOntology ontology = getOntology();
+//            HpoOntology ontology = getHpoOntology();
 //            DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(this.pathToAnnotationFile,ontology);
 //            annotmap=parser.parse();
 //            directAnnotMap=parser.getDirectannotmap();
@@ -87,7 +87,7 @@ public class Model {
         // user wan't all databases, just pass through
         if (dbase== DiseaseModel.database.ALL) return diseases;
         // filter for desired database
-        ImmutableList.Builder<DiseaseModel> builder = new ImmutableList.Builder();
+        ImmutableList.Builder<DiseaseModel> builder = new ImmutableList.Builder<>();
         for (DiseaseModel dm : diseases) {
             if (dm.database().equals(dbase)) {
                 builder.add(dm);
