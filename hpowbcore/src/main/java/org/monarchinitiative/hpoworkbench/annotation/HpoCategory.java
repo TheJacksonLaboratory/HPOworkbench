@@ -75,7 +75,25 @@ public class HpoCategory {
         annotatedTerms.add(tid);
   }
 
-  public static class Builder {
+    @Override
+    public boolean equals(Object that) {
+        if (that == null) return false;
+        if (!(that instanceof HpoCategory)) return false;
+        HpoCategory otherHpoCategory = (HpoCategory) that;
+
+        return this.tid.equals(otherHpoCategory.tid);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + tid.hashCode();
+        return result;
+    }
+
+
+
+    public static class Builder {
 
     private final TermId tid;
     private String label;
@@ -100,6 +118,8 @@ public class HpoCategory {
       return cat;
 
     }
+
+
 
   }
 

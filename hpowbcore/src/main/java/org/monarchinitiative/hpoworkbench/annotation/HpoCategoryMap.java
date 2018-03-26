@@ -28,7 +28,7 @@ public class HpoCategoryMap {
     private static final Logger logger = LogManager.getLogger();
     /**
      * Key: the HPO TermId, value: HpoCategory for this term. For instance, the HPO TermId HP:0001626
-     * (Abnormality of the cardiovascular system) would corresspond to the category Cardiovascular and
+     * (Abnormality of the cardiovascular system) would correspond to the category Cardiovascular and
      * several subcategories.
      */
     private ImmutableMap<TermId, HpoCategory> categorymap;
@@ -183,6 +183,12 @@ public class HpoCategoryMap {
         } catch (Exception e) {
             logger.error(String.format("Exception trying to find category for %s",ontology.getTermMap().get(tid).getName()));
             e.printStackTrace();
+        }
+    }
+
+    public void addAnnotatedTerms(List<TermId> tidlist, HpoOntology ontology) {
+        for (TermId tid : tidlist) {
+            addAnnotatedTerm(tid,ontology);
         }
     }
 
