@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.controller.HpoController;
 import org.monarchinitiative.hpoworkbench.controller.MainController;
 import org.monarchinitiative.hpoworkbench.controller.MondoController;
 import org.monarchinitiative.hpoworkbench.controller.StatusController;
@@ -82,6 +83,8 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
 
         bind(MondoController.class).asEagerSingleton();
 
+        bind(HpoController.class).asEagerSingleton();
+
         // ------ CONTROLLERS ------
     }
 
@@ -136,7 +139,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
         Properties properties = new Properties();
         if (propertiesPath.isFile()) {
             try {
-                LOGGER.trace("Loading app properties from {}", propertiesPath.getAbsolutePath());
+                LOGGER.info("Loading app properties from {}", propertiesPath.getAbsolutePath());
                 properties.load(new FileReader(propertiesPath));
             } catch (IOException e) {
                 LOGGER.warn(e);
@@ -144,7 +147,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
         } else {
             try {
                 URL propertiesUrl = Main.class.getResource("/" + PlatformUtil.HPO_WORKBENCH_SETTINGS_FILENAME);
-                LOGGER.trace("Trying to load app properties from bundled file {}", propertiesUrl.getPath());
+                LOGGER.info("Loading app properties from bundled file {}", propertiesUrl.getPath());
                 properties.load(Main.class.getResourceAsStream("/" + PlatformUtil.HPO_WORKBENCH_SETTINGS_FILENAME));
             } catch (IOException e) {
                 LOGGER.warn(e);
@@ -177,10 +180,12 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
     @Named("hpoWorkbenchDir")
     private File hpoWorkbenchDir() {
         File workbenchdir = PlatformUtil.getHpoWorkbenchDir();
-        if (workbenchdir.isDirectory() || workbenchdir.mkdirs())
-            return workbenchdir;
-        else
-            LOGGER.fatal("Unable to create HPO workbench directory at {}", workbenchdir);
+        if (workbenchdir != null) {
+            if (workbenchdir.isDirectory() || workbenchdir.mkdirs())
+                return workbenchdir;
+        }
+
+        LOGGER.fatal("Unable to create HPO workbench directory at {}", workbenchdir);
         Platform.exit();
         return null; // shouldn't get here, but we need to return something
     }

@@ -1,14 +1,11 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
-import com.google.inject.Singleton;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -27,11 +24,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
 import java.util.*;
-import java.util.function.Consumer;
 
-import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.existsPath;
-import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
-import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getParentTerms;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
 
 
 /**
@@ -39,12 +33,15 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getPa
  *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
-@Singleton
-public class MondoController {
+public final class MondoController {
+
     private static final Logger logger = LogManager.getLogger();
+
     private final OptionalResources optionalResources;
+
     /** Unused, but still required. */
     private final File hpoWorkbenchDir;
+
     /**
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
      * resides in the classpath.
@@ -52,7 +49,36 @@ public class MondoController {
     private final Properties properties;
 
     /** Reference to the primary stage of the App. */
-    private final Stage primarystage;
+    private final Stage primaryStage;
+
+    @FXML
+    public RadioButton hpoTermRadioButton;
+
+    public RadioButton diseaseRadioButton;
+
+    public RadioButton newAnnotationRadioButton;
+
+    public Button goButton;
+
+    public Button exportHierarchicalSummaryButton;
+
+    public Button exportToExcelButton;
+
+    public Button suggestCorrectionToTermButton;
+
+    public Button suggestNewChildTermButton;
+
+    public Button suggestNewAnnotationButton;
+
+    public Button reportMistakenAnnotationButton;
+
+    public RadioButton allDatabaseButton;
+
+    public RadioButton orphanetButton;
+
+    public RadioButton omimButton;
+
+    public RadioButton decipherButton;
 
     /** The MONDO term that is currently selected in the Browser window. */
     private GenericTerm selectedTerm = null;
@@ -76,31 +102,37 @@ public class MondoController {
     private WebEngine infoWebEngine;
 
 
-
     @Inject
     public MondoController(OptionalResources optionalResources, Properties properties,
-                          @Named("mainWindow") Stage primarystage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
+                           @Named("mainWindow") Stage primaryStage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
         this.properties = properties;
-        this.primarystage = primarystage;
+        this.primaryStage = primaryStage;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
     }
 
     @FXML
     public void initialize() {
-        //logger.trace("initialize");
-//        // This action will be run after user approves a PhenotypeTerm in the ontologyTreePane
-//        Consumer<HpoTerm> addHook = (ph -> logger.trace(String.format("Hook for %s", ph.getName())));
-
-
 
         // this binding evaluates to true, if ontology or annotations files are missing (null)
-        BooleanBinding someResourceMissing = optionalResources.someResourceMissing();
+        BooleanBinding mondoResourceIsMissing = optionalResources.mondoResourceMissing();
 
+        hpoTermRadioButton.disableProperty().bind(mondoResourceIsMissing);
+        diseaseRadioButton.disableProperty().bind(mondoResourceIsMissing);
+        newAnnotationRadioButton.disableProperty().bind(mondoResourceIsMissing);
+        goButton.disableProperty().bind(mondoResourceIsMissing);
+        exportHierarchicalSummaryButton.disableProperty().bind(mondoResourceIsMissing);
+        exportToExcelButton.disableProperty().bind(mondoResourceIsMissing);
+        suggestCorrectionToTermButton.disableProperty().bind(mondoResourceIsMissing);
+        suggestNewChildTermButton.disableProperty().bind(mondoResourceIsMissing);
+        suggestNewAnnotationButton.disableProperty().bind(mondoResourceIsMissing);
+        reportMistakenAnnotationButton.disableProperty().bind(mondoResourceIsMissing);
+        allDatabaseButton.disableProperty().bind(mondoResourceIsMissing);
+        orphanetButton.disableProperty().bind(mondoResourceIsMissing);
+        omimButton.disableProperty().bind(mondoResourceIsMissing);
+        decipherButton.disableProperty().bind(mondoResourceIsMissing);
 
-
-
-        someResourceMissing.addListener(((observable, oldValue, newValue) -> {
+        mondoResourceIsMissing.addListener(((observable, oldValue, newValue) -> {
             if (!newValue) { // nothing is missing anymore
                 activate();
             } else { // invalidate model and anything in the background. Controls should be disabled automatically
@@ -109,18 +141,18 @@ public class MondoController {
         }));
 
 
-        if (!someResourceMissing.get()) {
+        if (!mondoResourceIsMissing.get()) {
             activate();
         }
     }
 
     private void activate() {
-        initTree(optionalResources.getMondoOntology(), k -> System.out.println("Consumed " + k));
+        initTree(optionalResources.getMondoOntology());
 
     }
 
     private void deactivate() {
-        initTree(null, k -> System.out.println("Consumed " + k));
+        initTree(null);
         //this.model = new Model(null, null, null);
     }
 
@@ -129,9 +161,8 @@ public class MondoController {
      * Initialize the ontology browser-tree in the left column of the app.
      *
      * @param ontology Reference to the HPO
-     * @param addHook  function hook (currently unused)
      */
-    private void initTree(Ontology<GenericTerm, GenericRelationship> ontology, Consumer<HpoTerm> addHook) {
+    private void initTree(Ontology<GenericTerm, GenericRelationship> ontology) {
         // populate the TreeView with top-level elements from ontology hierarchy
         if (ontology == null) {
             mondoOntologyTreeView.setRoot(null);
@@ -151,54 +182,58 @@ public class MondoController {
                     }
                     GenericTermWrapper w = newValue.getValue();
                     TreeItem item = new MondoController.GenericTermTreeItem(w);
-                   // updateDescription(item);
+                    // updateDescription(item);
                 });
         // create Map for lookup of the terms in the ontology based on their Name
         ontology.getTermMap().values().forEach(term -> {
             labelsAndMondoIds.put(term.getName(), term.getId());
-            labelsAndMondoIds.put(term.getId().getIdWithPrefix(),term.getId());
+            labelsAndMondoIds.put(term.getId().getIdWithPrefix(), term.getId());
         });
         WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndMondoIds.keySet());
 
         // show intro message in the infoWebView
         Platform.runLater(() -> {
             infoWebEngine = infoWebView.getEngine();
-            infoWebEngine.loadContent("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>HPO tree browser</title></head>" +
-                    "<body><p>Click on HPO term in the tree browser to display additional information</p></body></html>");
+            infoWebEngine.loadContent("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>MONDO " +
+                    "tree browser</title></head>" +
+                    "<body><p>Click on MONDO term in the tree browser to display additional " +
+                    "information</p></body></html>");
         });
     }
 
 
-
-
     /**
      * Get the parents of "term"
+     *
      * @param term HPO Term of interest
+     *
      * @return parents of term (not including term itself).
      */
     private Set<GenericTerm> getTermParents(GenericTerm term) {
         Ontology ontology = optionalResources.getMondoOntology();
-        if (ontology==null) {
-            PopUps.showInfoMessage("Error: Could not initialize HPO Ontology","ERROR");
+        if (ontology == null) {
+            PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return new HashSet<>(); // return empty set
         }
-        Set<TermId> parentIds = getParentTerms(ontology,term.getId(),false);
+        Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
         Set<GenericTerm> eltern = new HashSet<>();
-        parentIds.forEach(tid ->{GenericTerm ht = (GenericTerm)ontology.getTermMap().get(tid); eltern.add(ht);});
+        parentIds.forEach(tid -> {
+            GenericTerm ht = (GenericTerm) ontology.getTermMap().get(tid);
+            eltern.add(ht);
+        });
         return eltern;
     }
 
     private boolean existsPathFromRoot(GenericTerm term) {
         Ontology ontology = optionalResources.getMondoOntology();
-        if (ontology==null) {
-            PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology","ERROR");
+        if (ontology == null) {
+            PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
             return false;
         }
         TermId rootId = ontology.getRootTermId();
         TermId tid = term.getId();
-        return existsPath(ontology,tid,rootId);
+        return existsPath(ontology, tid, rootId);
     }
-
 
 
     /**
@@ -209,7 +244,7 @@ public class MondoController {
      */
     private void expandUntilTerm(GenericTerm term) {
         // logger.trace("expand until term " + term.toString());
-       // switchToMode(BROWSE_HPO);
+        // switchToMode(BROWSE_HPO);
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
             Stack<GenericTerm> termStack = new Stack<>();
@@ -247,26 +282,30 @@ public class MondoController {
     }
 
 
-
     /**
      * Get the children of "term"
+     *
      * @param term HPO Term of interest
+     *
      * @return children of term (not including term itself).
      */
     private Set<GenericTerm> getTermChildren(GenericTerm term) {
         Ontology ontology = optionalResources.getMondoOntology();
-        if (ontology==null) {
-            PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology","ERROR");
+        if (ontology == null) {
+            PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
             return new HashSet<>(); // return empty set
         }
-        if (term==null) {
-            PopUps.showInfoMessage("Error: term==null in getTermChildren","ERROR");
+        if (term == null) {
+            PopUps.showInfoMessage("Error: term==null in getTermChildren", "ERROR");
             return new HashSet<>(); // return empty set
         }
         TermId parentTermId = term.getId();
-        Set<TermId> childrenIds = getChildTerms(ontology,parentTermId,false);
+        Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
         Set<GenericTerm> kids = new HashSet<>();
-        childrenIds.forEach(tid ->{GenericTerm gt = (GenericTerm)ontology.getTermMap().get(tid); kids.add(gt);});
+        childrenIds.forEach(tid -> {
+            GenericTerm gt = (GenericTerm) ontology.getTermMap().get(tid);
+            kids.add(gt);
+        });
         return kids;
     }
 
