@@ -214,7 +214,7 @@ public class MainController {
         }
 
         ProgressIndicator pb = new ProgressIndicator();
-        javafx.scene.control.Label label = new javafx.scene.control.Label("downloading phenotype_annotation.tab...");
+        javafx.scene.control.Label label = new javafx.scene.control.Label("downloading phenotype.hpoa...");
         FlowPane root = new FlowPane();
         root.setPadding(new Insets(10));
         root.setHgap(10);
