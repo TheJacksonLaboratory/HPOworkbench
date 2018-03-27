@@ -110,7 +110,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
             optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
             optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
         }
-        String mondoOboFile = properties.getProperty("mono.obo.path");
+        String mondoOboFile = properties.getProperty("mondo.obo.path");
         if (mondoOboFile!=null && new File(mondoOboFile).isFile()) {
             LOGGER.trace("Loading MONDO ontology from {}",mondoOboFile);
             try {
