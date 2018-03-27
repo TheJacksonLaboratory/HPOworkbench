@@ -116,7 +116,7 @@ public final class MondoController {
 
         // this binding evaluates to true, if ontology or annotations files are missing (null)
         BooleanBinding mondoResourceIsMissing = optionalResources.mondoResourceMissing();
-
+    logger.error("Initializing MondoController, missing = " + mondoResourceIsMissing.toString());
         hpoTermRadioButton.disableProperty().bind(mondoResourceIsMissing);
         diseaseRadioButton.disableProperty().bind(mondoResourceIsMissing);
         newAnnotationRadioButton.disableProperty().bind(mondoResourceIsMissing);

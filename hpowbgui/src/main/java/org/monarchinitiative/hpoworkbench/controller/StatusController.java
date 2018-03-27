@@ -53,6 +53,7 @@ public final class StatusController {
         optionalResources.hpoOntologyProperty().addListener(listener);
         optionalResources.indirectAnnotMapProperty().addListener(listener);
         optionalResources.directAnnotMapProperty().addListener(listener);
+        optionalResources.mondoOntologyProperty().addListener(listener);
 
         checkAll();
     }

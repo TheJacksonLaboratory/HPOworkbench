@@ -173,11 +173,14 @@ public class MainController {
         window.setTitle("MONDO download");
         window.setScene(scene);
 
-        Task mondodownload = new Downloader(dirpath, properties.getProperty("mondo.obo.url"), PlatformUtil.MONDO_OBO_FILENAME);
-        pb.progressProperty().bind(mondodownload.progressProperty());
-
         logger.trace("mondo url = " +  properties.getProperty("mondo.obo.url"));
         logger.trace("mondo FN = " +  PlatformUtil.MONDO_OBO_FILENAME);
+        String MONDO_URL_HACK="https://osf.io/e87hn/download";
+
+        Task mondodownload = new Downloader(dirpath, MONDO_URL_HACK, PlatformUtil.MONDO_OBO_FILENAME);
+        pb.progressProperty().bind(mondodownload.progressProperty());
+
+
         window.show();
         mondodownload.setOnSucceeded(event -> {
             window.close();
