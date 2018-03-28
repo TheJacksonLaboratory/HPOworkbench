@@ -25,6 +25,7 @@ import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.base.PhenolException;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 
 import javax.inject.Named;
 import java.io.File;
@@ -67,6 +68,7 @@ public class MainController {
         this.properties = properties;
         this.primaryStage = primaryStage;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
+        logger.trace("CTOR optionsl="+optionalResources.toString());
     }
 
     public static String getVersion() {
@@ -187,7 +189,9 @@ public class MainController {
             logger.trace(String.format("Successfully downloaded mondo to %s", dirpath));
             String mondoOboPath = dirpath + File.separator + PlatformUtil.MONDO_OBO_FILENAME;
             try {
-                optionalResources.setMondoOntology(new MondoParser(mondoOboPath).getMondo());
+                MondoParser parser = new MondoParser(mondoOboPath);
+                Ontology mondo =parser.getMondo();
+                optionalResources.setMondoOntology(mondo);
                 properties.setProperty("mondo.obo.path", mondoOboPath);
             } catch (PhenolException pe) {
                 PopUps.showException("ERROR","Could not parse Mondo obo file", pe);

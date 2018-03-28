@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import javafx.application.Platform;
+import javafx.beans.property.Property;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -93,6 +94,11 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
     private OptionalResources optionalResources(Properties properties) {
         OptionalResources optionalResources = new OptionalResources();
 
+        System.err.println("OPTIMAL RESOURCES");
+        for (String p :properties.stringPropertyNames()) {
+            System.err.println("P="+p+": "+properties.getProperty(p));
+        }
+
         // load ontology & annotation file, if available
         String obofile = properties.getProperty("hpo.obo.path");
         if (obofile != null && new File(obofile).isFile()) {
@@ -111,6 +117,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
             optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
         }
         String mondoOboFile = properties.getProperty("mondo.obo.path");
+        System.err.println("MODNO = "+mondoOboFile);
         if (mondoOboFile!=null && new File(mondoOboFile).isFile()) {
             LOGGER.trace("Loading MONDO ontology from {}",mondoOboFile);
             try {

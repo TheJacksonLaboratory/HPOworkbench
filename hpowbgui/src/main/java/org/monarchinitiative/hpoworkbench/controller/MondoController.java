@@ -116,7 +116,7 @@ public final class MondoController {
 
         // this binding evaluates to true, if ontology or annotations files are missing (null)
         BooleanBinding mondoResourceIsMissing = optionalResources.mondoResourceMissing();
-    logger.error("Initializing MondoController, missing = " + mondoResourceIsMissing.toString());
+        logger.error("Initializing MondoController, missing = " + mondoResourceIsMissing.toString());
         hpoTermRadioButton.disableProperty().bind(mondoResourceIsMissing);
         diseaseRadioButton.disableProperty().bind(mondoResourceIsMissing);
         newAnnotationRadioButton.disableProperty().bind(mondoResourceIsMissing);
@@ -138,6 +138,7 @@ public final class MondoController {
             } else { // invalidate model and anything in the background. Controls should be disabled automatically
                 deactivate();
             }
+            System.out.println("MONDO LISTEBNER old="+oldValue+" new="+newValue);
         }));
 
 
@@ -169,7 +170,9 @@ public final class MondoController {
             return;
         }
         TermId rootId = ontology.getRootTermId();
+        logger.trace("root id = " + rootId.getIdWithPrefix());
         GenericTerm rootTerm = ontology.getTermMap().get(rootId);
+        logger.trace("RootTerm is " + rootTerm.toString());
         TreeItem<GenericTermWrapper> root = new MondoController.GenericTermTreeItem(new GenericTermWrapper(rootTerm));
         root.setExpanded(true);
         mondoOntologyTreeView.setShowRoot(false);

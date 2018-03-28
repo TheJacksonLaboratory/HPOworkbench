@@ -48,7 +48,8 @@ public final class OptionalResources {
 
     private final ObjectProperty<HpoOntology> hpoOntology = new SimpleObjectProperty<>(this, "hpoOntology", null);
 
-    private final ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntology = new SimpleObjectProperty<>(this, "mondoOntology", null);
+    private final ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntology
+            = new SimpleObjectProperty<>(this, "mondoOntology", null);
 
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMap =
             new SimpleObjectProperty<>(this, "indirectAnnotMap", null);
@@ -63,7 +64,8 @@ public final class OptionalResources {
                 hpoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
 
         mondoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(mondoOntologyProperty(),
-                indirectAnnotMapProperty(), directAnnotMapProperty()).anyMatch(op -> op.get() == null),
+                indirectAnnotMapProperty(),
+                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
                 mondoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
     }
 
@@ -121,8 +123,12 @@ public final class OptionalResources {
         return mondoOntology.get();
     }
 
-    public void setMondoOntology(Ontology mondoOntology) {
-        this.mondoOntology.set(ResourceValidators.mondoResourceValidator().isValid(mondoOntology) ? mondoOntology : null);
+    public void setMondoOntology(Ontology<GenericTerm, GenericRelationship> mondoOntology) {
+        if (this.mondoOntology==null) {
+            System.err.println("[ERROR] MONDO ONTOLOGTY NULL");
+            return;
+        }
+        this.mondoOntology.set(mondoOntology);
     }
 
     public ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntologyProperty() {
