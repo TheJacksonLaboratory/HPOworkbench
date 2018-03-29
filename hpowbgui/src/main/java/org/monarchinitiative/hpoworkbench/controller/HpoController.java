@@ -59,90 +59,50 @@ public final class HpoController {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String EVENT_TYPE_CLICK = "click";
-
     private static final String EVENT_TYPE_MOUSEOVER = "mouseover";
-
     private static final String EVENT_TYPE_MOUSEOUT = "mouseclick";
 
     private final Stage primaryStage;
-
+    /** Object that stores the ontology data etc. if available. */
     private final OptionalResources optionalResources;
 
     /** Current behavior of HPO Workbench. See {@link MainController.mode}. */
     private MainController.mode currentMode = MainController.mode.BROWSE_HPO;
 
-    @FXML
-    private RadioButton hpoTermRadioButton;
-
-    @FXML
-    private RadioButton diseaseRadioButton;
-
-    @FXML
-    private RadioButton newAnnotationRadioButton;
-
-    @FXML
-    private TextField searchTextField;
-
-    @FXML
-    private Button goButton;
-
-    @FXML
-    private TreeView<HpoTermWrapper> ontologyTreeView;
-
+    @FXML private RadioButton hpoTermRadioButton;
+    @FXML private RadioButton diseaseRadioButton;
+    @FXML private RadioButton newAnnotationRadioButton;
+    @FXML private TextField searchTextField;
+    @FXML private Button goButton;
+    /** The tree view that shows the HPO Ontology hierarchy */
+    @FXML private TreeView<HpoTermWrapper> ontologyTreeView;
     /** WebView for displaying details of the Term that is selected in the {@link #ontologyTreeView}. */
-    @FXML
-    private WebView infoWebView;
-
+    @FXML private WebView infoWebView;
     /** WebEngine backing up the {@link #infoWebView}. */
     private WebEngine infoWebEngine;
-
-    @FXML
-    private Button exportHierarchicalSummaryButton;
-
-    @FXML
-    private Button exportToExcelButton;
-
-    @FXML
-    private Button suggestCorrectionToTermButton;
-
-    @FXML
-    private Button suggestNewChildTermButton;
-
-    @FXML
-    private Button suggestNewAnnotationButton;
-
-    @FXML
-    private Button reportMistakenAnnotationButton;
-
-    @FXML
-    private RadioButton allDatabaseButton;
-
-    @FXML
-    private RadioButton orphanetButton;
-
-    @FXML
-    private RadioButton omimButton;
-
-    @FXML
-    private RadioButton decipherButton;
-
+    @FXML private Button exportHierarchicalSummaryButton;
+    @FXML private Button exportToExcelButton;
+    @FXML private Button suggestCorrectionToTermButton;
+    @FXML private Button suggestNewChildTermButton;
+    @FXML private Button suggestNewAnnotationButton;
+    @FXML private Button reportMistakenAnnotationButton;
+    @FXML private RadioButton allDatabaseButton;
+    @FXML private RadioButton orphanetButton;
+    @FXML private RadioButton omimButton;
+    @FXML private RadioButton decipherButton;
     /** Current disease shown in the browser. Any suggested changes will refer to this disease. */
     private DiseaseModel selectedDisease = null;
-
     /** This determines which disease as shown (OMIM, Orphanet, DECIPHER, or all). Default: ALL. */
     private DiseaseModel.database selectedDatabase = DiseaseModel.database.ALL;
-
     /** Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}. */
     private Map<String, TermId> labelsAndHpoIds = new HashMap<>();
 
     private Model model;
-
     /** The term that is currently selected in the Browser window. */
     private HpoTerm selectedTerm = null;
-
     /** Users can create a github issue. Username and password will be stored for the current session only. */
     private String githubUsername = null;
-
+    /** Github password. Username and password will be stored for the current session only. */
     private String githubPassword;
 
     @Inject
@@ -172,6 +132,9 @@ public final class HpoController {
         }
     }
 
+    /**
+     * Export a hierarchical summary of part of the HPO as an Excel file.
+     */
     @FXML
     public void exportHierarchicalSummary() {
         if (selectedTerm == null) {
@@ -198,7 +161,7 @@ public final class HpoController {
             return;
         }
         LOGGER.trace(String.format("Exporting hierarchical summary starting from term %s", selectedTerm.toString()));
-        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(model.getOntology(), selectedTerm);
+        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(model.getHpoOntology(), selectedTerm);
         try {
             exporter.exportToExcel(f.getAbsolutePath());
         } catch (HPOException e) {
@@ -206,6 +169,7 @@ public final class HpoController {
         }
     }
 
+    /** Export the entire HPO ontology as an excel file. */
     @FXML
     public void exportToExcel() {
         LOGGER.trace("exporting to excel");
@@ -218,7 +182,7 @@ public final class HpoController {
         if (f != null) {
             String path = f.getAbsolutePath();
             LOGGER.trace(String.format("Setting path to LOINC Core Table file to %s", path));
-            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getOntology());
+            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getHpoOntology());
             exporter.exportToExcelFile(path);
         } else {
             LOGGER.error("Unable to obtain path to Excel export file");
@@ -347,6 +311,10 @@ public final class HpoController {
         postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord());
     }
 
+
+    public Model getModel() {
+        return model;
+    }
 
     public void initialize() {
                 //logger.trace("initialize");
@@ -529,7 +497,7 @@ public final class HpoController {
         if (annotatedDiseases == null) {
             LOGGER.error("could not retrieve diseases for " + termID);
         }
-        int n_descendents = 42;//getDescendents(model.getOntology(),term.getId()).size();
+        int n_descendents = 42;//getDescendents(model.getHpoOntology(),term.getId()).size();
         //todo--add number of descendents to HTML
         String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
         //System.out.print(content);
@@ -598,10 +566,6 @@ public final class HpoController {
         HpoTerm rootTerm = ontology.getTermMap().get(rootId);
         TreeItem<HpoTermWrapper> root = new HpoTermTreeItem(new HpoTermWrapper(rootTerm));
         root.setExpanded(true);
-//        if (ontologyTreeView==null) {
-//            logger.fatal("Tree view is not initialized");
-//            return;
-//        }
         ontologyTreeView.setShowRoot(false);
         ontologyTreeView.setRoot(root);
         ontologyTreeView.getSelectionModel().selectedItemProperty()

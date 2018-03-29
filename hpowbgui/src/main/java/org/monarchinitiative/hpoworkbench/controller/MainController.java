@@ -68,7 +68,6 @@ public class MainController {
         this.properties = properties;
         this.primaryStage = primaryStage;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
-        logger.trace("CTOR optionsl="+optionalResources.toString());
     }
 
     public static String getVersion() {
@@ -79,7 +78,7 @@ public class MainController {
         } catch (Exception e) {
             // do nothing
         }
-        if (version == null) version = "0.1.14"; // this works on a maven build but needs to be reassigned in intellij
+        if (version == null) version = "0.2.1"; // this works on a maven build but needs to be reassigned in intellij
         return version;
     }
 
@@ -175,13 +174,11 @@ public class MainController {
         window.setTitle("MONDO download");
         window.setScene(scene);
 
-        logger.trace("mondo url = " +  properties.getProperty("mondo.obo.url"));
-        logger.trace("mondo FN = " +  PlatformUtil.MONDO_OBO_FILENAME);
+        //TODO the following is necessary because redirect is not working somehow
         String MONDO_URL_HACK="https://osf.io/e87hn/download";
 
         Task mondodownload = new Downloader(dirpath, MONDO_URL_HACK, PlatformUtil.MONDO_OBO_FILENAME);
         pb.progressProperty().bind(mondodownload.progressProperty());
-
 
         window.show();
         mondodownload.setOnSucceeded(event -> {

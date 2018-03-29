@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class coordinates the data on diseases and annotations.
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ */
 public class Model {
     private static final Logger logger = LogManager.getLogger();
     private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
@@ -28,18 +32,12 @@ public class Model {
 
     private List<String> githublabels=new ArrayList<>();
 
-//    public Model(){
-//        initPaths();
-//        importData();
-//    }
 
     public Model(HpoOntology ontology, Map<TermId, List<DiseaseModel>> annotMap,
                  Map<TermId, List<DiseaseModel>> directAnnotMap) {
         this.ontology = ontology;
         this.annotmap = annotMap;
         this.directAnnotMap = directAnnotMap;
-//        this.pathToAnnotationFile=phenoAnnotationPath;
-//        importData();
     }
 
     public void setGithublabels(List<String> lab) { this.githublabels=lab; }
@@ -47,35 +45,6 @@ public class Model {
     public List<String> getGithublabels() { return githublabels; }
 
     public boolean hasLabels(){ return githublabels!=null && githublabels.size()>0; }
-
-    @Deprecated
-    private void initPaths() {
-//        this.pathToHpoOboFile=getLocalHPOPath();
-//        this.pathToAnnotationFile=getLocalPhenotypeAnnotationPath();
-    }
-
-    @Deprecated
-    private void importData() {
-//        if (ontology==null) {
-//            if (pathToHpoOboFile==null) {
-//                logger.error("Path to hp.obo was not initialized");
-//                return;
-//            }
-//            HPOParser parser = new HPOParser(pathToHpoOboFile);
-//            this.ontology=parser.getHPO();
-//        }
-//        if (annotmap==null) {
-//            HpoOntology ontology = getHpoOntology();
-//            DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(this.pathToAnnotationFile,ontology);
-//            annotmap=parser.parse();
-//            directAnnotMap=parser.getDirectannotmap();
-//        }
-//        logger.trace("Ingested annot map with size="+annotmap.size());
-
-    }
-
-
-
 
     public List<DiseaseModel> getDiseaseAnnotations(String hpoTermId, DiseaseModel.database dbase) {
         List<DiseaseModel> diseases=new ArrayList<>();
@@ -139,15 +108,7 @@ public class Model {
 
 
 
-    public HpoOntology getOntology() {
-//        if (ontology==null) {
-//            if (pathToHpoOboFile==null) {
-//                logger.error("Path to hp.obo was not initialized");
-//                return null;
-//            }
-//            HPOParser parser = new HPOParser(pathToHpoOboFile);
-//            this.ontology=parser.getHPO();
-//        }
+    public HpoOntology getHpoOntology() {
         return ontology;
     }
 

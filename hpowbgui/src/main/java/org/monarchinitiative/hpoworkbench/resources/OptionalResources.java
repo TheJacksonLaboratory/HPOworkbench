@@ -9,6 +9,7 @@ import javafx.scene.control.Tab;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
 import org.monarchinitiative.phenol.formats.generic.GenericTerm;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -57,6 +58,9 @@ public final class OptionalResources {
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> directAnnotMap =
             new SimpleObjectProperty<>(this, "directAnnotMap", null);
 
+    private final ObjectProperty<Map<String, HpoDisease>> disease2annotationMap =
+            new SimpleObjectProperty<>(this,"disease2annotationMap", null);
+
     public OptionalResources() {
         hpoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(hpoOntologyProperty(),
                 indirectAnnotMapProperty(),
@@ -95,6 +99,13 @@ public final class OptionalResources {
         this.indirectAnnotMap.set(indirectAnnotMap);
     }
 
+    public void setDisease2annotationMap(Map<String, HpoDisease> d2amap) {
+        this.disease2annotationMap.set(d2amap);
+    }
+    public ObjectProperty<Map<String, HpoDisease>> disease2annotationMapProperty() { return disease2annotationMap; }
+
+    public Map<String, HpoDisease> getDisease2AnnotationMap() { return disease2annotationMap.get(); }
+
     public ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMapProperty() {
         return indirectAnnotMap;
     }
@@ -125,7 +136,7 @@ public final class OptionalResources {
 
     public void setMondoOntology(Ontology<GenericTerm, GenericRelationship> mondoOntology) {
         if (this.mondoOntology==null) {
-            System.err.println("[ERROR] MONDO ONTOLOGTY NULL");
+            System.err.println("[ERROR] MONDO ONTOLOGY NULL");
             return;
         }
         this.mondoOntology.set(mondoOntology);

@@ -13,12 +13,15 @@ import org.monarchinitiative.hpoworkbench.controller.MainController;
 import org.monarchinitiative.hpoworkbench.controller.MondoController;
 import org.monarchinitiative.hpoworkbench.controller.StatusController;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
+import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.io.UTF8Control;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.base.PhenolException;
+import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -46,6 +49,10 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String HPO_OBO_FILE="hp.obo";
+    private static final String MONDO_OBO_FILE="mondo.obo";
+    private static final String HP_ANNOTATION_FILE="phenotype.hpoa";
+
     /**
      * This is the main stage/window of the GUI provided by JavaFX in
      * {@link javafx.application.Application#start(Stage)} method. We keep it here to ensure a nice GUI behaviour -
@@ -53,7 +60,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
      */
     private final Stage window;
 
-    public HpoWorkbenchGuiModule(Stage window) {
+    HpoWorkbenchGuiModule(Stage window) {
         this.window = window;
     }
 
@@ -93,12 +100,6 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
     @Singleton
     private OptionalResources optionalResources(Properties properties) {
         OptionalResources optionalResources = new OptionalResources();
-
-        System.err.println("OPTIMAL RESOURCES");
-        for (String p :properties.stringPropertyNames()) {
-            System.err.println("P="+p+": "+properties.getProperty(p));
-        }
-
         // load ontology & annotation file, if available
         String obofile = properties.getProperty("hpo.obo.path");
         if (obofile != null && new File(obofile).isFile()) {
@@ -115,9 +116,19 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
             parser.doParse();
             optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
             optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
+            HpoOntology hpoontology = optionalResources.getHpoOntology();
+
+            if (hpoontology!=null) {
+                HpoDiseaseAnnotationParser annotparser = new HpoDiseaseAnnotationParser(annots,hpoontology);
+                try {
+                    optionalResources.setDisease2annotationMap(annotparser.parse());
+                } catch (PhenolException pe) {
+                    PopUps.showException("Error","Could not parse annotation file", pe);
+                }
+            }
+
         }
         String mondoOboFile = properties.getProperty("mondo.obo.path");
-        System.err.println("MODNO = "+mondoOboFile);
         if (mondoOboFile!=null && new File(mondoOboFile).isFile()) {
             LOGGER.trace("Loading MONDO ontology from {}",mondoOboFile);
             try {
@@ -136,17 +147,19 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
      * tried. If the file doesn't exist, we will fall back to the <code>application.properties</code> that is
      * bundled in the JAR file.
      *
-     * @param propertiesPath {@link File} pointing to the <code>application.properties</code> file
+     * @param hpoWorkbenchDir {@link File} pointing to the users .hpoworkbench directory
      *
      * @return application {@link Properties}
      */
     @Provides
     @Singleton
-    private Properties properties(@Named("propertiesFilePath") File propertiesPath) {
+    private Properties properties(@Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
         Properties properties = new Properties();
-        if (propertiesPath.isFile()) {
+        String propertiesPath=String.format("%s%sapplication.properties",hpoWorkbenchDir,File.separator);
+        File propfile=new File(propertiesPath);
+        if (propfile.isFile()) {
             try {
-                LOGGER.info("Loading app properties from {}", propertiesPath.getAbsolutePath());
+                LOGGER.info("Loading app properties from {}", propertiesPath);
                 properties.load(new FileReader(propertiesPath));
             } catch (IOException e) {
                 LOGGER.warn(e);
@@ -160,6 +173,23 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
                 LOGGER.warn(e);
             }
         }
+        // property for the downloaded Mondo file, if available
+        String mondoDownloadPath = String.format("%s%s%s",hpoWorkbenchDir.getAbsolutePath(),File.separator,MONDO_OBO_FILE);
+        if (properties.getProperty("mondo.obo.path")==null) {
+            properties.setProperty("mondo.obo.path",mondoDownloadPath);
+        }
+        String hpoDownloadPath = String.format("%s%s%s",hpoWorkbenchDir.getAbsolutePath(),File.separator,HPO_OBO_FILE);
+        if (properties.getProperty("hpo.obo.path")==null) {
+            properties.setProperty("hpo.obo.path",hpoDownloadPath);
+        }
+        String annotatDownloadPath= String.format("%s%s%s",hpoWorkbenchDir.getAbsolutePath(),File.separator,HP_ANNOTATION_FILE);
+        if (properties.getProperty("hpo.annotations.path")==null) {
+            properties.setProperty("hpo.annotations.path",annotatDownloadPath);
+        }
+
+//        for (String pr : properties.stringPropertyNames()) {
+//            LOGGER.trace("{} = {}", pr, properties.getProperty(pr));
+//        }
 
         return properties;
     }
