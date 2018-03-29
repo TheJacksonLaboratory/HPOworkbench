@@ -104,8 +104,8 @@ public class AnnotationMerger {
                 String label = ontology.getTermMap().get(ctid).getName();
                 System.out.println("Both diseases: " + label + "[" + ctid.getIdWithPrefix() + "]");
             }
-            List<TermSubClassPair> sclasspairs = catmerge.getD1subclassOfd2();
-            for (TermSubClassPair tscp : sclasspairs) {
+            List<SubClassTermPair> sclasspairs = catmerge.getD1subclassOfd2();
+            for (SubClassTermPair tscp : sclasspairs) {
                 TermId t1=tscp.getSubTid();
                 TermId t2=tscp.getSuperTid();
                 String label1 = ontology.getTermMap().get(t1).getName();
@@ -115,7 +115,7 @@ public class AnnotationMerger {
                         label2, t2.getIdWithPrefix(), diseaseName2));
             }
             sclasspairs = catmerge.getD2subclassOfd1();
-            for (TermSubClassPair tscp : sclasspairs) {
+            for (SubClassTermPair tscp : sclasspairs) {
                 TermId t2=tscp.getSubTid();
                 TermId t1=tscp.getSuperTid();
                 String label1 = ontology.getTermMap().get(t1).getName();

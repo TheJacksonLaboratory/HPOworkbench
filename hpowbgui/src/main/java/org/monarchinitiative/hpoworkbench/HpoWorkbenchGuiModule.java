@@ -20,6 +20,7 @@ import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.io.UTF8Control;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.base.PhenolException;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 
@@ -30,6 +31,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -121,7 +123,11 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
             if (hpoontology!=null) {
                 HpoDiseaseAnnotationParser annotparser = new HpoDiseaseAnnotationParser(annots,hpoontology);
                 try {
-                    optionalResources.setDisease2annotationMap(annotparser.parse());
+                    Map<String,HpoDisease> diseasemap =annotparser.parse();
+                    for (String d : diseasemap.keySet()) {
+                        System.err.print(d);
+                    }
+                    optionalResources.setDisease2annotationMap(diseasemap);
                 } catch (PhenolException pe) {
                     PopUps.showException("Error","Could not parse annotation file", pe);
                 }

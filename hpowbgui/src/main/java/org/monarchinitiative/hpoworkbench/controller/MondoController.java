@@ -20,6 +20,7 @@ import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
 import org.monarchinitiative.phenol.formats.generic.GenericTerm;
+import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.Dbxref;
@@ -273,12 +274,16 @@ public final class MondoController {
         String omim=getOMIMid(mondoTerm);
         String orpha= getOrphanetid(mondoTerm).replaceAll("Orphanet","ORPHA");
 
+
         String termID = mondoTerm.getId().getIdWithPrefix();
         Map<String, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
         HpoDisease omimDisease=null;
         HpoDisease orphaDisease=null;
         omimDisease=disease2AnnotationMap.get(omim);
         orphaDisease=disease2AnnotationMap.get(orpha);
+        debugDisease(omimDisease);
+        debugDisease(orphaDisease);
+
         if (omimDisease ==null || orphaDisease == null) {
             logger.warn("Could not init diseases");
             int c = 0;
@@ -329,6 +334,16 @@ public final class MondoController {
                 }
             }
         });
+
+    }
+
+    private void debugDisease(HpoDisease disease) {
+        System.err.println("DEBUG DISEASE PRINT MONDO CONTROLLER");
+        System.err.println(disease.getName() +" ["+disease.getDatabase()+":"+disease.getDiseaseDatabaseId()+"]");
+        List<HpoAnnotation> termlist = disease.getPhenotypicAbnormalities();
+        for (HpoAnnotation annot : termlist) {
+            System.err.println("\t" + annot.toString());
+        }
 
     }
 

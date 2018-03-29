@@ -5,8 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.annotation.AnnotationMerger;
 import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
 import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
-import org.monarchinitiative.hpoworkbench.annotation.TermSubClassPair;
-import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.hpoworkbench.annotation.SubClassTermPair;
 import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
@@ -122,16 +121,16 @@ public class MondoHtmlPageGenerator {
         String diseaseName2=catmerge.getDisease2name();
         StringBuilder sb = new StringBuilder();
 
-        List<TermSubClassPair> sclasspairs = catmerge.getD1subclassOfd2();
+        List<SubClassTermPair> sclasspairs = catmerge.getD1subclassOfd2();
         if (sclasspairs==null || sclasspairs.isEmpty()) {
             sb.append(EMPTY_STRING);
         } else {
-            for (TermSubClassPair tscp : sclasspairs) {
+            for (SubClassTermPair tscp : sclasspairs) {
                 TermId t1 = tscp.getSubTid();
                 TermId t2 = tscp.getSuperTid();
                 String label1 = ontology.getTermMap().get(t1).getName();
                 String label2 = ontology.getTermMap().get(t2).getName();
-                sb.append(String.format("         <td rowspan=\"2\">s [%s] (%s)is subclass of %s [%s] (%s)</td>\n",
+                sb.append(String.format("         <td rowspan=\"2\">s [%s] (%s)is subclass of %s [%s]</td>\n",
                         label1, t1.getIdWithPrefix(), diseaseName1,
                         label2, t2.getIdWithPrefix(), diseaseName2));
             }
@@ -140,7 +139,7 @@ public class MondoHtmlPageGenerator {
         if (sclasspairs==null || sclasspairs.isEmpty()) {
             sb.append(EMPTY_STRING);
         } else {
-            for (TermSubClassPair tscp : sclasspairs) {
+            for (SubClassTermPair tscp : sclasspairs) {
                 TermId t2 = tscp.getSubTid();
                 TermId t1 = tscp.getSuperTid();
                 String label1 = ontology.getTermMap().get(t1).getName();
