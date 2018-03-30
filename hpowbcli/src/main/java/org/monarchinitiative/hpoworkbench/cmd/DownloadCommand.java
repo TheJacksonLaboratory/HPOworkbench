@@ -42,11 +42,11 @@ public final class DownloadCommand extends HPOCommand {
 
 
     private void downloadPhenotypeAnnotationDotTab() {
-        // Now the same for the phenotype_annotation.tab file
-        String downloadLocation=String.format("%s%sphenotype_annotation.tab",downloadDirectory, File.separator);
+        // Now the same for the phenotype.hpoa file
+        String downloadLocation=String.format("%s%sphenotype.hpoa",downloadDirectory, File.separator);
         File f = new File(downloadLocation);
         if (f.exists()) {
-            LOGGER.trace("cowardly refusing to download phenoptype_annotation.tab, since it is already there");
+            LOGGER.trace("cowardly refusing to download phenotype.hpoa, since it is already there");
             return;
         }
         try {

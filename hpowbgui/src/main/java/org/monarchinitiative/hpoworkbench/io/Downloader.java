@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.io;
 
 import javafx.concurrent.Task;
-import javafx.scene.control.ProgressIndicator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,10 +31,6 @@ public class Downloader extends Task<Void> {
      */
     private File localFilePath=null;
 
-    /** A reference to a ProgressIndicator that must have be
-     * initialized in the GUI and not within this class.
-     */
-    private ProgressIndicator progress=null;
 
     /** This is the URL of the file we want to download */
     protected String urlstring=null;
@@ -48,16 +43,6 @@ public class Downloader extends Task<Void> {
 
     public Downloader(String path, String url, String basename) {
         this(new File(path),url,basename);
-    }
-
-    public Downloader(String path, String url, String basename, ProgressIndicator pi) {
-        this(path,url,basename);
-        this.progress = pi;
-    }
-
-    public Downloader(File path, String url, String basename, ProgressIndicator pi) {
-        this(path,url,basename);
-        this.progress = pi;
     }
 
     public Downloader(File path, String url){
@@ -103,7 +88,6 @@ public class Downloader extends Task<Void> {
             int totalBytesRead = 0;
             int bytesRead = 0;
             int size = urlc.getContentLength();
-            if (progress!=null) { updateProgress(0.01); }
             logger.trace("Size of file to be downloaded: "+size);
             if (size >= 0)
                 block = size /100;
@@ -112,39 +96,24 @@ public class Downloader extends Task<Void> {
                 buffer = new byte[153600];
                 totalBytesRead += bytesRead;
                 if (size>0 && totalBytesRead > threshold) {
-                    updateProgress((double)totalBytesRead/size);
+                    updateProgress((double)totalBytesRead/size, 1); // Task has updateProgressProperty
                     threshold += block;
                 }
             }
             logger.info("Successful download from "+urlstring+": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
-            updateProgress(0.00);
+            updateProgress(0.00, 1);
             throw new Exception(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
         } catch (IOException e) {
-            updateProgress(0.00);
+            updateProgress(0.00, 1);
             throw new Exception(String.format("IO Exception reading from URL: \"%s\" to local file \"%s\"\n%s", urlstring,localFilePath, e.toString()));
         } catch (Exception e){
-            updateProgress(0.00);
+            updateProgress(0.00, 1);
             throw new Exception(e.getMessage());
         }
-        updateProgress(1.000); /* show 100% completion */
+        updateProgress(1.000, 1.000); /* show 100% completion */
         return null;
-    }
-
-    /** Update the progress bar of the GUI in a separate thread.
-     * @param pr Current progress.
-     */
-    private void updateProgress(double pr) {
-        javafx.application.Platform.runLater(new Runnable() {
-            @Override public void run() {
-                if (progress==null) {
-                    logger.error("NULL pointer to download progress indicator");
-                    return;
-                }
-                progress.setProgress(pr);
-            }
-        });
     }
 
 

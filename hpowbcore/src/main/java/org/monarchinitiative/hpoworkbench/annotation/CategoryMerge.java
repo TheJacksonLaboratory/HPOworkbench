@@ -24,8 +24,8 @@ public class CategoryMerge {
     private List<TermId> disease1onlyTerms;
     private List<TermId> disease2onlyTerms;
     private List<TermId> commonTerms;
-    private List<TermSubClassPair> d1subclassOfd2;
-    private List<TermSubClassPair> d2subclassOfd1;
+    private List<SubClassTermPair> d1subclassOfd2;
+    private List<SubClassTermPair> d2subclassOfd1;
 
     public CategoryMerge(String label,String d1name, String d2name){
         categoryLabel=label;
@@ -56,16 +56,16 @@ public class CategoryMerge {
     }
 
     public void addTermId1SubclassOfubOfTermId2(TermId t1,TermId t2) {
-        TermSubClassPair tscp = new TermSubClassPair(t1,t2);
+        SubClassTermPair tscp = new SubClassTermPair(t1,t2);
         d1subclassOfd2.add(tscp);
     }
 
-    public List<TermSubClassPair> getD2subclassOfd1() {
+    public List<SubClassTermPair> getD2subclassOfd1() {
         return d2subclassOfd1;
     }
 
     public void addTermId2SubclassOfubOfTermId1(TermId t2, TermId t1) {
-        TermSubClassPair tscp = new TermSubClassPair(t2,t1);
+        SubClassTermPair tscp = new SubClassTermPair(t2,t1);
         d2subclassOfd1.add(tscp);
     }
 
@@ -106,7 +106,7 @@ public class CategoryMerge {
         return commonTerms;
     }
 
-    public List<TermSubClassPair> getD1subclassOfd2() {
+    public List<SubClassTermPair> getD1subclassOfd2() {
         return d1subclassOfd2;
     }
 

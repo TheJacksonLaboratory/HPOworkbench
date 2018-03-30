@@ -11,6 +11,8 @@ import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import javax.inject.Inject;
 import java.util.ResourceBundle;
 
+enum MessageType {INFO, WARNING, ERROR}
+
 /**
  * This class is a controller of the bottom part of the main dialog window. Status messages are displayed here, as
  * well as the copyright.
@@ -51,6 +53,7 @@ public final class StatusController {
         optionalResources.hpoOntologyProperty().addListener(listener);
         optionalResources.indirectAnnotMapProperty().addListener(listener);
         optionalResources.directAnnotMapProperty().addListener(listener);
+        optionalResources.mondoOntologyProperty().addListener(listener);
 
         checkAll();
     }
@@ -64,10 +67,14 @@ public final class StatusController {
         } else if (optionalResources.getDirectAnnotMap() == null || // annotations file is missing
                 optionalResources.getIndirectAnnotMap() == null) {
             publishMessage(resourceBundle.getString("status.download.annotations"), MessageType.ERROR);
-        } else { // since we check only 2 resources, we should be fine here
+        } else if (optionalResources.getMondoOntology() == null) {
+            publishMessage(resourceBundle.getString("status.download.mondo"), MessageType.ERROR);
+        } else { // since we check only 2 resources, we should be
+            // fine here
             publishMessage(resourceBundle.getString("status.all.set"), MessageType.INFO);
         }
     }
+
 
     /**
      * Post information message to the status bar.
@@ -122,6 +129,4 @@ public final class StatusController {
 
         return label;
     }
-
-    enum MessageType {INFO, WARNING, ERROR}
 }

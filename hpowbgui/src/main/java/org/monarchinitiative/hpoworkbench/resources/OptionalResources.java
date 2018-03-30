@@ -5,9 +5,11 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Tab;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
 import org.monarchinitiative.phenol.formats.generic.GenericTerm;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -33,11 +35,22 @@ import java.util.stream.Stream;
  */
 public final class OptionalResources {
 
-    private final BooleanBinding someResourceIsMissing;
+    /**
+     * This binding evaluates as true when a resource required for a {@link Tab} controlled by
+     * {@link org.monarchinitiative.hpoworkbench.controller.MondoController} is missing.
+     */
+    private final BooleanBinding mondoResourceIsMissing;
+
+    /**
+     * This binding evaluates as true when a resource required for a {@link Tab} controlled by
+     * {@link org.monarchinitiative.hpoworkbench.controller.HpoController} is missing.
+     */
+    private final BooleanBinding hpoResourceIsMissing;
 
     private final ObjectProperty<HpoOntology> hpoOntology = new SimpleObjectProperty<>(this, "hpoOntology", null);
 
-    private final ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntology = new SimpleObjectProperty<>(this,"mondoOntology", null);
+    private final ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntology
+            = new SimpleObjectProperty<>(this, "mondoOntology", null);
 
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMap =
             new SimpleObjectProperty<>(this, "indirectAnnotMap", null);
@@ -45,11 +58,19 @@ public final class OptionalResources {
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> directAnnotMap =
             new SimpleObjectProperty<>(this, "directAnnotMap", null);
 
+    private final ObjectProperty<Map<String, HpoDisease>> disease2annotationMap =
+            new SimpleObjectProperty<>(this,"disease2annotationMap", null);
+
     public OptionalResources() {
-        someResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(hpoOntologyProperty(),
+        hpoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(hpoOntologyProperty(),
                 indirectAnnotMapProperty(),
                 directAnnotMapProperty()).anyMatch(op -> op.get() == null),
                 hpoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
+
+        mondoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(mondoOntologyProperty(),
+                indirectAnnotMapProperty(),
+                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
+                mondoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
     }
 
     /**
@@ -57,8 +78,17 @@ public final class OptionalResources {
      *
      * @return {@link BooleanBinding}
      */
-    public BooleanBinding someResourceMissing() {
-        return someResourceIsMissing;
+    public BooleanBinding hpoResourceMissing() {
+        return hpoResourceIsMissing;
+    }
+
+    /**
+     * This binding evaluates to false, if any of mondoOntology, annotMap or directAnnotMap are missing/null.
+     *
+     * @return {@link BooleanBinding}
+     */
+    public BooleanBinding mondoResourceMissing() {
+        return mondoResourceIsMissing;
     }
 
     public Map<TermId, List<DiseaseModel>> getIndirectAnnotMap() {
@@ -68,6 +98,13 @@ public final class OptionalResources {
     public void setIndirectAnnotMap(Map<TermId, List<DiseaseModel>> indirectAnnotMap) {
         this.indirectAnnotMap.set(indirectAnnotMap);
     }
+
+    public void setDisease2annotationMap(Map<String, HpoDisease> d2amap) {
+        this.disease2annotationMap.set(d2amap);
+    }
+    public ObjectProperty<Map<String, HpoDisease>> disease2annotationMapProperty() { return disease2annotationMap; }
+
+    public Map<String, HpoDisease> getDisease2AnnotationMap() { return disease2annotationMap.get(); }
 
     public ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMapProperty() {
         return indirectAnnotMap;
@@ -89,18 +126,24 @@ public final class OptionalResources {
         return hpoOntology.get();
     }
 
-    public Ontology<GenericTerm, GenericRelationship> getMondoOntology() { return mondoOntology.get(); }
-
     public void setHpoOntology(HpoOntology hpoOntology) {
         this.hpoOntology.set(ResourceValidators.ontologyResourceValidator().isValid(hpoOntology) ? hpoOntology : null);
     }
 
-    public ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntologyProperty() {
-        return mondoOntology;
+    public Ontology<GenericTerm, GenericRelationship> getMondoOntology() {
+        return mondoOntology.get();
     }
 
-    public void setMondoOntology(Ontology mondoOntology) {
-        this.mondoOntology.set(ResourceValidators.mondoResourceValidator().isValid(mondoOntology) ? mondoOntology : null);
+    public void setMondoOntology(Ontology<GenericTerm, GenericRelationship> mondoOntology) {
+        if (this.mondoOntology==null) {
+            System.err.println("[ERROR] MONDO ONTOLOGY NULL");
+            return;
+        }
+        this.mondoOntology.set(mondoOntology);
+    }
+
+    public ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntologyProperty() {
+        return mondoOntology;
     }
 
     public ObjectProperty<HpoOntology> hpoOntologyProperty() {

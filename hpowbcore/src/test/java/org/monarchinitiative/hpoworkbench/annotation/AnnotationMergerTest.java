@@ -54,19 +54,19 @@ public class AnnotationMergerTest {
         HPOParser parser = new HPOParser(hpoPath);
         ontology = parser.getHPO();
         // Make an ORPHANET disease
-        List<HpoAnnotation> orpha = ImmutableList.of(new HpoAnnotation("HP:0002808"),
-                new HpoAnnotation("HP:0002650"),
-                new HpoAnnotation("HP:0003103"),
-                new HpoAnnotation("HP:0011001"),
-                new HpoAnnotation("HP:0003312"),
-                new HpoAnnotation("HP:0100861")
+        List<HpoAnnotation> orpha = ImmutableList.of( HpoAnnotation.parseTerm("HP:0002808"),
+                HpoAnnotation.parseTerm("HP:0002650"),
+                HpoAnnotation.parseTerm("HP:0003103"),
+                HpoAnnotation.parseTerm("HP:0011001"),
+                HpoAnnotation.parseTerm("HP:0003312"),
+                HpoAnnotation.parseTerm("HP:0100861")
                 );
         Osteomesopyknosis_ORPHANET = makeHpoDisease("Osteomesopyknosis","ORPHA","2777",orpha);
         // Make an OMIM disease
-        List<HpoAnnotation> omim = ImmutableList.of(new HpoAnnotation("HP:0000006"),
-                new HpoAnnotation("HP:0000789"),
-                new HpoAnnotation("HP:0011001"),
-                new HpoAnnotation("HP:0003419")
+        List<HpoAnnotation> omim = ImmutableList.of(HpoAnnotation.parseTerm("HP:0000006"),
+                HpoAnnotation.parseTerm("HP:0000789"),
+                HpoAnnotation.parseTerm("HP:0011001"),
+                HpoAnnotation.parseTerm("HP:0003419")
         );
         OSTEOMESOPYKNOSIS_OMIM = makeHpoDisease("OSTEOMESOPYKNOSIS","OMIM","166450",omim);
         setupCCAIDCMS();
@@ -81,51 +81,51 @@ public class AnnotationMergerTest {
      */
     private static void setupCCAIDCMS(){
         List<HpoAnnotation> orpha = new ArrayList<>();
-        //orpha.add(new HpoAnnotation("HP: "));
-        orpha.add(new HpoAnnotation("HP:0000426"));
-        orpha.add(new HpoAnnotation("HP:0000175"));
-        orpha.add(new HpoAnnotation("HP:0000612"));
-        orpha.add(new HpoAnnotation("HP:0000494"));
-        orpha.add(new HpoAnnotation("HP:0000218"));
-        orpha.add(new HpoAnnotation("HP:0000348"));
-        orpha.add(new HpoAnnotation("HP:0000453"));
-        orpha.add(new HpoAnnotation("HP:0000588"));
-        orpha.add(new HpoAnnotation("HP:0001629"));
-        orpha.add(new HpoAnnotation("HP:0001643"));
-        orpha.add(new HpoAnnotation("HP:0000407"));
-        orpha.add(new HpoAnnotation("HP:0000369"));
-        orpha.add(new HpoAnnotation("HP:0000378"));
-        orpha.add(new HpoAnnotation("HP:0000639"));
-        orpha.add(new HpoAnnotation("HP:0001274"));
-        orpha.add(new HpoAnnotation("HP:0001249"));
-        orpha.add(new HpoAnnotation("HP:0000767"));
-        orpha.add(new HpoAnnotation("HP:0000278"));
-        orpha.add(new HpoAnnotation("HP:0002650"));
-        orpha.add(new HpoAnnotation("HP:0000256"));
-        orpha.add(new HpoAnnotation("HP:0000470"));
-        orpha.add(new HpoAnnotation("HP:0004322"));
+        //orpha.add(HpoAnnotation.parseTerm("HP: "));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000426"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000175"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000612"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000494"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000218"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000348"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000453"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000588"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0001629"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0001643"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000407"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000369"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000378"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000639"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0001274"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0001249"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000767"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000278"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0002650"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000256"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0000470"));
+        orpha.add(HpoAnnotation.parseTerm("HP:0004322"));
         CCAIDCMS_ORPHA=makeHpoDisease("CCAIDCMS","ORHPA","52055",orpha);
 
         List<HpoAnnotation> mim = new ArrayList<>();
-        mim.add(new HpoAnnotation("HP:0001419"));
-        mim.add(new HpoAnnotation("HP:0000612"));
-        mim.add(new HpoAnnotation("HP:0000494"));
-        mim.add(new HpoAnnotation("HP:0000218"));
-        mim.add(new HpoAnnotation("HP:0000475"));
-        mim.add(new HpoAnnotation("HP:0000348"));
-        mim.add(new HpoAnnotation("HP:0000588"));
-        mim.add(new HpoAnnotation("HP:0000407"));
-        mim.add(new HpoAnnotation("HP:0000369"));
-        mim.add(new HpoAnnotation("HP:0000378"));
-        mim.add(new HpoAnnotation("HP:0000505"));
-        mim.add(new HpoAnnotation("HP:0001274"));
-        mim.add(new HpoAnnotation("HP:0001249"));
-        mim.add(new HpoAnnotation("HP:0000767"));
-        mim.add(new HpoAnnotation("HP:0000278"));
-        mim.add(new HpoAnnotation("HP:0002650"));
-        mim.add(new HpoAnnotation("HP:0000256"));
-        mim.add(new HpoAnnotation("HP:0000470"));
-        mim.add(new HpoAnnotation("HP:0004322"));
+        mim.add(HpoAnnotation.parseTerm("HP:0001419"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000612"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000494"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000218"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000475"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000348"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000588"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000407"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000369"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000378"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000505"));
+        mim.add(HpoAnnotation.parseTerm("HP:0001274"));
+        mim.add(HpoAnnotation.parseTerm("HP:0001249"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000767"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000278"));
+        mim.add(HpoAnnotation.parseTerm("HP:0002650"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000256"));
+        mim.add(HpoAnnotation.parseTerm("HP:0000470"));
+        mim.add(HpoAnnotation.parseTerm("HP:0004322"));
         CCAIDCMS_OMIM = makeHpoDisease("CCAIDCMS","OMIM","300472",mim);
 
 

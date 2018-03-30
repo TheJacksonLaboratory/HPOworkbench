@@ -59,7 +59,7 @@ public class CountFrequencyCommand extends HPOCommand {
             } catch (PhenolException pe ) {
                 pe.printStackTrace(); //todo refacgtor
             }
-            Map<String,HpoDisease> annotationMap = aparser.getDisdeaseMap();
+            Map<String,HpoDisease> annotationMap = aparser.getDiseaseMap();
             LOGGER.error("Annotation count total " + annotationMap.size());
             Set<TermId> descendents = getDescendents(ontology, termId);
             descendentTermCount = descendents.size();
