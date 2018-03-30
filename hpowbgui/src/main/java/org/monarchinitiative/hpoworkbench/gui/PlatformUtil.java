@@ -16,7 +16,7 @@ public class PlatformUtil {
 
     public static final String MONDO_OBO_FILENAME = "mondo.obo";
 
-    public static final String HPO_ANNOTATIONS_FILENAME = "phenotype_annotation.tab";
+    public static final String HPO_ANNOTATIONS_FILENAME = "phenotype.hpoa";
 
     public static final String HPO_WORKBENCH_SETTINGS_FILENAME = "application.properties";
 

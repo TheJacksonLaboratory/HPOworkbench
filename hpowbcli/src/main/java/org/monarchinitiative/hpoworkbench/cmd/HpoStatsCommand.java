@@ -87,7 +87,7 @@ public class HpoStatsCommand extends HPOCommand  {
         hpoOntology=parser.getHPO();
         try {
             HPOAnnotationParser annotparser = new HPOAnnotationParser(annotpath, hpoOntology);
-            diseaseMap = annotparser.getDisdeaseMap();
+            diseaseMap = annotparser.getDiseaseMap();
         } catch (PhenolException pe) {
             pe.printStackTrace();
         }
@@ -143,7 +143,7 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
 
-    boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
+    private boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
         List<HpoAnnotation> tiwmlist= d.getPhenotypicAbnormalities();
         for (HpoAnnotation id:tiwmlist) {
           if (this.descendentsOfTheTermOfInterest.contains(id.getTermId()))
@@ -167,7 +167,6 @@ public class HpoStatsCommand extends HPOCommand  {
                 decipher.add(d);
             } else {
                 LOGGER.error("Did not recognize data base"+ database);
-                continue;
             }
         }
         String termname=hpoOntology.getTermMap().get(termOfInterest).getName();

@@ -210,7 +210,7 @@ public class MainController {
         String dirpath = hpoWorkbenchDir.getAbsolutePath();
         File f = new File(dirpath);
         if (!(f.exists() && f.isDirectory())) {
-            logger.trace("Cannot download phenotype_annotation.tab, because directory not existing at " + f.getAbsolutePath());
+            logger.trace("Cannot download phenotype.hpoa, because directory not existing at " + f.getAbsolutePath());
             return;
         }
 

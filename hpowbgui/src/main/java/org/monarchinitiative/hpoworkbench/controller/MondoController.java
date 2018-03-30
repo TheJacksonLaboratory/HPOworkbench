@@ -250,7 +250,7 @@ public final class MondoController {
         if (dbxlst==null) return null;
         for (Dbxref dbx : dbxlst) {
             if (dbx.getName().startsWith("Orphanet:"))
-                return dbx.getName();
+                return dbx.getName().replaceAll("Orphanet","ORPHA");
         }
         return null;
     }
@@ -264,23 +264,14 @@ public final class MondoController {
         if (treeItem == null)
             return;
 
-        Model mod = hpoController.getModel();
-        if (mod==null) {
-            mod =new Model(optionalResources.getHpoOntology(), optionalResources.getIndirectAnnotMap(),
-                    optionalResources.getDirectAnnotMap());
-        }
-
         GenericTerm mondoTerm = treeItem.getValue().term;
         String omim=getOMIMid(mondoTerm);
-        String orpha= getOrphanetid(mondoTerm).replaceAll("Orphanet","ORPHA");
+        String orpha= getOrphanetid(mondoTerm);
 
-
-        String termID = mondoTerm.getId().getIdWithPrefix();
         Map<String, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
-        HpoDisease omimDisease=null;
-        HpoDisease orphaDisease=null;
-        omimDisease=disease2AnnotationMap.get(omim);
-        orphaDisease=disease2AnnotationMap.get(orpha);
+
+        HpoDisease omimDisease=disease2AnnotationMap.get(omim);
+        HpoDisease orphaDisease=disease2AnnotationMap.get(orpha);
         debugDisease(omimDisease);
         debugDisease(orphaDisease);
 
