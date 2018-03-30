@@ -269,7 +269,10 @@ public final class MondoController {
         String orpha= getOrphanetid(mondoTerm);
 
         Map<String, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
-
+        if (disease2AnnotationMap==null) {
+            PopUps.showInfoMessage("Error: disease annotation map could not be initialized", "Error");
+            return;
+        }
         HpoDisease omimDisease=disease2AnnotationMap.get(omim);
         HpoDisease orphaDisease=disease2AnnotationMap.get(orpha);
         debugDisease(omimDisease);
@@ -330,12 +333,14 @@ public final class MondoController {
 
     private void debugDisease(HpoDisease disease) {
         System.err.println("DEBUG DISEASE PRINT MONDO CONTROLLER");
+        if (disease==null) {
+            System.err.println("disease null"); return;
+        }
         System.err.println(disease.getName() +" ["+disease.getDatabase()+":"+disease.getDiseaseDatabaseId()+"]");
         List<HpoAnnotation> termlist = disease.getPhenotypicAbnormalities();
         for (HpoAnnotation annot : termlist) {
             System.err.println("\t" + annot.toString());
         }
-
     }
 
 
@@ -422,7 +427,8 @@ public final class MondoController {
         TermId tid = labelsAndMondoIds.get(searchTextField.getText());
         GenericTerm term = optionalResources.getMondoOntology().getTermMap().get(tid);
         if (term==null) {
-            PopUps.showInfoMessage("Warning","Could not find ontology term for search result");
+            String msg=String.format("Could not find ontology term for search result: %s",searchTextField.getText() );
+            PopUps.showInfoMessage(msg,"Warning");
             return;
         }
         expandUntilTerm(term);
