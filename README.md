@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/af2d44ee32e148eb92341578e1575e6d)](https://www.codacy.com/app/peter.robinson/HPOworkbench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TheJacksonLaboratory/HPOworkbench&amp;utm_campaign=Badge_Grade)
+
 # HPO Workbench
 A Java app for working with the Human Phenotype Ontology (HPO).
 
