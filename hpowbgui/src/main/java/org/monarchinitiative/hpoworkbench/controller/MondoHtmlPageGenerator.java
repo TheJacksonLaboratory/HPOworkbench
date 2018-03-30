@@ -86,10 +86,10 @@ public class MondoHtmlPageGenerator {
 
     private static String getTableFramework(String title, String disease1name, String disease2name) {
         return String.format("  <table class=\"zebra\">\n" +
-                "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">%s</caption>\n" +
+                "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">%s (disease 1: %s; disease 2: %s)</caption>\n" +
                 "    <thead>\n" +
                 "      <tr>\n" +
-                "        <th>Id</th><th>%s</th><th>%s</th>\n" +
+                "        <th>Id</th><th>status</th>\n" +
                 "      </tr>\n" +
                 "    </thead>\n" +
                 "    <tfoot>\n" +
@@ -105,8 +105,8 @@ public class MondoHtmlPageGenerator {
         for (TermId tid : termIdList) {
             HpoTerm term = ontology.getTermMap().get(tid);
             String row = String.format("<tr>\n" +
-                            "        <td rowspan=\"2\">Terms shared by both diseases</td>\n" +
-                            "        <td rowspan=\"2\"><a href=\"%s\">%s [%s]</a></td>\n" +
+                            "        <td><a href=\"%s\">%s [%s]</a></td>\n" +
+                            "        <td>shared by both diseases</td>\n" +
                             "      </tr>\n",
                     term.getId().getIdWithPrefix(),
                     term.getName(),
@@ -130,7 +130,7 @@ public class MondoHtmlPageGenerator {
                 TermId t2 = tscp.getSuperTid();
                 String label1 = ontology.getTermMap().get(t1).getName();
                 String label2 = ontology.getTermMap().get(t2).getName();
-                sb.append(String.format("         <td rowspan=\"2\">s [%s] (%s)is subclass of %s [%s]</td>\n",
+                sb.append(String.format("       <tr>  <td>%s [%s] (%s)</td><td> subclass of %s [%s]</td> </tr>\n",
                         label1, t1.getIdWithPrefix(), diseaseName1,
                         label2, t2.getIdWithPrefix(), diseaseName2));
             }
@@ -144,9 +144,9 @@ public class MondoHtmlPageGenerator {
                 TermId t1 = tscp.getSuperTid();
                 String label1 = ontology.getTermMap().get(t1).getName();
                 String label2 = ontology.getTermMap().get(t2).getName();
-                sb.append(String.format("<td rowspan=\"2\">%s [%s] (%s) is subclass of %s [%s] (%s)</td>",
+                sb.append(String.format("<tr><td>%s [%s] (%s)</td><td> subclass of %s [%s] (%s)</td></tr>",
                         label2, t2.getIdWithPrefix(), diseaseName2,
-                        label1, t1.getIdWithPrefix(), diseaseName1));
+                         label1, t1.getIdWithPrefix(), diseaseName1));
             }
         }
         return sb.toString();
@@ -158,11 +158,11 @@ public class MondoHtmlPageGenerator {
         StringBuilder sb = new StringBuilder();
         for (TermId t1 : catmerge.getDisease1onlyTerms()) {
             String label = ontology.getTermMap().get(t1).getName();
-            sb.append(String.format("<td rowspan=\"2\">%s only: %s [%s]</td>",diseaseName1,label,t1.getIdWithPrefix()));
+            sb.append(String.format("<tr><td>%s [%s]</td><td>%s only</td></tr>",label,t1.getIdWithPrefix(),diseaseName1));
         }
         for (TermId t2 : catmerge.getDisease2onlyTerms()) {
             String label = ontology.getTermMap().get(t2).getName();
-            sb.append(String.format("<td rowspan=\"2\">%s only: %s [%s]</td>",diseaseName2,label,t2.getIdWithPrefix()));
+            sb.append(String.format("<tr><td>%s [%s]</td><td>%s only</td></tr>",label,t2.getIdWithPrefix(),diseaseName2));
         }
         return sb.toString();
     }
