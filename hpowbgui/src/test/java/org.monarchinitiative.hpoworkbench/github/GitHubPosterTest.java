@@ -15,7 +15,7 @@ public class GitHubPosterTest {
         String messagebody="Test";
 
         GitHubPoster poster = new GitHubPoster(uname,  passw,  title,  messagebody);
-        //poster.postIssue();
+        //poster.postHpoIssue();
     }
 
 

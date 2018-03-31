@@ -14,9 +14,11 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
+import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
+import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
-import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
 import org.monarchinitiative.phenol.formats.generic.GenericTerm;
@@ -52,13 +54,25 @@ public final class MondoController {
 
     private final OptionalResources optionalResources;
 
-    private final TermId MONDO_ROOT_ID=ImmutableTermId.constructWithPrefix("MONDO:0000001");
+    private final TermId MONDO_ROOT_ID = ImmutableTermId.constructWithPrefix("MONDO:0000001");
 
-    /** Unused, but still required. */
+    /**
+     * Unused, but still required.
+     */
     private final File hpoWorkbenchDir;
     private static final String EVENT_TYPE_CLICK = "click";
     private static final String EVENT_TYPE_MOUSEOVER = "mouseover";
     private static final String EVENT_TYPE_MOUSEOUT = "mouseclick";
+    //TODO migrate these variables into somewhere else, they are now duplicated between the HPO and MONDO controller
+    /**
+     * Users can create a github issue. Username and password will be stored for the current session only.
+     */
+    private String githubUsername = null;
+    /**
+     * Github password. Username and password will be stored for the current session only.
+     */
+    private String githubPassword;
+
 
     /**
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
@@ -66,7 +80,9 @@ public final class MondoController {
      */
     private final Properties properties;
 
-    /** Reference to the primary stage of the App. */
+    /**
+     * Reference to the primary stage of the App.
+     */
     private final Stage primaryStage;
 
     @FXML
@@ -98,27 +114,39 @@ public final class MondoController {
 
     public RadioButton decipherButton;
 
-    /** The MONDO term that is currently selected in the Browser window. */
+    /**
+     * The MONDO term that is currently selected in the Browser window.
+     */
     private GenericTerm selectedTerm = null;
 
     private HpoController hpoController;
 
-    /** Tree hierarchy of the ontology is presented here. */
+    /**
+     * Tree hierarchy of the ontology is presented here.
+     */
     @FXML
     private TreeView<GenericTermWrapper> mondoOntologyTreeView;
 
-    /** Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}. */
+    /**
+     * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
+     */
     private Map<String, TermId> labelsAndMondoIds = new HashMap<>();
 
-    /** Text field with autocompletion for jumping to a particular HPO term in the tree view. */
+    /**
+     * Text field with autocompletion for jumping to a particular HPO term in the tree view.
+     */
     @FXML
     private TextField searchTextField;
 
-    /** WebView for displaying details of the Term that is selected in the {@link #mondoOntologyTreeView}. */
+    /**
+     * WebView for displaying details of the Term that is selected in the {@link #mondoOntologyTreeView}.
+     */
     @FXML
     private WebView infoWebView;
 
-    /** WebEngine backing up the {@link #infoWebView}. */
+    /**
+     * WebEngine backing up the {@link #infoWebView}.
+     */
     private WebEngine infoWebEngine;
 
 
@@ -130,7 +158,7 @@ public final class MondoController {
         this.properties = properties;
         this.primaryStage = primaryStage;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
-        this.hpoController=hpocon;
+        this.hpoController = hpocon;
     }
 
     @FXML
@@ -138,21 +166,23 @@ public final class MondoController {
 
         // this binding evaluates to true, if ontology or annotations files are missing (null)
         BooleanBinding mondoResourceIsMissing = optionalResources.mondoResourceMissing();
+
+
         logger.error("Initializing MondoController, missing = " + mondoResourceIsMissing.toString());
-        hpoTermRadioButton.disableProperty().bind(mondoResourceIsMissing);
-        diseaseRadioButton.disableProperty().bind(mondoResourceIsMissing);
-        newAnnotationRadioButton.disableProperty().bind(mondoResourceIsMissing);
+        hpoTermRadioButton.disableProperty().setValue(false);
+        diseaseRadioButton.disableProperty().setValue(false);
+        newAnnotationRadioButton.disableProperty().setValue(false);
         goButton.disableProperty().bind(mondoResourceIsMissing);
-        exportHierarchicalSummaryButton.disableProperty().bind(mondoResourceIsMissing);
-        exportToExcelButton.disableProperty().bind(mondoResourceIsMissing);
+        exportHierarchicalSummaryButton.disableProperty().setValue(false);
+        exportToExcelButton.disableProperty().setValue(false);
         suggestCorrectionToTermButton.disableProperty().bind(mondoResourceIsMissing);
-        suggestNewChildTermButton.disableProperty().bind(mondoResourceIsMissing);
-        suggestNewAnnotationButton.disableProperty().bind(mondoResourceIsMissing);
-        reportMistakenAnnotationButton.disableProperty().bind(mondoResourceIsMissing);
-        allDatabaseButton.disableProperty().bind(mondoResourceIsMissing);
-        orphanetButton.disableProperty().bind(mondoResourceIsMissing);
-        omimButton.disableProperty().bind(mondoResourceIsMissing);
-        decipherButton.disableProperty().bind(mondoResourceIsMissing);
+        suggestNewChildTermButton.disableProperty().setValue(false);
+        suggestNewAnnotationButton.disableProperty().setValue(false);
+        reportMistakenAnnotationButton.disableProperty().setValue(false);
+        allDatabaseButton.disableProperty().setValue(false);
+        orphanetButton.disableProperty().setValue(false);
+        omimButton.disableProperty().setValue(false);
+        decipherButton.disableProperty().setValue(false);
 
         mondoResourceIsMissing.addListener(((observable, oldValue, newValue) -> {
             if (!newValue) { // nothing is missing anymore
@@ -160,7 +190,7 @@ public final class MondoController {
             } else { // invalidate model and anything in the background. Controls should be disabled automatically
                 deactivate();
             }
-            System.out.println("MONDO LISTEBNER old="+oldValue+" new="+newValue);
+            System.out.println("MONDO LISTEBNER old=" + oldValue + " new=" + newValue);
         }));
 
 
@@ -176,7 +206,6 @@ public final class MondoController {
 
     private void deactivate() {
         initTree(null);
-        //this.model = new Model(null, null, null);
     }
 
 
@@ -191,11 +220,10 @@ public final class MondoController {
             mondoOntologyTreeView.setRoot(null);
             return;
         }
-        TermId rootId = ontology.getRootTermId(); // TODO not working
-        rootId= ImmutableTermId.constructWithPrefix("MONDO:0000001");
+        TermId rootId = ImmutableTermId.constructWithPrefix("MONDO:0000001");
         logger.trace("root id = " + rootId.getIdWithPrefix());
         GenericTerm rootTerm = ontology.getTermMap().get(rootId);
-        if (rootTerm==null) {
+        if (rootTerm == null) {
             logger.error("Mondo root term was null");
             return;
         }
@@ -211,7 +239,7 @@ public final class MondoController {
                         return;
                     }
                     GenericTermWrapper w = newValue.getValue();
-                    TreeItem item = new MondoController.GenericTermTreeItem(w);
+                    TreeItem<GenericTermWrapper> item = new MondoController.GenericTermTreeItem(w);
                     updateMondoDescription(item);
                 });
         // create Map for lookup of the terms in the ontology based on their Name
@@ -232,25 +260,24 @@ public final class MondoController {
     }
 
 
-
     private String getOMIMid(GenericTerm gterm) {
-        List<Dbxref> dbxlst=gterm.getXrefs();
-        if (dbxlst==null) return null;
+        List<Dbxref> dbxlst = gterm.getXrefs();
+        if (dbxlst == null) return null;
         for (Dbxref dbx : dbxlst) {
 //           logger.trace("Name=" + dbx.getName());
 //           logger.trace("Description = "+ dbx.getDescription());
-           if (dbx.getName().startsWith("OMIM:"))
-               return dbx.getName();
+            if (dbx.getName().startsWith("OMIM:"))
+                return dbx.getName();
         }
         return null;
     }
 
     private String getOrphanetid(GenericTerm gterm) {
-        List<Dbxref> dbxlst=gterm.getXrefs();
-        if (dbxlst==null) return null;
+        List<Dbxref> dbxlst = gterm.getXrefs();
+        if (dbxlst == null) return null;
         for (Dbxref dbx : dbxlst) {
             if (dbx.getName().startsWith("Orphanet:"))
-                return dbx.getName().replaceAll("Orphanet","ORPHA");
+                return dbx.getName().replaceAll("Orphanet", "ORPHA");
         }
         return null;
     }
@@ -265,25 +292,25 @@ public final class MondoController {
             return;
 
         GenericTerm mondoTerm = treeItem.getValue().term;
-        String omim=getOMIMid(mondoTerm);
-        String orpha= getOrphanetid(mondoTerm);
+        String omim = getOMIMid(mondoTerm);
+        String orpha = getOrphanetid(mondoTerm);
 
         Map<String, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
-        if (disease2AnnotationMap==null) {
+        if (disease2AnnotationMap == null) {
             PopUps.showInfoMessage("Error: disease annotation map could not be initialized", "Error");
             return;
         }
-        HpoDisease omimDisease=disease2AnnotationMap.get(omim);
-        HpoDisease orphaDisease=disease2AnnotationMap.get(orpha);
+        HpoDisease omimDisease = disease2AnnotationMap.get(omim);
+        HpoDisease orphaDisease = disease2AnnotationMap.get(orpha);
         debugDisease(omimDisease);
         debugDisease(orphaDisease);
 
-        if (omimDisease ==null || orphaDisease == null) {
+        if (omimDisease == null || orphaDisease == null) {
             logger.warn("Could not init diseases");
             int c = 0;
             for (String dis : disease2AnnotationMap.keySet()) {
                 logger.warn("example name " + dis);
-                if (c++>10) break;
+                if (c++ > 10) break;
             }
         } else {
             logger.trace("Got mim " + omimDisease.toString());
@@ -291,52 +318,49 @@ public final class MondoController {
         }
 
 
-        String content = MondoHtmlPageGenerator.getHTML(mondoTerm, omimDisease,orphaDisease, optionalResources.getHpoOntology());
+        String content = MondoHtmlPageGenerator.getHTML(mondoTerm, omimDisease, orphaDisease, optionalResources.getHpoOntology());
         infoWebEngine.loadContent(content);
-        infoWebEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-            @Override
-            public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                if (newState == Worker.State.SUCCEEDED) {
-                    org.w3c.dom.events.EventListener listener = new EventListener() {
-                        @Override
-                        public void handleEvent(org.w3c.dom.events.Event ev) {
-                            String domEventType = ev.getType();
-                            // System.err.println("EventType FROM updateHPO: " + domEventType);
-                            if (domEventType.equals(EVENT_TYPE_CLICK)) {
-                                String href = ((Element) ev.getTarget()).getAttribute("href");
-                                // System.out.println("HREF "+href);
-                                if (href.equals("http://www.human-phenotype-ontology.org")) {
-                                    return; // the external link is taken care of by the Webengine
-                                    // therefore, we do not need to do anything special here
-                                }
-                                // The following line is necessary because sometimes multiple events are triggered
-                                // and we get a "stray" HPO-related link that does not belong here.
-                                if (href.startsWith("HP:")) return;
+        infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener
+                (ov, oldState, newState) -> {
+                    if (newState == Worker.State.SUCCEEDED) {
+                        org.w3c.dom.events.EventListener listener = // EventListener
+                                (event) -> {
+                                    String domEventType = event.getType();
+                                    // System.err.println("EventType FROM updateHPO: " + domEventType);
+                                    if (domEventType.equals(EVENT_TYPE_CLICK)) {
+                                        String href = ((Element) event.getTarget()).getAttribute("href");
+                                        // System.out.println("HREF "+href);
+                                        if (href.equals("http://www.human-phenotype-ontology.org")) {
+                                            return; // the external link is taken care of by the Webengine
+                                            // therefore, we do not need to do anything special here
+                                        }
+                                        // The following line is necessary because sometimes multiple events are triggered
+                                        // and we get a "stray" HPO-related link that does not belong here.
+                                        if (href.startsWith("HP:")) return;
 
-                                logger.trace("Got click from webview");
-                            }
+                                        logger.trace("Got click from webview");
+                                    }
+                                };
+
+                        Document doc = infoWebView.getEngine().getDocument();
+                        NodeList nodeList = doc.getElementsByTagName("a");
+                        for (int i = 0; i < nodeList.getLength(); i++) {
+                            ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
+                            //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
+                            //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
                         }
-                    };
-
-                    Document doc = infoWebView.getEngine().getDocument();
-                    NodeList nodeList = doc.getElementsByTagName("a");
-                    for (int i = 0; i < nodeList.getLength(); i++) {
-                        ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
-                        //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
-                        //((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_MOUSEOVER, listener, false);
                     }
-                }
-            }
-        });
+                });
 
     }
 
     private void debugDisease(HpoDisease disease) {
         System.err.println("DEBUG DISEASE PRINT MONDO CONTROLLER");
-        if (disease==null) {
-            System.err.println("disease null"); return;
+        if (disease == null) {
+            System.err.println("disease null");
+            return;
         }
-        System.err.println(disease.getName() +" ["+disease.getDatabase()+":"+disease.getDiseaseDatabaseId()+"]");
+        System.err.println(disease.getName() + " [" + disease.getDatabase() + ":" + disease.getDiseaseDatabaseId() + "]");
         List<HpoAnnotation> termlist = disease.getPhenotypicAbnormalities();
         for (HpoAnnotation annot : termlist) {
             System.err.println("\t" + annot.toString());
@@ -348,11 +372,10 @@ public final class MondoController {
      * Get the parents of "term"
      *
      * @param term HPO Term of interest
-     *
      * @return parents of term (not including term itself).
      */
     private Set<GenericTerm> getTermParents(GenericTerm term) {
-        Ontology ontology = optionalResources.getMondoOntology();
+        Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return new HashSet<>(); // return empty set
@@ -360,14 +383,14 @@ public final class MondoController {
         Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
         Set<GenericTerm> eltern = new HashSet<>();
         parentIds.forEach(tid -> {
-            GenericTerm ht = (GenericTerm) ontology.getTermMap().get(tid);
+            GenericTerm ht = ontology.getTermMap().get(tid);
             eltern.add(ht);
         });
         return eltern;
     }
 
     private boolean existsPathFromRoot(GenericTerm term) {
-        Ontology ontology = optionalResources.getMondoOntology();
+        Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
             return false;
@@ -426,14 +449,72 @@ public final class MondoController {
     public void goButtonAction() {
         TermId tid = labelsAndMondoIds.get(searchTextField.getText());
         GenericTerm term = optionalResources.getMondoOntology().getTermMap().get(tid);
-        if (term==null) {
-            String msg=String.format("Could not find ontology term for search result: %s",searchTextField.getText() );
-            PopUps.showInfoMessage(msg,"Warning");
+        if (term == null) {
+            String msg = String.format("Could not find ontology term for search result: %s", searchTextField.getText());
+            PopUps.showInfoMessage(msg, "Warning");
             return;
         }
         expandUntilTerm(term);
-        TreeItem titem = new TreeItem(new GenericTermWrapper(term));
+        TreeItem<GenericTermWrapper> titem = new TreeItem<>(new GenericTermWrapper(term));
         updateMondoDescription(titem);
+    }
+
+    /**
+     * Get currently selected Term. Used in tests.
+     *
+     * @return {@link HpoController.HpoTermTreeItem} that is currently selected
+     */
+    private GenericTermTreeItem getSelectedTerm() {
+        return (mondoOntologyTreeView.getSelectionModel().getSelectedItem() == null) ? null
+                : (GenericTermTreeItem) mondoOntologyTreeView.getSelectionModel().getSelectedItem();
+    }
+
+    private void postGitHubIssue(String message, String title, String uname, String pword) {
+        GitHubPoster poster = new GitHubPoster(uname, pword, title, message);
+        this.githubUsername = uname;
+        this.githubPassword = pword;
+        try {
+            poster.postMondoIssue();
+        } catch (HPOWorkbenchException he) {
+            PopUps.showException("GitHub error", "Bad Request (400): Could not post issue", he);
+        } catch (Exception ex) {
+            PopUps.showException("GitHub error", "GitHub error: Could not post issue", ex);
+            return;
+        }
+        String response = poster.getHttpResponse();
+        PopUps.showInfoMessage(
+                String.format("Created issue for %s\nServer response: %s", selectedTerm.getName(), response), "Created new issue");
+    }
+
+    /**
+     * Post an issue on the MONDO tracker to suggest a correction to a term.
+     */
+    @FXML
+    private void suggestCorrectionToTerm() {
+        if (getSelectedTerm() == null) {
+            logger.error("Select a term before creating GitHub issue");
+            PopUps.showInfoMessage("Please select a MONDO term before creating GitHub issue",
+                    "Error: No MONDO Term selected");
+            return;
+        } else {
+            selectedTerm = getSelectedTerm().getValue().term;
+        }
+        selectedTerm = getSelectedTerm().getValue().term;
+        GitHubPopup popup = new GitHubPopup(selectedTerm);
+        // initializeGitHubLabelsIfNecessary();
+        // popup.setLabels(model.getGithublabels());
+        popup.setupGithubUsernamePassword(githubUsername, githubPassword);
+        popup.displayWindow(primaryStage);
+        String githubissue = popup.retrieveGitHubIssue();
+        if (popup.wasCancelled()) {
+            return;
+        }
+        if (githubissue == null) {
+            logger.trace("got back null GitHub issue");
+            return;
+        }
+        String title = String.format("Correction to term %s", selectedTerm.getName());
+        postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord());
     }
 
 
@@ -441,11 +522,10 @@ public final class MondoController {
      * Get the children of "term"
      *
      * @param term HPO Term of interest
-     *
      * @return children of term (not including term itself).
      */
     private Set<GenericTerm> getTermChildren(GenericTerm term) {
-        Ontology ontology = optionalResources.getMondoOntology();
+        Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
             return new HashSet<>(); // return empty set
@@ -458,7 +538,7 @@ public final class MondoController {
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
         Set<GenericTerm> kids = new HashSet<>();
         childrenIds.forEach(tid -> {
-            GenericTerm gt = (GenericTerm) ontology.getTermMap().get(tid);
+            GenericTerm gt = ontology.getTermMap().get(tid);
             kids.add(gt);
         });
         return kids;
@@ -471,7 +551,9 @@ public final class MondoController {
      */
     class GenericTermTreeItem extends TreeItem<GenericTermWrapper> {
 
-        /** List used for caching of the children of this term */
+        /**
+         * List used for caching of the children of this term
+         */
         private ObservableList<TreeItem<GenericTermWrapper>> childrenList;
 
         /**

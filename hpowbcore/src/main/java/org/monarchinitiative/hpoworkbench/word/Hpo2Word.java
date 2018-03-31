@@ -122,25 +122,6 @@ public class Hpo2Word {
         startTerm=id;
         XWPFTable table    = document.createTable();
 
-
-
-        XWPFTableRow rowOne = table.getRow(0);
-//                XWPFParagraph paragraph = rowOne.getCell(0).addParagraph();
-//                setRun(paragraph.createRun() , "Calibre LIght" ,
-//                        10,
-//                        "2b5079" ,
-//                        "Some string" ,
-//                        false,
-//                        false);
-//
-//        XWPFParagraph para = document.createParagraph();
-//        XWPFRun run        = para.createRun();
-//        run.setFontSize(9);
-
-
-
-       // run.setText("Excerpt of HPO from Term " + id);
-
         //create first row
         XWPFTableRow tableRowOne = table.getRow(0);
         tableRowOne.getCell(0).setText("Level");
@@ -169,8 +150,6 @@ public class Hpo2Word {
             TermId termId=pair.first;
             Integer level=pair.second;
             HpoTerm hterm = termmap.get(termId);
-            LOGGER.info("Adding row for " + termId.getIdWithPrefix());
-           // if (c++>10)break;
             if (! previouslyseen.contains(termId)) {
                 // we have not yet output this term!
                 XWPFTableRow tableRow = table.createRow();
@@ -259,7 +238,7 @@ public class Hpo2Word {
     }
 
 
-    /** Input the HPO ontologuy file into {@link #hpoOntology}. */
+    /** Input the HPO ontology file into {@link #hpoOntology}. */
     private void inputHPOdata(String hpo) {
         if (hpo==null)hpo="data/hp.obo";
         LOGGER.trace(String.format("inputting HPO ontology from file %s.",hpo));

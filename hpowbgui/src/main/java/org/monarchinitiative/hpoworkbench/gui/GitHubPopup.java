@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckComboBox;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
@@ -72,6 +73,18 @@ public class GitHubPopup {
                 stream().map(TermSynonym::getValue).collect(Collectors.joining(";"));
     }
 
+
+    public GitHubPopup(GenericTerm term) {
+        termlabel = term.getName();
+        termid = term.getId().getIdWithPrefix();
+        definition = term.getDefinition();
+        comment = term.getComment();
+        synlist = term.getSynonyms().size() == 0 ? "-" : term.getSynonyms().
+                stream().map(TermSynonym::getValue).collect(Collectors.joining(";"));
+    }
+
+
+
     /**
      * @param term      An HPO Term for which we ant to suggest a new child term.
      * @param childterm set this to true if we want to create an issue to make a new child term
@@ -109,7 +122,7 @@ public class GitHubPopup {
         window.initModality(Modality.APPLICATION_MODAL);
 
         ObservableList<String> options = FXCollections.observableArrayList(labels);
-        final ComboBox comboBox = new ComboBox(options);
+        final ComboBox<String> comboBox = new ComboBox<>(options);
         final CheckComboBox<String> checkComboBox = new CheckComboBox<>(options);
 
         VBox root = new VBox();
@@ -180,8 +193,8 @@ public class GitHubPopup {
 
     /** This is used if the user has alreay entered their GitHub name and password (they are stored in the
      * {@link org.monarchinitiative.hpoworkbench.model.Model} object.
-     * @param ghuname
-     * @param ghpword
+     * @param ghuname  GitHub user name
+     * @param ghpword corresponding GitHub password
      */
     public void setupGithubUsernamePassword(String ghuname, String ghpword) {
         uname = ghuname;

@@ -74,8 +74,8 @@ public class GitHubPoster {
 
     /**
      * Change a list of string into a Json array
-     * @param labels
-     * @return
+     * @param labels a list of GitHub isseu tracker labels
+     * @return A JSONified String with a list of GitHub labels
      */
     private String labelsArray4Json(List<String> labels) {
 
@@ -85,9 +85,9 @@ public class GitHubPoster {
 
         if (labels.size() > 1) {
             StringBuilder sb = new StringBuilder();
-            sb.append("\"" + labels.get(0) + "\"");
+            sb.append("\"").append(labels.get(0)).append("\"");
             for (int i = 1; i < labels.size(); i++) {
-                sb.append(", \"" + labels.get(i) + "\"");
+                sb.append(", \"").append(labels.get(i)).append("\"");
             }
             return sb.toString();
         }
@@ -128,7 +128,7 @@ public class GitHubPoster {
 
 
 
-    public void postIssue() throws Exception {
+    public void postHpoIssue() throws Exception {
         URL url = new URL("https://api.github.com/repos/obophenotype/human-phenotype-ontology/issues");
         URLConnection con = url.openConnection();
         String userpass = String.format("%s:%s",username,password);
@@ -136,7 +136,39 @@ public class GitHubPoster {
         HttpURLConnection http = (HttpURLConnection)con;
         http.setRequestMethod("POST"); // PUT is another valid option
         http.setDoOutput(true);
-        byte[] out = payload.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] out = payload.getBytes(StandardCharsets.UTF_8);
+        int length = out.length;
+        http.setFixedLengthStreamingMode(length);
+        http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        http.setRequestProperty("Authorization",basicAuth);
+        http.connect();
+        try(OutputStream os = http.getOutputStream()) {
+            os.write(out);
+            os.close();
+        }
+        if (http.getResponseCode()==400) {
+            String erro=String.format("URL:%s\nPayload=%s\nServer response: %s [%d]",
+                    http.toString(),
+                    payload,
+                    http.getResponseMessage(),
+                    http.getResponseCode());
+            throw new Exception(erro);
+        } else {
+            this.response=http.getResponseMessage();
+            this.responsecode=http.getResponseCode();
+        }
+    }
+
+
+    public void postMondoIssue() throws Exception {
+        URL url = new URL("https://api.github.com/repos/monarch-initiative/mondo-build/issues");
+        URLConnection con = url.openConnection();
+        String userpass = String.format("%s:%s",username,password);
+        String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+        HttpURLConnection http = (HttpURLConnection)con;
+        http.setRequestMethod("POST"); // PUT is another valid option
+        http.setDoOutput(true);
+        byte[] out = payload.getBytes(StandardCharsets.UTF_8);
         int length = out.length;
         http.setFixedLengthStreamingMode(length);
         http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
