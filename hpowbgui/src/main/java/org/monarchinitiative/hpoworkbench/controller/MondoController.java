@@ -2,8 +2,6 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
@@ -32,7 +30,6 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import javax.inject.Inject;
@@ -49,7 +46,6 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public final class MondoController {
-
     private static final Logger logger = LogManager.getLogger();
 
     private final OptionalResources optionalResources;
@@ -184,14 +180,13 @@ public final class MondoController {
         omimButton.disableProperty().setValue(false);
         decipherButton.disableProperty().setValue(false);
 
-        mondoResourceIsMissing.addListener(((observable, oldValue, newValue) -> {
+        mondoResourceIsMissing.addListener((observable, oldValue, newValue) -> {
             if (!newValue) { // nothing is missing anymore
                 activate();
             } else { // invalidate model and anything in the background. Controls should be disabled automatically
                 deactivate();
             }
-            System.out.println("MONDO LISTEBNER old=" + oldValue + " new=" + newValue);
-        }));
+        });
 
 
         if (!mondoResourceIsMissing.get()) {
@@ -221,13 +216,13 @@ public final class MondoController {
             return;
         }
         TermId rootId = ImmutableTermId.constructWithPrefix("MONDO:0000001");
-        logger.trace("root id = " + rootId.getIdWithPrefix());
+        logger.trace("Initializing Mondo tree with root id {}", rootId.getIdWithPrefix());
         GenericTerm rootTerm = ontology.getTermMap().get(rootId);
         if (rootTerm == null) {
             logger.error("Mondo root term was null");
             return;
         }
-        logger.trace("RootTerm is " + rootTerm.toString());
+        logger.trace("Initializing Mondo tree with RootTerm {}", rootTerm.toString());
         TreeItem<GenericTermWrapper> root = new MondoController.GenericTermTreeItem(new GenericTermWrapper(rootTerm));
         root.setExpanded(true);
         mondoOntologyTreeView.setShowRoot(false);
@@ -302,16 +297,11 @@ public final class MondoController {
         }
         HpoDisease omimDisease = disease2AnnotationMap.get(omim);
         HpoDisease orphaDisease = disease2AnnotationMap.get(orpha);
-        debugDisease(omimDisease);
-        debugDisease(orphaDisease);
+        //debugDisease(omimDisease);
+        //debugDisease(orphaDisease);
 
         if (omimDisease == null || orphaDisease == null) {
             logger.warn("Could not init diseases");
-            int c = 0;
-            for (String dis : disease2AnnotationMap.keySet()) {
-                logger.warn("example name " + dis);
-                if (c++ > 10) break;
-            }
         } else {
             logger.trace("Got mim " + omimDisease.toString());
             logger.trace("Got orph " + orphaDisease.toString());
@@ -378,7 +368,7 @@ public final class MondoController {
         Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
-            return new HashSet<>(); // return empty set
+            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
         Set<GenericTerm> eltern = new HashSet<>();
@@ -528,11 +518,11 @@ public final class MondoController {
         Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
-            return new HashSet<>(); // return empty set
+            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         if (term == null) {
             PopUps.showInfoMessage("Error: term==null in getTermChildren", "ERROR");
-            return new HashSet<>(); // return empty set
+            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         TermId parentTermId = term.getId();
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);

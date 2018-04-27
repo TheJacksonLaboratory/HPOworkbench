@@ -25,6 +25,8 @@ import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.base.PhenolException;
+import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
+import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 
 import javax.inject.Named;
@@ -187,7 +189,7 @@ public class MainController {
             String mondoOboPath = dirpath + File.separator + PlatformUtil.MONDO_OBO_FILENAME;
             try {
                 MondoParser parser = new MondoParser(mondoOboPath);
-                Ontology mondo =parser.getMondo();
+                Ontology<GenericTerm,GenericRelationship> mondo =parser.getMondo();
                 optionalResources.setMondoOntology(mondo);
                 properties.setProperty("mondo.obo.path", mondoOboPath);
             } catch (PhenolException pe) {

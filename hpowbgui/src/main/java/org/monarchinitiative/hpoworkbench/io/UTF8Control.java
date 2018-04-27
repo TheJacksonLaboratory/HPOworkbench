@@ -35,7 +35,7 @@ public final class UTF8Control extends ResourceBundle.Control {
     }
 
     @Override
-    public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IllegalAccessException, InstantiationException, IOException {
+    public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
         // based on https://stackoverflow.com/questions/4659929/how-to-use-utf-8-in-resource-properties-with-resourcebundle
         // The below is a copy of the default implementation.
         String bundleName = toBundleName(baseName, locale);

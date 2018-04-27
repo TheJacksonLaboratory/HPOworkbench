@@ -33,7 +33,7 @@ public class Downloader extends Task<Void> {
 
 
     /** This is the URL of the file we want to download */
-    protected String urlstring=null;
+    private String urlstring=null;
 
     public Downloader(File directoryPath, String url, String basename) {
         this.localDir = directoryPath;
@@ -50,9 +50,9 @@ public class Downloader extends Task<Void> {
     }
 
 
-    protected File getLocalFilePath() { return  this.localFilePath; }
+    private File getLocalFilePath() { return  this.localFilePath; }
 
-    protected void setLocalFilePath (String bname) {
+    private void setLocalFilePath (String bname) {
         this.localFilePath = new File(this.localDir + File.separator + bname);
         logger.debug("setLocalFilepath for download to: "+localFilePath);
     }
@@ -86,7 +86,7 @@ public class Downloader extends Task<Void> {
             writer = new FileOutputStream(localFilePath);
             byte[] buffer = new byte[153600];
             int totalBytesRead = 0;
-            int bytesRead = 0;
+            int bytesRead;
             int size = urlc.getContentLength();
             logger.trace("Size of file to be downloaded: "+size);
             if (size >= 0)

@@ -20,15 +20,9 @@ package org.monarchinitiative.hpoworkbench.gui;
  * #L%
  */
 
-import com.google.common.base.Supplier;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.*;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +40,7 @@ public class HelpViewFactory {
     private static final String READTHEDOCS_SITE = "http://hpo-workbench.readthedocs.io/en/latest/";
 
     private static String getHTML() {
-        String sb = "<html><body>\n" +
+        return "<html><body>\n" +
                 inlineCSS() +
                 "<h1>HPO Workbench Help</h1>" +
                 "<p><i>HPO Workbench</i> is designed to help curators explore the HPO and suggest new terms, " +
@@ -54,18 +48,14 @@ public class HelpViewFactory {
                 setup() +
                 openFile() +
                 "</body></html>";
-        return sb;
-
     }
 
     private static String getHTMLError() {
-        String sb = "<html><body>\n" +
+        return "<html><body>\n" +
                 inlineCSS() +
                 "<h1>HPO Workbench: Connection error</h1>" +
                 "<p><Unable to conect to the internet.</p>" +
                 "</body></html>";
-        return sb;
-
     }
 
 

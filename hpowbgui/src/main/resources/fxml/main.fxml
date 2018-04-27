@@ -1,50 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<BorderPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
         <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
-            <children>
-                <MenuBar minHeight="30.0" minWidth="120.0" prefWidth="120.0" styleClass="mymenu" stylesheets="@../css/style.css">
-                    <menus>
-                        <Menu mnemonicParsing="false" text="File">
-                            <items>
-                                <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
-                            </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Edit">
-                            <items>
-                                <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
-                                <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
-                                <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo" />
-                                <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
-                            </items>
-                        </Menu>
-                    </menus>
-                </MenuBar>
-                <Region minHeight="30.0" styleClass="fx-menubar" HBox.hgrow="ALWAYS" />
-                <MenuBar minHeight="30.0" minWidth="70.0" HBox.hgrow="NEVER">
-                    <menus>
-                        <Menu mnemonicParsing="false" text="Help">
-                            <items>
-                                <MenuItem mnemonicParsing="false" onAction="#helpWindow" text="Help" />
-                                <MenuItem mnemonicParsing="false" onAction="#aboutWindow" text="About" />
-                            </items>
-                        </Menu>
-                    </menus>
-                </MenuBar>
-            </children>
+            <MenuBar minHeight="30.0" minWidth="120.0" prefWidth="120.0" styleClass="mymenu" stylesheets="@../css/style.css">
+                <menus>
+                    <Menu mnemonicParsing="false" text="File">
+                        <items>
+                            <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Edit">
+                        <items>
+                            <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
+                            <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
+                            <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo" />
+                            <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
+            <Region minHeight="30.0" styleClass="fx-menubar" HBox.hgrow="ALWAYS" />
+            <MenuBar minHeight="30.0" minWidth="70.0" HBox.hgrow="NEVER">
+                <menus>
+                    <Menu mnemonicParsing="false" text="Help">
+                        <items>
+                            <MenuItem mnemonicParsing="false" onAction="#helpWindow" text="Help" />
+                            <MenuItem mnemonicParsing="false" onAction="#aboutWindow" text="About" />
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
         </HBox>
     </top>
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE">
-            <Tab text="Hpo Browser">
-                <fx:include source="hpo.fxml"/>
+            <Tab text="HPO Browser">
+                <fx:include source="hpo.fxml" />
             </Tab>
             <Tab text="Mondo Browser">
-                <fx:include source="mondo.fxml"/>
+                <fx:include source="mondo.fxml" />
             </Tab>
+         <Tab text="HPO Analysis">
+           <fx:include source="hpoanalysis.fxml" />
+         </Tab>
         </TabPane>
     </center>
     <bottom>

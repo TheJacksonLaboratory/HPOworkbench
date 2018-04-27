@@ -52,7 +52,7 @@ public class Model {
         if (id!=null) {
             diseases=annotmap.get(id);
         }
-        if (diseases==null) return new ArrayList<>();// return empty
+        if (diseases==null) return new ArrayList<>();// return hasTermsUniqueToOnlyOneDisease
         // user wan't all databases, just pass through
         if (dbase== DiseaseModel.database.ALL) return diseases;
         // filter for desired database

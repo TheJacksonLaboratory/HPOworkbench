@@ -13,7 +13,7 @@ import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class PasswordPopup {
+class PasswordPopup {
     private static final Logger logger = LogManager.getLogger();
     private String uname=null;
     private String pword=null;

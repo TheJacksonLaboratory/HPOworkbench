@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.annotation;
 
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.ArrayList;
@@ -18,6 +19,9 @@ public class CategoryMerge {
     private final String disease1name;
     private final String disease2name;
 
+    private final String db1;
+    private final String db2;
+
     private List<HpoAnnotation> disease1allTerms;
     private List<HpoAnnotation> disease2allTerms;
 
@@ -27,10 +31,28 @@ public class CategoryMerge {
     private List<SubClassTermPair> d1subclassOfd2;
     private List<SubClassTermPair> d2subclassOfd1;
 
-    public CategoryMerge(String label,String d1name, String d2name){
+    public String getDb1() {
+        return db1;
+    }
+
+    public String getDb2() {
+        return db2;
+    }
+
+    public CategoryMerge(String label, HpoDisease d1, HpoDisease d2){
         categoryLabel=label;
-        disease1name=d1name;
-        disease2name=d2name;
+        disease1name=diseaseName(d1);
+        disease2name=diseaseName(d2);
+        if (d1==null){
+            db1="n/a";
+        } else {
+            db1 = d1.getDatabase();
+        }
+        if (d2==null) {
+            db2="n/a";
+        } else {
+            db2 = d2.getDatabase();
+        }
         disease1onlyTerms=new ArrayList<>();
         disease2onlyTerms=new ArrayList<>();
         commonTerms=new ArrayList<>();
@@ -71,6 +93,10 @@ public class CategoryMerge {
 
     public void addCommonTerm(TermId tid) {
      commonTerms.add(tid);
+    }
+
+    public boolean hasTermsUniqueToOnlyOneDisease() {
+        return disease1onlyTerms.size()>0 || disease2onlyTerms.size()>0;
     }
 
 
@@ -122,6 +148,24 @@ public class CategoryMerge {
                 disease1onlyTerms.isEmpty() &&
                 commonTerms.isEmpty() &&
                 (! disease2onlyTerms.isEmpty());
+    }
+
+    private String diseaseName(HpoDisease d) {
+        if (d==null) return "none";
+
+        return d.getName() +" (" + d.getDiseaseDatabaseId() +")";
+    }
+
+    public String getCounts() {
+        int total=0;
+        int identical=0;
+        int subclazz=0;
+        int unrelated=0;
+        identical=this.commonTerms.size();
+        subclazz=this.d1subclassOfd2.size()+d2subclassOfd1.size();
+        unrelated=this.disease1onlyTerms.size()+disease2onlyTerms.size();
+        total=identical+subclazz+unrelated;
+        return String.format("%d annotations [%d identical, %d subclass and %d unrelated",total,identical,subclazz,unrelated);
     }
 
 }

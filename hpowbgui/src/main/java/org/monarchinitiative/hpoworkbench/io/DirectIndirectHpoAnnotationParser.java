@@ -133,9 +133,9 @@ public class DirectIndirectHpoAnnotationParser {
             e.printStackTrace();
         }
         // When we get here, we transform the sets into an immutable, sorted list
-        ImmutableMap.Builder<TermId, List<DiseaseModel>> mapbuilder = new ImmutableMap.Builder();
+        ImmutableMap.Builder<TermId, List<DiseaseModel>> mapbuilder = new ImmutableMap.Builder<>();
         for (TermId key : tempmap.keySet()) {
-            ImmutableList.Builder<DiseaseModel> listbuilder = new ImmutableList.Builder();
+            ImmutableList.Builder<DiseaseModel> listbuilder = new ImmutableList.Builder<>();
             listbuilder.addAll(tempmap.get(key));
             mapbuilder.put(key, listbuilder.build());
         }

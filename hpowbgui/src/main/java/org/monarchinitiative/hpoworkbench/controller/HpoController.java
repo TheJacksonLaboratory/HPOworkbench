@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -160,12 +159,12 @@ public final class HpoController {
             searchTextField.clear();
         } else if (currentMode.equals(MainController.mode.BROWSE_HPO)) {
             TermId id = labelsAndHpoIds.get(searchTextField.getText());
-            if (id == null) return; // button was clicked while field was empty, no need to do anything
+            if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
             expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
             searchTextField.clear();
         } else if (currentMode == MainController.mode.NEW_ANNOTATION) {
             TermId id = labelsAndHpoIds.get(searchTextField.getText());
-            if (id == null) return; // button was clicked while field was empty, no need to do anything
+            if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
             expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
             searchTextField.clear();
         }
@@ -777,7 +776,7 @@ public final class HpoController {
         HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
-            return new HashSet<>(); // return empty set
+            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         TermId parentTermId = term.getId();
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
@@ -799,7 +798,7 @@ public final class HpoController {
         HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
-            return new HashSet<>(); // return empty set
+            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
         Set<HpoTerm> eltern = new HashSet<>();

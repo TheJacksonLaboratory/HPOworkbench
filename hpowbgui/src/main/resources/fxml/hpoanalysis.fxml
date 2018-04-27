@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
+
+<SplitPane id="splitPaneMondo" dividerPositions="0.5" focusTraversable="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.HpoAnalysisController">
+
+    <VBox BorderPane.alignment="CENTER">
+        <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse MONDO Terms or Diseases">
+            <VBox.margin>
+                <Insets bottom="5.0" left="15.0" top="5.0" />
+            </VBox.margin>
+        </Label>
+      <Button mnemonicParsing="false" onAction="#calculateTermAndRelationCounts" styleClass="Button" text="Term and relation counts">
+         <VBox.margin>
+            <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+         </VBox.margin></Button>
+    </VBox>
+
+    <AnchorPane>
+        <WebView fx:id="hpoAnalysisWebView" maxHeight="-1.0" maxWidth="-1.0" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="130.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+    </AnchorPane>
+
+</SplitPane>

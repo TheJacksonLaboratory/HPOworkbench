@@ -11,8 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -44,7 +42,7 @@ public class GitHubPopup {
     /** GitHub labels the user can choose from. */
     private List<String> labels=new ArrayList<>();
 
-    private String chosenLabel=null;
+    //private String chosenLabel=null;
     private List<String> chosenLabels = new ArrayList<>();
 
     /**
@@ -259,8 +257,7 @@ public class GitHubPopup {
     public String getGitHubPassWord() {
         return pword;
     }
-    @Deprecated
-    public String getGitHubLabel() { return chosenLabel; }
+
 
     public List<String> getGitHubLabels() { return chosenLabels; }
 

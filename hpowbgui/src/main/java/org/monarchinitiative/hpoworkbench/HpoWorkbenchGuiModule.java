@@ -4,14 +4,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import javafx.application.Platform;
-import javafx.beans.property.Property;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.controller.HpoController;
-import org.monarchinitiative.hpoworkbench.controller.MainController;
-import org.monarchinitiative.hpoworkbench.controller.MondoController;
-import org.monarchinitiative.hpoworkbench.controller.StatusController;
+import org.monarchinitiative.hpoworkbench.controller.*;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
@@ -95,7 +91,8 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
 
         bind(HpoController.class).asEagerSingleton();
 
-        // ------ CONTROLLERS ------
+        bind(HpoAnalysisController.class).asEagerSingleton();
+
     }
 
     @Provides

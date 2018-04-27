@@ -27,7 +27,7 @@ public class HpoStatsCommand extends HPOCommand  {
     private Map<String,HpoDisease> diseaseMap =null;
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
     private TermId termOfInterest;
-    /** Set of all HPO terms that are descencents of {@link #termOfInterest}. */
+    /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
     private Set<TermId> adultOnset=null;
     private Set<TermId> childhoodOnset=null;

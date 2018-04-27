@@ -8,7 +8,7 @@ public class GitHubPosterTest {
 
 
     @Test
-    public void testPost() throws  Exception{
+    public void testPost() {
         String uname="x";
         String passw="y";
         String title="Test";

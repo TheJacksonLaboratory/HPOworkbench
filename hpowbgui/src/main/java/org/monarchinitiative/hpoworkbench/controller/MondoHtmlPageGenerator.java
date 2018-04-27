@@ -5,18 +5,14 @@ import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.annotation.AnnotationMerger;
 import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
 import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
-import org.monarchinitiative.hpoworkbench.annotation.SubClassTermPair;
+import org.monarchinitiative.hpoworkbench.html.MondoTermHtmlGenerator;
+import org.monarchinitiative.hpoworkbench.html.OmimOrphanetDiseaseHtmlGenerator;
+import org.monarchinitiative.hpoworkbench.html.SingleDiseaseHTMLGenerator;
 import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.ontology.data.Dbxref;
-import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Convenience class to generate HTML code to display data about a MONDO entry.
@@ -26,19 +22,14 @@ public class MondoHtmlPageGenerator {
     private static final Logger logger = LogManager.getLogger();
 
 
-    private final static String EMPTY_STRING="";
+
 
     private static final String HTML_TEMPLATE = "<!DOCTYPE html>" +
             "<html lang=\"en\"><head>" +
             "<style>%s</style>\n" +
             "<meta charset=\"UTF-8\"><title>Mondo browser</title></head>" +
             "<body>" +
-            "<h1>%s</h1>" +
-            "<p><b>ID:</b> %s</p>" +
-            "<p><b>Definition:</b> %s</p>" +
-            "<p><b>Dbxref:</b> %s</p>" +
-            "<p><b>Synonyms:</b> %s</p>" +
-            "%s\n" +
+            "%s %s %s\n" + // the Mondo , summary, and the annotation HTML code go here
             "</body></html>";
 
     private static final String CSS = "body {\n" +
@@ -53,138 +44,45 @@ public class MondoHtmlPageGenerator {
             "  text-align: left;\n" +
             "  border: 1px solid #ccc;\n" +
             "}\n" +
-            "tbody tr:nth-child(odd) {\n" +
-            "  background: #eee;\n" +
+            "tr.myheader {background:#fff} "+
+            "tr.shared { background:#3ff} " +
+            "tr.subclazz { background:#f3f} " +
+            "tr.unrelated { background:#ff3} " +
+           // "tbody tr:nth-child(odd) {\n" +
+            //"  background: #eee;\n" +
             "}";
 
 
 
-    static String getHTML(GenericTerm term, HpoDisease omim, HpoDisease orpha, HpoOntology ontology) {
-        if (omim==null) {
-            logger.warn("Attempt to getHTML for null OMIM disease");
-        }
-        if (orpha==null) {
-            logger.warn("Attempt to getHTML for null Orphanet disease");
-        }
+    static String getHTML(GenericTerm mondoTerm, HpoDisease omim, HpoDisease orpha, HpoOntology ontology) {
         AnnotationMerger merger=new AnnotationMerger(omim,orpha, ontology);
         merger.merge();
         Map<HpoCategory,CategoryMerge> catmap = merger.getMergedCategoryMap();
 
-        String termID = term.getId().getIdWithPrefix();
-        String synonyms = (term.getSynonyms() == null) ? EMPTY_STRING : term.getSynonyms().stream().map(TermSynonym::getValue)
-                .collect(Collectors.joining("; "));
-        String definition = (term.getDefinition() == null) ? EMPTY_STRING : term.getDefinition();
-        List<Dbxref>  dbxlist = term.getXrefs();
-        String comment = (dbxlist == null||dbxlist.isEmpty()) ?
-                EMPTY_STRING :
-                dbxlist.stream().map(Dbxref::getName).collect(Collectors.joining("; "));
-        logger.trace("About to call getMergerTable, catmap size is "+catmap.size());
-        String tabula = getMergerTable(catmap,ontology);
-        return String.format(HTML_TEMPLATE, CSS, term.getName(), termID, definition, comment, synonyms, tabula);
-    }
+        String mondoHtml=MondoTermHtmlGenerator.getHTML(mondoTerm);
 
-
-    private static String getTableFramework(String title, String disease1name, String disease2name) {
-        return String.format("  <table class=\"zebra\">\n" +
-                "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">%s (disease 1: %s; disease 2: %s)</caption>\n" +
-                "    <thead>\n" +
-                "      <tr>\n" +
-                "        <th>Id</th><th>status</th>\n" +
-                "      </tr>\n" +
-                "    </thead>\n" +
-                "    <tfoot>\n" +
-                "      <tr>\n" +
-                "        <td colspan=\"3\">More information: <a href=\"http://www.human-phenotype-ontology.org\">HPO Website</a></td>\n" +
-                "      </tr>\n" +
-                "    </tfoot>", title, disease1name,disease2name);
-    }
-
-    private static String getBothDieasesRows(List<TermId> termIdList, HpoOntology ontology ) {
-        if (termIdList==null || termIdList.isEmpty()) return EMPTY_STRING;
-        StringBuilder sb = new StringBuilder();
-        for (TermId tid : termIdList) {
-            HpoTerm term = ontology.getTermMap().get(tid);
-            String row = String.format("<tr>\n" +
-                            "        <td><a href=\"%s\">%s [%s]</a></td>\n" +
-                            "        <td>shared by both diseases</td>\n" +
-                            "      </tr>\n",
-                    term.getId().getIdWithPrefix(),
-                    term.getName(),
-                    term.getId().getIdWithPrefix());
-            sb.append(row);
-        }
-        return sb.toString();
-    }
-
-    private static String getSubclassRows(CategoryMerge catmerge, HpoOntology ontology) {
-        String diseaseName1=catmerge.getDisease1name();
-        String diseaseName2=catmerge.getDisease2name();
-        StringBuilder sb = new StringBuilder();
-
-        List<SubClassTermPair> sclasspairs = catmerge.getD1subclassOfd2();
-        if (sclasspairs==null || sclasspairs.isEmpty()) {
-            sb.append(EMPTY_STRING);
+        String table;
+        String summary;
+        if (omim==null && orpha==null) {
+            summary="<br/>";
+            return String.format(HTML_TEMPLATE,CSS,mondoHtml,summary,"<p>No OMIM/Orphanet disease model found</p>");
+        } else if (orpha==null) {
+            summary=String.format("<h2>Merge results</h2><p>Found only OMIM annotations: %s (%s)",omim.getName(),omim.getDiseaseDatabaseId());
+            table=SingleDiseaseHTMLGenerator.getHTML(omim,ontology);
+        } else if (omim==null) {
+            summary=String.format("<h2>Merge results</h2><p>Found only Orphanet annotations: %s (%s)",orpha.getName(),orpha.getDiseaseDatabaseId());
+            table=SingleDiseaseHTMLGenerator.getHTML(orpha,ontology);
         } else {
-            for (SubClassTermPair tscp : sclasspairs) {
-                TermId t1 = tscp.getSubTid();
-                TermId t2 = tscp.getSuperTid();
-                String label1 = ontology.getTermMap().get(t1).getName();
-                String label2 = ontology.getTermMap().get(t2).getName();
-                sb.append(String.format("       <tr>  <td>%s [%s] (%s)</td><td> subclass of %s [%s]</td> </tr>\n",
-                        label1, t1.getIdWithPrefix(), diseaseName1,
-                        label2, t2.getIdWithPrefix(), diseaseName2));
-            }
+            logger.trace("About to call getMergerTable, catmap size is "+catmap.size());
+            summary=String.format("<h2>Merge results</h2><p>Found OMIM and Orphanet annotations.<br/>" +
+                    "OMIM: %s (%s) <br/> Orphanet: %s (%s)</p>",
+                    omim.getName(),omim.getDiseaseDatabaseId(),
+                    orpha.getName(),orpha.getDiseaseDatabaseId());
+            table=OmimOrphanetDiseaseHtmlGenerator.getHTML(omim,orpha,catmap,ontology);
         }
-        sclasspairs = catmerge.getD2subclassOfd1();
-        if (sclasspairs==null || sclasspairs.isEmpty()) {
-            sb.append(EMPTY_STRING);
-        } else {
-            for (SubClassTermPair tscp : sclasspairs) {
-                TermId t2 = tscp.getSubTid();
-                TermId t1 = tscp.getSuperTid();
-                String label1 = ontology.getTermMap().get(t1).getName();
-                String label2 = ontology.getTermMap().get(t2).getName();
-                sb.append(String.format("<tr><td>%s [%s] (%s)</td><td> subclass of %s [%s] (%s)</td></tr>",
-                        label2, t2.getIdWithPrefix(), diseaseName2,
-                         label1, t1.getIdWithPrefix(), diseaseName1));
-            }
-        }
-        return sb.toString();
-    }
-
-    private static String getOnlyOneDiseaseRows(CategoryMerge catmerge, HpoOntology ontology){
-        String diseaseName1=catmerge.getDisease1name();
-        String diseaseName2=catmerge.getDisease2name();
-        StringBuilder sb = new StringBuilder();
-        for (TermId t1 : catmerge.getDisease1onlyTerms()) {
-            String label = ontology.getTermMap().get(t1).getName();
-            sb.append(String.format("<tr><td>%s [%s]</td><td>%s only</td></tr>",label,t1.getIdWithPrefix(),diseaseName1));
-        }
-        for (TermId t2 : catmerge.getDisease2onlyTerms()) {
-            String label = ontology.getTermMap().get(t2).getName();
-            sb.append(String.format("<tr><td>%s [%s]</td><td>%s only</td></tr>",label,t2.getIdWithPrefix(),diseaseName2));
-        }
-        return sb.toString();
+        return String.format(HTML_TEMPLATE, CSS,  mondoHtml, summary, table);
     }
 
 
 
-
-    private static String getMergerTable(Map<HpoCategory,CategoryMerge> catmap, HpoOntology ontology) {
-        StringBuilder sb = new StringBuilder();
-        for (HpoCategory cat : catmap.keySet()) {
-            CategoryMerge catmerge = catmap.get(cat);
-            logger.trace("Get tanle for cat "+cat.getLabel());
-            String disease1name = catmerge.getDisease1name();
-            String disease2name = catmerge.getDisease2name();
-            String title = cat.getLabel();//String.format(template, cat.getLabel(), cat.getNumberOfAnnotations());
-            sb.append(getTableFramework(title, disease1name,disease2name));
-            List<TermId> termIdList = catmerge.getDisease1onlyTerms();
-            sb.append(getBothDieasesRows(termIdList,ontology));
-            sb.append(getSubclassRows(catmerge,ontology));
-            sb.append(getOnlyOneDiseaseRows(catmerge,ontology));
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
 }

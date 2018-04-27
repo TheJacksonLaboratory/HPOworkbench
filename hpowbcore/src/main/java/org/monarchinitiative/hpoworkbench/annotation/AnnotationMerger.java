@@ -44,20 +44,22 @@ public class AnnotationMerger {
 
     public AnnotationMerger(HpoDisease d1, HpoDisease d2, HpoOntology honto) {
         disease1=d1;
-
         disease2=d2;
         if (disease1==null) {
+            diseaseName1="";
             logger.trace("disease 1 == null");
         } else {
+            diseaseName1=disease1.getName();
             logger.trace("disdase 1 ok, {}" , disease1.toString());
         }
         if (disease2==null) {
             logger.trace("disease 2 == null");
+            diseaseName2="";
         } else {
+            diseaseName2=disease2.getName();
             logger.trace("disdase 2 ok, {}" , disease2.toString());
         }
-        diseaseName1=diseaseName(disease1);
-        diseaseName2=diseaseName(disease2);
+
         ontology=honto;
         categoryMap=new HpoCategoryMap();
         disease1ByCategory=new HashMap<>();
@@ -181,7 +183,7 @@ public class AnnotationMerger {
 
 
     private void MergeOneCategory(HpoCategory hcat) {
-        CategoryMerge catmerge = new CategoryMerge(hcat.getLabel(), diseaseName(disease1),diseaseName(disease2));
+        CategoryMerge catmerge = new CategoryMerge(hcat.getLabel(), disease1,disease2);
         if (disease2ByCategory.containsKey(hcat) && ! disease1ByCategory.containsKey(hcat)) {
             catmerge.addDisease2OnlyTermIdSet(disease2ByCategory.get(hcat));
         }  else if (disease1ByCategory.containsKey(hcat) && ! disease2ByCategory.containsKey(hcat)) {
@@ -235,14 +237,10 @@ public class AnnotationMerger {
         return mergedCategoryMap;
     }
 
-    private String diseaseName(HpoDisease d) {
-        if (d==null) return "none";
 
-        return d.getName() +"(" + d.getDatabase()+":"+ d.getDiseaseDatabaseId() +")";
-    }
 
     private void printDisease(HpoDisease d) {
-        System.out.println(diseaseName(d));
+        System.out.println(d.getName());
         for (HpoAnnotation ann : d.getPhenotypicAbnormalities()) {
             TermId tid = ann.getTermId();
             String label = ontology.getTermMap().get(tid).getName();
