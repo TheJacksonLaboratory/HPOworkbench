@@ -82,7 +82,7 @@ public final class MondoController {
     private final Stage primaryStage;
 
     @FXML
-    public RadioButton hpoTermRadioButton;
+    private RadioButton hpoTermRadioButton;
 
     public RadioButton diseaseRadioButton;
 
@@ -115,7 +115,7 @@ public final class MondoController {
      */
     private GenericTerm selectedTerm = null;
 
-    private HpoController hpoController;
+    private final HpoController hpoController;
 
     /**
      * Tree hierarchy of the ontology is presented here.

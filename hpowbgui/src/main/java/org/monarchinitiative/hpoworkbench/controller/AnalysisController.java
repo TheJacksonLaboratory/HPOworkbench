@@ -8,9 +8,11 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
+import org.monarchinitiative.hpoworkbench.analysis.MondoStats;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.html.HpoStatsHtmlGenerator;
+import org.monarchinitiative.hpoworkbench.html.MondoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -20,7 +22,7 @@ import javax.inject.Named;
 import java.io.File;
 import java.util.Properties;
 
-public final class HpoAnalysisController {
+public final class AnalysisController {
     private static final Logger logger = LogManager.getLogger();
 
     private final OptionalResources optionalResources;
@@ -53,8 +55,8 @@ public final class HpoAnalysisController {
     private final Stage primaryStage;
 
     @Inject
-    public HpoAnalysisController(OptionalResources optionalResources, Properties properties,
-                           @Named("mainWindow") Stage primaryStage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
+    public AnalysisController(OptionalResources optionalResources, Properties properties,
+                              @Named("mainWindow") Stage primaryStage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
         this.properties = properties;
         this.primaryStage = primaryStage;
@@ -66,7 +68,7 @@ public final class HpoAnalysisController {
 
 
     @FXML
-    private void calculateTermAndRelationCounts() {
+    private void showHpoStatistics() {
         try {
             HpoStats stats = new HpoStats(optionalResources.getHpoOntology(), optionalResources.getDisease2AnnotationMap());
             String html = HpoStatsHtmlGenerator.getHTML(stats);
@@ -77,7 +79,16 @@ public final class HpoAnalysisController {
         } catch (HPOException e) {
             PopUps.showException("Error","Could not retrieve HPO Stats",e);
         }
+    }
 
+    @FXML
+    private void showMondoStatistics() {
+        MondoStats stats = new MondoStats(optionalResources.getMondoOntology());
+        String html = MondoStatsHtmlGenerator.getHTML(stats);
+        Platform.runLater(() -> {
+            infoWebEngine = hpoAnalysisWebView.getEngine();
+            infoWebEngine.loadContent(html);
+        });
     }
 
 

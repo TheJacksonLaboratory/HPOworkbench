@@ -69,7 +69,7 @@ public class PlatformUtil {
      */
     public static String getAbsoluteLogPath() {
         File dir = getHpoWorkbenchDir();
-        return new String(dir + File.separator +  "hpoworkbench.log");
+        return dir + File.separator + "hpoworkbench.log";
     }
 
     /** Return the absolute path to the settings file, which is kept in the .loinc2hpo directory in the
@@ -109,7 +109,7 @@ public class PlatformUtil {
         OSX("Os X"),
         UNKNOWN("Unknown");
 
-        private String name;
+        private final String name;
 
         CurrentPlatform(String n) {this.name = n; }
 

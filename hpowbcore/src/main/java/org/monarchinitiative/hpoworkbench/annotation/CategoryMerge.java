@@ -26,7 +26,7 @@ public class CategoryMerge {
     private List<HpoAnnotation> disease2allTerms;
 
     private List<TermId> disease1onlyTerms;
-    private List<TermId> disease2onlyTerms;
+    private final List<TermId> disease2onlyTerms;
     private List<TermId> commonTerms;
     private List<SubClassTermPair> d1subclassOfd2;
     private List<SubClassTermPair> d2subclassOfd1;

@@ -59,6 +59,26 @@ public class HpoStats {
     /** Number of DECIPHER diseases with at least one annotation to the term of interest or its descendents */
     private int n_decipher;
 
+    private int n_omim_annotations;
+    private int n_orphanet_annotations;
+    private int n_decipher_annotations;
+
+    private int n_obsolete;
+    private int n_non_obsolete;
+    private int n_relations;
+
+    private int n_clinicalCourse;
+    private int n_clinicalModifier;
+    private int n_frequency;
+    private int n_modeOfInheritance;
+    private int n_phenotypicAbnormality;
+
+
+
+
+
+    private Map<String,String> metadata;
+
 
     public HpoStats(String hpopath, String annotationpath) throws HPOException{
         this(hpopath,annotationpath,rootHpoTerm);
@@ -86,6 +106,76 @@ public class HpoStats {
         this.diseaseMap=d2amap;
         getDescendentsOfTermOfInterest();
         filterDiseasesAccordingToDatabase();
+        calculateNumberOfAnnotations();
+        calculateOntologyStats();
+        calculateSubontologyCounts();
+    }
+
+
+    public int getN_obsolete() {
+        return n_obsolete;
+    }
+
+    public int getN_relations() {
+        return n_relations;
+    }
+
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public int getN_non_obsolete() {
+        return n_non_obsolete;
+    }
+
+
+    public int getN_clinicalCourse() {
+        return n_clinicalCourse;
+    }
+
+    public int getTotalAnnotationCount() {
+        return n_omim_annotations + n_decipher_annotations + n_orphanet_annotations;
+    }
+
+    public int getN_clinicalModifier() {
+        return n_clinicalModifier;
+    }
+
+    public int getN_frequency() {
+        return n_frequency;
+    }
+
+    public int getN_modeOfInheritance() {
+        return n_modeOfInheritance;
+    }
+
+    public int getN_phenotypicAbnormality() {
+        return n_phenotypicAbnormality;
+    }
+
+    private void calculateSubontologyCounts() {
+        TermId clinicalCourse = ImmutableTermId.constructWithPrefix("HP:0031797");
+        TermId clinicalModifier = ImmutableTermId.constructWithPrefix("HP:0012823");
+        TermId frequency = ImmutableTermId.constructWithPrefix("HP:0040279");
+        TermId modeOfInheritance = ImmutableTermId.constructWithPrefix("HP:0000005");
+        TermId phenotypicAbnormality = ImmutableTermId.constructWithPrefix("HP:0000118");
+
+        n_clinicalCourse = getDescendents(hpoOntology,clinicalCourse).size();
+        n_clinicalModifier = getDescendents(hpoOntology,clinicalModifier).size();
+        n_frequency = getDescendents(hpoOntology,frequency).size();
+        n_modeOfInheritance = getDescendents(hpoOntology,modeOfInheritance).size();
+        n_phenotypicAbnormality = getDescendents(hpoOntology,phenotypicAbnormality).size();
+
+    }
+
+    private void calculateOntologyStats() {
+
+        n_obsolete=hpoOntology.countObsoleteTerms();
+        n_non_obsolete=hpoOntology.countNonObsoleteTerms();
+
+        n_relations =hpoOntology.getRelationMap().size();
+        metadata=hpoOntology.getMetaInfo();
+
     }
 
 
@@ -216,6 +306,34 @@ public class HpoStats {
         LOGGER.trace(String.format("We found %d diseases in OMIM annotated to %s or descendents",omim.size(),termname));
         LOGGER.trace(String.format("We found %d diseases in Orphanet annotated to %s or descendents",orphanet.size(),termname));
         LOGGER.trace(String.format("We found %d diseases in DECIPHER annotated to %s or descendents",decipher.size(),termname));
+    }
+
+    public int getN_omim_annotations() {
+        return n_omim_annotations;
+    }
+
+    public int getN_orphanet_annotations() {
+        return n_orphanet_annotations;
+    }
+
+    public int getN_decipher_annotations() {
+        return n_decipher_annotations;
+    }
+
+    private void calculateNumberOfAnnotations() {
+        n_omim_annotations=0;
+        n_orphanet_annotations=0;
+        n_decipher_annotations=0;
+        for (HpoDisease d:omim) {
+            n_omim_annotations += (d.getPhenotypicAbnormalities().size()+d.getModesOfInheritance().size()+d.getNegativeAnnotations().size());
+        }
+        for (HpoDisease d:orphanet) {
+            n_orphanet_annotations += (d.getPhenotypicAbnormalities().size()+d.getModesOfInheritance().size()+d.getNegativeAnnotations().size());
+        }
+        for (HpoDisease d:decipher) {
+            n_decipher_annotations += (d.getPhenotypicAbnormalities().size()+d.getModesOfInheritance().size()+d.getNegativeAnnotations().size());
+        }
+
     }
 
 

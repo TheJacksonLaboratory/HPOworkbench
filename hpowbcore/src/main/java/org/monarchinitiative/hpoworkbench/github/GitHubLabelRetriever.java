@@ -5,12 +5,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,8 +57,6 @@ public class GitHubLabelRetriever {
             String response = scanner.useDelimiter("\\Z").next();
             scanner.close();
             decodeJSON(response);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

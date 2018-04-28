@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 public class GitHubPoster {
     /** GitHub username. */
-    private String username;
+    private final String username;
     /** GitHub password. */
     private String password;
     /** The contents of the GitHub issue we want to create.. */
@@ -144,7 +144,6 @@ public class GitHubPoster {
         http.connect();
         try(OutputStream os = http.getOutputStream()) {
             os.write(out);
-            os.close();
         }
         if (http.getResponseCode()==400) {
             String erro=String.format("URL:%s\nPayload=%s\nServer response: %s [%d]",
@@ -176,7 +175,6 @@ public class GitHubPoster {
         http.connect();
         try(OutputStream os = http.getOutputStream()) {
             os.write(out);
-            os.close();
         }
         if (http.getResponseCode()==400) {
             String erro=String.format("URL:%s\nPayload=%s\nServer response: %s [%d]",

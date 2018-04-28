@@ -68,8 +68,6 @@ public class Hpo2ExcelExporter {
             FileOutputStream outputStream = new FileOutputStream(path);
             workbook.write(outputStream);
             workbook.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

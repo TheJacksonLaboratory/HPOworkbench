@@ -3,14 +3,13 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssueRetriever;
-import org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever;
 import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
 //import org.monarchinitiative.hpoworkbench.word.GitIssue2Word;
 
 import java.util.List;
 
 public class GitCommand  extends HPOCommand {
-    private static Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
 
     private final String issueLabel;
 

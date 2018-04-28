@@ -1,6 +1,6 @@
 
 Installing and running HPO Workbench
-=====================================
+====================================
 The following sections explain how to install HPO Workbench on Mac, Windows, and linux. The final section explains
 how to setup the program (the HPO data files need to be downloaded upon initial use of the program).
 

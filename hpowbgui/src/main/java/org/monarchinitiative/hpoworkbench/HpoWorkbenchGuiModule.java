@@ -91,7 +91,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
 
         bind(HpoController.class).asEagerSingleton();
 
-        bind(HpoAnalysisController.class).asEagerSingleton();
+        bind(AnalysisController.class).asEagerSingleton();
 
     }
 

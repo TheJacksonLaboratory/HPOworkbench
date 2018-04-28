@@ -53,7 +53,7 @@ public class HPO2CSVCommand extends HPOCommand {
      is_a: HP:0025423 ! Abnormal larynx morphology
      TODO 	def not working,
      */
-    public static final String header="#id\tname\tdef\tsynonyms\txrefs\tis_a";
+    private static final String header="#id\tname\tdef\tsynonyms\txrefs\tis_a";
 
 
 

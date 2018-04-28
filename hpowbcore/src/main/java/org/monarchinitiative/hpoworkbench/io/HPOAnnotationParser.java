@@ -8,7 +8,6 @@ import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 
 
-import java.io.File;
 import java.util.Map;
 
 /**
@@ -16,7 +15,7 @@ import java.util.Map;
  * called {@code phenotype.hpoa}.
  */
 public class HPOAnnotationParser {
-    private static Logger LOGGER = Logger.getLogger(HPOAnnotationParser.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HPOAnnotationParser.class.getName());
     private Map<String,HpoDisease> diseaseMap =null;
     private final  HpoOntology ontology;
     private final String annotPath;

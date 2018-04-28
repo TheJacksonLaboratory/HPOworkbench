@@ -30,7 +30,7 @@ public final class StatusController {
     private final ResourceBundle resourceBundle;
 
     @FXML
-    public Label copyrightLabel;
+    private Label copyrightLabel;
 
     @FXML
     public HBox statusHBox;

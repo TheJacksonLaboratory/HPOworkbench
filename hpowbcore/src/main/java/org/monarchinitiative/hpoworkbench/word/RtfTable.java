@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.1.0
  */
-public class RtfTable {
+class RtfTable {
     private static final Logger LOGGER = LogManager.getLogger();
     /** A list of rows of the RTF table. */
 
 
-    List<HpoRtfTableRow> rows;
+    final List<HpoRtfTableRow> rows;
 
     public RtfTable(List<HpoRtfTableRow> rowlist) {
         rows=rowlist;
@@ -35,8 +35,7 @@ public class RtfTable {
 
     public String table() {
         String middle = rows.stream().map(r ->r.row()).collect(Collectors.joining("\n"));
-        String t = String.format("%s%s%s",HpoRtfTableRow.header(),middle,footer());
-        return t;
+        return String.format("%s%s%s",HpoRtfTableRow.header(),middle,footer());
     }
 
 }

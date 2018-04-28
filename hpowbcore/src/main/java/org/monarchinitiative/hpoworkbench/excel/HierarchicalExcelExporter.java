@@ -40,7 +40,7 @@ public class HierarchicalExcelExporter {
     /** Ordered list of terms and their attributes for all terms that descend from {@link #subhierarchyRoot}.
      * The {@link TermRow} objects have all of the data we need to export one row in Excel.
      */
-    private ArrayList<TermRow> termRowList=new ArrayList<>();
+    private final ArrayList<TermRow> termRowList=new ArrayList<>();
     /** The maximum depth of the hierarchy that we will export. */
     private int maxlevel=0;
 

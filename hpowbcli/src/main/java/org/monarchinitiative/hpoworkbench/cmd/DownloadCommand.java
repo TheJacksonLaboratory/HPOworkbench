@@ -18,7 +18,7 @@ import java.net.URL;
  * @version 0.0.1 (May 10, 2017)
  */
 public final class DownloadCommand extends HPOCommand {
-    private static Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
     private final String downloadDirectory;
 
     public String getName() { return "download"; }

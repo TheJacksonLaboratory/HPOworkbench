@@ -40,13 +40,11 @@ public class GitIssue2Doc4J {
             ife.printStackTrace();
         } catch (JAXBException jbe) {
             jbe.printStackTrace();
-        } catch (SAXParseException se) {
-            se.printStackTrace();
         }
     }
 
 
-    private void introductoryParagraph(MainDocumentPart document) throws JAXBException,SAXParseException {
+    private void introductoryParagraph(MainDocumentPart document) {
         document.addStyledParagraphOfText("Title", String.format("Human Phenotype Ontology Issues for %s",githubLabel));
            document.addParagraphOfText("This document is for suggesting revisions to the HPO.");
         document.addParagraphOfText(" Please add your comments and adivce directly to this document."+

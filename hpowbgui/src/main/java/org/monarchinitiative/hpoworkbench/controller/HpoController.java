@@ -127,7 +127,7 @@ public final class HpoController {
     /**
      * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
      */
-    private Map<String, TermId> labelsAndHpoIds = new HashMap<>();
+    private final Map<String, TermId> labelsAndHpoIds = new HashMap<>();
 
     private Model model;
     /**

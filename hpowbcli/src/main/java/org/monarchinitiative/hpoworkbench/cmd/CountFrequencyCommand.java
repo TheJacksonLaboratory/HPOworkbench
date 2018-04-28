@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
@@ -24,7 +25,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDe
  * @author <a href="mailto:peter.robinson">Peter Robinson</a>
  */
 public class CountFrequencyCommand extends HPOCommand {
-    private static Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
 
     private final String hpOboPath;
 
@@ -53,17 +54,18 @@ public class CountFrequencyCommand extends HPOCommand {
         try {
             HpoOboParser oparser = new HpoOboParser(new File(hpOboPath));
             HpoOntology ontology = oparser.parse();
-            HPOAnnotationParser aparser=null;
+            Map<String,HpoDisease> annotationMap=null;
             try {
-                aparser = new HPOAnnotationParser(annotationPath, ontology);
+                HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(annotationPath,ontology);
+                annotationMap =parser.parse();
+                LOGGER.trace("Annotation count total " + annotationMap.size());
             } catch (PhenolException pe ) {
-                pe.printStackTrace(); //todo refacgtor
+                pe.printStackTrace();
+                return;
             }
-            Map<String,HpoDisease> annotationMap = aparser.getDiseaseMap();
-            LOGGER.error("Annotation count total " + annotationMap.size());
             Set<TermId> descendents = getDescendents(ontology, termId);
             descendentTermCount = descendents.size();
-            LOGGER.error("Desc endet s size " + descendentTermCount);
+            LOGGER.error("Descendent Term Count size " + descendentTermCount);
             HashMap<TermId, Integer> annotationCounts = new HashMap<>();
             HashMap<TermId,Double> weightedAnnotationCounts=new HashMap<>();
             for (TermId t : descendents) {

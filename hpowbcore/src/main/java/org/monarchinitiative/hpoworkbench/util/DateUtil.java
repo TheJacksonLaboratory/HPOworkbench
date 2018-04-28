@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * Created by robinp on 5/25/17.
  */
-public class DateUtil {
+class DateUtil {
 
     private static final Map<String, String> DATE_FORMAT_REGEXPS = new HashMap<String, String>() {{
         put("^\\d{8}$", "yyyyMMdd");
@@ -100,7 +100,7 @@ public class DateUtil {
         }
     }
 
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public static String convertToCanonicalDateFormat(String olddate) {

@@ -25,7 +25,7 @@ import java.util.Scanner;
 public class GitHubIssueRetriever {
     private static final Logger logger = LogManager.getLogger();
 
-    private List<GitHubIssue> issues = new ArrayList<>();
+    private final List<GitHubIssue> issues = new ArrayList<>();
 
     private HttpURLConnection httpconnection=null;
 
@@ -74,8 +74,7 @@ public class GitHubIssueRetriever {
             Scanner scanner = new Scanner(url.openStream());String response = scanner.useDelimiter("\\Z").next();
             scanner.close();
             decodeJSON(response);
-            int responsecode=httpconnection.getResponseCode();
-            return responsecode;
+            return httpconnection.getResponseCode();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

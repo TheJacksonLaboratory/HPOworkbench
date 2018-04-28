@@ -16,7 +16,7 @@ public class WordCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private String hpopath=null;
 
-    private String DEFAULT_OUTPUTNAME="hpotest.word";
+    private final String DEFAULT_OUTPUTNAME="hpotest.word";
     private static String DEFAULT_START_TERM="HP:0000118";
 
 
@@ -24,7 +24,7 @@ public class WordCommand extends HPOCommand  {
     private String IMMUNOLOGY_STAERT_TERM="HP:0002715";
 
 
-    Hpo2Word hpo2Word =null;
+    private Hpo2Word hpo2Word =null;
 
 
     public WordCommand(String dir, String startTerm) {

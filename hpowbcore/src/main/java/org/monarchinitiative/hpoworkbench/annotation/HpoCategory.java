@@ -28,7 +28,7 @@ public class HpoCategory {
   /** List of the HPO terms from the disease we want to display that are children of this category. Note that we
    * try to put the TermsIds in the {@link #subcatlist} if possible, and then they do not appear here.
    */
-  private List<TermId> annotatedTerms;
+  private final List<TermId> annotatedTerms;
   /** This can be used for second (or higher) level categories that function as subcategories in a Browser display. */
   private List<HpoCategory> subcatlist=new ArrayList<>();
 
@@ -41,7 +41,7 @@ public class HpoCategory {
 
   String getAnnotationString() {
       StringBuilder sb = new StringBuilder();
-      sb.append(label +"\n");
+      sb.append(label).append("\n");
       for (TermId tid : annotatedTerms) {
           sb.append("\t"+tid.getIdWithPrefix() + "\n");
       }

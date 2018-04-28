@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.hpoworkbench.io.HPOParserTest;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
@@ -13,8 +12,6 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**

@@ -49,12 +49,11 @@ public class TermRow {
         String[] fields=new String[n];
 
         fields[level-1]=label;
-        int index=maxlevel;
-        fields[index]=id;
+        fields[maxlevel]=id;
 
-        fields[index+1]=definition;
-        fields[index+2]=comment;
-        fields[index+3]=synonyms;
+        fields[maxlevel +1]=definition;
+        fields[maxlevel +2]=comment;
+        fields[maxlevel +3]=synonyms;
 
         return fields;
     }

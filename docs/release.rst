@@ -1,6 +1,6 @@
 
 Releasing HPO Workbench
-===========================
+=======================
 Summary of procedure to release a version of HPO Workbench.
 
 

@@ -22,20 +22,18 @@ import java.util.stream.Collectors;
 
 public class AnnotationMerger {
     private static final Logger logger = LogManager.getLogger();
+    private final HpoOntology ontology;
 
     private final HpoDisease disease1;
     private final HpoDisease disease2;
-    private final HpoOntology ontology;
-
     private final String diseaseName1;
     private final String diseaseName2;
 
-
+    /** TermId's for annotations that are identical between OMIM and Orphanet. */
     private List<TermId> sharedTerms;
 
-    private final HpoCategoryMap categoryMap;
 
-    private Map<HpoCategory,Set<TermId>> disease1ByCategory;
+    private final Map<HpoCategory,Set<TermId>> disease1ByCategory;
     private Map<HpoCategory,Set<TermId>> disease2ByCategory;
     private Set<HpoCategory> allCategorySet;
 
@@ -50,18 +48,17 @@ public class AnnotationMerger {
             logger.trace("disease 1 == null");
         } else {
             diseaseName1=disease1.getName();
-            logger.trace("disdase 1 ok, {}" , disease1.toString());
+            logger.trace("disease 1 ok, {}" , disease1.toString());
         }
         if (disease2==null) {
             logger.trace("disease 2 == null");
             diseaseName2="";
         } else {
             diseaseName2=disease2.getName();
-            logger.trace("disdase 2 ok, {}" , disease2.toString());
+            logger.trace("disease 2 ok, {}" , disease2.toString());
         }
 
         ontology=honto;
-        categoryMap=new HpoCategoryMap();
         disease1ByCategory=new HashMap<>();
         disease2ByCategory=new HashMap<>();
         allCategorySet=new HashSet<>();

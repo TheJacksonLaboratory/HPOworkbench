@@ -118,7 +118,7 @@ public class Hpo2Word {
     }
 
 
-    private void writeTableFromTerm(XWPFDocument document,String id) throws IOException {
+    private void writeTableFromTerm(XWPFDocument document,String id) {
         startTerm=id;
         XWPFTable table    = document.createTable();
 

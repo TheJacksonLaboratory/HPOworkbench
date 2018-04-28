@@ -1,6 +1,6 @@
 
 Browsing the HPO using HPO Workbench
-=====================================
+====================================
 Navigate through the hierarchy of the using the tree browser or
 use the autocomplete text field to find the HPO term of your choice.
 HPO Workbench will display the ID, definition, comment, and synyonyms
