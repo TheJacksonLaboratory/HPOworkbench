@@ -5,7 +5,7 @@ import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
 import org.monarchinitiative.hpoworkbench.annotation.HpoCategoryMap;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 class HpoHtmlPageGenerator {
 
-    static String getHTML(HpoTerm term, List<DiseaseModel> annotatedDiseases) {
+    static String getHTML(Term term, List<DiseaseModel> annotatedDiseases) {
 
         String termID = term.getId().getIdWithPrefix();
         String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
@@ -81,7 +81,7 @@ class HpoHtmlPageGenerator {
             "</body></html>";
 
 
-    static String getDiseaseHTML(String database, String name, List<HpoTerm> terms, HpoOntology ontology) {
+    static String getDiseaseHTML(String database, String name, List<Term> terms, HpoOntology ontology) {
         String listOfCategories = getListOfTermsHTML(terms, ontology);
         int n_annotations = terms.size();
         return String.format(DISEASE_TEMPLATE, CSS, name, database, name, n_annotations, listOfCategories);
@@ -90,12 +90,12 @@ class HpoHtmlPageGenerator {
     /**
      * Create a table with the HPO Categories and annotations.
      */
-    private static String getListOfTermsHTML(List<HpoTerm> terms, HpoOntology ontology) {
+    private static String getListOfTermsHTML(List<Term> terms, HpoOntology ontology) {
         if (terms == null) {
             return "<p>No HPO annotations found.</p>";
         }
         HpoCategoryMap hpocatmap = new HpoCategoryMap();
-        for (HpoTerm term : terms) {
+        for (Term term : terms) {
             TermId tid = term.getId();
             hpocatmap.addAnnotatedTerm(tid, ontology);
         }
@@ -118,7 +118,7 @@ class HpoHtmlPageGenerator {
                     "    </tfoot>", title));
             List<TermId> termIdList = cat.getAnnotatingTermIds();
             for (TermId tid : termIdList) {
-                HpoTerm term = ontology.getTermMap().get(tid);
+                Term term = ontology.getTermMap().get(tid);
                 String row = String.format("<tr>\n" +
                                 "        <td><a href=\"%s\">%s</a></td>\n" +
                                 "        <td>%s</td>\n" +

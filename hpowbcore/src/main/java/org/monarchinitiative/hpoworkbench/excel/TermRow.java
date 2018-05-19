@@ -1,14 +1,12 @@
 package org.monarchinitiative.hpoworkbench.excel;
 
-
-
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TermRow {
+class TermRow {
 
     /** The level with respect to the initial term in the subhierarchy we are showing (which is defined as 1) */
     private final int level;
@@ -23,7 +21,7 @@ public class TermRow {
     /** List of synonyms (if any) of this HPO term. */
     private  String synonyms;
 
-    public TermRow(int lev, HpoTerm term) {
+    TermRow(int lev, Term term) {
         level=lev;
         id=term.getId().getIdWithPrefix();
         label=term.getName();
@@ -36,7 +34,7 @@ public class TermRow {
 
 
 
-    public TermRow(int lev, HpoTerm term, String explanation) {
+    TermRow(int lev, Term term, String explanation) {
         this(lev,term);
         definition=explanation;
         comment="not showing descendants here";
@@ -44,7 +42,7 @@ public class TermRow {
     }
 
 
-    public String[] getItems(int maxlevel) {
+    String[] getItems(int maxlevel) {
         int n=maxlevel-1+5; // number of columns needed
         String[] fields=new String[n];
 
@@ -58,7 +56,7 @@ public class TermRow {
         return fields;
     }
 
-    public static String[] getHeader(int maxlevel) {
+    static String[] getHeader(int maxlevel) {
         int n=maxlevel-1+5; // number of columns needed
         String[] fields=new String[n];
         for (int i=0;i<maxlevel;i++) {

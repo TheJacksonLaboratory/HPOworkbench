@@ -11,8 +11,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.word.Pair;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 
@@ -36,7 +36,7 @@ public class HierarchicalExcelExporter {
     private final HpoOntology ontology;
     private static final TermPrefix HPPREFIX = new ImmutableTermPrefix("HP");
     /** The term of the subhierarchy of the HPO that we will export. */
-    private final HpoTerm subhierarchyRoot;
+    private final Term subhierarchyRoot;
     /** Ordered list of terms and their attributes for all terms that descend from {@link #subhierarchyRoot}.
      * The {@link TermRow} objects have all of the data we need to export one row in Excel.
      */
@@ -48,7 +48,7 @@ public class HierarchicalExcelExporter {
      * @param onto Reference to the HPO ontology
      * @param selectedTerm term that defines the subhierarchy to export.
      */
-    public HierarchicalExcelExporter(HpoOntology onto, HpoTerm selectedTerm) {
+    public HierarchicalExcelExporter(HpoOntology onto, Term selectedTerm) {
         this.ontology=onto;
         if (ontology==null) {
             logger.error("ontology is null in COTR");
@@ -106,7 +106,7 @@ public class HierarchicalExcelExporter {
             Pair<TermId,Integer> pair = stack.pop();
             TermId termId=pair.first;
             Integer level=pair.second;
-            HpoTerm hterm = ontology.getTermMap().get(termId);
+            Term hterm = ontology.getTermMap().get(termId);
             if (previouslyseen.contains(termId)) {
                 // we have already output this term!
                 TermRow hrow = new TermRow(level, hterm,
@@ -124,7 +124,6 @@ public class HierarchicalExcelExporter {
             if (level>maxlevel)maxlevel=level;
         }
     }
-
 
 
 }

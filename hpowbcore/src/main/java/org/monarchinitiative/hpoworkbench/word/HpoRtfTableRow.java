@@ -1,8 +1,7 @@
 package org.monarchinitiative.hpoworkbench.word;
 
 
-
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 import java.util.Arrays;
@@ -24,7 +23,7 @@ class HpoRtfTableRow {
     private  String synonyms;
 
 
-    HpoRtfTableRow(int lev, HpoTerm term) {
+    HpoRtfTableRow(int lev, Term term) {
         level=lev;
         id=term.getId().getIdWithPrefix();
         label=term.getName();
@@ -36,7 +35,7 @@ class HpoRtfTableRow {
     }
 
 
-    HpoRtfTableRow(int lev, HpoTerm term, String explanation) {
+    HpoRtfTableRow(int lev, Term term, String explanation) {
         this(lev,term);
         definition=explanation;
         comment="not showing descendants here";

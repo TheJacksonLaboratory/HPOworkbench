@@ -29,8 +29,8 @@ import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -133,7 +133,7 @@ public final class HpoController {
     /**
      * The term that is currently selected in the Browser window.
      */
-    private HpoTerm selectedTerm = null;
+    private Term selectedTerm = null;
     /**
      * Users can create a github issue. Username and password will be stored for the current session only.
      */
@@ -408,17 +408,17 @@ public final class HpoController {
 
 
     /**
-     * Update content of the {@link #infoWebView} with currently selected {@link HpoTerm}.
+     * Update content of the {@link #infoWebView} with currently selected {@link Term}.
      * The function is called when the user is on an HPO Term page and selects a link to
      * a disease.
      *
-     * @param dmodel currently selected {@link TreeItem} containing {@link HpoTerm}
+     * @param dmodel currently selected {@link TreeItem} containing {@link Term}
      */
     private void updateDescriptionToDiseaseModel(DiseaseModel dmodel) {
         LOGGER.trace("TOP OF updateDescriptionToDiseaseModel");
         String dbName = dmodel.getDiseaseDbAndId();
         String diseaseName = dmodel.getDiseaseName();
-        List<HpoTerm> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
+        List<Term> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
         String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName, diseaseName, annotatingTerms, optionalResources
                 .getHpoOntology());
         infoWebEngine.loadContent(content);
@@ -442,7 +442,7 @@ public final class HpoController {
                                             return;
                                         }
                                         TermId tid = ImmutableTermId.constructWithPrefix(href);
-                                        HpoTerm term = optionalResources.getHpoOntology().getTermMap().get(tid);
+                                        Term term = optionalResources.getHpoOntology().getTermMap().get(tid);
                                         if (term == null) {
                                             LOGGER.error(String.format("Could not construct term  from termid \"%s\"", tid.getIdWithPrefix()));
                                             return;
@@ -468,21 +468,21 @@ public final class HpoController {
     }
 
     /**
-     * Find the path from the root term to given {@link HpoTerm}, expand the tree and set the selection model of the
+     * Find the path from the root term to given {@link Term}, expand the tree and set the selection model of the
      * TreeView to the term position.
      *
-     * @param term {@link HpoTerm} to be displayed
+     * @param term {@link Term} to be displayed
      */
-    private void expandUntilTerm(HpoTerm term) {
+    private void expandUntilTerm(Term term) {
         // logger.trace("expand until term " + term.toString());
         switchToMode(BROWSE_HPO);
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
-            Stack<HpoTerm> termStack = new Stack<>();
+            Stack<Term> termStack = new Stack<>();
             termStack.add(term);
-            Set<HpoTerm> parents = getTermParents(term);
+            Set<Term> parents = getTermParents(term);
             while (parents.size() != 0) {
-                HpoTerm parent = parents.iterator().next();
+                Term parent = parents.iterator().next();
                 termStack.add(parent);
                 parents = getTermParents(parent);
             }
@@ -492,7 +492,7 @@ public final class HpoController {
             termStack.pop(); // get rid of 'All' node which is hidden
             TreeItem<HpoTermWrapper> target = ontologyTreeView.getRoot();
             while (!termStack.empty()) {
-                HpoTerm current = termStack.pop();
+                Term current = termStack.pop();
                 for (TreeItem<HpoTermWrapper> child : children) {
                     if (child.getValue().term.equals(current)) {
                         child.setExpanded(true);
@@ -506,7 +506,7 @@ public final class HpoController {
             ontologyTreeView.scrollTo(ontologyTreeView.getSelectionModel().getSelectedIndex());
         } else {
             TermId rootId = optionalResources.getHpoOntology().getRootTermId();
-            HpoTerm rootTerm = optionalResources.getHpoOntology().getTermMap().get(rootId);
+            Term rootTerm = optionalResources.getHpoOntology().getTermMap().get(rootId);
             LOGGER.warn(String.format("Unable to find the path from %s to %s", rootTerm.toString(), term.getName()));
         }
         selectedTerm = term;
@@ -514,9 +514,9 @@ public final class HpoController {
 
 
     /**
-     * Update content of the {@link #infoWebView} with currently selected {@link HpoTerm}.
+     * Update content of the {@link #infoWebView} with currently selected {@link Term}.
      *
-     * @param treeItem currently selected {@link TreeItem} containing {@link HpoTerm}
+     * @param treeItem currently selected {@link TreeItem} containing {@link Term}
      */
     private void updateDescription(TreeItem<HpoTermWrapper> treeItem) {
         LOGGER.trace("TOP OF UPDATE DESCRIPTION");
@@ -526,7 +526,7 @@ public final class HpoController {
         if (treeItem == null)
             return;
 
-        HpoTerm term = treeItem.getValue().term;
+        Term term = treeItem.getValue().term;
         String termID = term.getId().getIdWithPrefix();
         List<DiseaseModel> annotatedDiseases = model.getDiseaseAnnotations(termID, selectedDatabase);
         if (annotatedDiseases == null) {
@@ -585,14 +585,14 @@ public final class HpoController {
      * @param ontology Reference to the HPO
      * @param addHook  function hook (currently unused)
      */
-    private void initTree(HpoOntology ontology, Consumer<HpoTerm> addHook) {
+    private void initTree(HpoOntology ontology, Consumer<Term> addHook) {
         // populate the TreeView with top-level elements from ontology hierarchy
         if (ontology == null) {
             ontologyTreeView.setRoot(null);
             return;
         }
         TermId rootId = ontology.getRootTermId();
-        HpoTerm rootTerm = ontology.getTermMap().get(rootId);
+        Term rootTerm = ontology.getTermMap().get(rootId);
         TreeItem<HpoTermWrapper> root = new HpoTermTreeItem(new HpoTermWrapper(rootTerm));
         root.setExpanded(true);
         ontologyTreeView.setShowRoot(false);
@@ -772,7 +772,7 @@ public final class HpoController {
      * @param term HPO Term of interest
      * @return children of term (not including term itself).
      */
-    private Set<HpoTerm> getTermChildren(HpoTerm term) {
+    private Set<Term> getTermChildren(Term term) {
         HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
@@ -780,9 +780,9 @@ public final class HpoController {
         }
         TermId parentTermId = term.getId();
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
-        Set<HpoTerm> kids = new HashSet<>();
+        Set<Term> kids = new HashSet<>();
         childrenIds.forEach(tid -> {
-            HpoTerm ht = ontology.getTermMap().get(tid);
+            Term ht = ontology.getTermMap().get(tid);
             kids.add(ht);
         });
         return kids;
@@ -794,22 +794,22 @@ public final class HpoController {
      * @param term HPO Term of interest
      * @return parents of term (not including term itself).
      */
-    private Set<HpoTerm> getTermParents(HpoTerm term) {
+    private Set<Term> getTermParents(Term term) {
         HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
-        Set<HpoTerm> eltern = new HashSet<>();
+        Set<Term> eltern = new HashSet<>();
         parentIds.forEach(tid -> {
-            HpoTerm ht = ontology.getTermMap().get(tid);
+            Term ht = ontology.getTermMap().get(tid);
             eltern.add(ht);
         });
         return eltern;
     }
 
-    private boolean existsPathFromRoot(HpoTerm term) {
+    private boolean existsPathFromRoot(Term term) {
         HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
@@ -822,7 +822,7 @@ public final class HpoController {
 
 
     /**
-     * Inner class that defines a bridge between hierarchy of {@link HpoTerm}s and {@link TreeItem}s of the
+     * Inner class that defines a bridge between hierarchy of {@link Term}s and {@link TreeItem}s of the
      * {@link TreeView}.
      */
     class HpoTermTreeItem extends TreeItem<HpoTermWrapper> {
@@ -835,14 +835,14 @@ public final class HpoController {
         /**
          * Default & only constructor for the TreeItem.
          *
-         * @param term {@link HpoTerm} that is represented by this TreeItem
+         * @param term {@link Term} that is represented by this TreeItem
          */
         HpoTermTreeItem(HpoTermWrapper term) {
             super(term);
         }
 
         /**
-         * Check that the {@link HpoTerm} that is represented by this TreeItem is a leaf term as described below.
+         * Check that the {@link Term} that is represented by this TreeItem is a leaf term as described below.
          * <p>
          * {@inheritDoc}
          */
@@ -853,7 +853,7 @@ public final class HpoController {
 
 
         /**
-         * Get list of children of the {@link HpoTerm} that is represented by this TreeItem.
+         * Get list of children of the {@link Term} that is represented by this TreeItem.
          * {@inheritDoc}
          */
         @Override
@@ -861,9 +861,9 @@ public final class HpoController {
             if (childrenList == null) {
                 // logger.debug(String.format("Getting children for term %s", getValue().term.getName()));
                 childrenList = FXCollections.observableArrayList();
-                Set<HpoTerm> children = getTermChildren(getValue().term);
+                Set<Term> children = getTermChildren(getValue().term);
                 children.stream()
-                        .sorted(Comparator.comparing(HpoTerm::getName))
+                        .sorted(Comparator.comparing(Term::getName))
                         .map(term -> new HpoTermTreeItem(new HpoTermWrapper(term)))
                         .forEach(childrenList::add);
                 super.getChildren().setAll(childrenList);

@@ -2,8 +2,6 @@ package org.monarchinitiative.hpoworkbench.io;
 
 import org.apache.log4j.Logger;
 import org.monarchinitiative.phenol.base.PhenolException;
-import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
-import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.io.owl.OwlImmutableOntologyLoader;
 import org.monarchinitiative.phenol.io.owl.generic.GenericOwlFactory;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -17,7 +15,7 @@ public class MondoParser {
 
     private final String mondoOboPath;
 
-    private Ontology<GenericTerm, GenericRelationship> mondo=null;
+    private Ontology mondo=null;
 
 
     public MondoParser(String pathToMondoObo) throws PhenolException {
@@ -27,20 +25,20 @@ public class MondoParser {
 
 
 
-    public Ontology<GenericTerm, GenericRelationship> getMondo() {
+    public Ontology getMondo() {
         return mondo;
     }
 
     private void parse() throws PhenolException {
         LOGGER.trace("Parsing mondo obo file at " + mondoOboPath);
-        final OwlImmutableOntologyLoader<GenericTerm, GenericRelationship> loader =
-                new OwlImmutableOntologyLoader<>(
+        final OwlImmutableOntologyLoader loader =
+                new OwlImmutableOntologyLoader(
                         new File(mondoOboPath));
 
         final GenericOwlFactory cof = new GenericOwlFactory();
         try {
             mondo= loader.load(cof);
-        } catch (OWLOntologyCreationException | IOException e) {
+        } catch (OWLOntologyCreationException e) {
             throw new PhenolException(String.format("Could not create Mondo ontology: %s",e.getMessage() ));
         }
     }

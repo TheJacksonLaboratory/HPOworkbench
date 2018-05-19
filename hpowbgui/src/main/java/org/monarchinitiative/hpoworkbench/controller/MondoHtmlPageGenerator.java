@@ -8,9 +8,9 @@ import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
 import org.monarchinitiative.hpoworkbench.html.MondoTermHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.OmimOrphanetDiseaseHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.SingleDiseaseHTMLGenerator;
-import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public class MondoHtmlPageGenerator {
 
 
 
-    static String getHTML(GenericTerm mondoTerm, HpoDisease omim, HpoDisease orpha, HpoOntology ontology) {
+    static String getHTML(Term mondoTerm, HpoDisease omim, HpoDisease orpha, HpoOntology ontology) {
         AnnotationMerger merger=new AnnotationMerger(omim,orpha, ontology);
         merger.merge();
         Map<HpoCategory,CategoryMerge> catmap = merger.getMergedCategoryMap();

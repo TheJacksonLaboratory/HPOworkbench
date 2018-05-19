@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 /**
@@ -71,12 +71,12 @@ public class HPO2CSVCommand extends HPOCommand {
             System.exit(1);
         }
 
-        Collection<HpoTerm>  terms = ontology.getTerms();
+        Collection<Term>  terms = ontology.getTerms();
 
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter("hp.tsv"));
             bw.write(header+"\n");
-           for (HpoTerm t :terms) {
+           for (Term t :terms) {
                 //System.out.println(t);
                 String label = t.getName().toString();
                 String id = t.getId().getIdWithPrefix();

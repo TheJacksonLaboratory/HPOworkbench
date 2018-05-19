@@ -18,15 +18,9 @@ import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
-import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
-import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.ontology.data.Dbxref;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
-import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.ontology.data.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -113,7 +107,7 @@ public final class MondoController {
     /**
      * The MONDO term that is currently selected in the Browser window.
      */
-    private GenericTerm selectedTerm = null;
+    private Term selectedTerm = null;
 
     private final HpoController hpoController;
 
@@ -209,7 +203,7 @@ public final class MondoController {
      *
      * @param ontology Reference to the HPO
      */
-    private void initTree(Ontology<GenericTerm, GenericRelationship> ontology) {
+    private void initTree(Ontology ontology) {
         // populate the TreeView with top-level elements from ontology hierarchy
         if (ontology == null) {
             mondoOntologyTreeView.setRoot(null);
@@ -217,7 +211,7 @@ public final class MondoController {
         }
         TermId rootId = ImmutableTermId.constructWithPrefix("MONDO:0000001");
         logger.trace("Initializing Mondo tree with root id {}", rootId.getIdWithPrefix());
-        GenericTerm rootTerm = ontology.getTermMap().get(rootId);
+        Term rootTerm = ontology.getTermMap().get(rootId);
         if (rootTerm == null) {
             logger.error("Mondo root term was null");
             return;
@@ -255,7 +249,7 @@ public final class MondoController {
     }
 
 
-    private String getOMIMid(GenericTerm gterm) {
+    private String getOMIMid(Term gterm) {
         List<Dbxref> dbxlst = gterm.getXrefs();
         if (dbxlst == null) return null;
         for (Dbxref dbx : dbxlst) {
@@ -267,7 +261,7 @@ public final class MondoController {
         return null;
     }
 
-    private String getOrphanetid(GenericTerm gterm) {
+    private String getOrphanetid(Term gterm) {
         List<Dbxref> dbxlst = gterm.getXrefs();
         if (dbxlst == null) return null;
         for (Dbxref dbx : dbxlst) {
@@ -278,15 +272,15 @@ public final class MondoController {
     }
 
     /**
-     * Update content of the {@link #infoWebView} with currently selected {@link HpoTerm}.
+     * Update content of the {@link #infoWebView} with currently selected {@link Term}.
      *
-     * @param treeItem currently selected {@link TreeItem} containing {@link HpoTerm}
+     * @param treeItem currently selected {@link TreeItem} containing {@link Term}
      */
     private void updateMondoDescription(TreeItem<GenericTermWrapper> treeItem) {
         if (treeItem == null)
             return;
 
-        GenericTerm mondoTerm = treeItem.getValue().term;
+        Term mondoTerm = treeItem.getValue().term;
         String omim = getOMIMid(mondoTerm);
         String orpha = getOrphanetid(mondoTerm);
 
@@ -364,23 +358,23 @@ public final class MondoController {
      * @param term HPO Term of interest
      * @return parents of term (not including term itself).
      */
-    private Set<GenericTerm> getTermParents(GenericTerm term) {
-        Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
+    private Set<Term> getTermParents(Term term) {
+        Ontology ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
-        Set<GenericTerm> eltern = new HashSet<>();
+        Set<Term> eltern = new HashSet<>();
         parentIds.forEach(tid -> {
-            GenericTerm ht = ontology.getTermMap().get(tid);
+            Term ht = ontology.getTermMap().get(tid);
             eltern.add(ht);
         });
         return eltern;
     }
 
-    private boolean existsPathFromRoot(GenericTerm term) {
-        Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
+    private boolean existsPathFromRoot(Term term) {
+        Ontology ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
             return false;
@@ -391,21 +385,21 @@ public final class MondoController {
 
 
     /**
-     * Find the path from the root term to given {@link HpoTerm}, expand the tree and set the selection model of the
+     * Find the path from the root term to given {@link Term}, expand the tree and set the selection model of the
      * TreeView to the term position.
      *
-     * @param term {@link HpoTerm} to be displayed
+     * @param term {@link Term} to be displayed
      */
-    private void expandUntilTerm(GenericTerm term) {
+    private void expandUntilTerm(Term term) {
         // logger.trace("expand until term " + term.toString());
         // switchToMode(BROWSE_HPO);
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
-            Stack<GenericTerm> termStack = new Stack<>();
+            Stack<Term> termStack = new Stack<>();
             termStack.add(term);
-            Set<GenericTerm> parents = getTermParents(term);
+            Set<Term> parents = getTermParents(term);
             while (parents.size() != 0) {
-                GenericTerm parent = parents.iterator().next();
+                Term parent = parents.iterator().next();
                 termStack.add(parent);
                 parents = getTermParents(parent);
             }
@@ -415,7 +409,7 @@ public final class MondoController {
             termStack.pop(); // get rid of 'All' node which is hidden
             TreeItem<GenericTermWrapper> target = mondoOntologyTreeView.getRoot();
             while (!termStack.empty()) {
-                GenericTerm current = termStack.pop();
+                Term current = termStack.pop();
                 for (TreeItem<GenericTermWrapper> child : children) {
                     if (child.getValue().term.equals(current)) {
                         child.setExpanded(true);
@@ -429,7 +423,7 @@ public final class MondoController {
             mondoOntologyTreeView.scrollTo(mondoOntologyTreeView.getSelectionModel().getSelectedIndex());
         } else {
             TermId rootId = optionalResources.getMondoOntology().getRootTermId();
-            GenericTerm rootTerm = optionalResources.getMondoOntology().getTermMap().get(rootId);
+            Term rootTerm = optionalResources.getMondoOntology().getTermMap().get(rootId);
             logger.warn(String.format("Unable to find the path from %s to %s", rootTerm.toString(), term.getName()));
         }
         selectedTerm = term;
@@ -438,7 +432,7 @@ public final class MondoController {
     @FXML
     public void goButtonAction() {
         TermId tid = labelsAndMondoIds.get(searchTextField.getText());
-        GenericTerm term = optionalResources.getMondoOntology().getTermMap().get(tid);
+        Term term = optionalResources.getMondoOntology().getTermMap().get(tid);
         if (term == null) {
             String msg = String.format("Could not find ontology term for search result: %s", searchTextField.getText());
             PopUps.showInfoMessage(msg, "Warning");
@@ -514,8 +508,8 @@ public final class MondoController {
      * @param term HPO Term of interest
      * @return children of term (not including term itself).
      */
-    private Set<GenericTerm> getTermChildren(GenericTerm term) {
-        Ontology<GenericTerm, GenericRelationship> ontology = optionalResources.getMondoOntology();
+    private Set<Term> getTermChildren(Term term) {
+        Ontology ontology = optionalResources.getMondoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
             return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
@@ -526,9 +520,9 @@ public final class MondoController {
         }
         TermId parentTermId = term.getId();
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
-        Set<GenericTerm> kids = new HashSet<>();
+        Set<Term> kids = new HashSet<>();
         childrenIds.forEach(tid -> {
-            GenericTerm gt = ontology.getTermMap().get(tid);
+            Term gt = ontology.getTermMap().get(tid);
             kids.add(gt);
         });
         return kids;
@@ -536,7 +530,7 @@ public final class MondoController {
 
 
     /**
-     * Inner class that defines a bridge between hierarchy of {@link HpoTerm}s and {@link TreeItem}s of the
+     * Inner class that defines a bridge between hierarchy of {@link Term}s and {@link TreeItem}s of the
      * {@link TreeView}.
      */
     class GenericTermTreeItem extends TreeItem<GenericTermWrapper> {
@@ -549,14 +543,14 @@ public final class MondoController {
         /**
          * Default & only constructor for the TreeItem.
          *
-         * @param term {@link HpoTerm} that is represented by this TreeItem
+         * @param term {@link Term} that is represented by this TreeItem
          */
         GenericTermTreeItem(GenericTermWrapper term) {
             super(term);
         }
 
         /**
-         * Check that the {@link HpoTerm} that is represented by this TreeItem is a leaf term as described below.
+         * Check that the {@link Term} that is represented by this TreeItem is a leaf term as described below.
          * <p>
          * {@inheritDoc}
          */
@@ -567,7 +561,7 @@ public final class MondoController {
 
 
         /**
-         * Get list of children of the {@link HpoTerm} that is represented by this TreeItem.
+         * Get list of children of the {@link Term} that is represented by this TreeItem.
          * {@inheritDoc}
          */
         @Override
@@ -575,9 +569,9 @@ public final class MondoController {
             if (childrenList == null) {
                 // logger.debug(String.format("Getting children for term %s", getValue().term.getName()));
                 childrenList = FXCollections.observableArrayList();
-                Set<GenericTerm> children = getTermChildren(getValue().term);
+                Set<Term> children = getTermChildren(getValue().term);
                 children.stream()
-                        .sorted(Comparator.comparing(GenericTerm::getName))
+                        .sorted(Comparator.comparing(Term::getName))
                         .map(term -> new MondoController.GenericTermTreeItem(new GenericTermWrapper(term)))
                         .forEach(childrenList::add);
                 super.getChildren().setAll(childrenList);

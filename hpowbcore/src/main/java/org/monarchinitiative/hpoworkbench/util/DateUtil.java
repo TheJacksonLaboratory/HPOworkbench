@@ -67,7 +67,7 @@ class DateUtil {
      * @return The matching SimpleDateFormat pattern, or null if format is unknown.
      * @see SimpleDateFormat
      */
-    public static String determineDateFormat(String dateString) {
+    private static String determineDateFormat(String dateString) {
         for (String regexp : DATE_FORMAT_REGEXPS.keySet()) {
             if (dateString.toLowerCase().matches(regexp)) {
                 return DATE_FORMAT_REGEXPS.get(regexp);

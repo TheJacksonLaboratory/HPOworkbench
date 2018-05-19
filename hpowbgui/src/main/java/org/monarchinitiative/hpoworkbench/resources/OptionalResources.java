@@ -7,8 +7,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Tab;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
-import org.monarchinitiative.phenol.formats.generic.GenericRelationship;
-import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -49,7 +47,7 @@ public final class OptionalResources {
 
     private final ObjectProperty<HpoOntology> hpoOntology = new SimpleObjectProperty<>(this, "hpoOntology", null);
 
-    private final ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntology
+    private final ObjectProperty<Ontology> mondoOntology
             = new SimpleObjectProperty<>(this, "mondoOntology", null);
 
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMap =
@@ -130,11 +128,11 @@ public final class OptionalResources {
         this.hpoOntology.set(ResourceValidators.ontologyResourceValidator().isValid(hpoOntology) ? hpoOntology : null);
     }
 
-    public Ontology<GenericTerm, GenericRelationship> getMondoOntology() {
+    public Ontology getMondoOntology() {
         return mondoOntology.get();
     }
 
-    public void setMondoOntology(Ontology<GenericTerm, GenericRelationship> mondoOntology) {
+    public void setMondoOntology(Ontology mondoOntology) {
         if (this.mondoOntology==null) {
             System.err.println("[ERROR] MONDO ONTOLOGY NULL");
             return;
@@ -142,7 +140,7 @@ public final class OptionalResources {
         this.mondoOntology.set(mondoOntology);
     }
 
-    public ObjectProperty<Ontology<GenericTerm, GenericRelationship>> mondoOntologyProperty() {
+    public ObjectProperty<Ontology> mondoOntologyProperty() {
         return mondoOntology;
     }
 

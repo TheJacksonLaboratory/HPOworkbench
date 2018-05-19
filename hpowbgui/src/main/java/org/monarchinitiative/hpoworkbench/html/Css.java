@@ -1,6 +1,6 @@
 package org.monarchinitiative.hpoworkbench.html;
 
-public class Css {
+class Css {
 
     private static final String CSS = "body {\n" +
             "  font: normal medium/1.4 sans-serif;\n" +

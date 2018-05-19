@@ -225,6 +225,10 @@ public class Commandline {
         writer.println("\t<pheno_annot.tab>: path to annotation file (default \"data/phenotype_annotation.tab\")");
         writer.println("\t<start-term>: HPO term of interest");
         writer.println();
+        writer.println("git:");
+        writer.println("\tjava -jar HPOWorkbench.jar git -g <label> ");
+        writer.println("\t<label>: github label");
+        writer.println();
         writer.close();
         System.exit(0);
     }

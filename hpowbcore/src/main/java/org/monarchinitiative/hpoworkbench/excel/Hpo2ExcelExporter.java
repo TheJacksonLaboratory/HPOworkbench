@@ -9,12 +9,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.Dbxref;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
-import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -90,7 +90,7 @@ public class Hpo2ExcelExporter {
     }
 
 
-    private String getXrefs(HpoTerm term) {
+    private String getXrefs(Term term) {
         List<Dbxref> dbxlst =  term.getXrefs();
         return dbxlst.stream().map(Dbxref::getName).collect(Collectors.joining("; "));
     }
@@ -103,7 +103,7 @@ public class Hpo2ExcelExporter {
 
 
     private String[] getRow(TermId tid) {
-        HpoTerm term = ontology.getTermMap().get(tid);
+        Term term = ontology.getTermMap().get(tid);
         String row[] = new String[7];
         if (term == null) {
             logger.error("Could not get term object for tid=%s"+tid.getIdWithPrefix());

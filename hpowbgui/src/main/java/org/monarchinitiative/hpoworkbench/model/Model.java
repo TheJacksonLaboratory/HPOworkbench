@@ -5,11 +5,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
-import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermPrefix;
+import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,11 +79,11 @@ public class Model {
     }
 
 
-    public List<HpoTerm> getAnnotationTermsForDisease(DiseaseModel dmod) {
-        List<HpoTerm> annotating=new ArrayList<>();
+    public List<Term> getAnnotationTermsForDisease(DiseaseModel dmod) {
+        List<Term> annotating=new ArrayList<>();
         for (TermId tid : directAnnotMap.keySet()) {
             if (directAnnotMap.get(tid).contains(dmod)) {
-                HpoTerm term = ontology.getTermMap().get(tid);
+                Term term = ontology.getTermMap().get(tid);
                 annotating.add(term);
             }
         }

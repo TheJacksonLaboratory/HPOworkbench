@@ -33,24 +33,24 @@ public class FileDownloader {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDownloader.class);
 
     public static class ProxyOptions {
-        public String host = null;
-        public int port = -1;
-        public String user = null;
-        public String password = null;
+        String host = null;
+        int port = -1;
+        String user = null;
+        String password = null;
     }
 
     /**
      * Configuration for the {@link FileDownloader}.
      */
     public static class Options {
-        public boolean printProgressBar = false;
-        public ProxyOptions http = new ProxyOptions();
-        public ProxyOptions https = new ProxyOptions();
-        public ProxyOptions ftp = new ProxyOptions();
+        boolean printProgressBar = false;
+        ProxyOptions http = new ProxyOptions();
+        ProxyOptions https = new ProxyOptions();
+        ProxyOptions ftp = new ProxyOptions();
     }
 
     /** configuration for the downloader */
-    Options options;
+    private Options options;
 
     /** Initializer FileDownloader with the given options string */
     public FileDownloader(Options options) {
@@ -101,6 +101,8 @@ public class FileDownloader {
                 throw new IOException("Could not login with anonymous:anonymous@example.com");
             if (!ftp.isConnected())
                 LOGGER.error("Weird, not connected!");
+        } catch (SocketException e) {
+            throw new FileDownloadException("ERROR: problem connecting when downloading file.", e);
         } catch (IOException e) {
             throw new FileDownloadException("ERROR: problem connecting when downloading file.", e);
         }
@@ -119,26 +121,30 @@ public class FileDownloader {
             }
             throw new FileDownloadException("ERROR: could not use binary transfer.", e);
         }
-        if (in == null)
-            throw new FileNotFoundException("Could not open connection for file " + fileName);
-        if (fileSize != -1)
-            pb = new ProgressBar(0, fileSize, options.printProgressBar);
-        else
-            LOGGER.info("(server did not tell us the file size, no progress bar)");
-        ProgressBar pb = null;
-        ftp.pwd();
-        for (FTPFile file : files)
-            if (file.getName().equals(fileName))
-                fileSize = file.getSize();
-        long fileSize = -1;
-        FTPFile[] files = ftp.listFiles(fileName);
-        if (!ftp.changeWorkingDirectory(parentDir))
-            throw new FileNotFoundException("Could not change directory to " + parentDir);
-        final String fileName = new File(src.getPath()).getName();
-        final String parentDir = new File(src.getPath()).getParent().substring(1);
-        try (InputStream in = ftp.retrieveFileStream(fileName); OutputStream out = new FileOutputStream(dest)) {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            final String parentDir = new File(src.getPath()).getParent().substring(1);
+            final String fileName = new File(src.getPath()).getName();
+            if (!ftp.changeWorkingDirectory(parentDir))
+                throw new FileNotFoundException("Could not change directory to " + parentDir);
             // Try to get file size.
+            FTPFile[] files = ftp.listFiles(fileName);
+            long fileSize = -1;
+            for (int i = 0; i < files.length; ++i)
+                if (files[i].getName().equals(fileName))
+                    fileSize = files[i].getSize();
+            ftp.pwd();
+            ProgressBar pb = null;
+            if (fileSize != -1)
+                pb = new ProgressBar(0, fileSize, options.printProgressBar);
+            else
+                LOGGER.info("(server did not tell us the file size, no progress bar)");
             // Download file.
+            in = ftp.retrieveFileStream(fileName);
+            if (in == null)
+                throw new FileNotFoundException("Could not open connection for file " + fileName);
+            out = new FileOutputStream(dest);
             BufferedInputStream inBf = new BufferedInputStream(in);
             byte buffer[] = new byte[128 * 1024];
             int readCount;
@@ -159,6 +165,19 @@ public class FileDownloader {
             // if (!ftp.completePendingCommand())
             // throw new IOException("Could not finish download!");
 
+        } catch (FileNotFoundException e) {
+            dest.delete();
+            try {
+                ftp.logout();
+            } catch (IOException e1) {
+                // swallow, nothing we can do about it
+            }
+            try {
+                ftp.disconnect();
+            } catch (IOException e1) {
+                // swallow, nothing we can do about it
+            }
+            throw new FileDownloadException("ERROR: problem downloading file.", e);
         } catch (IOException e) {
             dest.delete();
             try {
@@ -172,18 +191,25 @@ public class FileDownloader {
                 // swallow, nothing we can do about it
             }
             throw new FileDownloadException("ERROR: problem downloading file.", e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    // swallow, nothing we can do
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // swallow, nothing we can do
+                }
+            }
         }
-        // swallow, nothing we can do
-        // swallow, nothing we can do
-        // if (ftp != null) {
-        // try {
-        // ftp.completePendingCommand();
-        // } catch (IOException e) {
-        // // swallow, nothing we can do
-        // }
-        // }
         return false;
     }
+
 
     /**
      * Copy contents of a URL to a file using the {@link URL} class.

@@ -5,7 +5,7 @@ import org.monarchinitiative.hpoworkbench.annotation.HpoCategoryMap;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;
@@ -63,7 +63,7 @@ public class SingleDiseaseHTMLGenerator {
                     "    </tfoot><br/>", title));
             List<TermId> termIdList = cat.getAnnotatingTermIds();
             for (TermId tid : termIdList) {
-                HpoTerm term = ontology.getTermMap().get(tid);
+                Term term = ontology.getTermMap().get(tid);
                 String row = String.format("<tr>\n" +
                                 "        <td><a href=\"%s\">%s</a></td>\n" +
                                 "        <td>%s</td>\n" +

@@ -1,7 +1,7 @@
 package org.monarchinitiative.hpoworkbench.html;
 
-import org.monarchinitiative.phenol.formats.generic.GenericTerm;
 import org.monarchinitiative.phenol.ontology.data.Dbxref;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class MondoTermHtmlGenerator {
             "            <p><b>Comment:</b> %s</p>\n";
 
 
-    public static String getHTML(GenericTerm mondoTerm) {
+    public static String getHTML(Term mondoTerm) {
         String termID = mondoTerm.getId().getIdWithPrefix();
         String synonyms = (mondoTerm.getSynonyms() == null) ? EMPTY_STRING : mondoTerm.getSynonyms().stream().map(TermSynonym::getValue)
                 .collect(Collectors.joining("; "));

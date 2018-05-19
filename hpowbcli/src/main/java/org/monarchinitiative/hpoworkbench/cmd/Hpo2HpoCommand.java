@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
@@ -92,7 +91,7 @@ public class Hpo2HpoCommand extends HPOCommand {
         for (Object t: mp2.keySet()) {
             TermId tid = (TermId) t;
             double count = (double)mp2.get(t);
-            String name =  ((HpoTerm)ontology.getTermMap().get(tid)).getName();
+            String name =  ontology.getTermMap().get(tid).getName();
             System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count);
         }
     }

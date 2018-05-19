@@ -19,8 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckComboBox;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
-import org.monarchinitiative.phenol.formats.generic.GenericTerm;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class GitHubPopup {
      *
      * @param term and HPO Term to which we suggest a correction as a new GitHub issue.
      */
-    public GitHubPopup(HpoTerm term) {
+    public GitHubPopup(Term term) {
         termlabel = term.getName();
         termid = term.getId().getIdWithPrefix();
         definition = term.getDefinition();
@@ -71,15 +70,6 @@ public class GitHubPopup {
                 stream().map(TermSynonym::getValue).collect(Collectors.joining(";"));
     }
 
-
-    public GitHubPopup(GenericTerm term) {
-        termlabel = term.getName();
-        termid = term.getId().getIdWithPrefix();
-        definition = term.getDefinition();
-        comment = term.getComment();
-        synlist = term.getSynonyms().size() == 0 ? "-" : term.getSynonyms().
-                stream().map(TermSynonym::getValue).collect(Collectors.joining(";"));
-    }
 
 
 
@@ -87,20 +77,20 @@ public class GitHubPopup {
      * @param term      An HPO Term for which we ant to suggest a new child term.
      * @param childterm set this to true if we want to create an issue to make a new child term
      */
-    public GitHubPopup(HpoTerm term, boolean childterm) {
+    public GitHubPopup(Term term, boolean childterm) {
         this(term);
         this.suggestNewChildTerm = childterm;
     }
 
 
-    public GitHubPopup(HpoTerm term, DiseaseModel dmodel) {
+    public GitHubPopup(Term term, DiseaseModel dmodel) {
         this(term);
         this.dmodel = dmodel;
         newAnnotation = true;
 
     }
 
-    public GitHubPopup(HpoTerm term, DiseaseModel dmodel, boolean mistaken) {
+    public GitHubPopup(Term term, DiseaseModel dmodel, boolean mistaken) {
         this(term, dmodel);
         mistakenAnnotation = true;
     }

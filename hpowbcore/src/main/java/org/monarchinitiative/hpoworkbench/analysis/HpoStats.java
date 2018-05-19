@@ -9,8 +9,8 @@ import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.io.File;
@@ -86,12 +86,12 @@ public class HpoStats {
 
 
     public String getHpoTerm() {
-        HpoTerm term = hpoOntology.getTermMap().get(termIdOfInterest);
+        Term term = hpoOntology.getTermMap().get(termIdOfInterest);
         return String.format("%s [%s]",term.getName(),termIdOfInterest.getIdWithPrefix());
     }
 
     public String getHpoDefinition() {
-        HpoTerm term = hpoOntology.getTermMap().get(termIdOfInterest);
+        Term term = hpoOntology.getTermMap().get(termIdOfInterest);
         return term.getDefinition();
     }
 

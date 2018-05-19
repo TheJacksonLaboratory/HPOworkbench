@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.poi.xwpf.usermodel.*;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 
@@ -130,7 +129,7 @@ public class Hpo2Word {
         tableRowOne.addNewTableCell().setText("Comment");
         tableRowOne.addNewTableCell().setText("Synonyms");
         //create second row
-        Map<TermId,HpoTerm> termmap = hpoOntology.getTermMap();
+        Map<TermId,Term> termmap = hpoOntology.getTermMap();
         Set<TermId> previouslyseen=new HashSet<>();
         Stack<Pair<TermId,Integer>> stack = new Stack<>();
         if (id==null) {
@@ -149,7 +148,7 @@ public class Hpo2Word {
             Pair<TermId,Integer> pair = stack.pop();
             TermId termId=pair.first;
             Integer level=pair.second;
-            HpoTerm hterm = termmap.get(termId);
+            Term hterm = termmap.get(termId);
             if (! previouslyseen.contains(termId)) {
                 // we have not yet output this term!
                 XWPFTableRow tableRow = table.createRow();
@@ -197,7 +196,7 @@ public class Hpo2Word {
      * @return Table object
      */
     private RtfTable createTable() {
-        Map<TermId,HpoTerm> termmap = hpoOntology.getTermMap();
+        Map<TermId,Term> termmap = hpoOntology.getTermMap();
         Set<TermId> previouslyseen=new HashSet<>();
         String id = startTerm;
         Stack<Pair<TermId,Integer>> stack = new Stack<>();
@@ -216,7 +215,7 @@ public class Hpo2Word {
             Pair<TermId,Integer> pair = stack.pop();
             TermId termId=pair.first;
             Integer level=pair.second;
-            HpoTerm hterm = termmap.get(termId);
+            Term hterm = termmap.get(termId);
             if (previouslyseen.contains(termId)) {
                 // we have already output this term!
                 HpoRtfTableRow hrow = new HpoRtfTableRow(level, hterm,

@@ -7,7 +7,7 @@ import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
 import org.monarchinitiative.hpoworkbench.annotation.SubClassTermPair;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.formats.hpo.HpoTerm;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
         String row1="<tr class=\"shared\"><td colspan=\"2\"><i><b>OMIM and Orphanet: identical</b></i></td></tr>";
         sb.append(row1);
         for (TermId tid : termIdList) {
-            HpoTerm term = ontology.getTermMap().get(tid);
+            Term term = ontology.getTermMap().get(tid);
             String row = String.format("<tr class=\"shared\">\n" +
                             "        <td><a href=\"%s\">%s [%s]</a></td>\n" +
                             "        <td>%s</td>\n" +
