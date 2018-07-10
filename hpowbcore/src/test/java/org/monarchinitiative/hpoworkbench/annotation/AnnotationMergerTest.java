@@ -58,14 +58,16 @@ public class AnnotationMergerTest {
                 HpoAnnotation.parseTerm("HP:0003312"),
                 HpoAnnotation.parseTerm("HP:0100861")
                 );
-        Osteomesopyknosis_ORPHANET = makeHpoDisease("Osteomesopyknosis","ORPHA","2777",orpha);
+        TermId OsteomesopyknosisId = TermId.constructWithPrefix("ORPHA:2777");
+        Osteomesopyknosis_ORPHANET = makeHpoDisease("Osteomesopyknosis",OsteomesopyknosisId, orpha);
         // Make an OMIM disease
         List<HpoAnnotation> omim = ImmutableList.of(HpoAnnotation.parseTerm("HP:0000006"),
                 HpoAnnotation.parseTerm("HP:0000789"),
                 HpoAnnotation.parseTerm("HP:0011001"),
                 HpoAnnotation.parseTerm("HP:0003419")
         );
-        OSTEOMESOPYKNOSIS_OMIM = makeHpoDisease("OSTEOMESOPYKNOSIS","OMIM","166450",omim);
+        TermId OmimId = TermId.constructWithPrefix("OMIM:166450");
+        OSTEOMESOPYKNOSIS_OMIM = makeHpoDisease("OSTEOMESOPYKNOSIS",OmimId,omim);
         setupCCAIDCMS();
 
     }
@@ -101,7 +103,9 @@ public class AnnotationMergerTest {
         orpha.add(HpoAnnotation.parseTerm("HP:0000256"));
         orpha.add(HpoAnnotation.parseTerm("HP:0000470"));
         orpha.add(HpoAnnotation.parseTerm("HP:0004322"));
-        CCAIDCMS_ORPHA=makeHpoDisease("CCAIDCMS","ORHPA","52055",orpha);
+        TermId Orph52055 = TermId.constructWithPrefix("ORHPA:52055");
+
+        CCAIDCMS_ORPHA=makeHpoDisease("CCAIDCMS",Orph52055,orpha);
 
         List<HpoAnnotation> mim = new ArrayList<>();
         mim.add(HpoAnnotation.parseTerm("HP:0001419"));
@@ -123,18 +127,20 @@ public class AnnotationMergerTest {
         mim.add(HpoAnnotation.parseTerm("HP:0000256"));
         mim.add(HpoAnnotation.parseTerm("HP:0000470"));
         mim.add(HpoAnnotation.parseTerm("HP:0004322"));
-        CCAIDCMS_OMIM = makeHpoDisease("CCAIDCMS","OMIM","300472",mim);
+
+        TermId omim300472 = TermId.constructWithPrefix("OMIM:300472");
+
+        CCAIDCMS_OMIM = makeHpoDisease("CCAIDCMS",omim300472,mim);
 
 
     }
 
 
-    private static HpoDisease makeHpoDisease(String diseaseName, String database, String diseaseId, List<HpoAnnotation> annots) {
+    private static HpoDisease makeHpoDisease(String diseaseName, TermId diseaseId, List<HpoAnnotation> annots) {
         List<TermId> emptyList = ImmutableList.of();
         return
                 new HpoDisease(
                         diseaseName,
-                        database,
                         diseaseId,
                         annots,
                         emptyList,

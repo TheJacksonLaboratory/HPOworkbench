@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class Model {
     private static final Logger logger = LogManager.getLogger();
-    private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
+    private final TermPrefix HP_PREFIX = new TermPrefix("HP");
     /** Ontology model for full HPO ontology (all subhierarchies). */
     private final HpoOntology ontology;
     /** List of annotated diseases (direct annotations) */
@@ -70,7 +70,7 @@ public class Model {
             logger.error("Malformed termstring: "+termstring);
             return null;
         }
-        TermId tid = new ImmutableTermId(HP_PREFIX,termstring);
+        TermId tid = new TermId(HP_PREFIX,termstring);
         if (! ontology.getAllTermIds().contains(tid)) {
             logger.error("Unknown TermId "+tid.getIdWithPrefix());
             return null;

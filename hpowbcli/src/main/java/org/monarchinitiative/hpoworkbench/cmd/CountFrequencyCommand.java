@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
+import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
-import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.io.File;
@@ -46,15 +46,22 @@ public class CountFrequencyCommand extends HPOCommand {
         if (hpoTermId.startsWith("HP:")) {
             hpoTermId=hpoTermId.substring(3);
         }
-        TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
-        termId = new ImmutableTermId(HP_PREFIX,hpoTermId);
+        TermPrefix HP_PREFIX = new TermPrefix("HP");
+        termId = new TermId(HP_PREFIX,hpoTermId);
     }
 
     public void run()  {
-        try {
-            HpoOboParser oparser = new HpoOboParser(new File(hpOboPath));
-            HpoOntology ontology = oparser.parse();
-            Map<String,HpoDisease> annotationMap=null;
+
+            HpOboParser oparser = new HpOboParser(new File(hpOboPath));
+            Optional<HpoOntology> ontoOpt = oparser.parse();
+            if (! ontoOpt.isPresent()) {
+                System.err.println("Could not get ontology TODO");
+                LOGGER.error("Could not input ontology");
+                System.exit(1);
+                return;
+            }
+            HpoOntology ontology = ontoOpt.get();
+            Map<TermId,HpoDisease> annotationMap;
             try {
                 HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(annotationPath,ontology);
                 annotationMap =parser.parse();
@@ -85,11 +92,9 @@ public class CountFrequencyCommand extends HPOCommand {
                 }
             }
             outputCounts(annotationCounts, weightedAnnotationCounts,ontology);
-        } catch (IOException e) {
-            e.printStackTrace();
-            LOGGER.error("Could not input ontology: {}",e);
-            System.exit(1);
-        }
+
+
+
 
 
     }

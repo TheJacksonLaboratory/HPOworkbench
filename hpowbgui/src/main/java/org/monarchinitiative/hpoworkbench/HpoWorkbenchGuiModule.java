@@ -19,6 +19,7 @@ import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -120,9 +121,9 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
             if (hpoontology!=null) {
                 HpoDiseaseAnnotationParser annotparser = new HpoDiseaseAnnotationParser(annots,hpoontology);
                 try {
-                    Map<String,HpoDisease> diseasemap =annotparser.parse();
-                    for (String d : diseasemap.keySet()) {
-                        System.err.print(d);
+                    Map<TermId,HpoDisease> diseasemap =annotparser.parse();
+                    for (TermId d : diseasemap.keySet()) {
+                        System.err.print(d.getIdWithPrefix());
                     }
                     optionalResources.setDisease2annotationMap(diseasemap);
                 } catch (PhenolException pe) {

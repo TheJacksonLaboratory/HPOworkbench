@@ -6,7 +6,6 @@ import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.io.File;
@@ -24,7 +23,7 @@ public class HpoStatsCommand extends HPOCommand  {
     private final String annotpath;
     private HpoOntology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
-    private Map<String,HpoDisease> diseaseMap =null;
+    private Map<TermId,HpoDisease> diseaseMap =null;
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
     private TermId termOfInterest;
     /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
@@ -47,7 +46,7 @@ public class HpoStatsCommand extends HPOCommand  {
             LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",term ));
             System.exit(1);
         }
-        this.termOfInterest=ImmutableTermId.constructWithPrefix(term);
+        this.termOfInterest=TermId.constructWithPrefix(term);
         LOGGER.trace("Term of interest: "+termOfInterest.getIdWithPrefix());
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();

@@ -33,7 +33,7 @@ public class Hpo2Word {
     private HpoOntology hpoOntology=null;
     private static String DEFAULT_START_TERM="HP:0000118";
 
-    private static final TermPrefix HPPREFIX = new ImmutableTermPrefix("HP");
+    private static final TermPrefix HPPREFIX = new TermPrefix("HP");
 
 
 
@@ -139,7 +139,7 @@ public class Hpo2Word {
         if (id.startsWith("HP:")) {
             id = id.substring(3);
         }
-        TermId tid = new ImmutableTermId(HPPREFIX,id);
+        TermId tid = new TermId(HPPREFIX,id);
         stack.push(new Pair<>(tid,1));
 
         int c=0;
@@ -207,7 +207,7 @@ public class Hpo2Word {
         if (id.startsWith("HP:")) {
             id = id.substring(3);
         }
-        TermId tid = new ImmutableTermId(HPPREFIX,id);
+        TermId tid = new TermId(HPPREFIX,id);
         stack.push(new Pair<>(tid,1));
         ArrayList<HpoRtfTableRow> rtfrows = new ArrayList<>();
 

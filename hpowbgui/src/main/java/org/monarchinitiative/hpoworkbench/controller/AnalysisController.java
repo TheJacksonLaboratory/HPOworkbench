@@ -17,7 +17,6 @@ import org.monarchinitiative.hpoworkbench.html.AnnotationTlcHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.HpoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.MondoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import javax.inject.Inject;
@@ -41,7 +40,7 @@ public final class AnalysisController {
      */
     private WebEngine infoWebEngine;
 
-    private final TermId MONDO_ROOT_ID = ImmutableTermId.constructWithPrefix("MONDO:0000001");
+    private final TermId MONDO_ROOT_ID = TermId.constructWithPrefix("MONDO:0000001");
 
     /**
      * Unused, but still required.

@@ -2,13 +2,15 @@ package org.monarchinitiative.hpoworkbench.io;
 
 import org.apache.log4j.Logger;
 import org.monarchinitiative.phenol.base.PhenolException;
+import org.monarchinitiative.phenol.io.obo.OboOntologyLoader;
 import org.monarchinitiative.phenol.io.owl.OwlImmutableOntologyLoader;
-import org.monarchinitiative.phenol.io.owl.generic.GenericOwlFactory;
+
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Optional;
+
 
 public class MondoParser {
     private static final Logger LOGGER = Logger.getLogger(MondoParser.class.getName());
@@ -34,12 +36,11 @@ public class MondoParser {
         final OwlImmutableOntologyLoader loader =
                 new OwlImmutableOntologyLoader(
                         new File(mondoOboPath));
-
-        final GenericOwlFactory cof = new GenericOwlFactory();
         try {
-            mondo= loader.load(cof);
+            mondo = loader.load();
         } catch (OWLOntologyCreationException e) {
-            throw new PhenolException(String.format("Could not create Mondo ontology: %s",e.getMessage() ));
+            e.printStackTrace();
+
         }
     }
 

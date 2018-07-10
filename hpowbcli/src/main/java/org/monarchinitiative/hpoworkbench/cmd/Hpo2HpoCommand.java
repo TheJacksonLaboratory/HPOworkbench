@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
+import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.io.File;
@@ -40,8 +40,8 @@ public class Hpo2HpoCommand extends HPOCommand {
         if (hpoTermId.startsWith("HP:")) {
             hpoTermId = hpoTermId.substring(3);
         }
-        TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
-        termId = new ImmutableTermId(HP_PREFIX, hpoTermId);
+        TermPrefix HP_PREFIX = new TermPrefix("HP");
+        termId = new TermId(HP_PREFIX, hpoTermId);
     }
 
 
@@ -55,9 +55,9 @@ public class Hpo2HpoCommand extends HPOCommand {
 
     /** input the hp.obo and the annotations. */
     private void inputHpoData() {
-        try {
-            HpoOboParser oparser = new HpoOboParser(new File(hpOboPath));
-            this.ontology = oparser.parse();
+            HpOboParser oparser = new HpOboParser(new File(hpOboPath));
+            Optional<HpoOntology> opt = oparser.parse();
+            this.ontology = opt.get();
             try {
                 HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath, ontology);
             } catch (PhenolException pe) {
@@ -66,10 +66,6 @@ public class Hpo2HpoCommand extends HPOCommand {
             //this.annotlist = aparser.getAnnotations();
             throw new UnsupportedOperationException(); // TODO REFACTOR!!!!
            // this.descendents = getDescendents(ontology, termId);
-        } catch (IOException e) {
-            LOGGER.error(String.format("Could not input ontology: %s",e.getMessage()));
-            System.exit(1);
-        }
     }
 
 

@@ -10,6 +10,7 @@ import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;
@@ -56,7 +57,7 @@ public final class OptionalResources {
     private final ObjectProperty<Map<TermId, List<DiseaseModel>>> directAnnotMap =
             new SimpleObjectProperty<>(this, "directAnnotMap", null);
 
-    private final ObjectProperty<Map<String, HpoDisease>> disease2annotationMap =
+    private final ObjectProperty<Map<TermId, HpoDisease>> disease2annotationMap =
             new SimpleObjectProperty<>(this,"disease2annotationMap", null);
 
     public OptionalResources() {
@@ -97,12 +98,12 @@ public final class OptionalResources {
         this.indirectAnnotMap.set(indirectAnnotMap);
     }
 
-    public void setDisease2annotationMap(Map<String, HpoDisease> d2amap) {
+    public void setDisease2annotationMap(Map<TermId, HpoDisease> d2amap) {
         this.disease2annotationMap.set(d2amap);
     }
-    public ObjectProperty<Map<String, HpoDisease>> disease2annotationMapProperty() { return disease2annotationMap; }
+    public ObjectProperty<Map<TermId, HpoDisease>> disease2annotationMapProperty() { return disease2annotationMap; }
 
-    public Map<String, HpoDisease> getDisease2AnnotationMap() { return disease2annotationMap.get(); }
+    public Map<TermId, HpoDisease> getDisease2AnnotationMap() { return disease2annotationMap.get(); }
 
     public ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMapProperty() {
         return indirectAnnotMap;

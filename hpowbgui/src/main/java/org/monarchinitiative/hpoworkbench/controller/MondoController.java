@@ -44,7 +44,7 @@ public final class MondoController {
 
     private final OptionalResources optionalResources;
 
-    private final TermId MONDO_ROOT_ID = ImmutableTermId.constructWithPrefix("MONDO:0000001");
+    private final TermId MONDO_ROOT_ID = TermId.constructWithPrefix("MONDO:0000001");
 
     /**
      * Unused, but still required.
@@ -209,7 +209,7 @@ public final class MondoController {
             mondoOntologyTreeView.setRoot(null);
             return;
         }
-        TermId rootId = ImmutableTermId.constructWithPrefix("MONDO:0000001");
+        TermId rootId = TermId.constructWithPrefix("MONDO:0000001");
         logger.trace("Initializing Mondo tree with root id {}", rootId.getIdWithPrefix());
         Term rootTerm = ontology.getTermMap().get(rootId);
         if (rootTerm == null) {
@@ -284,7 +284,7 @@ public final class MondoController {
         String omim = getOMIMid(mondoTerm);
         String orpha = getOrphanetid(mondoTerm);
 
-        Map<String, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
+        Map<TermId, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
         if (disease2AnnotationMap == null) {
             PopUps.showInfoMessage("Error: disease annotation map could not be initialized", "Error");
             return;

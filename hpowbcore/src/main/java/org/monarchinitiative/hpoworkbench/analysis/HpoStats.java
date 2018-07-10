@@ -9,7 +9,6 @@ import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -32,7 +31,7 @@ public class HpoStats {
     private String annotpath;
     private HpoOntology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
-    private Map<String,HpoDisease> diseaseMap =null;
+    private Map<TermId,HpoDisease> diseaseMap =null;
     /** Set of all HPO terms that are descendents of {@link #termIdOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
     private Set<TermId> adultOnset=null;
@@ -97,8 +96,8 @@ public class HpoStats {
 
 
 
-    public HpoStats(HpoOntology ontolog,Map<String, HpoDisease> d2amap) throws HPOException {
-        termIdOfInterest=ImmutableTermId.constructWithPrefix(rootHpoTerm);
+    public HpoStats(HpoOntology ontolog,Map<TermId, HpoDisease> d2amap) throws HPOException {
+        termIdOfInterest=TermId.constructWithPrefix(rootHpoTerm);
         hpoOntology=ontolog;
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();
@@ -154,11 +153,11 @@ public class HpoStats {
     }
 
     private void calculateSubontologyCounts() {
-        TermId clinicalCourse = ImmutableTermId.constructWithPrefix("HP:0031797");
-        TermId clinicalModifier = ImmutableTermId.constructWithPrefix("HP:0012823");
-        TermId frequency = ImmutableTermId.constructWithPrefix("HP:0040279");
-        TermId modeOfInheritance = ImmutableTermId.constructWithPrefix("HP:0000005");
-        TermId phenotypicAbnormality = ImmutableTermId.constructWithPrefix("HP:0000118");
+        TermId clinicalCourse = TermId.constructWithPrefix("HP:0031797");
+        TermId clinicalModifier = TermId.constructWithPrefix("HP:0012823");
+        TermId frequency = TermId.constructWithPrefix("HP:0040279");
+        TermId modeOfInheritance = TermId.constructWithPrefix("HP:0000005");
+        TermId phenotypicAbnormality = TermId.constructWithPrefix("HP:0000118");
 
         n_clinicalCourse = getDescendents(hpoOntology,clinicalCourse).size();
         n_clinicalModifier = getDescendents(hpoOntology,clinicalModifier).size();
@@ -193,7 +192,7 @@ public class HpoStats {
         if (!term.startsWith("HP:") || term.length() != 10) {
             throw new HPOException(String.format("Malformed HPO id: \"%s\"", term));
         } else {
-            termIdOfInterest = ImmutableTermId.constructWithPrefix(term);
+            termIdOfInterest = TermId.constructWithPrefix(term);
         }
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();

@@ -6,6 +6,7 @@ import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 public class HPOAnnotationParser {
     private static final Logger LOGGER = Logger.getLogger(HPOAnnotationParser.class.getName());
-    private Map<String,HpoDisease> diseaseMap =null;
+    private Map<TermId,HpoDisease> diseaseMap =null;
     private final  HpoOntology ontology;
     private final String annotPath;
 
@@ -27,7 +28,7 @@ public class HPOAnnotationParser {
         parse();
     }
 
-    public Map<String, HpoDisease> getDiseaseMap() {
+    public Map<TermId, HpoDisease> getDiseaseMap() {
         return diseaseMap;
     }
 

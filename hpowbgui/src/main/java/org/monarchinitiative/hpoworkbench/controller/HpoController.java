@@ -29,7 +29,6 @@ import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.w3c.dom.Document;
@@ -441,7 +440,7 @@ public final class HpoController {
                                         if (!href.startsWith("HP:")) {
                                             return;
                                         }
-                                        TermId tid = ImmutableTermId.constructWithPrefix(href);
+                                        TermId tid = TermId.constructWithPrefix(href);
                                         Term term = optionalResources.getHpoOntology().getTermMap().get(tid);
                                         if (term == null) {
                                             LOGGER.error(String.format("Could not construct term  from termid \"%s\"", tid.getIdWithPrefix()));

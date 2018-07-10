@@ -3,10 +3,11 @@ package org.monarchinitiative.hpoworkbench.io;
 
 import org.apache.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.io.obo.hpo.HpoOboParser;
+import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Use <a href="https://github.com/Phenomics/ontolib">ontolib</a> to parse the HPO OBO file.
@@ -27,12 +28,12 @@ public class HPOParser {
             LOGGER.error(String.format("Unable to find HPO file at %s",path));
             return;
         }
-        final HpoOboParser parser = new HpoOboParser(f);
-        try {
-            this.hpo = parser.parse();
-        } catch(IOException e) {
+        final HpOboParser parser = new HpOboParser(f);
+        Optional<HpoOntology> ontologyOpt = parser.parse();
+        if (ontologyOpt.isPresent()) {
+            this.hpo = ontologyOpt.get();
+        } else  {
             LOGGER.error(String.format("I/O error with HPO file at %s",path));
-            LOGGER.error(e,e);
         }
     }
     /** @return an initiliazed HPO ontology or null in case of errors. */

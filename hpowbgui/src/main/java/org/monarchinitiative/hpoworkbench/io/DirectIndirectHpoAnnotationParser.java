@@ -7,8 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 
@@ -32,7 +30,7 @@ public class DirectIndirectHpoAnnotationParser {
 
     private final HpoOntology ontology;
 
-    private final TermPrefix HP_PREFIX = new ImmutableTermPrefix("HP");
+    private final TermPrefix HP_PREFIX = new TermPrefix("HP");
 
 
     private Map<TermId, List<DiseaseModel>> directAnnotMap = null;
@@ -74,7 +72,7 @@ public class DirectIndirectHpoAnnotationParser {
             logger.error("Malformed termstring: " + termstring);
             return null;
         }
-        TermId tid = new ImmutableTermId(HP_PREFIX, termstring);
+        TermId tid = new TermId(HP_PREFIX, termstring);
         if (!ontology.getAllTermIds().contains(tid)) {
             logger.error("Unknown TermId " + tid.getIdWithPrefix());
             return null;

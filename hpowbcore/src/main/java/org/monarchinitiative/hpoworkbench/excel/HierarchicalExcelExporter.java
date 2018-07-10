@@ -11,7 +11,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.word.Pair;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermPrefix;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermPrefix;
@@ -34,7 +33,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getCh
 public class HierarchicalExcelExporter {
     private static final Logger logger = LogManager.getLogger();
     private final HpoOntology ontology;
-    private static final TermPrefix HPPREFIX = new ImmutableTermPrefix("HP");
+    private static final TermPrefix HPPREFIX = new TermPrefix("HP");
     /** The term of the subhierarchy of the HPO that we will export. */
     private final Term subhierarchyRoot;
     /** Ordered list of terms and their attributes for all terms that descend from {@link #subhierarchyRoot}.

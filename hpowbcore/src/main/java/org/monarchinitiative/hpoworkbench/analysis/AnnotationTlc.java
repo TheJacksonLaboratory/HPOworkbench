@@ -2,11 +2,9 @@ package org.monarchinitiative.hpoworkbench.analysis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.ontology.data.ImmutableTermId;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.HashMap;
@@ -21,13 +19,13 @@ public class AnnotationTlc {
     private String annotpath;
     private final HpoOntology hpoOntology;
     /** All disease annotations for the entire ontology. */
-    private final Map<String,HpoDisease> diseaseMap;
+    private final Map<TermId,HpoDisease> diseaseMap;
 
     private Map<String,Integer> underannotatedDiseases;
     private Map<String,String> diseasesWithTooGeneralAnnotations;
 
 
-    public AnnotationTlc(HpoOntology ontolog,Map<String, HpoDisease> d2amap)  {
+    public AnnotationTlc(HpoOntology ontolog,Map<TermId, HpoDisease> d2amap)  {
         hpoOntology = ontolog;
         diseaseMap = d2amap;
         lookForUnderannotatedDiseases();
@@ -45,7 +43,7 @@ public class AnnotationTlc {
     private void lookForUnderannotatedDiseases() {
         underannotatedDiseases=new HashMap<>();
         diseasesWithTooGeneralAnnotations=new HashMap<>();
-        for (Map.Entry<String,HpoDisease> entry : diseaseMap.entrySet()) {
+        for (Map.Entry<TermId,HpoDisease> entry : diseaseMap.entrySet()) {
             HpoDisease disease = entry.getValue();
             String db = disease.getDatabase();
             if (! db.equals("OMIM")) continue;  // just look at OMIM entries
