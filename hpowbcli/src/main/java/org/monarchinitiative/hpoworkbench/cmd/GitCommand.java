@@ -9,7 +9,7 @@ import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
 import java.util.List;
 
 public class GitCommand  extends HPOCommand {
-    private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GitCommand.class.getName());
 
     private final String issueLabel;
 

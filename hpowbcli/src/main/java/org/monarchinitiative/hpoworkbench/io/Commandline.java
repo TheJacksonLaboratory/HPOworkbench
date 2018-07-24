@@ -45,7 +45,7 @@ public class Commandline {
     private String gitHubIssueLabel=null;
 
 
-    private String outputFilePath = null;
+    private String inputFilePath = null;
     private String outputDirectory = null;
 
 
@@ -95,39 +95,59 @@ public class Commandline {
             if (commandLine.hasOption("t")) {
                 this.termid = commandLine.getOptionValue("t");
             }
+            if (commandLine.hasOption("i")) {
+                this.inputFilePath = commandLine.getOptionValue("i");
+            }
         } catch (ParseException parseException)  // checked exception
         {
             String msg = String.format("Could not parse options %s [%s]", clstring, parseException.toString());
             printUsage(msg);
         }
-        if (mycommand.equals("download")) {
-            this.command = new DownloadCommand(this.downloadDirectory);
-        } else if (mycommand.equals("stats")) {
-            if (termid==null) {
-                printUsage("[ERROR] stats command requires -t option");
-            }
-            this.command = new HpoStatsCommand(this.hpoOboPath,this.annotationPath,this.termid);
-        } else if (mycommand.equals("csv") ) {
-            this.command = new HPO2CSVCommand(this.hpoOboPath);
-        } else if (mycommand.equals("countfreq") ) {
-            if (this.termid == null) {
-                printUsage("-t HP:0000123 option required for countfreq");
-            }
-            this.command = new CountFrequencyCommand(this.hpoOboPath, this.annotationPath, this.termid);
-        }  else if (mycommand.equals("hpo2hpo") ) {
-            if (this.termid == null) {
-                printUsage("-t HP:0000123 option required for hpo2hpo");
-            }
-            this.command = new Hpo2HpoCommand(this.hpoOboPath, this.annotationPath, this.termid);
-        }  else if (mycommand.equals("word")) {
-            this.command=new WordCommand(this.downloadDirectory,this.hpoOboPath);
-        } else if (mycommand.equals("git")) {
-            if (gitHubIssueLabel==null) {
-                printUsage("-g (github issue) required for git command");
-            }
-            this.command=new GitCommand(gitHubIssueLabel);
-        } else {
-            printUsage(String.format("Did not recognize command: %s", mycommand));
+        switch (mycommand) {
+            case "download":
+                this.command = new DownloadCommand(this.downloadDirectory);
+                break;
+            case "stats":
+                if (termid == null) {
+                    printUsage("[ERROR] stats command requires -t option");
+                }
+                this.command = new HpoStatsCommand(this.hpoOboPath, this.annotationPath, this.termid);
+                break;
+            case "csv":
+                this.command = new HPO2CSVCommand(this.hpoOboPath);
+                break;
+            case "countfreq":
+                if (this.termid == null) {
+                    printUsage("-t HP:0000123 option required for countfreq");
+                }
+                this.command = new CountFrequencyCommand(this.hpoOboPath, this.annotationPath, this.termid);
+                break;
+            case "hpo2hpo":
+                if (this.termid == null) {
+                    printUsage("-t HP:0000123 option required for hpo2hpo");
+                }
+                this.command = new Hpo2HpoCommand(this.hpoOboPath, this.annotationPath, this.termid);
+                break;
+            case "word":
+                this.command = new WordCommand(this.downloadDirectory, this.hpoOboPath);
+                break;
+            case "git":
+                if (gitHubIssueLabel == null) {
+                    printUsage("-g (github issue) required for git command");
+                }
+                this.command = new GitCommand(gitHubIssueLabel);
+                break;
+            case "batch":
+                if (gitHubIssueLabel == null) {
+                    printUsage("-g (github laqbel) required for batch command");
+                }
+                if (inputFilePath == null) {
+                    printUsage("-i (input file) required for batch command");
+                }
+                this.command = new BatchGitPostCommand(gitHubIssueLabel,inputFilePath);
+                break;
+            default:
+                printUsage(String.format("Did not recognize command: %s", mycommand));
         }
 
     }
@@ -144,15 +164,13 @@ public class Commandline {
      */
     private static Options constructGnuOptions() {
         final Options options = new Options();
-        options.addOption("o", "out", true, "name/path of output file/directory")
+        options.addOption("a", "annot", true, "path to HPO annotation file")
                 .addOption("d", "download", true, "directory to download HPO data (default \"data\")")
-                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
-                .addOption("a", "annot", true, "path to HPO annotation file")
                 .addOption("g","github-issue",true,"GitHub issue label")
-                .addOption("h", "hpo", true, "path to hp.obo");
-//                .addOption("b", "bad", false, "output bad (rejected) reads to separated file")
-//                .addOption(Option.builder("f1").longOpt("file1").desc("path to fastq file 1").hasArg(true).argName("file1").build())
-//                .addOption(Option.builder("f2").longOpt("file2").desc("path to fastq file 2").hasArg(true).argName("file2").build());
+                .addOption("h", "hpo", true, "path to hp.obo")
+                .addOption("i","input-file",true,"path to input file")
+                .addOption("o", "out", true, "name/path of output file/directory")
+                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)");
         return options;
     }
 
@@ -227,6 +245,11 @@ public class Commandline {
         writer.println();
         writer.println("git:");
         writer.println("\tjava -jar HPOWorkbench.jar git -g <label> ");
+        writer.println("\t<label>: github label");
+        writer.println();
+        writer.println("batch:");
+        writer.println("\tjava -jar HPOWorkbench.jar batch -i <file> -g <label> ");
+        writer.println("\t<file>: CSV file with GitHub issues");
         writer.println("\t<label>: github label");
         writer.println();
         writer.close();
