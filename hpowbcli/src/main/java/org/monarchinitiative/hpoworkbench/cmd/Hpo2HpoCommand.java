@@ -53,19 +53,20 @@ public class Hpo2HpoCommand extends HPOCommand {
         inputHpoData();
     }
 
-    /** input the hp.obo and the annotations. */
+    /**
+     * input the hp.obo and the annotations.
+     */
     private void inputHpoData() {
-            HpOboParser oparser = new HpOboParser(new File(hpOboPath));
-            Optional<HpoOntology> opt = oparser.parse();
-            this.ontology = opt.get();
-            try {
-                HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath, ontology);
-            } catch (PhenolException pe) {
-                pe.printStackTrace(); // todo refactor
-            }
-            //this.annotlist = aparser.getAnnotations();
-            throw new UnsupportedOperationException(); // TODO REFACTOR!!!!
-           // this.descendents = getDescendents(ontology, termId);
+        HpOboParser oparser = new HpOboParser(new File(hpOboPath));
+        try {
+            this.ontology = oparser.parse();
+            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath, ontology);
+        } catch (PhenolException pe) {
+            pe.printStackTrace(); // todo refactor
+        }
+        //this.annotlist = aparser.getAnnotations();
+        throw new UnsupportedOperationException(); // TODO REFACTOR!!!!
+        // this.descendents = getDescendents(ontology, termId);
     }
 
 

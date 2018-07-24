@@ -50,23 +50,18 @@ public class CountFrequencyCommand extends HPOCommand {
         termId = new TermId(HP_PREFIX,hpoTermId);
     }
 
-    public void run()  {
+    public void run() {
+        HpOboParser oparser = new HpOboParser(new File(hpOboPath));
+        try {
+            HpoOntology ontology = oparser.parse();
 
-            HpOboParser oparser = new HpOboParser(new File(hpOboPath));
-            Optional<HpoOntology> ontoOpt = oparser.parse();
-            if (! ontoOpt.isPresent()) {
-                System.err.println("Could not get ontology TODO");
-                LOGGER.error("Could not input ontology");
-                System.exit(1);
-                return;
-            }
-            HpoOntology ontology = ontoOpt.get();
-            Map<TermId,HpoDisease> annotationMap;
+
+            Map<TermId, HpoDisease> annotationMap;
             try {
-                HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(annotationPath,ontology);
-                annotationMap =parser.parse();
+                HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(annotationPath, ontology);
+                annotationMap = parser.parse();
                 LOGGER.trace("Annotation count total " + annotationMap.size());
-            } catch (PhenolException pe ) {
+            } catch (PhenolException pe) {
                 pe.printStackTrace();
                 return;
             }
@@ -74,29 +69,31 @@ public class CountFrequencyCommand extends HPOCommand {
             descendentTermCount = descendents.size();
             LOGGER.error("Descendent Term Count size " + descendentTermCount);
             HashMap<TermId, Integer> annotationCounts = new HashMap<>();
-            HashMap<TermId,Double> weightedAnnotationCounts=new HashMap<>();
+            HashMap<TermId, Double> weightedAnnotationCounts = new HashMap<>();
             for (TermId t : descendents) {
                 annotationCounts.put(t, 0);
-                weightedAnnotationCounts.put(t,0D);
+                weightedAnnotationCounts.put(t, 0D);
             }
             for (HpoDisease d : annotationMap.values()) {
-                List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
-                for (HpoAnnotation tiwm : ids){
-                TermId hpoid = tiwm.getTermId();
-                double freq = tiwm.getFrequency();
-                if (descendents.contains(hpoid)) {
-                    annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
-                    weightedAnnotationCounts.put(hpoid,freq+weightedAnnotationCounts.get(hpoid));
-                    totalAnnotationCount++;
-                }
+                List<HpoAnnotation> ids = d.getPhenotypicAbnormalities();
+                for (HpoAnnotation tiwm : ids) {
+                    TermId hpoid = tiwm.getTermId();
+                    double freq = tiwm.getFrequency();
+                    if (descendents.contains(hpoid)) {
+                        annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
+                        weightedAnnotationCounts.put(hpoid, freq + weightedAnnotationCounts.get(hpoid));
+                        totalAnnotationCount++;
+                    }
                 }
             }
-            outputCounts(annotationCounts, weightedAnnotationCounts,ontology);
-
-
-
-
-
+            outputCounts(annotationCounts, weightedAnnotationCounts, ontology);
+        } catch (PhenolException e) {
+            e.printStackTrace();
+            System.err.println("Could not get ontology TODO");
+            LOGGER.error("Could not input ontology");
+            System.exit(1);
+            return;
+        }
     }
 
     /**

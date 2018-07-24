@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.monarchinitiative</groupId>
     <artifactId>HPOworkbench</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
     <name>HPOworkbench</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.5</log4j.version>
-        <phenol.version>1.2.0</phenol.version>
+        <phenol.version>1.2.1</phenol.version>
     </properties>
 
     <modules>

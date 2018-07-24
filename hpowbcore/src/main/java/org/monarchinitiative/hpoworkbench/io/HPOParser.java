@@ -2,6 +2,7 @@ package org.monarchinitiative.hpoworkbench.io;
 
 
 import org.apache.log4j.Logger;
+import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
 
@@ -29,12 +30,13 @@ public class HPOParser {
             return;
         }
         final HpOboParser parser = new HpOboParser(f);
-        Optional<HpoOntology> ontologyOpt = parser.parse();
-        if (ontologyOpt.isPresent()) {
-            this.hpo = ontologyOpt.get();
-        } else  {
+        try {
+            this.hpo = parser.parse();
+        } catch (PhenolException e) {
+            e.printStackTrace();
             LOGGER.error(String.format("I/O error with HPO file at %s",path));
         }
+
     }
     /** @return an initiliazed HPO ontology or null in case of errors. */
     public HpoOntology getHPO() { return this.hpo; }
