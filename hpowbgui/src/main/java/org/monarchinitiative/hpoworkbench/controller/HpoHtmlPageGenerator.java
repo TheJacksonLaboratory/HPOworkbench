@@ -1,10 +1,10 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 
-import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
-import org.monarchinitiative.hpoworkbench.annotation.HpoCategoryMap;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
+import org.monarchinitiative.phenol.formats.hpo.category.HpoCategoryMap;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;

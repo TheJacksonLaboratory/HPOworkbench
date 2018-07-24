@@ -11,9 +11,9 @@
     <parent>
         <groupId>org.monarchinitiative</groupId>
         <artifactId>HPOworkbench</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
-    <version>1.0.1</version>
+    <version>${parent.version}</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

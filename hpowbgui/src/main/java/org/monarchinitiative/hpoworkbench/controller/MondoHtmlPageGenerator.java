@@ -4,15 +4,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.annotation.AnnotationMerger;
 import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
-import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
 import org.monarchinitiative.hpoworkbench.html.MondoTermHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.OmimOrphanetDiseaseHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.SingleDiseaseHTMLGenerator;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.ontology.data.Term;
 
 import java.util.Map;
+
 
 /**
  * Convenience class to generate HTML code to display data about a MONDO entry.

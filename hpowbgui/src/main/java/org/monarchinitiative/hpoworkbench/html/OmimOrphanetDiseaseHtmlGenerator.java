@@ -3,10 +3,10 @@ package org.monarchinitiative.hpoworkbench.html;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
-import org.monarchinitiative.hpoworkbench.annotation.HpoCategory;
 import org.monarchinitiative.hpoworkbench.annotation.SubClassTermPair;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -19,7 +19,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
     private final static String EMPTY_STRING="";
 
 
-    public static String getHTML(HpoDisease omim,HpoDisease orpha,Map<HpoCategory,CategoryMerge> catmap, HpoOntology ontology) {
+    public static String getHTML(HpoDisease omim, HpoDisease orpha, Map<HpoCategory,CategoryMerge> catmap, HpoOntology ontology) {
         return getMergerTable(catmap,ontology);
     }
 

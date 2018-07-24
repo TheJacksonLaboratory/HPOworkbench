@@ -5,9 +5,9 @@
     <parent>
         <artifactId>HPOworkbench</artifactId>
         <groupId>org.monarchinitiative</groupId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
-    <version>1.0.1</version>
+    <version>${parent.version}</version>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hpowbgui</artifactId>

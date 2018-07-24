@@ -6,7 +6,12 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.phenol.base.PhenolException;
+import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 
@@ -88,47 +93,36 @@ public class DirectIndirectHpoAnnotationParser {
             logger.warn("Ontology unset, cannot parse annotations file");
             return;
         }
+        logger.trace("doParse in DirectIndirectParser");
+        Map<TermId, HpoDisease> diseaseMap=null;
+        HpoDiseaseAnnotationParser daparser = new HpoDiseaseAnnotationParser(this.pathToPhenotypeAnnotationTab,this.ontology);
+        try {
+            diseaseMap = daparser.parse();
+            logger.trace("Got " + diseaseMap.size() + " disease models");
+        } catch (PhenolException pe) {
+            pe.printStackTrace();
+        }
 
         indirectAnnotMap = new HashMap<>();
         directAnnotMap = new HashMap<>();
         Map<TermId, Set<DiseaseModel>> tempmap = new HashMap<>();
 
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(pathToPhenotypeAnnotationTab));
-            String line;
-            int c = 0;
-            while ((line = br.readLine()) != null) {
-                String A[] = line.split("\t");
-                if (A.length < 5) {
-                    logger.error(String.format("Annotation line with less than 5 fields, \n%s", line));
-                    continue;
-                }
-                String db = A[0];
-                String dbId = A[1];
-                String diseasename = A[2];
-                int i = diseasename.indexOf(";");
-                if (i > 0) diseasename = diseasename.substring(0, i); // other synonyms follow the first ";"
-                DiseaseModel dis = new DiseaseModel(db, dbId, diseasename);
-                String HPOid = A[4];
-                TermId id = string2TermId(HPOid);
-                if (!directAnnotMap.containsKey(id)) {
-                    directAnnotMap.put(id, new ArrayList<>());
-
-                }
-                directAnnotMap.get(id).add(dis);
-                Set<TermId> ancs = ontology.getAncestorTermIds(id);
+        for (TermId diseaseId : diseaseMap.keySet()) {
+            HpoDisease dis = diseaseMap.get(diseaseId);
+            String db = dis.getDatabase();
+            String diseaseName = dis.getName();
+            DiseaseModel diseaseModel = new DiseaseModel(db,diseaseId.getId(),diseaseName);
+            for (HpoAnnotation annot : dis.getPhenotypicAbnormalities()) {
+                TermId hpoId = annot.getTermId();
+                directAnnotMap.putIfAbsent(hpoId, new ArrayList<>());
+                directAnnotMap.get(hpoId).add(diseaseModel);
+                Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, hpoId, true);
                 for (TermId t : ancs) {
-                    if (!tempmap.containsKey(t)) {
-                        tempmap.put(t, new HashSet<>());
-                    }
+                    tempmap.putIfAbsent(t, new HashSet<>());
                     Set<DiseaseModel> diseaseset = tempmap.get(t);
-                    diseaseset.add(dis);
+                    diseaseset.add(diseaseModel);
                 }
-                // logger.trace(String.format("Adding disease %s [%s:%s] to term %s",diseasename,db,dbId,id.getIdWithPrefix()));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         // When we get here, we transform the sets into an immutable, sorted list
         ImmutableMap.Builder<TermId, List<DiseaseModel>> mapbuilder = new ImmutableMap.Builder<>();

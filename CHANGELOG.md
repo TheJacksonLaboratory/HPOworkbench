@@ -1,7 +1,8 @@
 # HPO Workbench Changelog
 
-## v.0.1.12
-* Refactoring to use phenol library v0.1.7
+## v.1.0.2
+* Refactoring to use phenol library 1.2.1
+* Refactoring HpoCategory to use slightly refactored phenol version
 
 ## v.0.1.11
 ### hpowebgui
