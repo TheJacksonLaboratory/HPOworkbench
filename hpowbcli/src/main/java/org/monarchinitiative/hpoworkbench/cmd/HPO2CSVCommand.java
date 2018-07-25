@@ -16,6 +16,7 @@ import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
 /**
  * Make a CSV file representing the HPO hp.obo file
@@ -78,10 +79,10 @@ public class HPO2CSVCommand extends HPOCommand {
             bw.write(header+"\n");
            for (Term t :terms) {
                 //System.out.println(t);
-                String label = t.getName().toString();
+                String label = t.getName();
                 String id = t.getId().getIdWithPrefix();
                 String def=t.getDefinition();
-                String synString=t.getSynonyms().stream().map(s->s.getValue()).collect(Collectors.joining("; "));
+                String synString=t.getSynonyms().stream().map(TermSynonym::getValue).collect(Collectors.joining("; "));
               Set<TermId> ancestors= ontology.getAncestorTermIds(t.getId());
 
              /* for (TermId i:ancestors) {

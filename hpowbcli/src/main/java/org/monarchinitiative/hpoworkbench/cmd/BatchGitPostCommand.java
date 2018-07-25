@@ -1,0 +1,77 @@
+package org.monarchinitiative.hpoworkbench.cmd;
+
+import org.apache.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Post multiple issues to the HPO GitHub tracker. THe input is a CSV file with two columns -- the
+ * issue title and the body. The user can pass one or more labels for the issues.
+ * @author Peter Robinson
+ */
+public class BatchGitPostCommand extends HPOCommand {
+    private static final Logger logger = Logger.getLogger(BatchGitPostCommand.class.getName());
+
+    private final String issueLabel;
+    private final String inputFilePath;
+    /** Github user name */
+    private final String gitUname;
+    /** Github password */
+    private final String gitPword;
+
+    /**
+     * Create a word document with up to 30 open issues for the label. This is intended to be used
+     * to make a summary of open documents for collaborators but unfortunately is limited to up to
+     * 30 GitHub issues.
+     * @param label GitHub label
+     */
+    public BatchGitPostCommand(String label, String inputFile, String name, String pword) {
+        this.issueLabel=label;
+        this.inputFilePath=inputFile;
+        this.gitUname=name;
+        this.gitPword=pword;
+
+    }
+
+    public void run() {
+        logger.error("Running batch command with "+issueLabel + " and file " + inputFilePath);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(this.inputFilePath));
+            String line;
+            while ((line=br.readLine())!=null) {
+                System.out.println(line);
+                String F[] = line.split("\t");
+                if (F.length<2) {
+                    System.err.println("Malformed line, skipping: + line");
+                }
+                String title = F[0];
+                String messagebody=F[1].replaceAll("\\\\n","\n");
+                GitHubPoster poster = new GitHubPoster(gitUname,gitPword, title, messagebody);
+                List<String> labs  = new ArrayList<>();
+                labs.add(this.issueLabel);
+               /// labs.add("NIAID"); add as many as desired.
+                poster.setLabel(labs);
+                try {
+                    poster.postHpoIssue();
+                    Thread.sleep(1000);
+                    System.out.println("Issue: " + title + "; response=" + poster.getHttpResponse());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public String getName(){ return "batch-git-post";}
+
+}

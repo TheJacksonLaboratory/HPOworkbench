@@ -35,9 +35,9 @@ public class GitHubPoster {
 
     private List<String> githubLabels = null;
 
-    private String githubTitle=null;
+    private final String githubTitle;
 
-    private String githubBody=null;
+    private final String githubBody;
 
 
 
@@ -187,6 +187,12 @@ public class GitHubPoster {
             this.response=http.getResponseMessage();
             this.responsecode=http.getResponseCode();
         }
+    }
+
+
+    @Override
+    public String toString() {
+        return this.githubTitle + " " + this.githubBody;
     }
 
 }

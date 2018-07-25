@@ -8,7 +8,6 @@ import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
-import org.xml.sax.SAXParseException;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileOutputStream;
@@ -36,10 +35,8 @@ public class GitIssue2Doc4J {
             writeGitIssueAsParagraph(gi,mdp);
         }
             writeWordFile(wordMLPackage,fname);
-        } catch (InvalidFormatException ife) {
-            ife.printStackTrace();
-        } catch (JAXBException jbe) {
-            jbe.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
         }
     }
 
@@ -52,7 +49,7 @@ public class GitIssue2Doc4J {
     }
 
 
-    private void writeGitIssueAsParagraph(GitHubIssue gitissue,MainDocumentPart document) throws JAXBException  {
+    private void writeGitIssueAsParagraph(GitHubIssue gitissue,MainDocumentPart document)  {
         String myTitle;
         if (gitissue.hasValidIssueNumber()) {
             myTitle=String.format("%s) %s",gitissue.getIssueNumber(),gitissue.getTitle());
@@ -74,9 +71,7 @@ public class GitIssue2Doc4J {
         try {
             FileOutputStream out = new FileOutputStream(outPath);
             document.save(new java.io.File(outPath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Docx4JException e) {
+        } catch (IOException | Docx4JException e) {
             e.printStackTrace();
         }
         LOGGER.trace("Saved Word file to "+ outPath);

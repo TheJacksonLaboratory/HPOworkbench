@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.html;
 
 import org.monarchinitiative.hpoworkbench.analysis.AnnotationTlc;
-import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
 
 public class AnnotationTlcHtmlGenerator {
 

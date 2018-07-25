@@ -3,7 +3,6 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
 import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
@@ -11,11 +10,9 @@ import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getChildTerms;
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDescendents;
 
 /**
@@ -92,7 +89,6 @@ public class CountFrequencyCommand extends HPOCommand {
             System.err.println("Could not get ontology TODO");
             LOGGER.error("Could not input ontology");
             System.exit(1);
-            return;
         }
     }
 

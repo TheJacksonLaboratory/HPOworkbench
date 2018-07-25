@@ -101,8 +101,6 @@ public class FileDownloader {
                 throw new IOException("Could not login with anonymous:anonymous@example.com");
             if (!ftp.isConnected())
                 LOGGER.error("Weird, not connected!");
-        } catch (SocketException e) {
-            throw new FileDownloadException("ERROR: problem connecting when downloading file.", e);
         } catch (IOException e) {
             throw new FileDownloadException("ERROR: problem connecting when downloading file.", e);
         }
