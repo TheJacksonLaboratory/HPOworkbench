@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class represents the results of merging two diseases for one {@link HpoCategory}.
+ * This class represents the results of merging two diseases for one
+ * {@link org.monarchinitiative.phenol.formats.hpo.category.HpoCategory}.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class CategoryMerge {

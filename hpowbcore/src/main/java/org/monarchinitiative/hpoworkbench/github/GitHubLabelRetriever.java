@@ -6,7 +6,6 @@ import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +40,7 @@ public class GitHubLabelRetriever {
        Object obj= JSONValue.parse(s);
        JSONArray jsonArray = (JSONArray) obj;
        Iterator<String> iterator = jsonArray.iterator();
-       jsonArray.forEach(label -> parseLabelElement(label) );
+       jsonArray.forEach(this::parseLabelElement);
    }
 
 

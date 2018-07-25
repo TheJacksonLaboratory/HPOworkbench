@@ -9,7 +9,6 @@ import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -102,7 +101,7 @@ public class Hpo2HpoCommand extends HPOCommand {
             TermId tid = stack.pop();
             descset.add(tid);
             Set<TermId> directChildrenSet = getChildTerms(ontology,tid,false);
-            directChildrenSet.forEach(t -> stack.push(t));
+            directChildrenSet.forEach(stack::push);
         }
         return descset;
     }

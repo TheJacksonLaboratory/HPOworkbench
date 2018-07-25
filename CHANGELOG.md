@@ -1,8 +1,9 @@
 # HPO Workbench Changelog
 
-## v.1.0.2
+## v.1.0.3
 * Refactoring to use phenol library 1.2.1
 * Refactoring HpoCategory to use slightly refactored phenol version
+* Adding batch git issue posting function
 
 ## v.0.1.11
 ### hpowebgui

@@ -7,8 +7,6 @@ import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Use <a href="https://github.com/Phenomics/ontolib">ontolib</a> to parse the HPO OBO file.

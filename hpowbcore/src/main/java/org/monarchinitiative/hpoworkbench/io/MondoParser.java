@@ -2,14 +2,12 @@ package org.monarchinitiative.hpoworkbench.io;
 
 import org.apache.log4j.Logger;
 import org.monarchinitiative.phenol.base.PhenolException;
-import org.monarchinitiative.phenol.io.obo.OboOntologyLoader;
 import org.monarchinitiative.phenol.io.owl.OwlImmutableOntologyLoader;
 
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
-import java.util.Optional;
 
 
 public class MondoParser {
@@ -31,7 +29,7 @@ public class MondoParser {
         return mondo;
     }
 
-    private void parse() throws PhenolException {
+    private void parse() {
         LOGGER.trace("Parsing mondo obo file at " + mondoOboPath);
         final OwlImmutableOntologyLoader loader =
                 new OwlImmutableOntologyLoader(

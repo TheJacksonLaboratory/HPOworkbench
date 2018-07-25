@@ -30,6 +30,7 @@ import java.util.Map;
 /**
  * Created by robinp on 5/25/17.
  */
+@Deprecated
 class DateUtil {
 
     private static final Map<String, String> DATE_FORMAT_REGEXPS = new HashMap<String, String>() {{

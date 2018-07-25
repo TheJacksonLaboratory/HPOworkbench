@@ -30,12 +30,8 @@ public class Commandline {
             DEFAULT_DOWNLOAD_DIRECTORY, File.separator,"hp.obo");
 
     private final static String DEFAULT_ANNOTATION_OBOPATH = String.format("%s%s%s",
-            DEFAULT_DOWNLOAD_DIRECTORY, File.separator,"phenotype_annotation.tab");
+            DEFAULT_DOWNLOAD_DIRECTORY, File.separator,"phenotype.hpoa");
 
-
-    private final static String DEFAULT_TRUNCATION_SUFFIX = "truncated";
-
-    private final static String DEFAULT_OUTPUT_BAM_NAME = "diachromatic-processed";
 
     private String downloadDirectory;
     private String hpoOboPath = null;
@@ -43,6 +39,10 @@ public class Commandline {
     private String termid = null;
 
     private String gitHubIssueLabel=null;
+    /** Github user name */
+    private String gitUname=null;
+    /** Github password */
+    private String gitPword=null;
 
 
     private String inputFilePath = null;
@@ -74,29 +74,36 @@ public class Commandline {
                 printUsage("no arguments passed");
                 return;
             }
+
+            if (commandLine.hasOption("a")) {
+                annotationPath = commandLine.getOptionValue("a");
+            } else {
+                annotationPath =  DEFAULT_ANNOTATION_OBOPATH;
+            }
             if (commandLine.hasOption("d")) {
                 this.downloadDirectory = commandLine.getOptionValue("d");
             } else {
                 this.downloadDirectory = DEFAULT_DOWNLOAD_DIRECTORY;
+            }
+            if (commandLine.hasOption("g")) {
+                gitHubIssueLabel=commandLine.getOptionValue("g");
             }
             if (commandLine.hasOption("h")) {
                 this.hpoOboPath = commandLine.getOptionValue("h");
             } else {
                 this.hpoOboPath=DEFAULT_HPO_OBOPATH;
             }
-            if (commandLine.hasOption("a")) {
-                annotationPath = commandLine.getOptionValue("a");
-            } else {
-                annotationPath =  DEFAULT_ANNOTATION_OBOPATH;
+            if (commandLine.hasOption("i")) {
+                this.inputFilePath = commandLine.getOptionValue("i");
             }
-            if (commandLine.hasOption("g")) {
-                gitHubIssueLabel=commandLine.getOptionValue("g");
+            if (commandLine.hasOption("p")) {
+                gitPword=commandLine.getOptionValue("p");
             }
             if (commandLine.hasOption("t")) {
                 this.termid = commandLine.getOptionValue("t");
             }
-            if (commandLine.hasOption("i")) {
-                this.inputFilePath = commandLine.getOptionValue("i");
+            if (commandLine.hasOption("u")) {
+                gitUname=commandLine.getOptionValue("u");
             }
         } catch (ParseException parseException)  // checked exception
         {
@@ -144,7 +151,13 @@ public class Commandline {
                 if (inputFilePath == null) {
                     printUsage("-i (input file) required for batch command");
                 }
-                this.command = new BatchGitPostCommand(gitHubIssueLabel,inputFilePath);
+                if (gitPword == null) {
+                    printUsage("-p (password) required for batch command");
+                }
+                if (gitUname == null) {
+                    printUsage("-u (username) required for batch command");
+                }
+                this.command = new BatchGitPostCommand(gitHubIssueLabel,inputFilePath,gitUname,gitPword);
                 break;
             default:
                 printUsage(String.format("Did not recognize command: %s", mycommand));
@@ -170,7 +183,9 @@ public class Commandline {
                 .addOption("h", "hpo", true, "path to hp.obo")
                 .addOption("i","input-file",true,"path to input file")
                 .addOption("o", "out", true, "name/path of output file/directory")
-                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)");
+                .addOption("p", "password", true, "github password")
+                .addOption("t", "term", true, "HPO id (e.g., HP:0000123)")
+                .addOption("u", "username", true, "github username");
         return options;
     }
 
@@ -230,7 +245,7 @@ public class Commandline {
         writer.println("\tjava -jar HPOWorkbench.jar convert -h <hpo> -d <directory> \\");
         writer.println("\t<hpo>: path to hp.obo file");
         writer.println("\t<directory>: path to directory with RD annotation files");
-        writer.println(String.format("\t<outfile>: optional name of output file (Default: \"%s.bam\")", DEFAULT_OUTPUT_BAM_NAME));
+        writer.println("\t<outfile>: optional name of output file");
         writer.println();
         writer.println("word:");
         writer.println("\tjava -jar HPOWorkbench.jar word -h <hpo> -t <start-term> \\");

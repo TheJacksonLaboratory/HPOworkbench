@@ -34,7 +34,6 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import java.io.File;

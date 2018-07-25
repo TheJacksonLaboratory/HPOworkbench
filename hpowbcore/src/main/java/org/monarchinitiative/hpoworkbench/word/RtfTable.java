@@ -16,9 +16,9 @@ class RtfTable {
     /** A list of rows of the RTF table. */
 
 
-    final List<HpoRtfTableRow> rows;
+    private final List<HpoRtfTableRow> rows;
 
-    public RtfTable(List<HpoRtfTableRow> rowlist) {
+    RtfTable(List<HpoRtfTableRow> rowlist) {
         rows=rowlist;
     }
 
@@ -34,7 +34,7 @@ class RtfTable {
     }
 
     public String table() {
-        String middle = rows.stream().map(r ->r.row()).collect(Collectors.joining("\n"));
+        String middle = rows.stream().map(HpoRtfTableRow::row).collect(Collectors.joining("\n"));
         return String.format("%s%s%s",HpoRtfTableRow.header(),middle,footer());
     }
 

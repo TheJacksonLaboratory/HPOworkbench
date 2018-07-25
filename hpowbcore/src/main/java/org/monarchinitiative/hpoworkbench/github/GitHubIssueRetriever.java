@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,8 +56,8 @@ public class GitHubIssueRetriever {
        // System.out.println(s);
         Object obj= JSONValue.parse(s);
         JSONArray jsonArray = (JSONArray) obj;
-        Iterator<String> iterator = jsonArray.iterator();
-        jsonArray.forEach(label -> parseLabelElement(label) );
+        //Iterator<String> iterator = jsonArray.iterator();
+        jsonArray.forEach(this::parseLabelElement);
     }
 
 
@@ -75,8 +74,6 @@ public class GitHubIssueRetriever {
             scanner.close();
             decodeJSON(response);
             return httpconnection.getResponseCode();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
