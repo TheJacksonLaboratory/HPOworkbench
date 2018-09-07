@@ -7,6 +7,7 @@ import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * Use <a href="https://github.com/Phenomics/ontolib">ontolib</a> to parse the HPO OBO file.
@@ -27,10 +28,11 @@ public class HPOParser {
             LOGGER.error(String.format("Unable to find HPO file at %s",path));
             return;
         }
-        final HpOboParser parser = new HpOboParser(f);
+
         try {
+            final HpOboParser parser = new HpOboParser(f);
             this.hpo = parser.parse();
-        } catch (PhenolException e) {
+        } catch (PhenolException | FileNotFoundException e) {
             e.printStackTrace();
             LOGGER.error(String.format("I/O error with HPO file at %s",path));
         }

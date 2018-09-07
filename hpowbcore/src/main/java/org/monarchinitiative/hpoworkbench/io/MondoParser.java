@@ -36,7 +36,7 @@ public class MondoParser {
                         new File(mondoOboPath));
         try {
             mondo = loader.load();
-        } catch (OWLOntologyCreationException e) {
+        } catch (PhenolException e) {
             e.printStackTrace();
 
         }

@@ -10,6 +10,7 @@ import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,8 +49,9 @@ public class CountFrequencyCommand extends HPOCommand {
     }
 
     public void run() {
-        HpOboParser oparser = new HpOboParser(new File(hpOboPath));
+
         try {
+            HpOboParser oparser = new HpOboParser(new File(hpOboPath));
             HpoOntology ontology = oparser.parse();
 
 
@@ -58,7 +60,7 @@ public class CountFrequencyCommand extends HPOCommand {
                 HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(annotationPath, ontology);
                 annotationMap = parser.parse();
                 LOGGER.trace("Annotation count total " + annotationMap.size());
-            } catch (PhenolException pe) {
+            } catch (PhenolException  pe) {
                 pe.printStackTrace();
                 return;
             }
@@ -84,7 +86,7 @@ public class CountFrequencyCommand extends HPOCommand {
                 }
             }
             outputCounts(annotationCounts, weightedAnnotationCounts, ontology);
-        } catch (PhenolException e) {
+        } catch (PhenolException | FileNotFoundException e) {
             e.printStackTrace();
             System.err.println("Could not get ontology TODO");
             LOGGER.error("Could not input ontology");
