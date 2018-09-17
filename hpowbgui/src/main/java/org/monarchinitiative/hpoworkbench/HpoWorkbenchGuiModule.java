@@ -140,12 +140,9 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
         String mondoOboFile = properties.getProperty("mondo.obo.path");
         if (mondoOboFile!=null && new File(mondoOboFile).isFile()) {
             LOGGER.trace("Loading MONDO ontology from {}",mondoOboFile);
-            try {
-                MondoParser mparser = new MondoParser(mondoOboFile);
-                optionalResources.setMondoOntology(mparser.getMondo());
-            } catch (PhenolException pe) {
-                pe.printStackTrace();
-            }
+           MondoParser mparser = new MondoParser(mondoOboFile);
+           optionalResources.setMondoOntology(mparser.getMondo());
+
         }
 
         return optionalResources;

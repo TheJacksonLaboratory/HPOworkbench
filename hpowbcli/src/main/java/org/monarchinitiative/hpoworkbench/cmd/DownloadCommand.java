@@ -91,8 +91,7 @@ public final class DownloadCommand extends HPOCommand {
 
 
     /**
-     * Todo make robust
-     * @param dir
+     * @param dir directory to which we will download files (default: 'data')
      */
     private void createDownloadDir(String dir) {
         LOGGER.trace("creating download dir (and deleting previous version) at "+ dir);

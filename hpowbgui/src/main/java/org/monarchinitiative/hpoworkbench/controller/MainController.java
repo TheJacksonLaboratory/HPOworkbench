@@ -54,10 +54,14 @@ public class MainController {
      */
     private final Properties properties;
 
-    /** Reference to the primary stage of the App. */
+    /**
+     * Reference to the primary stage of the App.
+     */
     private final Stage primaryStage;
 
-    /** Place at the bottom of the window controlled by {@link StatusController} for showing messages to user */
+    /**
+     * Place at the bottom of the window controlled by {@link StatusController} for showing messages to user
+     */
     @FXML
     public StackPane statusStackPane;
 
@@ -83,11 +87,14 @@ public class MainController {
         return version;
     }
 
-    /** This is called from the Edit menu and allows the user to import a local copy of
+    /**
+     * This is called from the Edit menu and allows the user to import a local copy of
      * hp.obo (usually because the local copy is newer than the official release version of hp.obo).
+     *
      * @param e event
      */
-    @FXML private void importLocalHpObo(ActionEvent e) {
+    @FXML
+    private void importLocalHpObo(ActionEvent e) {
         e.consume();
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Import local hp.obo file");
@@ -176,7 +183,7 @@ public class MainController {
         window.setScene(scene);
 
         //TODO the following is necessary because redirect is not working somehow
-        String MONDO_URL_HACK="https://osf.io/e87hn/download";
+        String MONDO_URL_HACK = "https://osf.io/e87hn/download";
 
         Task mondodownload = new Downloader(dirpath, MONDO_URL_HACK, PlatformUtil.MONDO_OBO_FILENAME);
         pb.progressProperty().bind(mondodownload.progressProperty());
@@ -186,14 +193,12 @@ public class MainController {
             window.close();
             logger.trace(String.format("Successfully downloaded mondo to %s", dirpath));
             String mondoOboPath = dirpath + File.separator + PlatformUtil.MONDO_OBO_FILENAME;
-            try {
-                MondoParser parser = new MondoParser(mondoOboPath);
-                Ontology mondo =parser.getMondo();
-                optionalResources.setMondoOntology(mondo);
-                properties.setProperty("mondo.obo.path", mondoOboPath);
-            } catch (PhenolException pe) {
-                PopUps.showException("ERROR","Could not parse Mondo obo file", pe);
-            }
+
+            MondoParser parser = new MondoParser(mondoOboPath);
+            Ontology mondo = parser.getMondo();
+            optionalResources.setMondoOntology(mondo);
+            properties.setProperty("mondo.obo.path", mondoOboPath);
+
         });
         mondodownload.setOnFailed(event -> {
             window.close();
@@ -260,17 +265,21 @@ public class MainController {
 
     @FXML
     public void initialize() {
-      // NO-OP
+        // NO-OP
     }
 
-    /** Show the help dialog */
+    /**
+     * Show the help dialog
+     */
     @FXML
     private void helpWindow(ActionEvent e) {
         HelpViewFactory.openBrowser();
         e.consume();
     }
 
-    /** Show the about message */
+    /**
+     * Show the about message
+     */
     @FXML
     private void aboutWindow(ActionEvent e) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -283,7 +292,9 @@ public class MainController {
     }
 
 
-    /** Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations? */
+    /**
+     * Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations?
+     */
     enum mode {
         BROWSE_HPO, BROWSE_DISEASE, NEW_ANNOTATION
     }
