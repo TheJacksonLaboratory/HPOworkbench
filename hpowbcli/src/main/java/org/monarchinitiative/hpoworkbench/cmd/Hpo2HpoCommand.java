@@ -26,10 +26,6 @@ public class Hpo2HpoCommand extends HPOCommand {
     private final TermId termId;
     /** All of the ancestor terms of {@link #termId}. */
     private Set<TermId> descendents=null;
-    /** Annotations of all of the diseases in the HPO corpus. */
-    //private List<HpoDiseaseAnnotation> annotlist=null;
-
-    private HpoOntology ontology=null;
 
 
     public Hpo2HpoCommand(String hpoPath, String annotPath, String hpoTermId) {
@@ -58,7 +54,8 @@ public class Hpo2HpoCommand extends HPOCommand {
     private void inputHpoData() {
         HpOboParser oparser = new HpOboParser(new File(hpOboPath));
         try {
-            this.ontology = oparser.parse();
+            /* Annotations of all of the diseases in the HPO corpus. */ /** Annotations of all of the diseases in the HPO corpus. */ //private List<HpoDiseaseAnnotation> annotlist=null;
+            HpoOntology ontology = oparser.parse();
             HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath, ontology);
         } catch (PhenolException pe) {
             pe.printStackTrace(); // todo refactor

@@ -14,7 +14,6 @@ import org.monarchinitiative.hpoworkbench.word.Hpo2Word;
  */
 public class WordCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private String hpopath=null;
 
     private final String DEFAULT_OUTPUTNAME="hpotest.word";
     private static String DEFAULT_START_TERM="HP:0000118";
@@ -28,7 +27,7 @@ public class WordCommand extends HPOCommand  {
 
 
     public WordCommand(String dir, String startTerm) {
-        hpopath=dir;
+        String hpopath = dir;
         startTerm=startTerm;
     }
 

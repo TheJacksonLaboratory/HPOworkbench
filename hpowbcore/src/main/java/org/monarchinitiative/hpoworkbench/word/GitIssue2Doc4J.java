@@ -9,7 +9,6 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
 
-import javax.xml.bind.JAXBException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
