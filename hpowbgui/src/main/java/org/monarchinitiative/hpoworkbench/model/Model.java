@@ -4,6 +4,7 @@ package org.monarchinitiative.hpoworkbench.model;
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.*;
 
@@ -22,15 +23,15 @@ public class Model {
     /** Ontology model for full HPO ontology (all subhierarchies). */
     private final HpoOntology ontology;
     /** List of annotated diseases (direct annotations) */
-    private final Map<TermId,List<DiseaseModel>> annotmap;
+    private final Map<TermId,List<HpoDisease>> annotmap;
     /** List of all indirected annotations (by annotation propagation rule). */
-    private final Map<TermId,List<DiseaseModel>> directAnnotMap;
+    private final Map<TermId,List<HpoDisease>> directAnnotMap;
 
     private List<String> githublabels=new ArrayList<>();
 
 
-    public Model(HpoOntology ontology, Map<TermId, List<DiseaseModel>> annotMap,
-                 Map<TermId, List<DiseaseModel>> directAnnotMap) {
+    public Model(HpoOntology ontology, Map<TermId, List<HpoDisease>> annotMap,
+                 Map<TermId, List<HpoDisease>> directAnnotMap) {
         this.ontology = ontology;
         this.annotmap = annotMap;
         this.directAnnotMap = directAnnotMap;
@@ -42,21 +43,21 @@ public class Model {
 
     public boolean hasLabels(){ return githublabels!=null && githublabels.size()>0; }
 
-    public List<DiseaseModel> getDiseaseAnnotations(String hpoTermId, DiseaseModel.database dbase) {
-        List<DiseaseModel> diseases=new ArrayList<>();
+    public List<HpoDisease> getDiseaseAnnotations(String hpoTermId, DiseaseDatabase dbase) {
+        List<HpoDisease> diseases=new ArrayList<>();
         TermId id = string2TermId(hpoTermId);
         if (id!=null) {
             diseases=annotmap.get(id);
         }
         if (diseases==null) return new ArrayList<>();// return hasTermsUniqueToOnlyOneDisease
         // user wan't all databases, just pass through
-        if (dbase== DiseaseModel.database.ALL) return diseases;
+        if (dbase== DiseaseDatabase.ALL) return diseases;
         // filter for desired database
-        ImmutableList.Builder<DiseaseModel> builder = new ImmutableList.Builder<>();
-        for (DiseaseModel dm : diseases) {
-            if (dm.database().equals(dbase)) {
+        ImmutableList.Builder<HpoDisease> builder = new ImmutableList.Builder<>();
+        for (HpoDisease dm : diseases) {
+           // if (dm.getDatabase().equals(dbase)) {
                 builder.add(dm);
-            }
+          // }*/ //TODO ADD DATABASE FILTER
         }
         return builder.build();
     }
@@ -79,24 +80,24 @@ public class Model {
     }
 
 
-    public List<Term> getAnnotationTermsForDisease(DiseaseModel dmod) {
-        List<Term> annotating=new ArrayList<>();
+    public List<Term> getAnnotationTermsForDisease(HpoDisease dmod) {
+        ImmutableList.Builder<Term> builder=new ImmutableList.Builder<>();
         for (TermId tid : directAnnotMap.keySet()) {
             if (directAnnotMap.get(tid).contains(dmod)) {
                 Term term = ontology.getTermMap().get(tid);
-                annotating.add(term);
+                builder.add(term);
             }
         }
-        return annotating;
+        return builder.build();
     }
 
 
-    public HashMap<String,DiseaseModel> getDiseases() {
-        HashMap<String,DiseaseModel> mods = new HashMap<>();
+    public HashMap<String,HpoDisease> getDiseases() {
+        HashMap<String,HpoDisease> mods = new HashMap<>();
         for (TermId tid : directAnnotMap.keySet()) {
-            List<DiseaseModel> ls = directAnnotMap.get(tid);
-            for (DiseaseModel dmod : ls) {
-                mods.put(dmod.getDiseaseName(),dmod);
+            List<HpoDisease> ls = directAnnotMap.get(tid);
+            for (HpoDisease dmod : ls) {
+                mods.put(dmod.getName(),dmod);
             }
         }
         return mods;

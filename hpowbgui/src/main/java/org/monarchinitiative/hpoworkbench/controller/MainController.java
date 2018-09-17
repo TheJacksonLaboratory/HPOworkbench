@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
@@ -236,10 +237,14 @@ public class MainController {
             String hpoAnnotationsFileName = dirpath + File.separator + PlatformUtil.HPO_ANNOTATIONS_FILENAME;
             DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(hpoAnnotationsFileName, optionalResources
                     .getHpoOntology());
-            parser.doParse();
-            optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
-            optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
-            properties.setProperty("hpo.annotations.path", hpoAnnotationsFileName);
+            try {
+                parser.doParse();
+                optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
+                optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
+                properties.setProperty("hpo.annotations.path", hpoAnnotationsFileName);
+            } catch (HPOWorkbenchException exc) {
+                exc.printStackTrace(); // TODO Popup window warning
+            }
         });
         hpodownload.setOnFailed(event -> {
             window.close();

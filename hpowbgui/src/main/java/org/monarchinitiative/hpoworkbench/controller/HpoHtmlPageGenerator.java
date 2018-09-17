@@ -1,7 +1,7 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 
-import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategoryMap;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 class HpoHtmlPageGenerator {
 
-    static String getHTML(Term term, List<DiseaseModel> annotatedDiseases) {
+    static String getHTML(Term term, List<HpoDisease> annotatedDiseases) {
 
         String termID = term.getId().getIdWithPrefix();
         String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
@@ -38,7 +38,7 @@ class HpoHtmlPageGenerator {
      * @param Id ID of the HPO term in question
      * @return String to be displayed in an HTML browser
      */
-    private static String getDiseaseTableHTML(List<DiseaseModel> diseases, String Id) {
+    private static String getDiseaseTableHTML(List<HpoDisease> diseases, String Id) {
         if (diseases == null) {
             return "<p>No disease annotations found.</p>";
         }
@@ -57,11 +57,11 @@ class HpoHtmlPageGenerator {
                 "      </tr>\n" +
                 "    </tfoot>", Id, diseases.size());
         StringBuilder sb = new StringBuilder();
-        for (DiseaseModel s : diseases) {
+        for (HpoDisease s : diseases) {
             String row = String.format("<tr>\n" +
                     "        <td><a href=\"%s\">%s</a></td>\n" +
                     "        <td>%s</td>\n" +
-                    "      </tr>", s.getDiseaseName(), s.getDiseaseDbAndId(), s.getDiseaseName());
+                    "      </tr>", s.getName(), s.getDiseaseDatabaseId().getIdWithPrefix(), s.getName());
             sb.append(row);
         }
         return String.format("%s<tbody>%s</tbody></table></div>", header, sb.toString());

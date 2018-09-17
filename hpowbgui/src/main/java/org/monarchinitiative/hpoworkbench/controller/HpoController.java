@@ -25,9 +25,10 @@ import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
 import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
-import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.hpoworkbench.model.DiseaseDatabase;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -117,11 +118,11 @@ public final class HpoController {
     /**
      * Current disease shown in the browser. Any suggested changes will refer to this disease.
      */
-    private DiseaseModel selectedDisease = null;
+    private HpoDisease selectedDisease = null;
     /**
      * This determines which disease as shown (OMIM, Orphanet, DECIPHER, or all). Default: ALL.
      */
-    private DiseaseModel.database selectedDatabase = DiseaseModel.database.ALL;
+    private DiseaseDatabase selectedDatabase = DiseaseDatabase.ALL;
     /**
      * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
      */
@@ -150,7 +151,7 @@ public final class HpoController {
     @FXML
     public void goButtonAction() {
         if (currentMode.equals(BROWSE_DISEASE)) {
-            DiseaseModel dmod = model.getDiseases().get(searchTextField.getText());
+            HpoDisease dmod = model.getDiseases().get(searchTextField.getText());
             if (dmod == null) return;
             updateDescriptionToDiseaseModel(dmod);
             selectedDisease = dmod;
@@ -310,7 +311,7 @@ public final class HpoController {
             LOGGER.trace("got back null GitHub issue");
             return;
         }
-        String title = String.format("New annotation suggestion for %s", selectedDisease.getDiseaseName());
+        String title = String.format("New annotation suggestion for %s", selectedDisease.getName());
         postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord(), popup.getGitHubLabels());
     }
 
@@ -345,7 +346,7 @@ public final class HpoController {
             LOGGER.trace("got back null GitHub issue");
             return;
         }
-        String title = String.format("Erroneous annotation for %s", selectedDisease.getDiseaseName());
+        String title = String.format("Erroneous annotation for %s", selectedDisease.getName());
         postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord());
     }
 
@@ -412,10 +413,10 @@ public final class HpoController {
      *
      * @param dmodel currently selected {@link TreeItem} containing {@link Term}
      */
-    private void updateDescriptionToDiseaseModel(DiseaseModel dmodel) {
+    private void updateDescriptionToDiseaseModel(HpoDisease dmodel) {
         LOGGER.trace("TOP OF updateDescriptionToDiseaseModel");
-        String dbName = dmodel.getDiseaseDbAndId();
-        String diseaseName = dmodel.getDiseaseName();
+        String dbName = dmodel.getDiseaseDatabaseId().getIdWithPrefix();
+        String diseaseName = dmodel.getName();
         List<Term> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
         String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName, diseaseName, annotatingTerms, optionalResources
                 .getHpoOntology());
@@ -526,7 +527,7 @@ public final class HpoController {
 
         Term term = treeItem.getValue().term;
         String termID = term.getId().getIdWithPrefix();
-        List<DiseaseModel> annotatedDiseases = model.getDiseaseAnnotations(termID, selectedDatabase);
+        List<HpoDisease> annotatedDiseases = model.getDiseaseAnnotations(termID, selectedDatabase);
         if (annotatedDiseases == null) {
             LOGGER.error("could not retrieve diseases for " + termID);
         }
@@ -554,7 +555,7 @@ public final class HpoController {
                                         // The following line is necessary because sometimes multiple events are triggered
                                         // and we get a "stray" HPO-related link that does not belong here.
                                         if (href.startsWith("HP:")) return;
-                                        DiseaseModel dmod = model.getDiseases().get(href);
+                                        HpoDisease dmod = model.getDiseases().get(href);
                                         if (dmod == null) {
                                             LOGGER.error("Link to disease model for " + href + " was null");
                                             return;
@@ -637,16 +638,22 @@ public final class HpoController {
                         if (userdata == null) {
                             LOGGER.warn("Could not retrieve user data for database radio buttons");
                         }
-                        if (userdata.equals("orphanet"))
-                            selectedDatabase = DiseaseModel.database.ORPHANET;
-                        else if (userdata.equals("omim"))
-                            selectedDatabase = DiseaseModel.database.OMIM;
-                        else if (userdata.equals("all"))
-                            selectedDatabase = DiseaseModel.database.ALL;
-                        else if (userdata.equals("decipher"))
-                            selectedDatabase = DiseaseModel.database.DECIPHER;
-                        else {
-                            LOGGER.warn("did not recognize database " + userdata);
+                        switch (userdata) {
+                            case "orphanet":
+                                selectedDatabase = DiseaseDatabase.ORPHANET;
+                                break;
+                            case "omim":
+                                selectedDatabase = DiseaseDatabase.OMIM;
+                                break;
+                            case "all":
+                                selectedDatabase = DiseaseDatabase.ALL;
+                                break;
+                            case "decipher":
+                                selectedDatabase = DiseaseDatabase.DECIPHER;
+                                break;
+                            default:
+                                LOGGER.warn("did not recognize database " + userdata);
+                                break;
                         }
                     }
                 });

@@ -6,7 +6,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Tab;
-import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -50,10 +49,10 @@ public final class OptionalResources {
     private final ObjectProperty<Ontology> mondoOntology
             = new SimpleObjectProperty<>(this, "mondoOntology", null);
 
-    private final ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMap =
+    private final ObjectProperty<Map<TermId, List<HpoDisease>>> indirectAnnotMap =
             new SimpleObjectProperty<>(this, "indirectAnnotMap", null);
 
-    private final ObjectProperty<Map<TermId, List<DiseaseModel>>> directAnnotMap =
+    private final ObjectProperty<Map<TermId, List<HpoDisease>>> directAnnotMap =
             new SimpleObjectProperty<>(this, "directAnnotMap", null);
 
     private final ObjectProperty<Map<TermId, HpoDisease>> disease2annotationMap =
@@ -89,11 +88,11 @@ public final class OptionalResources {
         return mondoResourceIsMissing;
     }
 
-    public Map<TermId, List<DiseaseModel>> getIndirectAnnotMap() {
+    public Map<TermId, List<HpoDisease>> getIndirectAnnotMap() {
         return indirectAnnotMap.get();
     }
 
-    public void setIndirectAnnotMap(Map<TermId, List<DiseaseModel>> indirectAnnotMap) {
+    public void setIndirectAnnotMap(Map<TermId, List<HpoDisease>> indirectAnnotMap) {
         this.indirectAnnotMap.set(indirectAnnotMap);
     }
 
@@ -104,19 +103,19 @@ public final class OptionalResources {
 
     public Map<TermId, HpoDisease> getDisease2AnnotationMap() { return disease2annotationMap.get(); }
 
-    public ObjectProperty<Map<TermId, List<DiseaseModel>>> indirectAnnotMapProperty() {
+    public ObjectProperty<Map<TermId, List<HpoDisease>>> indirectAnnotMapProperty() {
         return indirectAnnotMap;
     }
 
-    public Map<TermId, List<DiseaseModel>> getDirectAnnotMap() {
+    public Map<TermId, List<HpoDisease>> getDirectAnnotMap() {
         return directAnnotMap.get();
     }
 
-    public void setDirectAnnotMap(Map<TermId, List<DiseaseModel>> directAnnotMap) {
+    public void setDirectAnnotMap(Map<TermId, List<HpoDisease>> directAnnotMap) {
         this.directAnnotMap.set(directAnnotMap);
     }
 
-    public ObjectProperty<Map<TermId, List<DiseaseModel>>> directAnnotMapProperty() {
+    public ObjectProperty<Map<TermId, List<HpoDisease>>> directAnnotMapProperty() {
         return directAnnotMap;
     }
 
@@ -132,12 +131,8 @@ public final class OptionalResources {
         return mondoOntology.get();
     }
 
-    public void setMondoOntology(Ontology mondoOntology) {
-        if (this.mondoOntology==null) {
-            System.err.println("[ERROR] MONDO ONTOLOGY NULL");
-            return;
-        }
-        this.mondoOntology.set(mondoOntology);
+    public void setMondoOntology(Ontology mondoOnt) {
+        this.mondoOntology.set(mondoOnt);
     }
 
     public ObjectProperty<Ontology> mondoOntologyProperty() {
