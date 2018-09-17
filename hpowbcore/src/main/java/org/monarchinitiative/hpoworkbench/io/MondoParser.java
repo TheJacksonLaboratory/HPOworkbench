@@ -18,7 +18,7 @@ public class MondoParser {
     private Ontology mondo=null;
 
 
-    public MondoParser(String pathToMondoObo) throws PhenolException {
+    public MondoParser(String pathToMondoObo) {
         mondoOboPath=pathToMondoObo;
         parse();
     }
@@ -36,7 +36,7 @@ public class MondoParser {
                         new File(mondoOboPath));
         try {
             mondo = loader.load();
-        } catch (OWLOntologyCreationException e) {
+        } catch (PhenolException e) {
             e.printStackTrace();
 
         }

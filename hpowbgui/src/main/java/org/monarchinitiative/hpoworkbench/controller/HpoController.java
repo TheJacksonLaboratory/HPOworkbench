@@ -415,11 +415,10 @@ public final class HpoController {
      */
     private void updateDescriptionToDiseaseModel(HpoDisease dmodel) {
         LOGGER.trace("TOP OF updateDescriptionToDiseaseModel");
-        String dbName = dmodel.getDiseaseDatabaseId().getIdWithPrefix();
-        String diseaseName = dmodel.getName();
-        List<Term> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
-        String content = HpoHtmlPageGenerator.getDiseaseHTML(dbName, diseaseName, annotatingTerms, optionalResources
-                .getHpoOntology());
+//        String dbName = dmodel.getDiseaseDatabaseId().getIdWithPrefix();
+//        String diseaseName = dmodel.getName();
+//        List<Term> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
+        String content = HpoHtmlPageGenerator.getDiseaseHTML(dmodel, optionalResources.getHpoOntology());
         infoWebEngine.loadContent(content);
         infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener<Worker.State>()
                 (ov, oldState, newState) -> {
@@ -665,27 +664,31 @@ public final class HpoController {
         newAnnotationRadioButton.setToggleGroup(group2);
         group2.selectedToggleProperty().addListener((ov, oldval, newval) -> {
             String userdata = (String) newval.getUserData();
-            if (userdata.equals("hpo")) {
-                currentMode = MainController.mode.BROWSE_HPO;
-                if (labelsAndHpoIds != null) {
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
-                } else {
-                    LOGGER.error("Attempt to init autocomplete with null list of HPO terms");
-                }
-            } else if (userdata.equals("disease")) {
-                currentMode = BROWSE_DISEASE;
-                if (this.model.getDiseases() != null) {
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, model.getDiseases().keySet());
-                } else {
-                    LOGGER.warn("Attempt to init autocomplete with null list of diseases");
-                }
-            } else if (userdata.equals("newannotation")) {
-                currentMode = NEW_ANNOTATION;
-                if (labelsAndHpoIds != null) {
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
-                } else {
-                    LOGGER.error("Attempt to init autocomplete with null list of HPO terms");
-                }
+            switch (userdata) {
+                case "hpo":
+                    currentMode = MainController.mode.BROWSE_HPO;
+                    if (labelsAndHpoIds != null) {
+                        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
+                    } else {
+                        LOGGER.error("Attempt to init autocomplete with null list of HPO terms");
+                    }
+                    break;
+                case "disease":
+                    currentMode = BROWSE_DISEASE;
+                    if (this.model.getDiseases() != null) {
+                        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, model.getDiseases().keySet());
+                    } else {
+                        LOGGER.warn("Attempt to init autocomplete with null list of diseases");
+                    }
+                    break;
+                case "newannotation":
+                    currentMode = NEW_ANNOTATION;
+                    if (labelsAndHpoIds != null) {
+                        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
+                    } else {
+                        LOGGER.error("Attempt to init autocomplete with null list of HPO terms");
+                    }
+                    break;
             }
         });
     }
