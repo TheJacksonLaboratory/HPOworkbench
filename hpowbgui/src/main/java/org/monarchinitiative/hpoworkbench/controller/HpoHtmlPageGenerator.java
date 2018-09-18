@@ -117,17 +117,19 @@ class HpoHtmlPageGenerator {
         String label = term.getName();
         String definition = term.getDefinition() != null ? term.getDefinition() : "";
         // try to get whatever we have in terms of frequency or modifiers
-        String fr = String.format("Frequency=%.0f%%",100.0*annot.getFrequency());
+        String fr = String.format("Frequency=%s",annot.getFrequencyString());
         List<TermId> modifiers = annot.getModifiers();
         HpoOnset onset = annot.getOnset();
-        String meta = fr;
+        StringBuilder sb = new StringBuilder();
+        sb.append(fr);
         if (modifiers.size()>0) {
             List<String> names=getTermsNamesFromIds(modifiers,ontology);
-            meta = fr +" " + names.stream().collect(Collectors.joining(": "));
+            sb.append("</br>Modifiers: ").append(names.stream().collect(Collectors.joining("; ")));
         }
         if (! onset.equals(HpoOnset.ONSET)) {
-            meta = meta + "; " + onset.toString();
+            sb.append("</br>").append(onset.toString());
         }
+        sb.append("</br>Source: ").append(annot.getCitations().stream().collect(Collectors.joining("; ")));
         return String.format("<tr>\n" +
                         "        <td><a href=\"%s\">%s</a></td>\n" +
                         "        <td>%s</td>\n" +
@@ -138,7 +140,7 @@ class HpoHtmlPageGenerator {
                 term.getId().getIdWithPrefix(),
                 label,
                 definition,
-                meta);
+                sb.toString());
     }
 
 
@@ -183,12 +185,7 @@ class HpoHtmlPageGenerator {
                     "      <tr>\n" +
                     "        <th>Id</th><th>Label</th><th>Definition</th><th>Other information</th>\n" +
                     "      </tr>\n" +
-                    "    </thead>\n" +
-                    "    <tfoot>\n" +
-                    "      <tr>\n" +
-                    "        <td colspan=\"3\">More information: <a href=\"http://www.human-phenotype-ontology.org\">HPO Website</a></td>\n" +
-                    "      </tr>\n" +
-                    "    </tfoot>", title));
+                    "    </thead>\n", title));
             List<TermId> termIdList = cat.getAnnotatingTermIds();
             for (TermId tid : termIdList) {
                 HpoAnnotation annot = id2annotationmap.get(tid);
