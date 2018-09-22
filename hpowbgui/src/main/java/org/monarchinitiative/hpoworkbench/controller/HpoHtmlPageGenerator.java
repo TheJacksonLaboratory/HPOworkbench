@@ -126,7 +126,7 @@ class HpoHtmlPageGenerator {
             List<String> names=getTermsNamesFromIds(modifiers,ontology);
             sb.append("</br>Modifiers: ").append(names.stream().collect(Collectors.joining("; ")));
         }
-        if (! onset.equals(HpoOnset.ONSET)) {
+        if (onset.available()) {
             sb.append("</br>").append(onset.toString());
         }
         sb.append("</br>Source: ").append(annot.getCitations().stream().collect(Collectors.joining("; ")));
