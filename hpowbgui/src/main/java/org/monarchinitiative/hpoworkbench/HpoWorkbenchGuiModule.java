@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.controller.*;
+import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
@@ -113,9 +114,13 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
             LOGGER.trace("Loading HPO annotations file from {}", annots);
             DirectIndirectHpoAnnotationParser parser =
                     new DirectIndirectHpoAnnotationParser(annots, optionalResources.getHpoOntology());
-            parser.doParse();
-            optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
-            optionalResources.setIndirectAnnotMap(parser.getIndirectAnnotMap());
+            try {
+                parser.doParse();
+                optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
+                optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
+            } catch (HPOWorkbenchException e) {
+                e.printStackTrace(); // TODO popup warning
+            }
             HpoOntology hpoontology = optionalResources.getHpoOntology();
 
             if (hpoontology!=null) {
@@ -135,12 +140,9 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
         String mondoOboFile = properties.getProperty("mondo.obo.path");
         if (mondoOboFile!=null && new File(mondoOboFile).isFile()) {
             LOGGER.trace("Loading MONDO ontology from {}",mondoOboFile);
-            try {
-                MondoParser mparser = new MondoParser(mondoOboFile);
-                optionalResources.setMondoOntology(mparser.getMondo());
-            } catch (PhenolException pe) {
-                pe.printStackTrace();
-            }
+           MondoParser mparser = new MondoParser(mondoOboFile);
+           optionalResources.setMondoOntology(mparser.getMondo());
+
         }
 
         return optionalResources;

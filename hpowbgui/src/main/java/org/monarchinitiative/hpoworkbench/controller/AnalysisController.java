@@ -43,10 +43,6 @@ public final class AnalysisController {
     private final TermId MONDO_ROOT_ID = TermId.constructWithPrefix("MONDO:0000001");
 
     /**
-     * Unused, but still required.
-     */
-    private final File hpoWorkbenchDir;
-    /**
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
      * resides in the classpath.
      */
@@ -62,7 +58,11 @@ public final class AnalysisController {
         this.optionalResources = optionalResources;
         this.properties = properties;
         this.primaryStage = primaryStage;
-        this.hpoWorkbenchDir = hpoWorkbenchDir;
+        /*
+      Unused, but still required.
+     */ /**
+         * Unused, but still required.
+         */File hpoWorkbenchDir1 = hpoWorkbenchDir;
     }
 
 

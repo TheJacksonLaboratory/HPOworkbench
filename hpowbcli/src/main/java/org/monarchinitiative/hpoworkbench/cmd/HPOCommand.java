@@ -42,8 +42,6 @@ public abstract class HPOCommand {
 
     /**
      * Function for the execution of the command.
-     *
-     * @throws HPOException on problems executing the command.
      */
     public abstract void run();
 

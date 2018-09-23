@@ -39,7 +39,8 @@ public class GitHubLabelRetriever {
    private void decodeJSON(String s) {
        Object obj= JSONValue.parse(s);
        JSONArray jsonArray = (JSONArray) obj;
-       Iterator iterator = jsonArray.iterator();
+       //noinspection unchecked
+       Iterator<String> iterator = jsonArray.iterator();
        jsonArray.forEach(this::parseLabelElement);
    }
 

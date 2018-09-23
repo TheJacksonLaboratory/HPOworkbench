@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
@@ -18,7 +18,7 @@ import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 import java.util.*;
 
 /**
- * The purpose of this class is to parse the phenotype_annotation.tab file in order to give the user
+ * The purpose of this class is to parse the phenotype.hpoa file in order to give the user
  * and overview of the diseases annotated to any given HPO term.
  *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
@@ -34,11 +34,14 @@ public class DirectIndirectHpoAnnotationParser {
 
     private final TermPrefix HP_PREFIX = new TermPrefix("HP");
 
+    /** Key: term id of an HPO term; value: List of references to diseases directly annotated to his term */
+    private Map<TermId,List<HpoDisease>> directAnnotationMap;
+    /** Key: term id of an HPO term; value: List of references to diseases directly or indirectly annotated to his term */
+    private Map<TermId,List<HpoDisease>> totalAnnotationMap;
 
-    private Map<TermId, List<DiseaseModel>> directAnnotMap = null;
 
 
-    private Map<TermId, List<DiseaseModel>> indirectAnnotMap = null;
+
 
     public DirectIndirectHpoAnnotationParser(String path, HpoOntology onto) {
         this.pathToPhenotypeAnnotationTab = path;
@@ -50,20 +53,20 @@ public class DirectIndirectHpoAnnotationParser {
      * Get map with direct annotations. The map will be <code>null</code>, if the {@link #doParse()} method have not been
      * invoked.
      *
-     * @return {@link Map} mapping {@link TermId}s to {@link List} of their {@link DiseaseModel}s
+     * @return {@link Map} mapping {@link TermId}s to {@link List} of their {@link HpoDisease}s
      */
-    public Map<TermId, List<DiseaseModel>> getDirectAnnotMap() {
-        return directAnnotMap;
+    public Map<TermId, List<HpoDisease>> getDirectAnnotMap() {
+        return directAnnotationMap;
     }
 
     /**
      * Get map with indirect annotations. The map will be <code>null</code>, if the {@link #doParse()} method have not been
      * invoked.
      *
-     * @return {@link Map} mapping {@link TermId}s to {@link List} of their {@link DiseaseModel}s
+     * @return {@link Map} mapping {@link TermId}s to {@link List} of their {@link HpoDisease}s
      */
-    public Map<TermId, List<DiseaseModel>> getIndirectAnnotMap() {
-        return indirectAnnotMap;
+    public Map<TermId, List<HpoDisease>> getTotalAnnotationMap() {
+        return totalAnnotationMap;
     }
 
     private TermId string2TermId(String termstring) {
@@ -85,7 +88,7 @@ public class DirectIndirectHpoAnnotationParser {
     /**
      * Parse annotations file and populate maps containing direct and indirect annotations.
      */
-    public void doParse() {
+    public void doParse()  throws HPOWorkbenchException {
         if (ontology == null) {
             logger.warn("Ontology unset, cannot parse annotations file");
             return;
@@ -100,35 +103,37 @@ public class DirectIndirectHpoAnnotationParser {
             pe.printStackTrace();
         }
 
-        indirectAnnotMap = new HashMap<>();
-        directAnnotMap = new HashMap<>();
-        Map<TermId, Set<DiseaseModel>> tempmap = new HashMap<>();
+        directAnnotationMap=new HashMap<>();
+        totalAnnotationMap=new HashMap<>();
+        Map<TermId, Set<HpoDisease>> tempmap = new HashMap<>();
+
+        if (diseaseMap==null) {
+            throw new HPOWorkbenchException("disease map was null after parse of "+pathToPhenotypeAnnotationTab);
+        }
+
 
         for (TermId diseaseId : diseaseMap.keySet()) {
-            HpoDisease dis = diseaseMap.get(diseaseId);
-            String db = dis.getDatabase();
-            String diseaseName = dis.getName();
-            DiseaseModel diseaseModel = new DiseaseModel(db,diseaseId.getId(),diseaseName);
-            for (HpoAnnotation annot : dis.getPhenotypicAbnormalities()) {
+            HpoDisease disease = diseaseMap.get(diseaseId);
+            for (HpoAnnotation annot : disease.getPhenotypicAbnormalities()) {
                 TermId hpoId = annot.getTermId();
-                directAnnotMap.putIfAbsent(hpoId, new ArrayList<>());
-                directAnnotMap.get(hpoId).add(diseaseModel);
+                directAnnotationMap.putIfAbsent(hpoId,new ArrayList<>());
+                directAnnotationMap.get(hpoId).add(disease);
                 Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, hpoId, true);
                 for (TermId t : ancs) {
                     tempmap.putIfAbsent(t, new HashSet<>());
-                    Set<DiseaseModel> diseaseset = tempmap.get(t);
-                    diseaseset.add(diseaseModel);
+                    Set<HpoDisease> diseaseset = tempmap.get(t);
+                    diseaseset.add(disease);
                 }
             }
         }
         // When we get here, we transform the sets into an immutable, sorted list
-        ImmutableMap.Builder<TermId, List<DiseaseModel>> mapbuilder = new ImmutableMap.Builder<>();
+        ImmutableMap.Builder<TermId, List<HpoDisease>> mapbuilder = new ImmutableMap.Builder<>();
         for (TermId key : tempmap.keySet()) {
-            ImmutableList.Builder<DiseaseModel> listbuilder = new ImmutableList.Builder<>();
+            ImmutableList.Builder<HpoDisease> listbuilder = new ImmutableList.Builder<>();
             listbuilder.addAll(tempmap.get(key));
             mapbuilder.put(key, listbuilder.build());
         }
-        this.indirectAnnotMap = mapbuilder.build();
+        this.totalAnnotationMap = mapbuilder.build();
     }
 
 }

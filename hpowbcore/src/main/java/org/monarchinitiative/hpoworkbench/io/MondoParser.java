@@ -5,7 +5,6 @@ import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.io.owl.OwlImmutableOntologyLoader;
 
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 
@@ -18,7 +17,7 @@ public class MondoParser {
     private Ontology mondo=null;
 
 
-    public MondoParser(String pathToMondoObo) throws PhenolException {
+    public MondoParser(String pathToMondoObo) {
         mondoOboPath=pathToMondoObo;
         parse();
     }

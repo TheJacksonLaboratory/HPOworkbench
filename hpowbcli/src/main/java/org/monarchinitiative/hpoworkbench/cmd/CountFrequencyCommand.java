@@ -49,7 +49,6 @@ public class CountFrequencyCommand extends HPOCommand {
     }
 
     public void run() {
-
         try {
             HpOboParser oparser = new HpOboParser(new File(hpOboPath));
             HpoOntology ontology = oparser.parse();

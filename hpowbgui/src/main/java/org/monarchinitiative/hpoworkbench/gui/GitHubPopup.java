@@ -18,7 +18,7 @@ import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckComboBox;
-import org.monarchinitiative.hpoworkbench.model.DiseaseModel;
+import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 
@@ -53,7 +53,7 @@ public class GitHubPopup {
      */
     private String githubIssueText = null;
     private boolean newAnnotation = false;
-    private DiseaseModel dmodel = null;
+    private HpoDisease dmodel = null;
     private boolean mistakenAnnotation = false;
 
     /**
@@ -83,14 +83,14 @@ public class GitHubPopup {
     }
 
 
-    public GitHubPopup(Term term, DiseaseModel dmodel) {
+    public GitHubPopup(Term term, HpoDisease dmodel) {
         this(term);
         this.dmodel = dmodel;
         newAnnotation = true;
 
     }
 
-    public GitHubPopup(Term term, DiseaseModel dmodel, boolean mistaken) {
+    public GitHubPopup(Term term, HpoDisease dmodel, boolean mistaken) {
         this(term, dmodel);
         mistakenAnnotation = true;
     }
@@ -211,8 +211,8 @@ public class GitHubPopup {
                             "Reference (e.g., PubMed ID):\n" +
                             "Your biocurator ID for nanoattribution (if desired):\n" +
                             "Anything else (replacement?):",
-                    dmodel.getDiseaseName(),
-                    dmodel.getDiseaseDbAndId(),
+                    dmodel.getName(),
+                    dmodel.getDiseaseDatabaseId().getIdWithPrefix(),
                     termlabel, termid);
         } else if (newAnnotation) {
             return String.format("Suggest creating new annotation for disease %s [%s] \n" +
@@ -220,8 +220,8 @@ public class GitHubPopup {
                             "Reference (e.g., PubMed ID):\n" +
                             "Your biocurator ID for nanoattribution (if desired):\n" +
                             "Anything else:",
-                    dmodel.getDiseaseName(),
-                    dmodel.getDiseaseDbAndId(),
+                    dmodel.getName(),
+                    dmodel.getDiseaseDatabaseId().getIdWithPrefix(),
                     termlabel, termid);
         } else {
             return String.format("Suggestion about term %s [%s]\nCurrent definition: %s\n" +

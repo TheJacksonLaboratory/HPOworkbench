@@ -1,5 +1,10 @@
 # HPO Workbench Changelog
 
+## v.1.1.0
+* Refactoring to use HpoDisease from phenol instead of old (and now removed) DiseaseModel class
+
+
+
 ## v.1.0.3
 * Refactoring to use phenol library 1.2.1
 * Refactoring HpoCategory to use slightly refactored phenol version
