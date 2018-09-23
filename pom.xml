@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.5</log4j.version>
-        <phenol.version>1.2.3</phenol.version>
+        <phenol.version>1.2.4</phenol.version>
     </properties>
 
     <modules>
