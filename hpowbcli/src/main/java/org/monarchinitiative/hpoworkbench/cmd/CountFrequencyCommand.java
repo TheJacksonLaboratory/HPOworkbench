@@ -59,7 +59,7 @@ public class CountFrequencyCommand extends HPOCommand {
                 HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(annotationPath, ontology);
                 annotationMap = parser.parse();
                 LOGGER.trace("Annotation count total " + annotationMap.size());
-            } catch (PhenolException pe) {
+            } catch (PhenolException  pe) {
                 pe.printStackTrace();
                 return;
             }
