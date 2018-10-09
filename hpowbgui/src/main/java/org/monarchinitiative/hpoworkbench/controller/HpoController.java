@@ -53,7 +53,6 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
  */
 
 public final class HpoController {
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String EVENT_TYPE_CLICK = "click";
@@ -70,15 +69,10 @@ public final class HpoController {
      * Current behavior of HPO Workbench. See {@link MainController.mode}.
      */
     private MainController.mode currentMode = MainController.mode.BROWSE_HPO;
-
     @FXML
-    private RadioButton hpoTermRadioButton;
+    private TextField hpoAutocompleteTextfield;
     @FXML
-    private RadioButton diseaseRadioButton;
-    @FXML
-    private RadioButton newAnnotationRadioButton;
-    @FXML
-    private TextField searchTextField;
+    private TextField diseaseAutocompleteTextfield;
     @FXML
     private Button goButton;
     /**
@@ -115,6 +109,8 @@ public final class HpoController {
     private RadioButton omimButton;
     @FXML
     private RadioButton decipherButton;
+    @FXML
+    private Label currentDiseaseLabel;
     /**
      * Current disease shown in the browser. Any suggested changes will refer to this disease.
      */
@@ -150,23 +146,36 @@ public final class HpoController {
 
     @FXML
     public void goButtonAction() {
-        if (currentMode.equals(BROWSE_DISEASE)) {
-            HpoDisease dmod = model.getDiseases().get(searchTextField.getText());
-            if (dmod == null) return;
-            updateDescriptionToDiseaseModel(dmod);
-            selectedDisease = dmod;
-            searchTextField.clear();
-        } else if (currentMode.equals(MainController.mode.BROWSE_HPO)) {
-            TermId id = labelsAndHpoIds.get(searchTextField.getText());
+            TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
             if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
             expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
-            searchTextField.clear();
-        } else if (currentMode == MainController.mode.NEW_ANNOTATION) {
-            TermId id = labelsAndHpoIds.get(searchTextField.getText());
+            hpoAutocompleteTextfield.clear();
+       /* } else if (currentMode == MainController.mode.NEW_ANNOTATION) {
+            TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
             if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
             expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
-            searchTextField.clear();
+            hpoAutocompleteTextfield.clear();
+        }*/
+    }
+
+    @FXML
+    private void goDiseaseAutocomplete() {
+        HpoDisease dmod = model.getDiseases().get(diseaseAutocompleteTextfield.getText());
+        if (dmod == null) {
+            LOGGER.warn("disease page could not be shown because disease model was null");
+            return;
+        } else {
+            LOGGER.error("got disease "+dmod.getName());
         }
+        updateDescriptionToDiseaseModel(dmod);
+        selectedDisease = dmod;
+        this.currentDiseaseLabel.setText(dmod.getName());
+        diseaseAutocompleteTextfield.clear();
+    }
+
+    @FXML
+    private void clearCurrentDisease() {
+        this.currentDiseaseLabel.setText("");
     }
 
     /**
@@ -365,11 +374,11 @@ public final class HpoController {
         // this binding evaluates to true, if ontology or annotations files are missing (null)
         BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
 
-        hpoTermRadioButton.disableProperty().bind(hpoResourceMissing);
-        diseaseRadioButton.disableProperty().bind(hpoResourceMissing);
-        newAnnotationRadioButton.disableProperty().bind(hpoResourceMissing);
+//        hpoTermRadioButton.disableProperty().bind(hpoResourceMissing);
+//        diseaseRadioButton.disableProperty().bind(hpoResourceMissing);
+//        newAnnotationRadioButton.disableProperty().bind(hpoResourceMissing);
 
-        searchTextField.disableProperty().bind(hpoResourceMissing);
+        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
         goButton.disableProperty().bind(hpoResourceMissing);
         ontologyTreeView.disableProperty().bind(hpoResourceMissing);
 
@@ -379,6 +388,7 @@ public final class HpoController {
         suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
         suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
         reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
+
 
         hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
             if (!newValue) { // nothing is missing anymore
@@ -392,12 +402,15 @@ public final class HpoController {
         if (!hpoResourceMissing.get()) {
             activate();
         }
-    }
 
+    }
+    /** FUnction is called once all of the resources are found (hp obo, disease annotations, mondo). */
     private void activate() {
         initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
         this.model = new Model(optionalResources.getHpoOntology(), optionalResources.getIndirectAnnotMap(),
                 optionalResources.getDirectAnnotMap());
+        WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
+        WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, model.getDiseases().keySet());
     }
 
     private void deactivate() {
@@ -450,9 +463,9 @@ public final class HpoController {
                                         // update the Webview browser
                                         LOGGER.trace("ABOUT TO UPDATE DESCRIPTION FOR " + term.getName());
                                         updateDescription(new HpoTermTreeItem(new HpoTermWrapper(term)));
-                                        searchTextField.clear();
+                                        hpoAutocompleteTextfield.clear();
                                         currentMode = MainController.mode.BROWSE_HPO;
-                                        hpoTermRadioButton.setSelected(true);
+                                        //hpoTermRadioButton.setSelected(true);
                                     }
                                 };
 
@@ -473,7 +486,6 @@ public final class HpoController {
      */
     private void expandUntilTerm(Term term) {
         // logger.trace("expand until term " + term.toString());
-        switchToMode(BROWSE_HPO);
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
             Stack<Term> termStack = new Stack<>();
@@ -561,9 +573,8 @@ public final class HpoController {
                                         }
                                         updateDescriptionToDiseaseModel(dmod);
                                         selectedDisease = dmod;
-                                        searchTextField.clear();
+                                        hpoAutocompleteTextfield.clear();
                                         currentMode = BROWSE_DISEASE;
-                                        diseaseRadioButton.setSelected(true);
                                     }
                                 };
 
@@ -610,7 +621,7 @@ public final class HpoController {
             labelsAndHpoIds.put(term.getName(), term.getId());
             labelsAndHpoIds.put(term.getId().getIdWithPrefix(), term.getId());
         });
-        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
+        WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
 
         // show intro message in the infoWebView
         Platform.runLater(() -> {
@@ -656,54 +667,9 @@ public final class HpoController {
                         }
                     }
                 });
-        // now the HPO vs disease
-        ToggleGroup group2 = new ToggleGroup();
-        hpoTermRadioButton.setSelected(true);
-        hpoTermRadioButton.setToggleGroup(group2);
-        diseaseRadioButton.setToggleGroup(group2);
-        newAnnotationRadioButton.setToggleGroup(group2);
-        group2.selectedToggleProperty().addListener((ov, oldval, newval) -> {
-            String userdata = (String) newval.getUserData();
-            switch (userdata) {
-                case "hpo":
-                    currentMode = MainController.mode.BROWSE_HPO;
-                    if (labelsAndHpoIds != null) {
-                        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
-                    } else {
-                        LOGGER.error("Attempt to init autocomplete with null list of HPO terms");
-                    }
-                    break;
-                case "disease":
-                    currentMode = BROWSE_DISEASE;
-                    if (this.model.getDiseases() != null) {
-                        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, model.getDiseases().keySet());
-                    } else {
-                        LOGGER.warn("Attempt to init autocomplete with null list of diseases");
-                    }
-                    break;
-                case "newannotation":
-                    currentMode = NEW_ANNOTATION;
-                    if (labelsAndHpoIds != null) {
-                        WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndHpoIds.keySet());
-                    } else {
-                        LOGGER.error("Attempt to init autocomplete with null list of HPO terms");
-                    }
-                    break;
-            }
-        });
+
     }
 
-    private void switchToMode(MainController.mode Mode) {
-        if (Mode.equals(MainController.mode.BROWSE_HPO)) {
-            hpoTermRadioButton.setSelected(true);
-            currentMode = MainController.mode.BROWSE_HPO;
-        } else if (Mode.equals(BROWSE_DISEASE)) {
-            diseaseRadioButton.setSelected(true);
-            currentMode = MainController.mode.BROWSE_DISEASE;
-        } else if (Mode.equals(NEW_ANNOTATION)) {
-            currentMode = MainController.mode.NEW_ANNOTATION;
-        }
-    }
 
     /**
      * For the GitHub new issues, we want to allow the user to choose a pre-existing label for the issue.
@@ -784,7 +750,7 @@ public final class HpoController {
         HpoOntology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
-            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
+            return new HashSet<>();
         }
         TermId parentTermId = term.getId();
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
@@ -834,10 +800,7 @@ public final class HpoController {
      * {@link TreeView}.
      */
     class HpoTermTreeItem extends TreeItem<HpoTermWrapper> {
-
-        /**
-         * List used for caching of the children of this term
-         */
+        /** List used for caching of the children of this term */
         private ObservableList<TreeItem<HpoTermWrapper>> childrenList;
 
         /**

@@ -8,6 +8,7 @@ import org.monarchinitiative.phenol.formats.hpo.HpoOnset;
 import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategoryMap;
+import org.monarchinitiative.phenol.ontology.data.SimpleXref;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
@@ -33,7 +34,13 @@ class HpoHtmlPageGenerator {
         String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
         String comment = (term.getComment() == null) ? "-" : term.getComment();
         String diseaseTable = getDiseaseTableHTML(annotatedDiseases, termID);
-        return String.format(HTML_TEMPLATE, CSS, term.getName(), termID, definition, comment, synonyms, diseaseTable);
+        List<SimpleXref> pmids=term.getPmidXrefs();
+        String pmidList;
+        if (pmids.isEmpty())
+            pmidList="-";
+        else
+        pmidList= pmids.stream().map(SimpleXref::getCurie).collect(Collectors.joining(": "));
+        return String.format(HTML_TEMPLATE, CSS, term.getName(), termID, definition, comment, synonyms, pmidList,diseaseTable);
     }
 
     /**
@@ -216,6 +223,7 @@ class HpoHtmlPageGenerator {
             "<p><b>Definition:</b> %s</p>" +
             "<p><b>Comment:</b> %s</p>" +
             "<p><b>Synonyms:</b> %s</p>" +
+            "<p><b>PMID:</b> %s</p>" +
             "%s" +
             "</body></html>";
 

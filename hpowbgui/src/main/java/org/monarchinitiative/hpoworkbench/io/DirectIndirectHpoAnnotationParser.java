@@ -13,36 +13,32 @@ import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermPrefix;
 
 import java.util.*;
 
 /**
  * The purpose of this class is to parse the phenotype.hpoa file in order to give the user
- * and overview of the diseases annotated to any given HPO term.
+ * and overview of the diseases annotated to any given HPO term. The {@link #directAnnotationMap} and
+ * {@link #totalAnnotationMap} are used to generate the displays for each disease annotated with HPO terms.
  *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
- * @version 0.2.13
+ * @version 0.2.14
  */
 public class DirectIndirectHpoAnnotationParser {
-
     private static final Logger logger = LogManager.getLogger();
-
+    /** Path to phenotyoe.hpoa */
     private final String pathToPhenotypeAnnotationTab;
-
+    /** Reference to HPO ontology object. */
     private final HpoOntology ontology;
-
-    private final TermPrefix HP_PREFIX = new TermPrefix("HP");
-
     /** Key: term id of an HPO term; value: List of references to diseases directly annotated to his term */
     private Map<TermId,List<HpoDisease>> directAnnotationMap;
     /** Key: term id of an HPO term; value: List of references to diseases directly or indirectly annotated to his term */
     private Map<TermId,List<HpoDisease>> totalAnnotationMap;
 
-
-
-
-
+    /**
+     * @param path Path to phenotype.hpoa
+     * @param onto reference to HPO Ontology
+     */
     public DirectIndirectHpoAnnotationParser(String path, HpoOntology onto) {
         this.pathToPhenotypeAnnotationTab = path;
         this.ontology = onto;
@@ -67,22 +63,6 @@ public class DirectIndirectHpoAnnotationParser {
      */
     public Map<TermId, List<HpoDisease>> getTotalAnnotationMap() {
         return totalAnnotationMap;
-    }
-
-    private TermId string2TermId(String termstring) {
-        if (termstring.startsWith("HP:")) {
-            termstring = termstring.substring(3);
-        }
-        if (termstring.length() != 7) {
-            logger.error("Malformed termstring: " + termstring);
-            return null;
-        }
-        TermId tid = new TermId(HP_PREFIX, termstring);
-        if (!ontology.getAllTermIds().contains(tid)) {
-            logger.error("Unknown TermId " + tid.getIdWithPrefix());
-            return null;
-        }
-        return tid;
     }
 
     /**
@@ -119,6 +99,17 @@ public class DirectIndirectHpoAnnotationParser {
                 directAnnotationMap.putIfAbsent(hpoId,new ArrayList<>());
                 directAnnotationMap.get(hpoId).add(disease);
                 Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, hpoId, true);
+                for (TermId t : ancs) {
+                    tempmap.putIfAbsent(t, new HashSet<>());
+                    Set<HpoDisease> diseaseset = tempmap.get(t);
+                    diseaseset.add(disease);
+                }
+            }
+            // Also add the modes of inhertiance to the annotations
+            for (TermId inheritanceId : disease.getModesOfInheritance()) {
+                directAnnotationMap.putIfAbsent(inheritanceId,new ArrayList<>());
+                directAnnotationMap.get(inheritanceId).add(disease);
+                Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, inheritanceId, true);
                 for (TermId t : ancs) {
                     tempmap.putIfAbsent(t, new HashSet<>());
                     Set<HpoDisease> diseaseset = tempmap.get(t);
