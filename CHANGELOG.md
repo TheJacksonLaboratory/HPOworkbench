@@ -1,5 +1,9 @@
 # HPO Workbench Changelog
 
+## v1.2.0
+* Improving disease search and new annotation suggestion
+* Fixing bug in Excel export
+
 ## v.1.1.0
 * Refactoring to use HpoDisease from phenol instead of old (and now removed) DiseaseModel class
 

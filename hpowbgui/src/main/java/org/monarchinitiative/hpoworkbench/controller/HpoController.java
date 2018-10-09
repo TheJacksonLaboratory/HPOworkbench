@@ -183,7 +183,7 @@ public final class HpoController {
      */
     @FXML
     public void exportHierarchicalSummary() {
-        if (selectedTerm == null) {
+        if (selectedTerm == null && getSelectedTerm()!=null) {
             selectedTerm = getSelectedTerm().getValue().term;
         }
         if (selectedTerm == null) { // should only happen if the user hasn't selected anything at all.
@@ -192,7 +192,7 @@ public final class HpoController {
                     "Error: No HPO Term selected");
             return; // to do throw exceptio
         }
-        selectedTerm = getSelectedTerm().getValue().term;
+
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Export HPO as Excel-format file");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel file (*.xlsx)", "*.xlsx");
@@ -229,7 +229,7 @@ public final class HpoController {
         File f = chooser.showSaveDialog(null);
         if (f != null) {
             String path = f.getAbsolutePath();
-            LOGGER.trace(String.format("Setting path to LOINC Core Table file to %s", path));
+            LOGGER.trace(String.format("Setting path to export HPO as excel file at: %s", path));
             Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getHpoOntology());
             exporter.exportToExcelFile(path);
         } else {
@@ -354,10 +354,6 @@ public final class HpoController {
         postGitHubIssue(githubissue, title, popup.getGitHubUserName(), popup.getGitHubPassWord());
     }
 
-
-    public Model getModel() {
-        return model;
-    }
 
     public void initialize() {
         //logger.trace("initialize");
@@ -643,6 +639,7 @@ public final class HpoController {
                         if (userdata == null) {
                             LOGGER.warn("Could not retrieve user data for database radio buttons");
                         }
+                        if (userdata==null) return;
                         switch (userdata) {
                             case "orphanet":
                                 selectedDatabase = DiseaseDatabase.ORPHANET;
