@@ -25,7 +25,6 @@ import org.monarchinitiative.hpoworkbench.io.Downloader;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
-import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 
 import javax.inject.Named;
@@ -277,11 +276,8 @@ public class MainController {
         e.consume();
     }
 
-    /**
-     * Show the about message
-     */
-    @FXML
-    private void aboutWindow(ActionEvent e) {
+    /** Show the about message */
+    @FXML private void aboutWindow(ActionEvent e) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("HPO Workbench");
         alert.setHeaderText("Human Phenotype Ontology Workbench");

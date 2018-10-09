@@ -31,6 +31,12 @@
     -fx-padding: 5 5 5 5;
 }
 
+.smallfontlabel {
+    -fx-text-fill: black;
+    -fx-font: 8px "Helvetica";
+    -fx-padding: 2 2 2 2;
+}
+
 
 .w7 {
     -fx-background-color: #1c2fb1;

@@ -36,18 +36,15 @@ entered once. The data is not written to disk.
 Suggesting new annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-First navigate to a disease of interest as above. Then, click on the ``New annotation`` radio button. Then
-use the autocomplete field or the HPO hpoOntology hierarchy on the left to find the term you would like to
-propose as a new annotation for the disease. Then, click on the ``Suggest new annotation`` button to
-open a new GitHub issue as above. Again, please modify the text to provide information to support the suggestion.
-Use the *Report mistaken annotation* if you have found an error in the annotations for some disease.
+First navigate to a disease of interest as above. This will cause the name of the disease to be
+shown right underneath the search window. This is now the current disease. Following this,
+search for the desired new annotation (HPO term) using the autocomplete field or ontology
+hierarchy.
 
-In the following Figure, we have selected the disease ``Vici syndrome`` and then clicked on the ``New annotation``
-button. Following this, we used the autocomplete to mark the term ``Nystagmus``. Because the radio button ``HPO Terms`` is not
-active but the radio button ``New Annotation`` is, HPO Workbench does not show the HPO Term page in the browser
-but continues to show the disease page for Vici syndrome. We can now click on the ``Suggest new annotation`` button
-(which turns color, acquiring a blue hue to show it was clicked). This opens up a dialog that suggests that the HPO Term
-``Nystagmus`` be added to the  disease annotations for Vici syndrome. For real requests of this sort it would be
+We can now click on the ``Suggest new annotation`` button
+(which turns color, acquiring a blue hue to show it was clicked).
+This opens up a dialog that suggests that the HPO Term
+For real requests of this sort it would be
 very much appreciated it you can indicate the source of the annotation (the best source is an article in PubMed - please provide
 the PubMed id and the title). If possible, also indicate other attributes of the annotation. What is the age of onset?
 What is the overall frequency of patients with the disease that have the phenotypic abnormality in question (enter 5/8, for
