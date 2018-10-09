@@ -218,9 +218,11 @@ public class GitHubPopup {
             return String.format("Suggest creating new annotation for disease %s [%s] \n" +
                             "New annotation: %s [%s]\n" +
                             "Reference (e.g., PubMed ID):\n" +
+                            "Frequency (e.g., 3/7 or 42%%):\n" +
+                            "Age of onset:\n" +
                             "Your biocurator ID for nanoattribution (if desired):\n" +
                             "Anything else:",
-                    dmodel.getName(),
+                    shortName(dmodel.getName()),
                     dmodel.getDiseaseDatabaseId().getIdWithPrefix(),
                     termlabel, termid);
         } else {
@@ -233,6 +235,18 @@ public class GitHubPopup {
                     comment != null ? comment : "no comment available",
                     synlist != null ? synlist : "-");
         }
+    }
+
+    /**
+     * SOmetimes the name has a long list of synonyms and is not ideal for display
+     * This function gets the canonical name which is up to the first ";"
+     * @param name original name, e.g., #101600 PFEIFFER SYNDROME;;ACROCEPHALOSYNDACTYLY, TYPE V; ACS5;;ACS V;;N(...)
+     * @return name up to first semicolon, e.g., #101600 PFEIFFER SYNDROME
+     */
+    private String shortName(String name) {
+        int i =name.indexOf(";");
+        if (i<0) return name;
+        else return name.substring(0,i);
     }
 
 

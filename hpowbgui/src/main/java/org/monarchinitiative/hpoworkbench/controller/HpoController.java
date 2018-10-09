@@ -299,11 +299,6 @@ public final class HpoController {
         } else {
             selectedTerm = getSelectedTerm().getValue().term;
         }
-        if (!currentMode.equals(MainController.mode.NEW_ANNOTATION)) {
-            PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
-                    "Error: No disease selected");
-            return;
-        }
         selectedTerm = getSelectedTerm().getValue().term;
         if (selectedDisease == null) {
             PopUps.showInfoMessage("Please select a disease and then a new HPO term before using this option",
