@@ -1,5 +1,8 @@
 # HPO Workbench Changelog
 
+## v.1.2.1
+* Extending HPO stats command to show number of subclasses and number of annotated diseases
+
 ## v.1.1.0
 * Refactoring to use HpoDisease from phenol instead of old (and now removed) DiseaseModel class
 

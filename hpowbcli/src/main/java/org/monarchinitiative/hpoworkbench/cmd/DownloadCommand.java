@@ -21,6 +21,8 @@ public final class DownloadCommand extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
     private final String downloadDirectory;
 
+    private final String PHENOTYPE_HPOA_URL="http://compbio.charite.de/jenkins/job/hpo.annotations.2018/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa";
+
     public String getName() { return "download"; }
 
     /**
@@ -37,11 +39,11 @@ public final class DownloadCommand extends HPOCommand {
     public void run()  {
         createDownloadDir(downloadDirectory);
         downloadHpObo();
-        downloadPhenotypeAnnotationDotTab();
+        downloadPhenotypeDotHpoa();
     }
 
-
-    private void downloadPhenotypeAnnotationDotTab() {
+    /** Download the phenotype.hpoa file. */
+    private void downloadPhenotypeDotHpoa() {
         // Now the same for the phenotype.hpoa file
         String downloadLocation=String.format("%s%sphenotype.hpoa",downloadDirectory, File.separator);
         File f = new File(downloadLocation);
@@ -50,13 +52,13 @@ public final class DownloadCommand extends HPOCommand {
             return;
         }
         try {
-            URL url = new URL("http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation.tab");
+            URL url = new URL(PHENOTYPE_HPOA_URL);
             FileDownloader downloader = new FileDownloader();
             boolean result = downloader.copyURLToFile(url,f);
             if (result) {
-                LOGGER.trace("Downloaded phenotype_annotation.tab to "+ downloadLocation);
+                LOGGER.trace("Downloaded phenotype.hpoa to "+ downloadLocation);
             } else {
-                LOGGER.error("[ERROR] Could not phenotype_annotation.tab hp.obo to " + downloadLocation);
+                LOGGER.error("[ERROR] Could not download phenotype.hpoa to " + downloadLocation);
             }
 
         } catch (Exception e){

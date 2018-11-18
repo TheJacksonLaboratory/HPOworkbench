@@ -1,17 +1,20 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
+import org.monarchinitiative.phenol.graph.IdLabeledEdge;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.io.File;
 import java.util.*;
 
-import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDescendents;
+import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.existsPath;
 
 /**
  * Extract descriptive statistics about a a certain subhierarchy of the HPO.
@@ -25,9 +28,11 @@ public class HpoStatsCommand extends HPOCommand  {
     /** All disease annotations for the entire ontology. */
     private Map<TermId,HpoDisease> diseaseMap =null;
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
-    private TermId termOfInterest;
+    private final TermId termOfInterest;
     /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
+    /** We use this to count the number of subclass relations underneath {@link #termOfInterest}. */
+    private Set<IdLabeledEdge> relationsUnderTermOfInterest;
     private Set<TermId> adultOnset=null;
     private Set<TermId> childhoodOnset=null;
 
@@ -35,6 +40,10 @@ public class HpoStatsCommand extends HPOCommand  {
     private List<HpoDisease> omim;
     private List<HpoDisease> orphanet;
     private List<HpoDisease> decipher;
+
+
+
+
 
 
 
@@ -94,12 +103,62 @@ public class HpoStatsCommand extends HPOCommand  {
 
     private void getDescendentsOfTermOfInterest() {
         String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termOfInterest).getName(),termOfInterest.getIdWithPrefix() );
-        descendentsOfTheTermOfInterest = getDescendents(hpoOntology,termOfInterest);
+        relationsUnderTermOfInterest=new HashSet<>();
+        descendentsOfTheTermOfInterest = countDescendentsAndSubclassRelations(hpoOntology,termOfInterest);
         int n_textual_def = getNumberOfTermsWithDefinition(hpoOntology,descendentsOfTheTermOfInterest);
         int n_synonyms = getTotalNumberOfSynonyms(hpoOntology,descendentsOfTheTermOfInterest);
         LOGGER.trace(String.format("We found a total of %d terms annotated to %s or descendents", descendentsOfTheTermOfInterest.size(), name));
         LOGGER.trace(String.format("Of these terms, %d has a textual definition. There were a total of %d synonyms.",n_textual_def,n_synonyms));
+        LOGGER.trace(String.format("We found a total of %d subclass relations beneath the term of interest",relationsUnderTermOfInterest.size()));
     }
+
+
+
+    /**
+     * Find all of the descendents of parentTermId (including direct children and more distant
+     * descendents)
+     *
+     * @param ontology The ontology to which parentTermId belongs
+     * @param parentTermId The term whose descendents were are seeking
+     * @return A set of all descendents of parentTermId (including the parentTermId itself)
+     */
+    private Set<TermId> countDescendentsAndSubclassRelations(
+            Ontology ontology, TermId parentTermId) {
+        ImmutableSet.Builder<TermId> descset = new ImmutableSet.Builder<>();
+        Stack<TermId> stack = new Stack<>();
+        stack.push(parentTermId);
+        while (!stack.empty()) {
+            TermId tid = stack.pop();
+            descset.add(tid);
+            Set<TermId> directChildrenSet = countChildTermsAndSubclassRelations(ontology, tid);
+            directChildrenSet.forEach(stack::push);
+        }
+        return descset.build();
+    }
+
+    /**
+     * Find all of the direct children of parentTermId (do not include "grandchildren" and other
+     * descendents).
+     *
+     * @param ontology The ontology to which parentTermId belongs
+     * @param parentTermId The term whose children were are seeking
+     * @return A set of all child terms of parentTermId
+     */
+    public Set<TermId> countChildTermsAndSubclassRelations(
+            Ontology ontology,
+            TermId parentTermId) {
+        ImmutableSet.Builder<TermId> kids = new ImmutableSet.Builder<>();
+        //if (includeOriginalTerm) kids.add(parentTermId);
+        for (IdLabeledEdge edge : ontology.getGraph().incomingEdgesOf(parentTermId)) {
+            TermId sourceId = (TermId) edge.getSource();
+            kids.add(sourceId);
+            this.relationsUnderTermOfInterest.add(edge);
+        }
+        return kids.build();
+    }
+
+
+
 
     private int getTotalNumberOfSynonyms(HpoOntology ontology, Set<TermId> terms) {
         int n=0;
@@ -153,25 +212,42 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
     private void filterDiseasesAccordingToDatabase() {
+        int n_omim_annot=0;
+        int n_orpha_annot=0;
+        int n_decipher_annot=0;
+        if (diseaseMap==null) {
+            LOGGER.fatal("Disease map was not properly initialized. Terminating program...");
+            System.exit(1);
+        }
         for (HpoDisease d:this.diseaseMap.values()) {
             if (!diseaseAnnotatedToTermOfInterest(d)) {
                 continue;
             }
+            int n_annot=0;
+            for (HpoAnnotation annot : d.getPhenotypicAbnormalities() ){
+                TermId hpoId=annot.getTermId();
+                if (existsPath(hpoOntology,hpoId,termOfInterest)) {
+                    n_annot++;
+                }
+            }
             String database=d.getDatabase();
             if (database.startsWith("OMIM")) {
                 omim.add(d);
+                n_omim_annot+=n_annot;
             } else if (database.startsWith("ORPHA")){
                 orphanet.add(d);
+                n_orpha_annot+=n_annot;
             } else if (database.startsWith("DECIPHER")) {
                 decipher.add(d);
+                n_decipher_annot+=n_annot;
             } else {
                 LOGGER.error("Did not recognize data base"+ database);
             }
         }
         String termname=hpoOntology.getTermMap().get(termOfInterest).getName();
-        LOGGER.trace(String.format("We found %d diseases in OMIM annotated to %s or descendents",omim.size(),termname));
-        LOGGER.trace(String.format("We found %d diseases in Orphanet annotated to %s or descendents",orphanet.size(),termname));
-        LOGGER.trace(String.format("We found %d diseases in DECIPHER annotated to %s or descendents",decipher.size(),termname));
+        LOGGER.trace(String.format("We found %d diseases in OMIM annotated to %s or descendents with %d total annotations for the term of interest",omim.size(),termname,n_omim_annot));
+        LOGGER.trace(String.format("We found %d diseases in Orphanet annotated to %s or descendents with %d total annotations for the term of interest",orphanet.size(),termname,n_orpha_annot));
+        LOGGER.trace(String.format("We found %d diseases in DECIPHER annotated to %s or descendents with %d total annotations for the term of interest",decipher.size(),termname,n_decipher_annot));
     }
 
 
