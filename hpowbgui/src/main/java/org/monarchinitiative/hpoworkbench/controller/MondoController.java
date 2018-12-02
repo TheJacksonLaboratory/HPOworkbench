@@ -5,8 +5,11 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -28,8 +31,12 @@ import org.w3c.dom.events.EventTarget;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
 
@@ -62,6 +69,8 @@ public final class MondoController {
      * Github password. Username and password will be stored for the current session only.
      */
     private String githubPassword;
+    /** Holds the generated HTML string that is displayed in the JavaFX browser. */
+    private String htmlContent=null;
 
 
     /**
@@ -83,8 +92,8 @@ public final class MondoController {
     public RadioButton newAnnotationRadioButton;
 
     public Button goButton;
-
-    public Button exportHierarchicalSummaryButton;
+    @FXML
+    public Button copyToClipboardButton;
 
     public Button exportToExcelButton;
 
@@ -109,8 +118,6 @@ public final class MondoController {
      */
     private Term selectedTerm = null;
 
-    private final HpoController hpoController;
-
     /**
      * Tree hierarchy of the ontology is presented here.
      */
@@ -120,7 +127,7 @@ public final class MondoController {
     /**
      * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
      */
-    private Map<String, TermId> labelsAndMondoIds = new HashMap<>();
+    private final Map<String, TermId> labelsAndMondoIds = new HashMap<>();
 
     /**
      * Text field with autocompletion for jumping to a particular HPO term in the tree view.
@@ -142,13 +149,11 @@ public final class MondoController {
 
     @Inject
     public MondoController(OptionalResources optionalResources, Properties properties,
-                           @Named("mainWindow") Stage primaryStage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir,
-                           HpoController hpocon) {
+                           @Named("mainWindow") Stage primaryStage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
         this.properties = properties;
         this.primaryStage = primaryStage;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
-        this.hpoController = hpocon;
     }
 
     @FXML
@@ -163,7 +168,7 @@ public final class MondoController {
         diseaseRadioButton.disableProperty().setValue(false);
         newAnnotationRadioButton.disableProperty().setValue(false);
         goButton.disableProperty().bind(mondoResourceIsMissing);
-        exportHierarchicalSummaryButton.disableProperty().setValue(false);
+        copyToClipboardButton.disableProperty().setValue(false);
         exportToExcelButton.disableProperty().setValue(false);
         suggestCorrectionToTermButton.disableProperty().bind(mondoResourceIsMissing);
         suggestNewChildTermButton.disableProperty().setValue(false);
@@ -249,30 +254,32 @@ public final class MondoController {
     }
 
 
-    private String getOMIMid(Term gterm) {
+    private TermId getOMIMid(Term gterm) {
         List<Dbxref> dbxlst = gterm.getXrefs();
         if (dbxlst == null) return null;
         for (Dbxref dbx : dbxlst) {
 //           logger.trace("Name=" + dbx.getName());
 //           logger.trace("Description = "+ dbx.getDescription());
             if (dbx.getName().startsWith("OMIM:"))
-                return dbx.getName();
+                return TermId.constructWithPrefix(dbx.getName());
         }
         return null;
     }
 
-    private String getOrphanetid(Term gterm) {
+    private TermId getOrphanetid(Term gterm) {
         List<Dbxref> dbxlst = gterm.getXrefs();
         if (dbxlst == null) return null;
         for (Dbxref dbx : dbxlst) {
-            if (dbx.getName().startsWith("Orphanet:"))
-                return dbx.getName().replaceAll("Orphanet", "ORPHA");
+            if (dbx.getName().startsWith("Orphanet:")) {
+                String id = dbx.getName().replaceAll("Orphanet", "ORPHA");
+                return TermId.constructWithPrefix(id);
+            }
         }
         return null;
     }
 
     /**
-     * Update content of the {@link #infoWebView} with currently selected {@link Term}.
+     * Update content of the {@link #infoWebView} with currently selected MONDO {@link Term}.
      *
      * @param treeItem currently selected {@link TreeItem} containing {@link Term}
      */
@@ -281,16 +288,16 @@ public final class MondoController {
             return;
 
         Term mondoTerm = treeItem.getValue().term;
-        String omim = getOMIMid(mondoTerm);
-        String orpha = getOrphanetid(mondoTerm);
+        TermId omimTermId = getOMIMid(mondoTerm);
+        TermId orphaTermId = getOrphanetid(mondoTerm);
 
         Map<TermId, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
         if (disease2AnnotationMap == null) {
-            PopUps.showInfoMessage("Error: disease annotation map could not be initialized", "Error");
+            PopUps.showInfoMessage("Error: disease annotation map could not be initialized. Consider restarting the app.", "Error");
             return;
         }
-        HpoDisease omimDisease = disease2AnnotationMap.get(omim);
-        HpoDisease orphaDisease = disease2AnnotationMap.get(orpha);
+        HpoDisease omimDisease = disease2AnnotationMap.get(omimTermId);
+        HpoDisease orphaDisease = disease2AnnotationMap.get(orphaTermId);
         //debugDisease(omimDisease);
         //debugDisease(orphaDisease);
 
@@ -302,8 +309,8 @@ public final class MondoController {
         }
 
 
-        String content = MondoHtmlPageGenerator.getHTML(mondoTerm, omimDisease, orphaDisease, optionalResources.getHpoOntology());
-        infoWebEngine.loadContent(content);
+        this.htmlContent = MondoHtmlPageGenerator.getHTML(mondoTerm, omimDisease, orphaDisease, optionalResources.getHpoOntology());
+        infoWebEngine.loadContent(this.htmlContent);
         infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener
                 (ov, oldState, newState) -> {
                     if (newState == Worker.State.SUCCEEDED) {
@@ -441,6 +448,21 @@ public final class MondoController {
         expandUntilTerm(term);
         TreeItem<GenericTermWrapper> titem = new TreeItem<>(new GenericTermWrapper(term));
         updateMondoDescription(titem);
+    }
+
+    @FXML
+    public void copyHtmlToSystemClipboard(Event e) {
+        String str;
+        if (this.htmlContent==null) {
+            str="no MONDO disease seleced";
+        } else {
+            str=this.htmlContent;
+        }
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Clipboard clipboard = toolkit.getSystemClipboard();
+        StringSelection strSel = new StringSelection(str);
+        clipboard.setContents(strSel, null);
+        e.consume();
     }
 
     /**

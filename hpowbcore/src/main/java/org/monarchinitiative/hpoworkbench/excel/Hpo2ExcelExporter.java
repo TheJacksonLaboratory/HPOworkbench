@@ -22,11 +22,16 @@ import java.util.stream.Collectors;
 
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getParentTerms;
 
-
+/**
+ * A class for exporting all or part of the HPO as an excel file.
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ */
 public class Hpo2ExcelExporter {
     private static final Logger logger = LogManager.getLogger();
 
     private final HpoOntology ontology;
+
+    private final static String EMPTY_STRING="";
 
     public Hpo2ExcelExporter(HpoOntology onto) {
         this.ontology=onto;
@@ -52,7 +57,7 @@ public class Hpo2ExcelExporter {
             cell.setCellValue(h);
         }
         // now do the ontology
-        Set<TermId> tids = ontology.getAllTermIds();
+        Set<TermId> tids = ontology.getNonObsoleteTermIds();
         List<TermId> lst = new ArrayList<>(tids);
         Collections.sort(lst);
         for (TermId t : lst) {
@@ -92,6 +97,7 @@ public class Hpo2ExcelExporter {
 
     private String getXrefs(Term term) {
         List<Dbxref> dbxlst =  term.getXrefs();
+        if (dbxlst==null || dbxlst.isEmpty()) return EMPTY_STRING;
         return dbxlst.stream().map(Dbxref::getName).collect(Collectors.joining("; "));
     }
 
@@ -117,16 +123,6 @@ public class Hpo2ExcelExporter {
         row[5]=getXrefs(term);
         row[6]=getParents(tid);
         return row;
-    }
-
-
-    public void ouputHPO() {
-        Set<TermId> tids = ontology.getAllTermIds();
-        List<TermId> lst = new ArrayList<>(tids);
-        Collections.sort(lst);
-        for (TermId t : lst) {
-            System.out.println(t.getIdWithPrefix());
-        }
     }
 
 }

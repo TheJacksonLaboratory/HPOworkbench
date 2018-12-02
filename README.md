@@ -10,7 +10,8 @@ Please see the [full documentation](http://hpo-workbench.readthedocs.io/en/lates
 
 ## Download current release
 
-A cross-platform executable Jar file (HPOWorkbench.jar) is recommended for most users. Assuming you have Java 8 or higher installed on your computer, you should be able to start HPOWorkbench by double-clicking on this file. A Windows executable (HPOWorkbench.exe) is also available.
+A cross-platform executable Jar file (HPOWorkbench.jar) is recommended for most users. Assuming you have Java 8 or higher installed on your computer, you should be able to start HPOWorkbench by double-clicking on this file.
+The Jar file should work on Windows, Mac, and linux.
 
 https://github.com/TheJacksonLaboratory/HPOworkbench/releases/
 
