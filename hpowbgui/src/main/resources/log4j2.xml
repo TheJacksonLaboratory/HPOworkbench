@@ -18,6 +18,9 @@
         </Console>
     </Appenders>
     <Loggers>
+        <Logger name="org.semanticweb.owlapi.rio.RioFunctionalSyntaxParserFactory" level="error" />
+        <Logger name="org.semanticweb.owlapi.rio.RioOWLXMLParserFactory" level="error" />
+        <Logger name=" org.openrdf.rio.binary.BinaryRDFParserFactory" level="error" />
         <Root level="TRACE">
             <AppenderRef ref="LogFile"/>
             <AppenderRef ref="Console"/>

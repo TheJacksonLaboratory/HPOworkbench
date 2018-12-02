@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.monarchinitiative</groupId>
     <artifactId>HPOworkbench</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.3</version>
     <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
     <name>HPOworkbench</name>
 
@@ -62,12 +62,11 @@
             <artifactId>log4j-core</artifactId>
         </dependency>
 
-        <dependency>
+     <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.24</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.slf4j</groupId>

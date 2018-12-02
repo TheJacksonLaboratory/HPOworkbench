@@ -1,5 +1,9 @@
 # HPO Workbench Changelog
 
+
+## v1.2.3
+* Added function to export HTML MONDO analysis file to system clipboard
+
 ## v1.2.0
 * Improving disease search and new annotation suggestion
 * Fixing bug in Excel export
