@@ -5,10 +5,11 @@
             <PatternLayout pattern="[%t] %-5level %d{yyyy-MM-dd HH\:mm\:ss} %-5p %l - %m%n"/>
         </File>
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="%5p [%t] (%F:%L) - %m%n"/>
+            <PatternLayout pattern="%5p [%t] %-5p (%l) - %m%n"/>
         </Console>
     </Appenders>
     <Loggers>
+        <Logger name="org.semanticweb.owlapi.rio.RioFunctionalSyntaxParserFactory" level="error" />
         <Root level="TRACE">
             <AppenderRef ref="LogFile"/>
             <AppenderRef ref="STDOUT"/>
