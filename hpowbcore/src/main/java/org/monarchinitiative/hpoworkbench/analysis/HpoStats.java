@@ -86,7 +86,7 @@ public class HpoStats {
 
     public String getHpoTerm() {
         Term term = hpoOntology.getTermMap().get(termIdOfInterest);
-        return String.format("%s [%s]",term.getName(),termIdOfInterest.getIdWithPrefix());
+        return String.format("%s [%s]",term.getName(),termIdOfInterest.getValue());
     }
 
     public String getHpoDefinition() {
@@ -97,7 +97,7 @@ public class HpoStats {
 
 
     public HpoStats(HpoOntology ontolog,Map<TermId, HpoDisease> d2amap) throws HPOException {
-        termIdOfInterest=TermId.constructWithPrefix(rootHpoTerm);
+        termIdOfInterest=TermId.of(rootHpoTerm);
         hpoOntology=ontolog;
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();
@@ -153,11 +153,11 @@ public class HpoStats {
     }
 
     private void calculateSubontologyCounts() {
-        TermId clinicalCourse = TermId.constructWithPrefix("HP:0031797");
-        TermId clinicalModifier = TermId.constructWithPrefix("HP:0012823");
-        TermId frequency = TermId.constructWithPrefix("HP:0040279");
-        TermId modeOfInheritance = TermId.constructWithPrefix("HP:0000005");
-        TermId phenotypicAbnormality = TermId.constructWithPrefix("HP:0000118");
+        TermId clinicalCourse = TermId.of("HP:0031797");
+        TermId clinicalModifier = TermId.of("HP:0012823");
+        TermId frequency = TermId.of("HP:0040279");
+        TermId modeOfInheritance = TermId.of("HP:0000005");
+        TermId phenotypicAbnormality = TermId.of("HP:0000118");
 
         n_clinicalCourse = getDescendents(hpoOntology,clinicalCourse).size();
         n_clinicalModifier = getDescendents(hpoOntology,clinicalModifier).size();
@@ -192,7 +192,7 @@ public class HpoStats {
         if (!term.startsWith("HP:") || term.length() != 10) {
             throw new HPOException(String.format("Malformed HPO id: \"%s\"", term));
         } else {
-            termIdOfInterest = TermId.constructWithPrefix(term);
+            termIdOfInterest = TermId.of(term);
         }
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();
@@ -209,7 +209,7 @@ public class HpoStats {
         if (! hpoOntology.getTermMap().containsKey(termIdOfInterest)) {
             throw new HPOException("Could not retrieve term for term id: "+termIdOfInterest);
         }
-        String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termIdOfInterest).getName(),termIdOfInterest.getIdWithPrefix() );
+        String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termIdOfInterest).getName(),termIdOfInterest.getValue() );
         descendentsOfTheTermOfInterest = getDescendents(hpoOntology,termIdOfInterest);
         this.n_textual_def = getNumberOfTermsWithDefinition(hpoOntology,descendentsOfTheTermOfInterest);
         this.n_synonyms = getTotalNumberOfSynonyms(hpoOntology,descendentsOfTheTermOfInterest);

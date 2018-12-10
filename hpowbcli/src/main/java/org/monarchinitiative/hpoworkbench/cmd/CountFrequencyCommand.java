@@ -45,7 +45,7 @@ public class CountFrequencyCommand extends HPOCommand {
             hpoTermId=hpoTermId.substring(3);
         }
         TermPrefix HP_PREFIX = new TermPrefix("HP");
-        termId = new TermId(HP_PREFIX,hpoTermId);
+        termId = TermId.of(HP_PREFIX,hpoTermId);
     }
 
     public void run() {
@@ -116,7 +116,7 @@ public class CountFrequencyCommand extends HPOCommand {
     private void outputCounts(HashMap<TermId,Integer> hm, Map<TermId,Double> weightedmap,Ontology ontology) {
         Map<TermId,Integer> mp2 = sortByValue(hm);
         String termS=String.format("%s [%s]",ontology.getTermMap().get(termId).getName(),
-                termId.getIdWithPrefix());
+                termId.getValue());
         System.out.println();
         System.out.println("Annotation counts for " + termS);
         System.out.println("\tNumber of descendent terms: " + descendentTermCount);
@@ -127,7 +127,7 @@ public class CountFrequencyCommand extends HPOCommand {
             TermId tid = (TermId) t;
             int count = mp2.get(t);
             String name =  ontology.getTermMap().get(tid).getName();
-            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count + " (" + weightedmap.get(tid)+")");
+            System.out.println(name + " [" +tid.getValue() + "]: " + count + " (" + weightedmap.get(tid)+")");
         }
     }
 

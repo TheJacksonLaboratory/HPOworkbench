@@ -28,7 +28,7 @@ class HpoHtmlPageGenerator {
     /**@return A String with the HTML for representing one HPO term and the diseases it is annotated to. */
     static String getHTML(Term term, List<HpoDisease> annotatedDiseases) {
 
-        String termID = term.getId().getIdWithPrefix();
+        String termID = term.getId().getValue();
         String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
                 .collect(Collectors.joining("; "));
         String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
@@ -73,7 +73,7 @@ class HpoHtmlPageGenerator {
             String row = String.format("<tr>\n" +
                     "        <td><a href=\"%s\">%s</a></td>\n" +
                     "        <td>%s</td>\n" +
-                    "      </tr>", s.getName(), s.getDiseaseDatabaseId().getIdWithPrefix(), s.getName());
+                    "      </tr>", s.getName(), s.getDiseaseDatabaseId().getValue(), s.getName());
             sb.append(row);
         }
         return String.format("%s<tbody>%s</tbody></table></div>", header, sb.toString());
@@ -100,7 +100,7 @@ class HpoHtmlPageGenerator {
         for (TermId tid : ids){
             Term term = ontology.getTermMap().get(tid);
             if (term==null) {
-                System.err.println("[WARNING] Null term for " + tid.getIdWithPrefix());
+                System.err.println("[WARNING] Null term for " + tid.getValue());
                 continue;
             }
             builder.add(term);
@@ -143,8 +143,8 @@ class HpoHtmlPageGenerator {
                         "        <td>%s</td>\n" +
                         "        <td>%s</td>\n" +
                         "      </tr>\n",
-                term.getId().getIdWithPrefix(),
-                term.getId().getIdWithPrefix(),
+                term.getId().getValue(),
+                term.getId().getValue(),
                 label,
                 definition,
                 sb.toString());

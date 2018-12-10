@@ -22,7 +22,7 @@ public class MondoTermHtmlGenerator {
 
 
     public static String getHTML(Term mondoTerm) {
-        String termID = mondoTerm.getId().getIdWithPrefix();
+        String termID = mondoTerm.getId().getValue();
         String synonyms = (mondoTerm.getSynonyms() == null) ? EMPTY_STRING : mondoTerm.getSynonyms().stream().map(TermSynonym::getValue)
                 .collect(Collectors.joining("; "));
         String definition = (mondoTerm.getDefinition() == null) ? EMPTY_STRING : mondoTerm.getDefinition();

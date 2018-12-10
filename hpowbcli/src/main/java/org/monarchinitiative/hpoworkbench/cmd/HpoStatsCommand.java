@@ -55,8 +55,8 @@ public class HpoStatsCommand extends HPOCommand  {
             LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",term ));
             System.exit(1);
         }
-        this.termOfInterest=TermId.constructWithPrefix(term);
-        LOGGER.trace("Term of interest: "+termOfInterest.getIdWithPrefix());
+        this.termOfInterest=TermId.of(term);
+        LOGGER.trace("Term of interest: "+termOfInterest.getValue());
         omim=new ArrayList<>();
         orphanet=new ArrayList<>();
         decipher=new ArrayList<>();
@@ -102,7 +102,7 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
     private void getDescendentsOfTermOfInterest() {
-        String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termOfInterest).getName(),termOfInterest.getIdWithPrefix() );
+        String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termOfInterest).getName(),termOfInterest.getValue() );
         relationsUnderTermOfInterest=new HashSet<>();
         descendentsOfTheTermOfInterest = countDescendentsAndSubclassRelations(hpoOntology,termOfInterest);
         int n_textual_def = getNumberOfTermsWithDefinition(hpoOntology,descendentsOfTheTermOfInterest);

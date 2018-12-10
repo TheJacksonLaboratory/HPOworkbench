@@ -443,10 +443,10 @@ public final class HpoController {
                                         if (!href.startsWith("HP:")) {
                                             return;
                                         }
-                                        TermId tid = TermId.constructWithPrefix(href);
+                                        TermId tid = TermId.of(href);
                                         Term term = optionalResources.getHpoOntology().getTermMap().get(tid);
                                         if (term == null) {
-                                            LOGGER.error(String.format("Could not construct term  from termid \"%s\"", tid.getIdWithPrefix()));
+                                            LOGGER.error(String.format("Could not construct term  from termid \"%s\"", tid.getValue()));
                                             return;
                                         }
                                         // set the tree on the left to our new term
@@ -528,7 +528,7 @@ public final class HpoController {
             return;
 
         Term term = treeItem.getValue().term;
-        String termID = term.getId().getIdWithPrefix();
+        String termID = term.getId().getValue();
         List<HpoDisease> annotatedDiseases = model.getDiseaseAnnotations(termID, selectedDatabase);
         if (annotatedDiseases == null) {
             LOGGER.error("could not retrieve diseases for " + termID);
@@ -610,7 +610,7 @@ public final class HpoController {
         // create Map for lookup of the terms in the ontology based on their Name
         ontology.getTermMap().values().forEach(term -> {
             labelsAndHpoIds.put(term.getName(), term.getId());
-            labelsAndHpoIds.put(term.getId().getIdWithPrefix(), term.getId());
+            labelsAndHpoIds.put(term.getId().getValue(), term.getId());
         });
         WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
 

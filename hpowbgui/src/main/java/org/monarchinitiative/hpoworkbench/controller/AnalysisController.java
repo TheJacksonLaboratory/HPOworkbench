@@ -40,7 +40,7 @@ public final class AnalysisController {
      */
     private WebEngine infoWebEngine;
 
-    private final TermId MONDO_ROOT_ID = TermId.constructWithPrefix("MONDO:0000001");
+    private final TermId MONDO_ROOT_ID = TermId.of("MONDO:0000001");
 
     /**
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
