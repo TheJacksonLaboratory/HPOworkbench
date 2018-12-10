@@ -91,7 +91,7 @@ public class Hpo2ExcelExporter {
         }
         Set<TermId> parents = getParentTerms(ontology,childId);
         if (parents.isEmpty()) return " ";
-        else return parents.stream().map(TermId::getIdWithPrefix).collect(Collectors.joining("; "));
+        else return parents.stream().map(TermId::getValue).collect(Collectors.joining("; "));
     }
 
 
@@ -112,11 +112,11 @@ public class Hpo2ExcelExporter {
         Term term = ontology.getTermMap().get(tid);
         String row[] = new String[7];
         if (term == null) {
-            logger.error("Could not get term object for tid=%s"+tid.getIdWithPrefix());
+            logger.error("Could not get term object for tid=%s"+tid.getValue());
             return row;
         }
         row[0]=term.getName(); // 1. label
-        row[1]=tid.getIdWithPrefix(); // 2. term id
+        row[1]=tid.getValue(); // 2. term id
         row[2]=term.getDefinition()!=null?term.getDefinition():"[no definition]";
         row[3]=term.getComment()!=null?term.getComment():"-";
         row[4]=term.getSynonyms().stream().map(TermSynonym::getValue).collect(Collectors.joining("; "));

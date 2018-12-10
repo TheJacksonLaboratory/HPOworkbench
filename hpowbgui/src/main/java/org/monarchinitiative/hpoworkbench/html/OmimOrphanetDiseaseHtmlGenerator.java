@@ -57,9 +57,9 @@ public class OmimOrphanetDiseaseHtmlGenerator {
                             "        <td><a href=\"%s\">%s [%s]</a></td>\n" +
                             "        <td>%s</td>\n" +
                             "      </tr>\n",
-                    term.getId().getIdWithPrefix(),
+                    term.getId().getValue(),
                     term.getName(),
-                    term.getId().getIdWithPrefix(),
+                    term.getId().getValue(),
                     term.getDefinition());
 
             sb.append(row);
@@ -90,10 +90,10 @@ public class OmimOrphanetDiseaseHtmlGenerator {
                 String label2 = ontology.getTermMap().get(t2).getName();
                 sb.append(String.format("<tr class=\"subclazz\"><td>%s [%s] (%s) <br/>subclass of<br/> %s [%s] (%s)</td>" +
                                 "<td>%s: %s<br/>%s: %s</td> </tr>\n",
-                        label1, t1.getIdWithPrefix(), db1,
-                        label2, t2.getIdWithPrefix(), db2,
-                        t1.getIdWithPrefix(),ontology.getTermMap().get(t1).getDefinition(),
-                        t2.getIdWithPrefix(),ontology.getTermMap().get(t2).getDefinition()
+                        label1, t1.getValue(), db1,
+                        label2, t2.getValue(), db2,
+                        t1.getValue(),ontology.getTermMap().get(t1).getDefinition(),
+                        t2.getValue(),ontology.getTermMap().get(t2).getDefinition()
                         ));
             }
         }
@@ -108,10 +108,10 @@ public class OmimOrphanetDiseaseHtmlGenerator {
                 String label2 = ontology.getTermMap().get(t2).getName();
                 sb.append(String.format("<tr class=\"subclazz\"><td>%s [%s] (%s) <br/>subclass of<br/> %s [%s] (%s)</td>" +
                                 "<td>%s: %s<br/>%s: %s</td> </tr>\n",
-                        label1, t1.getIdWithPrefix(), db1,
-                        label2, t2.getIdWithPrefix(), db2,
-                        t1.getIdWithPrefix(),ontology.getTermMap().get(t1).getDefinition(),
-                        t2.getIdWithPrefix(),ontology.getTermMap().get(t2).getDefinition()
+                        label1, t1.getValue(), db1,
+                        label2, t2.getValue(), db2,
+                        t1.getValue(),ontology.getTermMap().get(t1).getDefinition(),
+                        t2.getValue(),ontology.getTermMap().get(t2).getDefinition()
                 ));
             }
         }
@@ -130,12 +130,12 @@ public class OmimOrphanetDiseaseHtmlGenerator {
         for (TermId t1 : catmerge.getDisease1onlyTerms()) {
             String label = ontology.getTermMap().get(t1).getName();
             String definition=ontology.getTermMap().get(t1).getDefinition();
-            sb.append(String.format("<tr class=\"unrelated\"><td>%s [%s]</td><td>%s only<br/>%s</td></tr>",label,t1.getIdWithPrefix(),db1,definition));
+            sb.append(String.format("<tr class=\"unrelated\"><td>%s [%s]</td><td>%s only<br/>%s</td></tr>",label,t1.getValue(),db1,definition));
         }
         for (TermId t2 : catmerge.getDisease2onlyTerms()) {
             String label = ontology.getTermMap().get(t2).getName();
             String definition=ontology.getTermMap().get(t2).getDefinition();
-            sb.append(String.format("<tr class=\"unrelated\"><td>%s [%s]</td><td>%s only</td></tr>",label,t2.getIdWithPrefix(),db2,definition));
+            sb.append(String.format("<tr class=\"unrelated\"><td>%s [%s]</td><td>%s only</td></tr>",label,t2.getValue(),db2,definition));
         }
         return sb.toString();
     }

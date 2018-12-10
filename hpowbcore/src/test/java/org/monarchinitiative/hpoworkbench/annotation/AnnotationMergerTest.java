@@ -105,7 +105,7 @@ public class AnnotationMergerTest {
         orpha.add(HpoAnnotation.parseTerm("HP:0000256"));
         orpha.add(HpoAnnotation.parseTerm("HP:0000470"));
         orpha.add(HpoAnnotation.parseTerm("HP:0004322"));
-        TermId Orph52055 = TermId.constructWithPrefix("ORHPA:52055");
+        TermId Orph52055 = TermId.of("ORHPA:52055");
 
         CCAIDCMS_ORPHA=makeHpoDisease("CCAIDCMS",Orph52055,orpha);
 
@@ -130,7 +130,7 @@ public class AnnotationMergerTest {
         mim.add(HpoAnnotation.parseTerm("HP:0000470"));
         mim.add(HpoAnnotation.parseTerm("HP:0004322"));
 
-        TermId omim300472 = TermId.constructWithPrefix("OMIM:300472");
+        TermId omim300472 = TermId.of("OMIM:300472");
 
         CCAIDCMS_OMIM = makeHpoDisease("CCAIDCMS",omim300472,mim);
 

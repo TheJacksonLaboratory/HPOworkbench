@@ -25,7 +25,7 @@ class HpoRtfTableRow {
 
     HpoRtfTableRow(int lev, Term term) {
         level=lev;
-        id=term.getId().getIdWithPrefix();
+        id=term.getId().getValue();
         label=term.getName();
         definition=term.getDefinition()!=null?term.getDefinition():"\\b \\i needs definition! \\i0 \\b0";
         comment=term.getComment()!=null?term.getComment():"-";

@@ -128,7 +128,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
                 try {
                     Map<TermId,HpoDisease> diseasemap =annotparser.parse();
                     for (TermId d : diseasemap.keySet()) {
-                        System.err.print(d.getIdWithPrefix());
+                        System.err.print(d.getValue());
                     }
                     optionalResources.setDisease2annotationMap(diseasemap);
                 } catch (PhenolException pe) {

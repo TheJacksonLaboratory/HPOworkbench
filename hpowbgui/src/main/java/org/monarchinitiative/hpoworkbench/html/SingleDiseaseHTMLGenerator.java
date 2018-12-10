@@ -70,8 +70,8 @@ public class SingleDiseaseHTMLGenerator {
                                 "        <td>%s</td>\n" +
                                 "        <td>%s</td>\n" +
                                 "      </tr>\n",
-                        term.getId().getIdWithPrefix(),
-                        term.getId().getIdWithPrefix(),
+                        term.getId().getValue(),
+                        term.getId().getValue(),
                         term.getName(),
                         term.getDefinition() != null ? term.getDefinition() : "");
                 sb.append(row);

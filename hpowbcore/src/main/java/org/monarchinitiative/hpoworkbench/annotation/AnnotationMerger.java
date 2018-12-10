@@ -103,7 +103,7 @@ public class AnnotationMerger {
             List<TermId> commonterms = catmerge.getCommonTerms();
             for (TermId ctid : commonterms) {
                 String label = ontology.getTermMap().get(ctid).getName();
-                System.out.println("Both diseases: " + label + "[" + ctid.getIdWithPrefix() + "]");
+                System.out.println("Both diseases: " + label + "[" + ctid.getValue() + "]");
             }
             List<SubClassTermPair> sclasspairs = catmerge.getD1subclassOfd2();
             for (SubClassTermPair tscp : sclasspairs) {
@@ -112,8 +112,8 @@ public class AnnotationMerger {
                 String label1 = ontology.getTermMap().get(t1).getName();
                 String label2 = ontology.getTermMap().get(t2).getName();
                 System.out.println(String.format("%s [%s] (%s)is subclass of %s [%s] (%s)",
-                        label1, t1.getIdWithPrefix(), diseaseName1,
-                        label2, t2.getIdWithPrefix(), diseaseName2));
+                        label1, t1.getValue(), diseaseName1,
+                        label2, t2.getValue(), diseaseName2));
             }
             sclasspairs = catmerge.getD2subclassOfd1();
             for (SubClassTermPair tscp : sclasspairs) {
@@ -122,16 +122,16 @@ public class AnnotationMerger {
                 String label1 = ontology.getTermMap().get(t1).getName();
                 String label2 = ontology.getTermMap().get(t2).getName();
                 System.out.println(String.format("%s [%s] (%s) is subclass of %s [%s] (%s)",
-                        label2, t2.getIdWithPrefix(), diseaseName2,
-                        label1, t1.getIdWithPrefix(), diseaseName1));
+                        label2, t2.getValue(), diseaseName2,
+                        label1, t1.getValue(), diseaseName1));
             }
             for (TermId t1 : catmerge.getDisease1onlyTerms()) {
                 String label = ontology.getTermMap().get(t1).getName();
-                System.out.println(String.format("%s only: %s [%s]",diseaseName1,label,t1.getIdWithPrefix()));
+                System.out.println(String.format("%s only: %s [%s]",diseaseName1,label,t1.getValue()));
             }
             for (TermId t2 : catmerge.getDisease2onlyTerms()) {
                 String label = ontology.getTermMap().get(t2).getName();
-                System.out.println(String.format("%s only: %s [%s]",diseaseName2,label,t2.getIdWithPrefix()));
+                System.out.println(String.format("%s only: %s [%s]",diseaseName2,label,t2.getValue()));
             }
         }
     }
@@ -140,7 +140,7 @@ public class AnnotationMerger {
     private void printTerms(List<TermId> tidlist) {
         for (TermId tid : tidlist) {
             String label = ontology.getTermMap().get(tid).getName();
-            System.out.println("\t" + label + "[" + tid.getIdWithPrefix() +"]");
+            System.out.println("\t" + label + "[" + tid.getValue() +"]");
         }
     }
 
@@ -243,7 +243,7 @@ public class AnnotationMerger {
         for (HpoAnnotation ann : d.getPhenotypicAbnormalities()) {
             TermId tid = ann.getTermId();
             String label = ontology.getTermMap().get(tid).getName();
-            System.out.println("\t" + label + "[" + tid.getIdWithPrefix() +"]");
+            System.out.println("\t" + label + "[" + tid.getValue() +"]");
         }
     }
 

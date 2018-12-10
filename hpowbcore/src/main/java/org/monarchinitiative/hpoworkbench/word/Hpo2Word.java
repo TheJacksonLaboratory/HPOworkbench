@@ -139,7 +139,7 @@ public class Hpo2Word {
         if (id.startsWith("HP:")) {
             id = id.substring(3);
         }
-        TermId tid = new TermId(HPPREFIX,id);
+        TermId tid = TermId.of(HPPREFIX,id);
         stack.push(new Pair<>(tid,1));
 
         int c=0;
@@ -207,7 +207,7 @@ public class Hpo2Word {
         if (id.startsWith("HP:")) {
             id = id.substring(3);
         }
-        TermId tid = new TermId(HPPREFIX,id);
+        TermId tid =  TermId.of(HPPREFIX,id);
         stack.push(new Pair<>(tid,1));
         ArrayList<HpoRtfTableRow> rtfrows = new ArrayList<>();
 

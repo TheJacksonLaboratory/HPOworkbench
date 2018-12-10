@@ -51,7 +51,7 @@ public final class MondoController {
 
     private final OptionalResources optionalResources;
 
-    private final TermId MONDO_ROOT_ID = TermId.constructWithPrefix("MONDO:0000001");
+    private final TermId MONDO_ROOT_ID = TermId.of("MONDO:0000001");
 
     /**
      * Unused, but still required.
@@ -214,8 +214,8 @@ public final class MondoController {
             mondoOntologyTreeView.setRoot(null);
             return;
         }
-        TermId rootId = TermId.constructWithPrefix("MONDO:0000001");
-        logger.trace("Initializing Mondo tree with root id {}", rootId.getIdWithPrefix());
+        TermId rootId = TermId.of("MONDO:0000001");
+        logger.trace("Initializing Mondo tree with root id {}", rootId.getValue());
         Term rootTerm = ontology.getTermMap().get(rootId);
         if (rootTerm == null) {
             logger.error("Mondo root term was null");
@@ -239,7 +239,7 @@ public final class MondoController {
         // create Map for lookup of the terms in the ontology based on their Name
         ontology.getTermMap().values().forEach(term -> {
             labelsAndMondoIds.put(term.getName(), term.getId());
-            labelsAndMondoIds.put(term.getId().getIdWithPrefix(), term.getId());
+            labelsAndMondoIds.put(term.getId().getValue(), term.getId());
         });
         WidthAwareTextFields.bindWidthAwareAutoCompletion(searchTextField, labelsAndMondoIds.keySet());
 
@@ -261,7 +261,7 @@ public final class MondoController {
 //           logger.trace("Name=" + dbx.getName());
 //           logger.trace("Description = "+ dbx.getDescription());
             if (dbx.getName().startsWith("OMIM:"))
-                return TermId.constructWithPrefix(dbx.getName());
+                return TermId.of(dbx.getName());
         }
         return null;
     }
@@ -272,7 +272,7 @@ public final class MondoController {
         for (Dbxref dbx : dbxlst) {
             if (dbx.getName().startsWith("Orphanet:")) {
                 String id = dbx.getName().replaceAll("Orphanet", "ORPHA");
-                return TermId.constructWithPrefix(id);
+                return TermId.of(id);
             }
         }
         return null;

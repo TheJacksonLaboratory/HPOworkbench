@@ -55,7 +55,7 @@ public class AnnotationTlc {
                     TermId tid=ann.getTermId();
                     String lab = hpoOntology.getTermMap().get(tid).getName();
                     if (lab.contains("Abnormality of")) {
-                        String s = String.format("%s [%s]",lab,tid.getIdWithPrefix());
+                        String s = String.format("%s [%s]",lab,tid.getValue());
                         diseasesWithTooGeneralAnnotations.put(label,s);
 
                     }

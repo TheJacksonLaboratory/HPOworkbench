@@ -63,7 +63,7 @@ public class GitHubPopup {
      */
     public GitHubPopup(Term term) {
         termlabel = term.getName();
-        termid = term.getId().getIdWithPrefix();
+        termid = term.getId().getValue();
         definition = term.getDefinition();
         comment = term.getComment();
         synlist = term.getSynonyms().size() == 0 ? "-" : term.getSynonyms().
@@ -212,7 +212,7 @@ public class GitHubPopup {
                             "Your biocurator ID for nanoattribution (if desired):\n" +
                             "Anything else (replacement?):",
                     dmodel.getName(),
-                    dmodel.getDiseaseDatabaseId().getIdWithPrefix(),
+                    dmodel.getDiseaseDatabaseId().getValue(),
                     termlabel, termid);
         } else if (newAnnotation) {
             return String.format("Suggest creating new annotation for disease %s [%s] \n" +
@@ -223,7 +223,7 @@ public class GitHubPopup {
                             "Your biocurator ID for nanoattribution (if desired):\n" +
                             "Anything else:",
                     shortName(dmodel.getName()),
-                    dmodel.getDiseaseDatabaseId().getIdWithPrefix(),
+                    dmodel.getDiseaseDatabaseId().getValue(),
                     termlabel, termid);
         } else {
             return String.format("Suggestion about term %s [%s]\nCurrent definition: %s\n" +

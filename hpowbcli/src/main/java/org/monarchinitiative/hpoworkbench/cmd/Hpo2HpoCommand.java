@@ -37,7 +37,7 @@ public class Hpo2HpoCommand extends HPOCommand {
             hpoTermId = hpoTermId.substring(3);
         }
         TermPrefix HP_PREFIX = new TermPrefix("HP");
-        termId = new TermId(HP_PREFIX, hpoTermId);
+        termId = TermId.of(HP_PREFIX, hpoTermId);
     }
 
 
@@ -81,12 +81,12 @@ public class Hpo2HpoCommand extends HPOCommand {
     }
 
     private void outputCounts(HashMap<TermId,Double> hm, Ontology ontology) {
-        Map mp2 = sortByValue(hm);
+        Map<TermId,Double> mp2 = sortByValue(hm);
         for (Object t: mp2.keySet()) {
             TermId tid = (TermId) t;
             double count = (double)mp2.get(t);
             String name =  ontology.getTermMap().get(tid).getName();
-            System.out.println(name + " [" +tid.getIdWithPrefix() + "]: " + count);
+            System.out.println(name + " [" +tid.getValue() + "]: " + count);
         }
     }
 

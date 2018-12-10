@@ -23,7 +23,7 @@ class TermRow {
 
     TermRow(int lev, Term term) {
         level=lev;
-        id=term.getId().getIdWithPrefix();
+        id=term.getId().getValue();
         label=term.getName();
         definition=term.getDefinition()!=null?term.getDefinition():"currently no definition!";
         comment=term.getComment()!=null?term.getComment():"-";

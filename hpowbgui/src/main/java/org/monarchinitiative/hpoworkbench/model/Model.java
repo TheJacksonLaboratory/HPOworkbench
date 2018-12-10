@@ -71,9 +71,9 @@ public class Model {
             logger.error("Malformed termstring: "+termstring);
             return null;
         }
-        TermId tid = new TermId(HP_PREFIX,termstring);
+        TermId tid = TermId.of(HP_PREFIX,termstring);
         if (! ontology.getAllTermIds().contains(tid)) {
-            logger.error("Unknown TermId "+tid.getIdWithPrefix());
+            logger.error("Unknown TermId "+tid.getValue());
             return null;
         }
         return tid;
