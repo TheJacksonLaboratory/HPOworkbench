@@ -13,14 +13,17 @@
             </Policies>
             <DefaultRolloverStrategy max="2" />
         </RollingFile>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%t] %-5level (%F:%L) - %msg%n"/>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %t [%t] (%F:%L) - %m%n" />
         </Console>
     </Appenders>
     <Loggers>
         <Logger name="org.semanticweb.owlapi.rio.RioFunctionalSyntaxParserFactory" level="error" />
         <Logger name="org.semanticweb.owlapi.rio.RioOWLXMLParserFactory" level="error" />
         <Logger name=" org.openrdf.rio.binary.BinaryRDFParserFactory" level="error" />
+        <Logger name="org.obolibrary.oboformat.parser.OBOFormatParser" level="error" />
+        <logger name="uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryInternalsImpl" level="error"/>
+
         <Root level="TRACE">
             <AppenderRef ref="LogFile"/>
             <AppenderRef ref="Console"/>
