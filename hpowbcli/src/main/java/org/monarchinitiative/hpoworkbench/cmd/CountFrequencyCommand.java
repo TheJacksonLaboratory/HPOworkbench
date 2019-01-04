@@ -40,12 +40,7 @@ public class CountFrequencyCommand extends HPOCommand {
     public CountFrequencyCommand(String hpoPath, String annotPath, String hpoTermId) {
         this.hpOboPath=hpoPath;
         this.annotationPath=annotPath;
-
-        if (hpoTermId.startsWith("HP:")) {
-            hpoTermId=hpoTermId.substring(3);
-        }
-        TermPrefix HP_PREFIX = new TermPrefix("HP");
-        termId = TermId.of(HP_PREFIX,hpoTermId);
+        termId = TermId.of(hpoTermId);
     }
 
     public void run() {

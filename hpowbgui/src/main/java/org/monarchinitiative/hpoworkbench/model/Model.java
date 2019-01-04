@@ -19,7 +19,6 @@ import java.util.Map;
  */
 public class Model {
     private static final Logger logger = LogManager.getLogger();
-    private final TermPrefix HP_PREFIX = new TermPrefix("HP");
     /** Ontology model for full HPO ontology (all subhierarchies). */
     private final HpoOntology ontology;
     /** List of annotated diseases (direct annotations) */
@@ -64,14 +63,12 @@ public class Model {
 
 
     private TermId string2TermId(String termstring) {
-        if (termstring.startsWith("HP:")) {
-            termstring=termstring.substring(3);
-        }
-        if (termstring.length()!=7) {
+
+        if (termstring.length()!=10) {
             logger.error("Malformed termstring: "+termstring);
             return null;
         }
-        TermId tid = TermId.of(HP_PREFIX,termstring);
+        TermId tid = TermId.of(termstring);
         if (! ontology.getAllTermIds().contains(tid)) {
             logger.error("Unknown TermId "+tid.getValue());
             return null;

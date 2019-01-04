@@ -33,8 +33,6 @@ public class Hpo2Word {
     private HpoOntology hpoOntology=null;
     private static String DEFAULT_START_TERM="HP:0000118";
 
-    private static final TermPrefix HPPREFIX = new TermPrefix("HP");
-
 
 
     private String startTerm="HP:0002715"; // immunology
@@ -136,10 +134,7 @@ public class Hpo2Word {
             LOGGER.error("Attempt to create pretty format HPO Term with null id");
             return;
         }
-        if (id.startsWith("HP:")) {
-            id = id.substring(3);
-        }
-        TermId tid = TermId.of(HPPREFIX,id);
+        TermId tid = TermId.of(id);
         stack.push(new Pair<>(tid,1));
 
         int c=0;
@@ -204,10 +199,7 @@ public class Hpo2Word {
             LOGGER.error("Attempt to create pretty format HPO Term with null id");
             return null;
         }
-        if (id.startsWith("HP:")) {
-            id = id.substring(3);
-        }
-        TermId tid =  TermId.of(HPPREFIX,id);
+        TermId tid =  TermId.of(id);
         stack.push(new Pair<>(tid,1));
         ArrayList<HpoRtfTableRow> rtfrows = new ArrayList<>();
 
