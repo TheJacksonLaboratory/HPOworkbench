@@ -2,7 +2,6 @@ package org.monarchinitiative.hpoworkbench.resources;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 
 
@@ -15,17 +14,17 @@ import org.monarchinitiative.phenol.ontology.data.Ontology;
  * @see ResourceValidator
  * @since 0.1
  */
-public final class ResourceValidators {
+final class ResourceValidators {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
 
     /**
-     * Validate the {@link HpoOntology} object to make sure, that it can be used in GUI.
+     * Validate the {@link Ontology} object to make sure, that it can be used in GUI.
      *
-     * @return <code>true</code> if the {@link HpoOntology} is valid
+     * @return <code>true</code> if the {@link Ontology} is valid
      */
-    static ResourceValidator<HpoOntology> ontologyResourceValidator() {
+    static ResourceValidator<Ontology> ontologyResourceValidator() {
         return ontology -> {
             // TODO - validate ontology here, if necessary
             return true;

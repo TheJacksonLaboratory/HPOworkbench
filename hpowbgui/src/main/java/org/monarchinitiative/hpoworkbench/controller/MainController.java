@@ -82,7 +82,7 @@ public class MainController {
         } catch (Exception e) {
             // do nothing
         }
-        if (version == null) version = "0.2.1"; // this works on a maven build but needs to be reassigned in intellij
+        if (version == null) version = "1.2.4"; // this works on a maven build but needs to be reassigned in intellij
         return version;
     }
 
@@ -139,7 +139,7 @@ public class MainController {
         window.setTitle("HPO download");
         window.setScene(scene);
 
-        Task hpodownload = new Downloader(dirpath, properties.getProperty("hpo.obo.url"), PlatformUtil.HPO_OBO_FILENAME);
+        Task<Void> hpodownload = new Downloader(dirpath, properties.getProperty("hpo.obo.url"), PlatformUtil.HPO_OBO_FILENAME);
         pb.progressProperty().bind(hpodownload.progressProperty());
         window.show();
         hpodownload.setOnSucceeded(event -> {
@@ -184,7 +184,7 @@ public class MainController {
         //TODO the following is necessary because redirect is not working somehow
         String MONDO_URL_HACK = "https://osf.io/e87hn/download";
 
-        Task mondodownload = new Downloader(dirpath, MONDO_URL_HACK, PlatformUtil.MONDO_OBO_FILENAME);
+        Task<Void> mondodownload = new Downloader(dirpath, MONDO_URL_HACK, PlatformUtil.MONDO_OBO_FILENAME);
         pb.progressProperty().bind(mondodownload.progressProperty());
 
         window.show();
@@ -230,7 +230,7 @@ public class MainController {
         window.setTitle("HPO annotation download");
         window.setScene(scene);
 
-        Task hpodownload = new Downloader(dirpath, properties.getProperty("hpo.phenotype.annotations.url"),
+        Task<Void> hpodownload = new Downloader(dirpath, properties.getProperty("hpo.phenotype.annotations.url"),
                 PlatformUtil.HPO_ANNOTATIONS_FILENAME);
         pb.progressProperty().bind(hpodownload.progressProperty());
         window.show();

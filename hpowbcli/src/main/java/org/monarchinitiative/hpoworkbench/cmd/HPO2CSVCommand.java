@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
@@ -63,7 +63,7 @@ public class HPO2CSVCommand extends HPOCommand {
      */
     @Override
     public void run()  {
-        HpoOntology ontology=null;
+        Ontology ontology=null;
         HPOParser hpoparser=new HPOParser(pathToHpObo);
         try {
             ontology = hpoparser.getHPO();

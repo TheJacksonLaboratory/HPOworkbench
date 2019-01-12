@@ -3,7 +3,6 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -21,7 +20,7 @@ public class HpoListDescendentsCommand extends HPOCommand  {
     private final String hpopath;
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
     private final TermId termOfInterest;
-    private HpoOntology hpoOntology=null;
+    private Ontology hpoOntology=null;
     /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
 

@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.xwpf.usermodel.*;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 
@@ -30,12 +29,10 @@ public class Hpo2Word {
     /** Number of unique terms we have output in this file. */
     private int n_terms_output=0;
     /** HPO Ontology object. */
-    private HpoOntology hpoOntology=null;
+    private Ontology hpoOntology=null;
     private static String DEFAULT_START_TERM="HP:0000118";
-
-
-
-    private String startTerm="HP:0002715"; // immunology
+    /** Term at the top of the subhierarchy to be displayed. */
+    private String startTerm;
 
 
 

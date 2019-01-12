@@ -6,7 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class AnnotationMergerTest {
     private static HpoDisease OSTEOMESOPYKNOSIS_OMIM;
     private static HpoDisease CCAIDCMS_ORPHA;
     private static HpoDisease CCAIDCMS_OMIM;
-    private static HpoOntology ontology;
+    private static Ontology ontology;
 
     @BeforeClass
     public static void init() {

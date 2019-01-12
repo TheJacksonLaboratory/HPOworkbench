@@ -10,7 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.word.Pair;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -32,7 +32,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getCh
  */
 public class HierarchicalExcelExporter {
     private static final Logger logger = LogManager.getLogger();
-    private final HpoOntology ontology;
+    private final Ontology ontology;
     /** The term of the subhierarchy of the HPO that we will export. */
     private final Term subhierarchyRoot;
     /** Ordered list of terms and their attributes for all terms that descend from {@link #subhierarchyRoot}.
@@ -46,7 +46,7 @@ public class HierarchicalExcelExporter {
      * @param onto Reference to the HPO ontology
      * @param selectedTerm term that defines the subhierarchy to export.
      */
-    public HierarchicalExcelExporter(HpoOntology onto, Term selectedTerm) {
+    public HierarchicalExcelExporter(Ontology onto, Term selectedTerm) {
         this.ontology=onto;
         if (ontology==null) {
             logger.error("ontology is null in COTR");

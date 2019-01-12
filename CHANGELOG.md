@@ -1,5 +1,6 @@
 # HPO Workbench Changelog
-
+## v1.2.4
+* Updated for phenol 1.3.2
 ## v1.2.3
 * Added function to export HTML MONDO analysis file to system clipboard
 ## v.1.2.1

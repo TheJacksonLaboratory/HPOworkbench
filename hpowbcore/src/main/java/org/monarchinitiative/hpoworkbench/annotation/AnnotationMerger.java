@@ -6,9 +6,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategoryMap;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class AnnotationMerger {
     private static final Logger logger = LogManager.getLogger();
-    private final HpoOntology ontology;
+    private final Ontology ontology;
 
     private final HpoDisease disease1;
     private final HpoDisease disease2;
@@ -42,7 +42,7 @@ public class AnnotationMerger {
     private Map<HpoCategory,CategoryMerge> mergedCategoryMap;
 
 
-    public AnnotationMerger(HpoDisease d1, HpoDisease d2, HpoOntology honto) {
+    public AnnotationMerger(HpoDisease d1, HpoDisease d2, Ontology honto) {
         disease1=d1;
         disease2=d2;
         if (disease1==null) {

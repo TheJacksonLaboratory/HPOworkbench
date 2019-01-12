@@ -7,7 +7,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Tab;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -44,7 +43,7 @@ public final class OptionalResources {
      */
     private final BooleanBinding hpoResourceIsMissing;
 
-    private final ObjectProperty<HpoOntology> hpoOntology = new SimpleObjectProperty<>(this, "hpoOntology", null);
+    private final ObjectProperty<Ontology> hpoOntology = new SimpleObjectProperty<>(this, "hpoOntology", null);
 
     private final ObjectProperty<Ontology> mondoOntology
             = new SimpleObjectProperty<>(this, "mondoOntology", null);
@@ -119,11 +118,11 @@ public final class OptionalResources {
         return directAnnotMap;
     }
 
-    public HpoOntology getHpoOntology() {
+    public Ontology getHpoOntology() {
         return hpoOntology.get();
     }
 
-    public void setHpoOntology(HpoOntology hpoOntology) {
+    public void setHpoOntology(Ontology hpoOntology) {
         this.hpoOntology.set(ResourceValidators.ontologyResourceValidator().isValid(hpoOntology) ? hpoOntology : null);
     }
 
@@ -139,7 +138,7 @@ public final class OptionalResources {
         return mondoOntology;
     }
 
-    public ObjectProperty<HpoOntology> hpoOntologyProperty() {
+    public ObjectProperty<Ontology> hpoOntologyProperty() {
         return hpoOntology;
     }
 

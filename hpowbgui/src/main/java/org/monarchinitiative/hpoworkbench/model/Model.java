@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import java.util.Map;
 public class Model {
     private static final Logger logger = LogManager.getLogger();
     /** Ontology model for full HPO ontology (all subhierarchies). */
-    private final HpoOntology ontology;
+    private final Ontology ontology;
     /** List of annotated diseases (direct annotations) */
     private final Map<TermId,List<HpoDisease>> annotmap;
     /** List of all indirected annotations (by annotation propagation rule). */
@@ -29,7 +28,7 @@ public class Model {
     private List<String> githublabels=new ArrayList<>();
 
 
-    public Model(HpoOntology ontology, Map<TermId, List<HpoDisease>> annotMap,
+    public Model(Ontology ontology, Map<TermId, List<HpoDisease>> annotMap,
                  Map<TermId, List<HpoDisease>> directAnnotMap) {
         this.ontology = ontology;
         this.annotmap = annotMap;
@@ -102,7 +101,7 @@ public class Model {
 
 
 
-    public HpoOntology getHpoOntology() {
+    public Ontology getHpoOntology() {
         return ontology;
     }
 

@@ -5,13 +5,9 @@ import com.google.common.collect.ImmutableList;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.formats.hpo.HpoOnset;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategoryMap;
-import org.monarchinitiative.phenol.ontology.data.SimpleXref;
-import org.monarchinitiative.phenol.ontology.data.Term;
-import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermSynonym;
+import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,13 +85,13 @@ class HpoHtmlPageGenerator {
             "</body></html>";
 
 
-    static String getDiseaseHTML(HpoDisease disease, HpoOntology ontology) {
+    static String getDiseaseHTML(HpoDisease disease, Ontology ontology) {
         String listOfCategories = getListOfTermsHTML(disease, ontology);
         return String.format(DISEASE_TEMPLATE, CSS,  listOfCategories);
     }
 
 
-    private static List<Term> getTerms(List<TermId> ids,HpoOntology ontology) {
+    private static List<Term> getTerms(List<TermId> ids,Ontology ontology) {
         ImmutableList.Builder<Term> builder = new ImmutableList.Builder<>();
         for (TermId tid : ids){
             Term term = ontology.getTermMap().get(tid);
@@ -108,7 +104,7 @@ class HpoHtmlPageGenerator {
         return builder.build();
     }
 
-    private static List<String> getTermsNamesFromIds(List<TermId> tids, HpoOntology ontology) {
+    private static List<String> getTermsNamesFromIds(List<TermId> tids, Ontology ontology) {
         ImmutableList.Builder<String> builder = new ImmutableList.Builder<>();
         for (TermId id : tids) {
             Term t = ontology.getTermMap().get(id);
@@ -118,7 +114,7 @@ class HpoHtmlPageGenerator {
     }
 
     /** @return String representing an HTML table row for one disease annotation. */
-    private static String getAnnotationTableRow(HpoAnnotation annot, HpoOntology ontology) {
+    private static String getAnnotationTableRow(HpoAnnotation annot, Ontology ontology) {
         TermId tid = annot.getTermId();
         Term term = ontology.getTermMap().get(tid);
         String label = term.getName();
@@ -131,12 +127,12 @@ class HpoHtmlPageGenerator {
         sb.append(fr);
         if (modifiers.size()>0) {
             List<String> names=getTermsNamesFromIds(modifiers,ontology);
-            sb.append("</br>Modifiers: ").append(names.stream().collect(Collectors.joining("; ")));
+            sb.append("</br>Modifiers: ").append(String.join("; ",names));
         }
         if (onset.available()) {
             sb.append("</br>").append(onset.toString());
         }
-        sb.append("</br>Source: ").append(annot.getCitations().stream().collect(Collectors.joining("; ")));
+        sb.append("</br>Source: ").append(String.join("; ",annot.getCitations()));
         return String.format("<tr>\n" +
                         "        <td><a href=\"%s\">%s</a></td>\n" +
                         "        <td>%s</td>\n" +
@@ -155,7 +151,7 @@ class HpoHtmlPageGenerator {
     /**
      * Create a table with the HPO Categories and annotations.
      */
-    private static String getListOfTermsHTML(HpoDisease disease, HpoOntology ontology) {
+    private static String getListOfTermsHTML(HpoDisease disease, Ontology ontology) {
         List<Term> modesOfInheritance = getTerms(disease.getModesOfInheritance(),ontology);
         List<Term> negativeTerms=getTerms(disease.getNegativeAnnotations(),ontology);
         List<HpoAnnotation> annotations = disease.getPhenotypicAbnormalities();

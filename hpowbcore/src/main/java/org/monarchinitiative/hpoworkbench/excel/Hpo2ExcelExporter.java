@@ -8,11 +8,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.ontology.data.Dbxref;
-import org.monarchinitiative.phenol.ontology.data.Term;
-import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermSynonym;
+import org.monarchinitiative.phenol.ontology.data.*;
 
 
 import java.io.FileOutputStream;
@@ -29,11 +25,11 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getPa
 public class Hpo2ExcelExporter {
     private static final Logger logger = LogManager.getLogger();
 
-    private final HpoOntology ontology;
+    private final Ontology ontology;
 
     private final static String EMPTY_STRING="";
 
-    public Hpo2ExcelExporter(HpoOntology onto) {
+    public Hpo2ExcelExporter(Ontology onto) {
         this.ontology=onto;
         if (ontology==null) {
             logger.error("ontology is null in COTR");

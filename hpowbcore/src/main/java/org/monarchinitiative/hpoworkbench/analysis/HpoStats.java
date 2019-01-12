@@ -8,7 +8,7 @@ import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -29,7 +29,7 @@ public class HpoStats {
     private static final Logger LOGGER = LogManager.getLogger();
     private String hpopath;
     private String annotpath;
-    private HpoOntology hpoOntology=null;
+    private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
     private Map<TermId,HpoDisease> diseaseMap =null;
     /** Set of all HPO terms that are descendents of {@link #termIdOfInterest}. */
@@ -96,7 +96,7 @@ public class HpoStats {
 
 
 
-    public HpoStats(HpoOntology ontolog,Map<TermId, HpoDisease> d2amap) throws HPOException {
+    public HpoStats(Ontology ontolog,Map<TermId, HpoDisease> d2amap) throws HPOException {
         termIdOfInterest=TermId.of(rootHpoTerm);
         hpoOntology=ontolog;
         omim=new ArrayList<>();
@@ -224,7 +224,7 @@ public class HpoStats {
      * @param terms the set of terms for which we want to calculate the number of synomnyms
      * @return number of synonyms.
      */
-    private int getTotalNumberOfSynonyms(HpoOntology ontology, Set<TermId> terms) {
+    private int getTotalNumberOfSynonyms(Ontology ontology, Set<TermId> terms) {
         int n=0;
         for (TermId tid : terms) {
             n+=ontology.getTermMap().get(tid).getSynonyms().size();
@@ -238,7 +238,7 @@ public class HpoStats {
      * @param terms the set of terms for which we want to calculate the number of terms with definition
      * @return number of terms with definition.
      */
-    private int getNumberOfTermsWithDefinition(HpoOntology ontology, Set<TermId> terms) {
+    private int getNumberOfTermsWithDefinition(Ontology ontology, Set<TermId> terms) {
         int n=0;
         for (TermId tid : terms) {
             String def=ontology.getTermMap().get(tid).getDefinition();

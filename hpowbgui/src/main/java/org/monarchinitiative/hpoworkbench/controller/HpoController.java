@@ -29,7 +29,7 @@ import org.monarchinitiative.hpoworkbench.model.DiseaseDatabase;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.w3c.dom.Document;
@@ -585,7 +585,7 @@ public final class HpoController {
      * @param ontology Reference to the HPO
      * @param addHook  function hook (currently unused)
      */
-    private void initTree(HpoOntology ontology, Consumer<Term> addHook) {
+    private void initTree(Ontology ontology, Consumer<Term> addHook) {
         // populate the TreeView with top-level elements from ontology hierarchy
         if (ontology == null) {
             ontologyTreeView.setRoot(null);
@@ -739,7 +739,7 @@ public final class HpoController {
      * @return children of term (not including term itself).
      */
     private Set<Term> getTermChildren(Term term) {
-        HpoOntology ontology = optionalResources.getHpoOntology();
+        Ontology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return new HashSet<>();
@@ -761,7 +761,7 @@ public final class HpoController {
      * @return parents of term (not including term itself).
      */
     private Set<Term> getTermParents(Term term) {
-        HpoOntology ontology = optionalResources.getHpoOntology();
+        Ontology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
@@ -776,7 +776,7 @@ public final class HpoController {
     }
 
     private boolean existsPathFromRoot(Term term) {
-        HpoOntology ontology = optionalResources.getHpoOntology();
+        Ontology ontology = optionalResources.getHpoOntology();
         if (ontology == null) {
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return false;

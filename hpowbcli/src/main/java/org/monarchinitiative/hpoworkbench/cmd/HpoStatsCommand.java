@@ -24,7 +24,7 @@ public class HpoStatsCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
     private final String hpopath;
     private final String annotpath;
-    private HpoOntology hpoOntology=null;
+    private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
     private Map<TermId,HpoDisease> diseaseMap =null;
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
@@ -160,7 +160,7 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
 
-    private int getTotalNumberOfSynonyms(HpoOntology ontology, Set<TermId> terms) {
+    private int getTotalNumberOfSynonyms(Ontology ontology, Set<TermId> terms) {
         int n=0;
         for (TermId tid : terms) {
             n+=ontology.getTermMap().get(tid).getSynonyms().size();
@@ -168,7 +168,7 @@ public class HpoStatsCommand extends HPOCommand  {
         return n;
     }
 
-    private int getNumberOfTermsWithDefinition(HpoOntology ontology, Set<TermId> terms) {
+    private int getNumberOfTermsWithDefinition(Ontology ontology, Set<TermId> terms) {
         int n=0;
         for (TermId tid : terms) {
             String def=ontology.getTermMap().get(tid).getDefinition();
