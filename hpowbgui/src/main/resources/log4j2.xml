@@ -20,9 +20,13 @@
     <Loggers>
         <Logger name="org.semanticweb.owlapi.rio.RioFunctionalSyntaxParserFactory" level="error" />
         <Logger name="org.semanticweb.owlapi.rio.RioOWLXMLParserFactory" level="error" />
-        <Logger name=" org.openrdf.rio.binary.BinaryRDFParserFactory" level="error" />
+        <Logger name="org.openrdf.rio.binary.BinaryRDFParserFactory" level="error" />
         <Logger name="org.obolibrary.oboformat.parser.OBOFormatParser" level="error" />
         <logger name="uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryInternalsImpl" level="error"/>
+        <logger name="uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryInternalsImplNoCache" level="error"/>
+
+
+        <Logger name="org.openrdf.rio.RDFParserRegistry" level="error" />
 
         <Root level="TRACE">
             <AppenderRef ref="LogFile"/>
