@@ -9,9 +9,9 @@ import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.*;
@@ -29,7 +29,7 @@ public class DirectIndirectHpoAnnotationParser {
     /** Path to phenotyoe.hpoa */
     private final String pathToPhenotypeAnnotationTab;
     /** Reference to HPO ontology object. */
-    private final HpoOntology ontology;
+    private final Ontology ontology;
     /** Key: term id of an HPO term; value: List of references to diseases directly annotated to his term */
     private Map<TermId,List<HpoDisease>> directAnnotationMap;
     /** Key: term id of an HPO term; value: List of references to diseases directly or indirectly annotated to his term */
@@ -39,7 +39,7 @@ public class DirectIndirectHpoAnnotationParser {
      * @param path Path to phenotype.hpoa
      * @param onto reference to HPO Ontology
      */
-    public DirectIndirectHpoAnnotationParser(String path, HpoOntology onto) {
+    public DirectIndirectHpoAnnotationParser(String path, Ontology onto) {
         this.pathToPhenotypeAnnotationTab = path;
         this.ontology = onto;
     }

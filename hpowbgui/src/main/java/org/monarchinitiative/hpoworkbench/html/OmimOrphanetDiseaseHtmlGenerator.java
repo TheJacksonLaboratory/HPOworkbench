@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
 import org.monarchinitiative.hpoworkbench.annotation.SubClassTermPair;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -19,7 +19,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
     private final static String EMPTY_STRING="";
 
 
-    public static String getHTML(HpoDisease omim, HpoDisease orpha, Map<HpoCategory,CategoryMerge> catmap, HpoOntology ontology) {
+    public static String getHTML(HpoDisease omim, HpoDisease orpha, Map<HpoCategory,CategoryMerge> catmap, Ontology ontology) {
         return getMergerTable(catmap,ontology);
     }
 
@@ -46,7 +46,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
      * @param ontology
      * @return
      */
-    private static String gedtIdenticalInBothDatabasesRows(List<TermId> termIdList, HpoOntology ontology ) {
+    private static String gedtIdenticalInBothDatabasesRows(List<TermId> termIdList, Ontology ontology ) {
         if (termIdList==null || termIdList.isEmpty()) return EMPTY_STRING;
         StringBuilder sb = new StringBuilder();
         String row1="<tr class=\"shared\"><td colspan=\"2\"><i><b>OMIM and Orphanet: identical</b></i></td></tr>";
@@ -73,7 +73,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
      * @param ontology
      * @return
      */
-    private static String getSubclassRows(CategoryMerge catmerge, HpoOntology ontology) {
+    private static String getSubclassRows(CategoryMerge catmerge, Ontology ontology) {
         String db1=catmerge.getDb1();
         String db2=catmerge.getDb2();
         StringBuilder sb = new StringBuilder();
@@ -118,7 +118,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
         return sb.toString();
     }
 
-    private static String getOnlyOneDiseaseRows(CategoryMerge catmerge, HpoOntology ontology){
+    private static String getOnlyOneDiseaseRows(CategoryMerge catmerge, Ontology ontology){
         String db1=catmerge.getDb1();
         String db2=catmerge.getDb2();
         StringBuilder sb = new StringBuilder();
@@ -135,7 +135,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
         for (TermId t2 : catmerge.getDisease2onlyTerms()) {
             String label = ontology.getTermMap().get(t2).getName();
             String definition=ontology.getTermMap().get(t2).getDefinition();
-            sb.append(String.format("<tr class=\"unrelated\"><td>%s [%s]</td><td>%s only</td></tr>",label,t2.getValue(),db2,definition));
+            sb.append(String.format("<tr class=\"unrelated\"><td>%s [%s]</td><td>%s only</td></tr>",label,t2.getValue(),db2));
         }
         return sb.toString();
     }
@@ -147,7 +147,7 @@ public class OmimOrphanetDiseaseHtmlGenerator {
      * @param ontology
      * @return
      */
-    private static String getMergerTable(Map<HpoCategory,CategoryMerge> catmap, HpoOntology ontology) {
+    private static String getMergerTable(Map<HpoCategory,CategoryMerge> catmap, Ontology ontology) {
         StringBuilder sb = new StringBuilder();
         for (HpoCategory cat : catmap.keySet()) {
             CategoryMerge catmerge = catmap.get(cat);

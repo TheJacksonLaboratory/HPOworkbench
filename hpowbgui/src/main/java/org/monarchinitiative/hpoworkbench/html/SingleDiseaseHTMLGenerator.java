@@ -3,9 +3,9 @@ package org.monarchinitiative.hpoworkbench.html;
 
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.formats.hpo.category.HpoCategoryMap;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -25,7 +25,7 @@ public class SingleDiseaseHTMLGenerator {
      * @param ontology reference to HPO ontology object
      * @return HTML with tables representing a disease that has only OMIM or Orphanet annotations but not both
      */
-    public static String getHTML( HpoDisease disease,  HpoOntology ontology) {
+    public static String getHTML( HpoDisease disease,  Ontology ontology) {
         return getListOfTermsHTML(disease,ontology);
     }
 
@@ -35,7 +35,7 @@ public class SingleDiseaseHTMLGenerator {
     /**
      * Create a table with the HPO Categories and annotations.
      */
-    private static String getListOfTermsHTML(HpoDisease disease, HpoOntology ontology) {
+    private static String getListOfTermsHTML(HpoDisease disease, Ontology ontology) {
         List<HpoAnnotation> annotations = disease.getPhenotypicAbnormalities();
         if (annotations == null) {
             return "<p>No HPO annotations found.</p>";

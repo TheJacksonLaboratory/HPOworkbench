@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.util.ArrayList;
@@ -19,9 +18,8 @@ import java.util.Map;
  */
 public class Model {
     private static final Logger logger = LogManager.getLogger();
-    private final TermPrefix HP_PREFIX = new TermPrefix("HP");
     /** Ontology model for full HPO ontology (all subhierarchies). */
-    private final HpoOntology ontology;
+    private final Ontology ontology;
     /** List of annotated diseases (direct annotations) */
     private final Map<TermId,List<HpoDisease>> annotmap;
     /** List of all indirected annotations (by annotation propagation rule). */
@@ -30,7 +28,7 @@ public class Model {
     private List<String> githublabels=new ArrayList<>();
 
 
-    public Model(HpoOntology ontology, Map<TermId, List<HpoDisease>> annotMap,
+    public Model(Ontology ontology, Map<TermId, List<HpoDisease>> annotMap,
                  Map<TermId, List<HpoDisease>> directAnnotMap) {
         this.ontology = ontology;
         this.annotmap = annotMap;
@@ -64,14 +62,12 @@ public class Model {
 
 
     private TermId string2TermId(String termstring) {
-        if (termstring.startsWith("HP:")) {
-            termstring=termstring.substring(3);
-        }
-        if (termstring.length()!=7) {
+
+        if (termstring.length()!=10) {
             logger.error("Malformed termstring: "+termstring);
             return null;
         }
-        TermId tid = TermId.of(HP_PREFIX,termstring);
+        TermId tid = TermId.of(termstring);
         if (! ontology.getAllTermIds().contains(tid)) {
             logger.error("Unknown TermId "+tid.getValue());
             return null;
@@ -105,7 +101,7 @@ public class Model {
 
 
 
-    public HpoOntology getHpoOntology() {
+    public Ontology getHpoOntology() {
         return ontology;
     }
 

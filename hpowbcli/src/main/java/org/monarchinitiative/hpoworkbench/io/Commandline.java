@@ -114,6 +114,9 @@ public class Commandline {
             case "download":
                 this.command = new DownloadCommand(this.downloadDirectory);
                 break;
+            case "descendent":
+                this.command = new HpoListDescendentsCommand(this.hpoOboPath,this.termid);
+                break;
             case "stats":
                 if (termid == null) {
                     printUsage("[ERROR] stats command requires -t option");

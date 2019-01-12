@@ -4,7 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
+
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public class AnnotationTlc {
     private static final Logger LOGGER = LogManager.getLogger();
     private String hpopath;
     private String annotpath;
-    private final HpoOntology hpoOntology;
+    private final Ontology hpoOntology;
     /** All disease annotations for the entire ontology. */
     private final Map<TermId,HpoDisease> diseaseMap;
 
@@ -24,7 +25,7 @@ public class AnnotationTlc {
     private Map<String,String> diseasesWithTooGeneralAnnotations;
 
 
-    public AnnotationTlc(HpoOntology ontolog,Map<TermId, HpoDisease> d2amap)  {
+    public AnnotationTlc(Ontology ontolog,Map<TermId, HpoDisease> d2amap)  {
         hpoOntology = ontolog;
         diseaseMap = d2amap;
         lookForUnderannotatedDiseases();

@@ -4,12 +4,10 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.phenol.base.PhenolException;
-import org.monarchinitiative.phenol.formats.hpo.HpoOntology;
-import org.monarchinitiative.phenol.io.obo.hpo.HpOboParser;
+import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,12 +30,7 @@ public class Hpo2HpoCommand extends HPOCommand {
     public Hpo2HpoCommand(String hpoPath, String annotPath, String hpoTermId) {
         this.hpOboPath = hpoPath;
         this.annotationPath = annotPath;
-
-        if (hpoTermId.startsWith("HP:")) {
-            hpoTermId = hpoTermId.substring(3);
-        }
-        TermPrefix HP_PREFIX = new TermPrefix("HP");
-        termId = TermId.of(HP_PREFIX, hpoTermId);
+        termId = TermId.of(hpoTermId);
     }
 
 
@@ -55,11 +48,9 @@ public class Hpo2HpoCommand extends HPOCommand {
     private void inputHpoData() {
 
         try {
-            HpOboParser oparser = new HpOboParser(new File(hpOboPath));
-            /* Annotations of all of the diseases in the HPO corpus. */ /** Annotations of all of the diseases in the HPO corpus. */ //private List<HpoDiseaseAnnotation> annotlist=null;
-            HpoOntology ontology = oparser.parse();
+            Ontology ontology = OntologyLoader.loadOntology(new File(this.hpOboPath));
             HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath, ontology);
-        } catch (PhenolException | FileNotFoundException pe) {
+        } catch (PhenolException  pe) {
             pe.printStackTrace(); // todo refactor
         }
         //this.annotlist = aparser.getAnnotations();
