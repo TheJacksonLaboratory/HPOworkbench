@@ -105,6 +105,7 @@ public class HierarchicalExcelExporter {
             TermId termId=pair.first;
             Integer level=pair.second;
             Term hterm = ontology.getTermMap().get(termId);
+            logger.trace("Adding a total of {} rows for Excel file current term {}", termRowList.size(),hterm.getName());
             if (previouslyseen.contains(termId)) {
                 // we have already output this term!
                 TermRow hrow = new TermRow(level, hterm,
@@ -114,13 +115,17 @@ public class HierarchicalExcelExporter {
             } else {
                 previouslyseen.add(termId);
             }
-            Set<TermId> children = getChildTerms(ontology,tid,false);
+            Set<TermId> children = getChildTerms(ontology,termId,false);
+            logger.trace("Adding {} children for term {} stack size {}", children.size(),hterm.getName(), stack.size());
             for (TermId t:children) {
+                logger.trace("\tadding child {}",ontology.getTermMap().get(t).getName());
                 stack.push(new Pair<>(t,level+1));
             }
+            logger.trace("Added kids stack size {}",  stack.size());
             termRowList.add(new TermRow(level,hterm));
             if (level>maxlevel)maxlevel=level;
         }
+        logger.trace("Added a total of {} rows for Excel file", termRowList.size());
     }
 
 
