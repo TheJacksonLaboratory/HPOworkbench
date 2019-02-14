@@ -1,13 +1,18 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
+import org.monarchinitiative.phenol.io.assoc.HpoAssociationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -20,15 +25,13 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.exist
  * Extract descriptive statistics about a a certain subhierarchy of the HPO.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
+@Parameters(commandDescription = "stats. Extract descriptive statistics about a subhierarchy of the HPO.")
 public class HpoStatsCommand extends HPOCommand  {
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
-    private final String hpopath;
-    private final String annotpath;
+    private static final Logger LOGGER = LogManager.getLogger();
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
     private Map<TermId,HpoDisease> diseaseMap =null;
-    /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
-    private final TermId termOfInterest;
+
     /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
     /** We use this to count the number of subclass relations underneath {@link #termOfInterest}. */
@@ -45,11 +48,29 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
 
+    /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
+    @Parameter(names={"-t","--term"},description = "the root of the subhierarchy for which we are calculating the descriptive statistics.")
+    private String term;
 
 
-    public HpoStatsCommand(String hpo,String annotations,String term) {
-        this.hpopath=hpo;
-        this.annotpath=annotations;
+    private TermId termOfInterest;
+
+
+
+    public HpoStatsCommand() {
+
+    }
+
+    @Override
+    public  void run() {
+
+        if (hpopath==null) {
+            hpopath = this.downloadDirectory + File.separator + "hp.obo";
+        }
+        if (annotpath==null) {
+            annotpath = this.downloadDirectory + File.separator + "phenotype.hpoa";
+        }
+
         LOGGER.trace(String.format("HPO path: %s, annotations: %s",hpopath,annotpath ));
         if (! term.startsWith("HP:") || term.length()!=10) {
             LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",term ));
@@ -61,10 +82,6 @@ public class HpoStatsCommand extends HPOCommand  {
         orphanet=new ArrayList<>();
         decipher=new ArrayList<>();
         inputHPOdata();
-    }
-
-    @Override
-    public  void run() {
         getDescendentsOfTermOfInterest();
         filterDiseasesAccordingToDatabase();
         /*initializeAdultOnsetTerms();
@@ -76,7 +93,44 @@ public class HpoStatsCommand extends HPOCommand  {
         LOGGER.trace("Getting DECIPER diseases according to onset");
         filterDiseasesAccordingToOnset(this.decipher);
         */
+
+        qcInheritanceModesForDiseases();
+
     }
+
+    private void qcInheritanceModesForDiseases() {
+        String geneInfoFile = this.downloadDirectory + File.separator + "Homo_sapiens_gene_info.gz";
+        String mim2genemedgenFile = this.downloadDirectory + File.separator + "mim2gene_medgen";
+
+        File orphafilePlaceholder = null;//we do not need this for now
+        HpoAssociationParser assocParser = new HpoAssociationParser(geneInfoFile,
+                mim2genemedgenFile,
+                orphafilePlaceholder,
+                hpoOntology);
+        assocParser.parse();
+        final Multimap<TermId,TermId> disease2geneIdMultiMap=assocParser.getDiseaseToGeneIdMap();
+        final Map<TermId,String> geneId2SymbolMap = assocParser.getGeneIdToSymbolMap();
+        for (TermId diseaseId : disease2geneIdMultiMap.keys()) {
+            HpoDisease disease = this.diseaseMap.get(diseaseId);
+            if (disease==null) {
+                continue;
+            }
+            if (disease.getModesOfInheritance().isEmpty()) {
+                String diseasename = disease.getName();
+                String url = "https://omim.org/entry/" + disease.getDiseaseDatabaseId().getId();
+                List<String> genes = new ArrayList<>();
+                for (TermId geneId : disease2geneIdMultiMap.get(diseaseId)) {
+                    String symbol = geneId2SymbolMap.get(geneId);
+                    genes.add(symbol);
+                }
+                System.out.println(" - [ ] " + diseasename + "(" + url +"). Genes:" + String.join("; ",genes));
+            }
+        }
+    }
+
+
+
+
 
 
     private void inputHPOdata() {
@@ -96,6 +150,7 @@ public class HpoStatsCommand extends HPOCommand  {
         try {
             HPOAnnotationParser annotparser = new HPOAnnotationParser(annotpath, hpoOntology);
             diseaseMap = annotparser.getDiseaseMap();
+            LOGGER.trace("Diseases imported: " + diseaseMap.size());
         } catch (PhenolException pe) {
             pe.printStackTrace();
         }

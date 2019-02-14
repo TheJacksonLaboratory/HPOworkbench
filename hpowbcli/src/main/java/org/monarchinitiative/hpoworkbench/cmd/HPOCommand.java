@@ -1,12 +1,11 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
+import com.beust.jcommander.Parameter;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
-
-import org.monarchinitiative.hpoworkbench.exception.HPOException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +18,13 @@ import java.util.Map;
 public abstract class HPOCommand {
 
     public abstract String getName();
+
+    @Parameter(names={"-d","--download"},description = "directory to download HPO data")
+    protected String downloadDirectory="data";
+    @Parameter(names={"-a", "--annot"},description = "path to phenol.hpoa")
+    protected String hpopath=null;
+    @Parameter(names={"-h", "--hpo"}, description = "path to hp.obo")
+    protected String annotpath=null;
 
     protected Map<String,String> defaults=new HashMap<>();
 

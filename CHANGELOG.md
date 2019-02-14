@@ -1,4 +1,9 @@
 # HPO Workbench Changelog
+
+## v1.3.0
+* Refactored to use JCommander
+* Added command to check for HPO disease annotations that do not have inheritance information
+
 ## v1.2.4
 * Updated for phenol 1.3.2
 ## v1.2.3

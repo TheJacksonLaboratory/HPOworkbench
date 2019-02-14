@@ -1,5 +1,7 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
@@ -15,22 +17,26 @@ import java.util.stream.Collectors;
 /**
  * Generates a list of all terms that are descendents of a given term.
  */
+@Parameters(commandDescription = "descendent. Generates a list of all terms that are descendents of a given term.")
 public class HpoListDescendentsCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
-    private final String hpopath;
+
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
     private final TermId termOfInterest;
     private Ontology hpoOntology=null;
     /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
+    @Parameter(names={"-t","--term"},required = true,description = "TermId of interest")
+    private String hpoTermId;
 
-    public HpoListDescendentsCommand(String hpo,String term) {
-        this.hpopath=hpo;
-        if (! term.startsWith("HP:") || term.length()!=10) {
-            LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",term ));
+
+    public HpoListDescendentsCommand() {
+
+        if (! hpoTermId.startsWith("HP:") || hpoTermId.length()!=10) {
+            LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",hpoTermId ));
             System.exit(1);
         }
-        this.termOfInterest=TermId.of(term);
+        this.termOfInterest=TermId.of(hpoTermId);
         LOGGER.trace("Term of interest: "+termOfInterest.getValue());
 
         inputHPOdata();
