@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 public class HpoListDescendentsCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 
-    /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
-    private final TermId termOfInterest;
     private Ontology hpoOntology=null;
     /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
@@ -31,15 +29,6 @@ public class HpoListDescendentsCommand extends HPOCommand  {
 
 
     public HpoListDescendentsCommand() {
-
-        if (! hpoTermId.startsWith("HP:") || hpoTermId.length()!=10) {
-            LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",hpoTermId ));
-            System.exit(1);
-        }
-        this.termOfInterest=TermId.of(hpoTermId);
-        LOGGER.trace("Term of interest: "+termOfInterest.getValue());
-
-        inputHPOdata();
     }
 
     private void inputHPOdata() {
@@ -54,7 +43,17 @@ public class HpoListDescendentsCommand extends HPOCommand  {
 
     @Override
     public  void run() {
-        getDescendentsOfTermOfInterest();
+        if (! hpoTermId.startsWith("HP:") || hpoTermId.length()!=10) {
+            LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",hpoTermId ));
+            System.exit(1);
+        }
+
+        // the root of the subhierarchy for which we are calculating the descriptive statistics.
+        TermId termOfInterest=TermId.of(hpoTermId);
+        LOGGER.trace("Term of interest: "+termOfInterest.getValue());
+
+        inputHPOdata();
+        getDescendentsOfTermOfInterest(termOfInterest);
         String desclist=descendentsOfTheTermOfInterest.stream().
                 map(TermId::getValue).
                 collect(Collectors.joining("\"), TermId.of(\""));
@@ -62,7 +61,7 @@ public class HpoListDescendentsCommand extends HPOCommand  {
 
     }
 
-    private void getDescendentsOfTermOfInterest() {
+    private void getDescendentsOfTermOfInterest(TermId termOfInterest) {
         String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termOfInterest).getName(),termOfInterest.getValue() );
         descendentsOfTheTermOfInterest = countDescendentsAndSubclassRelations(hpoOntology,termOfInterest);
 

@@ -29,6 +29,8 @@ public class BatchGitPostCommand extends HPOCommand {
     /** Github password */
     @Parameter(names={"-p","--password"},required = true,description = "github password")
     private String gitPword;
+    @Parameter(names={"--dryrun"},description="print to shell but do not execute")
+    private boolean dryrun=false;
 
     /**
      * Create a word document with up to 30 open issues for the label. This is intended to be used
@@ -56,6 +58,9 @@ public class BatchGitPostCommand extends HPOCommand {
                 labs.add(this.issueLabel);
                /// labs.add("NIAID"); add as many as desired.
                 poster.setLabel(labs);
+                if (dryrun) {
+                    poster.setDryRun();
+                }
                 try {
                     poster.postHpoIssue();
                     Thread.sleep(1000);
