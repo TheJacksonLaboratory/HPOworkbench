@@ -38,6 +38,7 @@ public class HpoWorkbench {
         HpoListDescendentsCommand descendents = new HpoListDescendentsCommand();
         Hpo2HpoCommand hpo2hpo = new Hpo2HpoCommand();
         HPO2CSVCommand csv = new HPO2CSVCommand();
+        MatchTermsCommand matchterms = new MatchTermsCommand();
 
 
         JCommander jc = JCommander.newBuilder().
@@ -50,6 +51,7 @@ public class HpoWorkbench {
                 addCommand("git",git).
                 addCommand("hpo2hpo",hpo2hpo).
                 addCommand("descendents",descendents).
+                addCommand("matchterms",matchterms).
                 addCommand("csv",csv).
                 build();
         jc.setProgramName("java -jar HpoWorkbench.jar");
@@ -99,6 +101,9 @@ public class HpoWorkbench {
                 break;
             case "hpo2hpo":
                 hpocommand = hpo2hpo;
+                break;
+            case "matchterms":
+                hpocommand = matchterms;
                 break;
             case "csv":
                 hpocommand = csv;

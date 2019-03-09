@@ -146,6 +146,8 @@ public class AnnotationMergerTest {
                         diseaseId,
                         annots,
                         emptyList,
+                        emptyList,
+                        emptyList,
                         emptyList);
     }
 
