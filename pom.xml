@@ -80,6 +80,12 @@
             <version>1.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>me.xdrop</groupId>
+            <artifactId>fuzzywuzzy</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
         <!-- JUnit testing -->
         <dependency>
             <groupId>junit</groupId>

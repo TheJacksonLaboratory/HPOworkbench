@@ -38,7 +38,7 @@ public class HpoWorkbench {
         HpoListDescendentsCommand descendents = new HpoListDescendentsCommand();
         Hpo2HpoCommand hpo2hpo = new Hpo2HpoCommand();
         HPO2CSVCommand csv = new HPO2CSVCommand();
-        HpoBestMatchCommand bestmatch = new HpoBestMatchCommand();
+        MatchTermsCommand matchterms = new MatchTermsCommand();
 
 
         JCommander jc = JCommander.newBuilder().
@@ -51,8 +51,8 @@ public class HpoWorkbench {
                 addCommand("git",git).
                 addCommand("hpo2hpo",hpo2hpo).
                 addCommand("descendents",descendents).
+                addCommand("matchterms",matchterms).
                 addCommand("csv",csv).
-                addCommand("bestmatch",bestmatch).
                 build();
         jc.setProgramName("java -jar HpoWorkbench.jar");
         try {
@@ -102,11 +102,11 @@ public class HpoWorkbench {
             case "hpo2hpo":
                 hpocommand = hpo2hpo;
                 break;
+            case "matchterms":
+                hpocommand = matchterms;
+                break;
             case "csv":
                 hpocommand = csv;
-                break;
-            case "bestmatch":
-                hpocommand = bestmatch;
                 break;
             default:
                 System.err.println(String.format("[ERROR] command \"%s\" not recognized",command));
