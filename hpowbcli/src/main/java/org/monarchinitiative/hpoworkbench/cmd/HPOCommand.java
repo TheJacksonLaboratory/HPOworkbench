@@ -22,9 +22,9 @@ public abstract class HPOCommand {
     @Parameter(names={"-d","--download"},description = "directory to download HPO data")
     protected String downloadDirectory="data";
     @Parameter(names={"-a", "--annot"},description = "path to phenol.hpoa")
-    protected String hpopath=null;
+    protected String annotpath="data/phenotype.hpoa";
     @Parameter(names={"-h", "--hpo"}, description = "path to hp.obo")
-    protected String annotpath=null;
+    protected String hpopath ="data/hpo.obo";
 
     protected Map<String,String> defaults=new HashMap<>();
 
