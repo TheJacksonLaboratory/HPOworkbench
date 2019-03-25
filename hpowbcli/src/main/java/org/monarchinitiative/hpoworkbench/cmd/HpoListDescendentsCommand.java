@@ -22,7 +22,7 @@ public class HpoListDescendentsCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 
     private Ontology hpoOntology=null;
-    /** Set of all HPO terms that are descendents of {@link #termOfInterest}. */
+    /** Set of all HPO terms that are descendents of {@link #hpoTermId}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
     @Parameter(names={"-t","--term"},required = true,description = "TermId of interest")
     private String hpoTermId;
