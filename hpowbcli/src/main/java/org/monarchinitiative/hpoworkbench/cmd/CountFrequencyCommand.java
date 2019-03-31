@@ -1,6 +1,8 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
@@ -21,14 +23,14 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDe
  *
  * @author <a href="mailto:peter.robinson">Peter Robinson</a>
  */
+@Parameters(commandDescription = "countfreq. Count freqeuncy of annotations.")
 public class CountFrequencyCommand extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
 
-    private final String hpOboPath;
+    @Parameter(names={"-t","--term"},required = true,description = "TermId of interest")
+    private String hpoTermId;
 
-    private final String annotationPath;
-
-    private final TermId termId;
+    private TermId termId;
 
     private int descendentTermCount;
     /**
@@ -38,14 +40,18 @@ public class CountFrequencyCommand extends HPOCommand {
 
     private int TERMS_TO_SHOW = 10;
 
-    public CountFrequencyCommand(String hpoPath, String annotPath, String hpoTermId) {
-        this.hpOboPath = hpoPath;
-        this.annotationPath = annotPath;
-        termId = TermId.of(hpoTermId);
+    public CountFrequencyCommand() {
+
     }
 
     public void run() {
-        Ontology ontology = OntologyLoader.loadOntology(new File(this.hpOboPath));
+
+        String hpOboPath = this.downloadDirectory + File.separator + this.hpopath;
+        String annotationPath = this.downloadDirectory + File.separator + annotpath;
+        termId = TermId.of(hpoTermId);
+
+
+        Ontology ontology = OntologyLoader.loadOntology(new File(hpOboPath));
 
         Map<TermId, HpoDisease> annotationMap;
         try {

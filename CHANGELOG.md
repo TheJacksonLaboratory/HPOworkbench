@@ -1,4 +1,16 @@
 # HPO Workbench Changelog
+
+## v1.5.0
+* Count new HPO annotations from an arbitrary date
+
+## v1.4.0
+* Added HPO best match command (find best matches between two disease lists)
+* Upgraded to phenol 1.3.3
+
+## v1.3.0
+* Refactored to use JCommander
+* Added command to check for HPO disease annotations that do not have inheritance information
+
 ## v1.2.4
 * Updated for phenol 1.3.2
 ## v1.2.3

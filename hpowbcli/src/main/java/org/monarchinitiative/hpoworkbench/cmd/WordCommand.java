@@ -3,6 +3,8 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 import java.io.IOException;
 
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.word.Hpo2Word;
 
@@ -12,13 +14,14 @@ import org.monarchinitiative.hpoworkbench.word.Hpo2Word;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.1.0
  */
+@Parameters(commandDescription = "Output subontology as word file (experimental)")
 public class WordCommand extends HPOCommand  {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private final String DEFAULT_OUTPUTNAME="hpotest.word";
     private static String DEFAULT_START_TERM="HP:0000118";
 
-
+    @Parameter(names={"--startterm"})
     private String startTerm=DEFAULT_START_TERM;
     private String IMMUNOLOGY_STAERT_TERM="HP:0002715";
 
@@ -26,9 +29,7 @@ public class WordCommand extends HPOCommand  {
     private Hpo2Word hpo2Word =null;
 
 
-    public WordCommand(String dir, String startTerm) {
-        String hpopath = dir;
-        startTerm=startTerm;
+    public WordCommand() {
     }
 
 

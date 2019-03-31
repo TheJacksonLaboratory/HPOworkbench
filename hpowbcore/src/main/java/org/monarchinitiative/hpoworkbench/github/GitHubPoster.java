@@ -38,6 +38,8 @@ public class GitHubPoster {
     private final String githubTitle;
 
     private final String githubBody;
+    /** if this is set to true, then we output the messages to shell but do not execute. */
+    private boolean dryrun=false;
 
 
 
@@ -62,6 +64,10 @@ public class GitHubPoster {
     public void setLabel(List<String> labels) {
         this.githubLabels = labels.stream().map(JSONValue::escape).collect(Collectors.toList());
         reformatPayloadWithLabel(this.githubLabels);
+    }
+
+    public void setDryRun() {
+
     }
 
 
@@ -137,6 +143,10 @@ public class GitHubPoster {
         http.setRequestMethod("POST"); // PUT is another valid option
         http.setDoOutput(true);
         byte[] out = payload.getBytes(StandardCharsets.UTF_8);
+        if (dryrun) {
+            System.err.println(payload);
+            return;
+        }
         int length = out.length;
         http.setFixedLengthStreamingMode(length);
         http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");

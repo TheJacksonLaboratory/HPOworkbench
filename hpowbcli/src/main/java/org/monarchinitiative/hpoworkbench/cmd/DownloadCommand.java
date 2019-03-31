@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
+import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.FileDownloader;
 
@@ -17,9 +18,10 @@ import java.net.URL;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.0.1 (May 10, 2017)
  */
+@Parameters(commandDescription = "download. Download HPO/MONDO/medgen files.")
 public final class DownloadCommand extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
-    private final String downloadDirectory;
+
 
     private final String PHENOTYPE_HPOA_URL="http://compbio.charite.de/jenkins/job/hpo.annotations.2018/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa";
 
@@ -28,8 +30,7 @@ public final class DownloadCommand extends HPOCommand {
     /**
 
      */
-    public DownloadCommand(String downloadDir)  {
-        this.downloadDirectory=downloadDir;
+    public DownloadCommand()  {
     }
 
     /**
@@ -40,6 +41,8 @@ public final class DownloadCommand extends HPOCommand {
         createDownloadDir(downloadDirectory);
         downloadHpObo();
         downloadPhenotypeDotHpoa();
+        downloadMedgen();
+        downloadGeneInfo();
     }
 
     /** Download the phenotype.hpoa file. */
@@ -82,6 +85,45 @@ public final class DownloadCommand extends HPOCommand {
                 LOGGER.trace("Downloaded hp.obo to "+ downloadLocation);
             } else {
                 LOGGER.error("Could not download hp.obo to " + downloadLocation);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void downloadMedgen() {
+        final  String MIM2GENE_MEDGEN_URL = "ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/mim2gene_medgen";
+        String filename = "mim2gene_medgen";
+        String downloadLocation=String.format("%s%s%s",downloadDirectory, File.separator,filename);
+        File f = new File(downloadLocation);
+        try {
+            URL url = new URL(MIM2GENE_MEDGEN_URL);
+            FileDownloader downloader = new FileDownloader();
+            boolean result = downloader.copyURLToFile(url,f);
+            if (result) {
+                LOGGER.trace("Downloaded hp.obo to "+ downloadLocation);
+            } else {
+                LOGGER.error("Could not download hp.obo to " + downloadLocation);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    private void downloadGeneInfo() {
+         final  String GENE_INFO = "Homo_sapiens_gene_info.gz";
+         final  String GENE_INFO_URL = "ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz";
+        String downloadLocation=String.format("%s%s%s",downloadDirectory, File.separator,GENE_INFO);
+        File f = new File(downloadLocation);
+        try {
+            URL url = new URL(GENE_INFO_URL);
+            FileDownloader downloader = new FileDownloader();
+            boolean result = downloader.copyURLToFile(url,f);
+            if (result) {
+                LOGGER.trace("Downloaded gene info to "+ downloadLocation);
+            } else {
+                LOGGER.error("Could not download gene info to " + downloadLocation);
             }
         } catch (Exception e){
             e.printStackTrace();

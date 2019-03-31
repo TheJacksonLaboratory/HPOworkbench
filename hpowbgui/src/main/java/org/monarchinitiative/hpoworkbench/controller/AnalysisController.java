@@ -3,9 +3,11 @@ package org.monarchinitiative.hpoworkbench.controller;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.analysis.AnnotationTlc;
@@ -21,8 +23,15 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.Properties;
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class AnalysisController {
     private static final Logger logger = LogManager.getLogger();
@@ -34,6 +43,9 @@ public final class AnalysisController {
      */
     @FXML
     private WebView hpoAnalysisWebView;
+
+    @FXML
+    private DatePicker datepicker;
 
     /**
      * WebEngine backing up the {@link #hpoAnalysisWebView}.
@@ -58,11 +70,8 @@ public final class AnalysisController {
         this.optionalResources = optionalResources;
         this.properties = properties;
         this.primaryStage = primaryStage;
-        /*
-      Unused, but still required.
-     */ /**
-         * Unused, but still required.
-         */File hpoWorkbenchDir1 = hpoWorkbenchDir;
+         /** Unused, but still required.*/
+         File hpoWorkbenchDir1 = hpoWorkbenchDir;
     }
 
 
@@ -115,6 +124,92 @@ public final class AnalysisController {
             infoWebEngine = hpoAnalysisWebView.getEngine();
             infoWebEngine.loadContent(html);
         });
+    }
+
+
+    @FXML
+    private void countNewEntries(ActionEvent e) {
+        e.consume();
+
+        final String pattern = "yyyy-MM-dd";
+        final DateTimeFormatter dateFormatter =
+                DateTimeFormatter.ofPattern(pattern);
+        StringConverter converter = new StringConverter<LocalDate>() {
+
+            @Override
+            public String toString(LocalDate date) {
+                if (date != null) {
+                    return dateFormatter.format(date);
+                } else {
+                    return "";
+                }
+            }
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    return LocalDate.parse(string, dateFormatter);
+                } else {
+                    return null;
+                }
+            }
+        };
+        datepicker.setConverter(converter);
+        datepicker.setPromptText(pattern.toLowerCase());
+
+        String date = datepicker.getValue().format(DateTimeFormatter.ofPattern(pattern));
+        LocalDate d = datepicker.getValue();
+        System.out.println("Count new entries: " + date);
+
+
+        String annotPath = optionalResources.getAnnotationPath();
+        System.out.println("annotPath: " + annotPath);
+
+        int annot_count=0;
+        int newannot_count=0;
+        int bad_parse = 0;
+        Pattern datepattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
+        Map<LocalDate,Integer> counter = new HashMap<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(annotPath));
+            String line;
+            while ((line=br.readLine())!= null) {
+                if (line.startsWith("#") || line.startsWith("DatabaseID")) continue; // header
+                if (line.startsWith("ORPHA")) continue; // we will not count ORPHA
+                //BiocurationBy is the 12th field
+                annot_count++;
+                String []fields = line.split("\t");
+                if (fields.length<12) {
+                    bad_parse++;
+                    continue;
+                }
+                String biocurated = fields[11];
+                Matcher matcher = datepattern.matcher(biocurated);
+                while (matcher.find()) {
+                    String m = matcher.group(1);
+                    LocalDate curationData =  LocalDate.parse(m,dateFormatter);
+                    if (curationData.isAfter(d)) {
+                        newannot_count++;
+                        System.out.println("target: "+d.toString() + ", new="+ curationData.toString());
+                        counter.putIfAbsent(curationData,0);
+                        Integer count = 1 + counter.get(curationData);
+                        counter.put(curationData,count);
+                        break;
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            PopUps.showException("Error","Could not read annotations to count new entries",ex);
+            return;
+        }
+        int oldannotcount = annot_count - newannot_count;
+        System.out.println("total annot: " + annot_count + ", new: "
+                + newannot_count + ", old: "+ oldannotcount);
+        String html = AnnotationTlcHtmlGenerator.getNewAnnotationHTML(d, annot_count, newannot_count, oldannotcount, counter);
+        Platform.runLater(() -> {
+            infoWebEngine = hpoAnalysisWebView.getEngine();
+            infoWebEngine.loadContent(html);
+        });
+
     }
 
 

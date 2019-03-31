@@ -1,11 +1,13 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
+import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 
 
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -22,6 +24,7 @@ import org.monarchinitiative.phenol.ontology.data.TermSynonym;
  * Make a CSV file representing the HPO hp.obo file
  * Created by robinp on 6/23/17.
  */
+@Parameters(commandDescription = "csv.  Make a CSV file representing the HPO hp.obo file")
 public class HPO2CSVCommand extends HPOCommand {
     private static Logger LOGGER = Logger.getLogger(HPO2CSVCommand.class.getName());
     /** name of this command */
@@ -30,14 +33,14 @@ public class HPO2CSVCommand extends HPOCommand {
 
     public String getName() { return name; }
 
-    private final String pathToHpObo;
+
 
 
     /**
      *
      */
-    public HPO2CSVCommand(String hpOboPath)  {
-        this.pathToHpObo=hpOboPath;
+    public HPO2CSVCommand()  {
+
     }
 
 
@@ -64,7 +67,12 @@ public class HPO2CSVCommand extends HPOCommand {
     @Override
     public void run()  {
         Ontology ontology=null;
-        HPOParser hpoparser=new HPOParser(pathToHpObo);
+
+        if (hpopath==null) {
+            hpopath = this.downloadDirectory + File.separator + "hp.obo";
+        }
+
+        HPOParser hpoparser=new HPOParser(hpopath);
         try {
             ontology = hpoparser.getHPO();
         } catch (Exception e) {

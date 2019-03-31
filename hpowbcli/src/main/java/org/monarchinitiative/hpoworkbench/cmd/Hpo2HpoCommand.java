@@ -1,6 +1,8 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.phenol.base.PhenolException;
@@ -16,21 +18,19 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getCh
 /**
  * This class drives the HPO term "cross-correlation" analysis.
  */
+@Parameters(commandDescription = "hpo2hpo. term \"cross-correlation\" analysis.")
 public class Hpo2HpoCommand extends HPOCommand {
     private static Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
-    private final String hpOboPath;
 
-    private final String annotationPath;
 
-    private final TermId termId;
+    private TermId termId;
     /** All of the ancestor terms of {@link #termId}. */
     private Set<TermId> descendents=null;
+    @Parameter(names={"-t","--term"},required = true,description = "TermId of interest")
+    private String hpoTermId;
 
+    public Hpo2HpoCommand() {
 
-    public Hpo2HpoCommand(String hpoPath, String annotPath, String hpoTermId) {
-        this.hpOboPath = hpoPath;
-        this.annotationPath = annotPath;
-        termId = TermId.of(hpoTermId);
     }
 
 
@@ -48,8 +48,8 @@ public class Hpo2HpoCommand extends HPOCommand {
     private void inputHpoData() {
 
         try {
-            Ontology ontology = OntologyLoader.loadOntology(new File(this.hpOboPath));
-            HPOAnnotationParser aparser = new HPOAnnotationParser(annotationPath, ontology);
+            Ontology ontology = OntologyLoader.loadOntology(new File(this.hpopath));
+            HPOAnnotationParser aparser = new HPOAnnotationParser(annotpath, ontology);
         } catch (PhenolException  pe) {
             pe.printStackTrace(); // todo refactor
         }
