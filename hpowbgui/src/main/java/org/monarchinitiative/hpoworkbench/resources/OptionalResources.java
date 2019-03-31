@@ -5,6 +5,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tab;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -56,6 +58,9 @@ public final class OptionalResources {
 
     private final ObjectProperty<Map<TermId, HpoDisease>> disease2annotationMap =
             new SimpleObjectProperty<>(this,"disease2annotationMap", null);
+
+    private final StringProperty annotationPath =
+            new SimpleStringProperty(this,"annotationPath",null);
 
     public OptionalResources() {
         hpoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(hpoOntologyProperty(),
@@ -112,6 +117,13 @@ public final class OptionalResources {
 
     public void setDirectAnnotMap(Map<TermId, List<HpoDisease>> directAnnotMap) {
         this.directAnnotMap.set(directAnnotMap);
+    }
+
+    public void setAnnotationPath(String path) {
+        this.annotationPath.setValue(path);
+    }
+    public String getAnnotationPath() {
+        return annotationPath.getValue();
     }
 
     public ObjectProperty<Map<TermId, List<HpoDisease>>> directAnnotMapProperty() {

@@ -110,6 +110,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
         }
 
         String annots = properties.getProperty("hpo.annotations.path");
+        optionalResources.setAnnotationPath(annots);
         if (annots != null && new File(annots).isFile()) {
             LOGGER.trace("Loading HPO annotations file from {}", annots);
             DirectIndirectHpoAnnotationParser parser =

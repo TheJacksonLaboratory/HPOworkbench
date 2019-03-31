@@ -1,5 +1,8 @@
 # HPO Workbench Changelog
 
+## v1.5.0
+* Count new HPO annotations from an arbitrary date
+
 ## v1.4.0
 * Added HPO best match command (find best matches between two disease lists)
 * Upgraded to phenol 1.3.3
