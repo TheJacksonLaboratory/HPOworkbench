@@ -1,5 +1,10 @@
 # HPO Workbench Changelog
 
+## v1.5.1
+* Update to phenol 1.4.1
+* extract count of negated annotations
+
+
 ## v1.5.0
 * Count new HPO annotations from an arbitrary date
 

@@ -74,15 +74,7 @@ public class DirectIndirectHpoAnnotationParser {
             return;
         }
         logger.trace("doParse in DirectIndirectParser");
-        Map<TermId, HpoDisease> diseaseMap=null;
-        HpoDiseaseAnnotationParser daparser = new HpoDiseaseAnnotationParser(this.pathToPhenotypeAnnotationTab,this.ontology);
-        try {
-            diseaseMap = daparser.parse();
-            logger.trace("Got " + diseaseMap.size() + " disease models");
-        } catch (PhenolException pe) {
-            pe.printStackTrace();
-        }
-
+        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(this.pathToPhenotypeAnnotationTab,this.ontology);;
         directAnnotationMap=new HashMap<>();
         totalAnnotationMap=new HashMap<>();
         Map<TermId, Set<HpoDisease>> tempmap = new HashMap<>();
@@ -105,7 +97,7 @@ public class DirectIndirectHpoAnnotationParser {
                     diseaseset.add(disease);
                 }
             }
-            // Also add the modes of inhertiance to the annotations
+            // Also add the modes of inheritance to the annotations
             for (TermId inheritanceId : disease.getModesOfInheritance()) {
                 directAnnotationMap.putIfAbsent(inheritanceId,new ArrayList<>());
                 directAnnotationMap.get(inheritanceId).add(disease);

@@ -3,11 +3,10 @@ package org.monarchinitiative.hpoworkbench.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
-import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -61,6 +60,8 @@ public class HpoStats {
     private int n_omim_annotations;
     private int n_orphanet_annotations;
     private int n_decipher_annotations;
+    /** Count of explicitly excluded HPO terms. */
+    private int n_negated_annotations;
 
     private int n_obsolete;
     private int n_non_obsolete;
@@ -110,6 +111,10 @@ public class HpoStats {
         calculateSubontologyCounts();
     }
 
+    /** @return the total number of negated annotations. */
+    public int getNegatedAnnotationCount() {
+        return n_negated_annotations;
+    }
 
     public int getN_obsolete() {
         return n_obsolete;
@@ -200,6 +205,7 @@ public class HpoStats {
         inputHPOdata();
         getDescendentsOfTermOfInterest();
         filterDiseasesAccordingToDatabase();
+        countNegatedAnnotations();
     }
 
     private void getDescendentsOfTermOfInterest() throws HPOException {
@@ -282,6 +288,10 @@ public class HpoStats {
     }
 
     private void filterDiseasesAccordingToDatabase() {
+        if (diseaseMap == null) {
+            LOGGER.error("diseaseMap was not initialized");
+            return;
+        }
         for (HpoDisease d:this.diseaseMap.values()) {
             if (!diseaseAnnotatedToTermOfInterest(d)) {
                 continue;
@@ -305,6 +315,15 @@ public class HpoStats {
         LOGGER.trace(String.format("We found %d diseases in OMIM annotated to %s or descendents",omim.size(),termname));
         LOGGER.trace(String.format("We found %d diseases in Orphanet annotated to %s or descendents",orphanet.size(),termname));
         LOGGER.trace(String.format("We found %d diseases in DECIPHER annotated to %s or descendents",decipher.size(),termname));
+    }
+
+    private void countNegatedAnnotations() {
+        if (diseaseMap == null) {
+            LOGGER.error("diseaseMap was not initialized");
+            return;
+        }
+        this.n_negated_annotations = diseaseMap.values().stream().
+                mapToInt(d -> d.getNegativeAnnotations().size()).sum();
     }
 
     public int getN_omim_annotations() {
@@ -348,12 +367,6 @@ public class HpoStats {
         LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
-        try {
-            HPOAnnotationParser annotparser = new HPOAnnotationParser(annotpath, hpoOntology);
-            diseaseMap = annotparser.getDiseaseMap();
-        } catch (PhenolException pe) {
-            pe.printStackTrace();
-            throw new HPOException(pe.getMessage());
-        }
+        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath, hpoOntology);
     }
 }

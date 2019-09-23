@@ -4,8 +4,6 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
-import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.*;
 
@@ -46,13 +44,10 @@ public class Hpo2HpoCommand extends HPOCommand {
      * input the hp.obo and the annotations.
      */
     private void inputHpoData() {
+        Ontology ontology = OntologyLoader.loadOntology(new File(this.hpopath));
+        //diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotPath,ontology);
+           // HPOAnnotationParser aparser = new HPOAnnotationParser(annotpath, ontology);
 
-        try {
-            Ontology ontology = OntologyLoader.loadOntology(new File(this.hpopath));
-            HPOAnnotationParser aparser = new HPOAnnotationParser(annotpath, ontology);
-        } catch (PhenolException  pe) {
-            pe.printStackTrace(); // todo refactor
-        }
         //this.annotlist = aparser.getAnnotations();
         throw new UnsupportedOperationException(); // TODO REFACTOR!!!!
     }

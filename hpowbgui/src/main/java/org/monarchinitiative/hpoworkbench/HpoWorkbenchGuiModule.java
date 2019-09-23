@@ -123,20 +123,10 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
                 e.printStackTrace(); // TODO popup warning
             }
             Ontology hpoontology = optionalResources.getHpoOntology();
-
             if (hpoontology!=null) {
-                HpoDiseaseAnnotationParser annotparser = new HpoDiseaseAnnotationParser(annots,hpoontology);
-                try {
-                    Map<TermId,HpoDisease> diseasemap =annotparser.parse();
-                    for (TermId d : diseasemap.keySet()) {
-                        System.err.print(d.getValue());
-                    }
-                    optionalResources.setDisease2annotationMap(diseasemap);
-                } catch (PhenolException pe) {
-                    PopUps.showException("Error","Could not parse annotation file", pe);
-                }
+                Map<TermId,HpoDisease> diseasemap = HpoDiseaseAnnotationParser.loadDiseaseMap(annots,hpoontology);
+                optionalResources.setDisease2annotationMap(diseasemap);
             }
-
         }
         String mondoOboFile = properties.getProperty("mondo.obo.path");
         if (mondoOboFile!=null && new File(mondoOboFile).isFile()) {

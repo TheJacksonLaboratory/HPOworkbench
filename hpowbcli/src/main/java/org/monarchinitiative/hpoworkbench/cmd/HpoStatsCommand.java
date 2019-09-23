@@ -7,12 +7,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.*;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.io.assoc.HpoAssociationParser;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -102,12 +101,12 @@ public class HpoStatsCommand extends HPOCommand  {
         String geneInfoFile = this.downloadDirectory + File.separator + "Homo_sapiens_gene_info.gz";
         String mim2genemedgenFile = this.downloadDirectory + File.separator + "mim2gene_medgen";
 
-        File orphafilePlaceholder = null;//we do not need this for now
+        String orphafilePlaceholder = null;//we do not need this for now
         HpoAssociationParser assocParser = new HpoAssociationParser(geneInfoFile,
                 mim2genemedgenFile,
                 orphafilePlaceholder,
+                annotpath,
                 hpoOntology);
-        assocParser.parse();
         final Multimap<TermId,TermId> disease2geneIdMultiMap=assocParser.getDiseaseToGeneIdMap();
         final Map<TermId,String> geneId2SymbolMap = assocParser.getGeneIdToSymbolMap();
         for (TermId diseaseId : disease2geneIdMultiMap.keys()) {
@@ -147,13 +146,8 @@ public class HpoStatsCommand extends HPOCommand  {
         LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
-        try {
-            HPOAnnotationParser annotparser = new HPOAnnotationParser(annotpath, hpoOntology);
-            diseaseMap = annotparser.getDiseaseMap();
-            LOGGER.trace("Diseases imported: " + diseaseMap.size());
-        } catch (PhenolException pe) {
-            pe.printStackTrace();
-        }
+        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath, hpoOntology);
+        LOGGER.trace("Diseases imported: " + diseaseMap.size());
     }
 
     private void getDescendentsOfTermOfInterest() {

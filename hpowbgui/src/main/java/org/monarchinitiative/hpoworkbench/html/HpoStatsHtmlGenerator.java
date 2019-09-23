@@ -46,6 +46,7 @@ public class HpoStatsHtmlGenerator {
         sb.append("<li>Number of  relations: ").append(hpostats.getN_relations()).append("</li>");
         sb.append("<li>Number of  obsolete terms: ").append(hpostats.getN_obsolete()).append("</li>");
         sb.append("<li>Number of  non-obsolete terms: ").append(hpostats.getN_non_obsolete()).append("</li>");
+        sb.append("<li>Number of  negated annotations: ").append(hpostats.getNegatedAnnotationCount()).append("</li>");
         for (String key : hpostats.getMetadata().keySet()) {
             sb.append("<li>").append(key).append(": ").append(hpostats.getMetadata().get(key)).append("</li>");
         }

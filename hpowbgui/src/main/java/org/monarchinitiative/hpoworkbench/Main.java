@@ -33,7 +33,7 @@ import java.util.concurrent.ExecutorService;
  * @version 0.1.2
  */
 
-public class    Main extends Application {
+public class Main extends Application {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

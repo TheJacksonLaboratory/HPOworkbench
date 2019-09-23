@@ -54,14 +54,8 @@ public class CountFrequencyCommand extends HPOCommand {
         Ontology ontology = OntologyLoader.loadOntology(new File(hpOboPath));
 
         Map<TermId, HpoDisease> annotationMap;
-        try {
-            HpoDiseaseAnnotationParser parser = new HpoDiseaseAnnotationParser(annotationPath, ontology);
-            annotationMap = parser.parse();
-            LOGGER.trace("Annotation count total " + annotationMap.size());
-        } catch (PhenolException pe) {
-            pe.printStackTrace();
-            return;
-        }
+        annotationMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotationPath, ontology);
+        LOGGER.trace("Annotation count total " + annotationMap.size());
         Set<TermId> descendents = getDescendents(ontology, termId);
         descendentTermCount = descendents.size();
         LOGGER.error("Descendent Term Count size " + descendentTermCount);

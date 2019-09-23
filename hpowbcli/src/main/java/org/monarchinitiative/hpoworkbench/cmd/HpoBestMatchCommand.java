@@ -3,10 +3,9 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
-import org.monarchinitiative.hpoworkbench.io.HPOAnnotationParser;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.base.PhenolException;
 import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -201,13 +200,8 @@ public class HpoBestMatchCommand  extends HPOCommand {
         LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
-        try {
-            HPOAnnotationParser annotparser = new HPOAnnotationParser(annotpath, hpoOntology);
-            diseaseMap = annotparser.getDiseaseMap();
-            LOGGER.trace("Diseases imported: " + diseaseMap.size());
-        } catch (PhenolException pe) {
-            pe.printStackTrace();
-        }
+        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath,hpoOntology);
+        LOGGER.trace("Diseases imported: " + diseaseMap.size());
     }
 
     @Override public String getName() { return "hpo-bestmatch"; }
