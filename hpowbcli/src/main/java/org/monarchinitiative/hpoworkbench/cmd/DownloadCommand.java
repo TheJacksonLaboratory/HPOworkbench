@@ -23,7 +23,7 @@ public final class DownloadCommand extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
 
 
-    private final String PHENOTYPE_HPOA_URL="http://compbio.charite.de/jenkins/job/hpo.annotations.2018/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa";
+    private final String PHENOTYPE_HPOA_URL="http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa";
 
     public String getName() { return "download"; }
 

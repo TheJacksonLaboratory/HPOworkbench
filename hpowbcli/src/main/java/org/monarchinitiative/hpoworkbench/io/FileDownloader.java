@@ -110,11 +110,13 @@ public class FileDownloader {
                 ftp.logout();
             } catch (IOException e1) {
                 // swallow, nothing we can do about it
+                e1.printStackTrace();
             }
             try {
                 ftp.disconnect();
             } catch (IOException e1) {
                 // swallow, nothing we can do about it
+                e1.printStackTrace();
             }
             throw new FileDownloadException("ERROR: could not use binary transfer.", e);
         }
@@ -173,6 +175,7 @@ public class FileDownloader {
                 ftp.disconnect();
             } catch (IOException e1) {
                 // swallow, nothing we can do about it
+                e1.printStackTrace();
             }
             throw new FileDownloadException("ERROR: problem downloading file.", e);
         } catch (IOException e) {
@@ -186,6 +189,7 @@ public class FileDownloader {
                 ftp.disconnect();
             } catch (IOException e1) {
                 // swallow, nothing we can do about it
+                e1.printStackTrace();
             }
             throw new FileDownloadException("ERROR: problem downloading file.", e);
         } finally {
@@ -199,8 +203,9 @@ public class FileDownloader {
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
+                } catch (IOException e1) {
                     // swallow, nothing we can do
+                    e1.printStackTrace();
                 }
             }
         }

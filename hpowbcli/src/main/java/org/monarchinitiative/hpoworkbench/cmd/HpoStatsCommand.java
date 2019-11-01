@@ -94,7 +94,38 @@ public class HpoStatsCommand extends HPOCommand  {
         */
 
         qcInheritanceModesForDiseases();
+        countDiseasesWithAndWithoutAssociatedGenes();
 
+    }
+
+
+    private void countDiseasesWithAndWithoutAssociatedGenes() {
+        String geneInfoFile = this.downloadDirectory + File.separator + "Homo_sapiens_gene_info.gz";
+        String mim2genemedgenFile = this.downloadDirectory + File.separator + "mim2gene_medgen";
+        HpoAssociationParser assocParser = new HpoAssociationParser(geneInfoFile,
+                mim2genemedgenFile,
+                //orphafilePlaceholder,
+                // annotpath,
+                hpoOntology);
+        final Multimap<TermId,TermId> disease2geneIdMultiMap=assocParser.getDiseaseToGeneIdMap();
+        final Map<TermId,String> geneId2SymbolMap = assocParser.getGeneIdToSymbolMap();
+        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath, hpoOntology);
+        int disease_without_gene = 0;
+        int disease_with_gene = 0;
+        final Set<TermId> geneset = new HashSet<>();
+        for (TermId diseaseId : diseaseMap.keySet()) {
+            if (! diseaseId.getValue().contains("OMIM")) {
+                continue;
+            }
+            if (disease2geneIdMultiMap.containsKey(diseaseId)) {
+                disease_with_gene++;
+                geneset.addAll(disease2geneIdMultiMap.get(diseaseId));
+            } else {
+                disease_without_gene++;
+            }
+        }
+        System.out.printf("Diseases with associated gene: %d. Without associated gene: %d. Total %d Total genes: %d\n\n",
+                disease_with_gene, disease_without_gene, disease_with_gene+disease_without_gene, geneset.size());
     }
 
     private void qcInheritanceModesForDiseases() {
@@ -102,10 +133,13 @@ public class HpoStatsCommand extends HPOCommand  {
         String mim2genemedgenFile = this.downloadDirectory + File.separator + "mim2gene_medgen";
 
         String orphafilePlaceholder = null;//we do not need this for now
+        if (annotpath == null || annotpath.isEmpty()) {
+            throw new RuntimeException("phenotype.hpoa path was not initialized");
+        }
         HpoAssociationParser assocParser = new HpoAssociationParser(geneInfoFile,
                 mim2genemedgenFile,
-                orphafilePlaceholder,
-                annotpath,
+                //orphafilePlaceholder,
+               // annotpath,
                 hpoOntology);
         final Multimap<TermId,TermId> disease2geneIdMultiMap=assocParser.getDiseaseToGeneIdMap();
         final Map<TermId,String> geneId2SymbolMap = assocParser.getGeneIdToSymbolMap();

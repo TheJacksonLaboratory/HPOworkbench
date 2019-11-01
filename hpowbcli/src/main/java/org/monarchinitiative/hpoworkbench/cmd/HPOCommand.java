@@ -24,7 +24,7 @@ public abstract class HPOCommand {
     @Parameter(names={"-a", "--annot"},description = "path to phenol.hpoa")
     protected String annotpath="data/phenotype.hpoa";
     @Parameter(names={"-h", "--hpo"}, description = "path to hp.obo")
-    protected String hpopath ="data/hpo.obo";
+    protected String hpopath ="data/hp.obo";
 
     protected Map<String,String> defaults=new HashMap<>();
 
