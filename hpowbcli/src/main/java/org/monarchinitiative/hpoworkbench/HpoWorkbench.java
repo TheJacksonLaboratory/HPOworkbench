@@ -19,14 +19,6 @@ public class HpoWorkbench {
     private boolean usageHelpRequested;
 
     public static void main(String[] args){
-       /* Commandline clp = new Commandline(argv);
-        HPOCommand command = clp.getCommand();
-        LOGGER.trace(String.format("running command %s",command));
-        command.run();
-
-        LOGGER.trace("Done");
-        */
-
 
         HpoWorkbench workbench = new HpoWorkbench();
         WordCommand word = new WordCommand();
@@ -58,11 +50,8 @@ public class HpoWorkbench {
         try {
             jc.parse(args);
         } catch (ParameterException e) {
-            // Note that by default, JCommand is OK with -h download but
-            // not with download -h
-            // The following hack makes things work with either option.
-            String commandString=null;
-            jc.usage();
+            System.err.println("[ERROR] " + e.getMessage());
+            System.err.println("[ERROR] Enter java -jar HpoWorkbench.jar -h for help");
             System.exit(1);
         }
         String parsedCommand = jc.getParsedCommand();
@@ -76,6 +65,10 @@ public class HpoWorkbench {
             System.exit(1);
         }
         String command = jc.getParsedCommand();
+        if (command == null || command.isEmpty()) {
+            System.err.println("[ERROR] No command passed");
+            return;
+        }
         HPOCommand hpocommand=null;
         switch (command) {
             case "download":

@@ -11,7 +11,7 @@ import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
 import java.util.List;
 
 
-@Parameters(commandDescription = "batch. Post a batch of GitHub issues to the HPO tracker.")
+@Parameters(commandDescription = "git. Download GitHub issues and create a Word doc.")
 public class GitCommand  extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(GitCommand.class.getName());
     @Parameter(names={"-l","--label"},required = true,description = "git issue label")
