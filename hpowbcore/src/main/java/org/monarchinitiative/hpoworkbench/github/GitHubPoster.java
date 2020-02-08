@@ -67,7 +67,7 @@ public class GitHubPoster {
     }
 
     public void setDryRun() {
-
+        this.dryrun = true;
     }
 
 
