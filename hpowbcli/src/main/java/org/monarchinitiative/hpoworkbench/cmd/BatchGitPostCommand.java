@@ -31,6 +31,8 @@ public class BatchGitPostCommand extends HPOCommand {
     private String gitPword;
     @Parameter(names={"--dryrun"},description="print to shell but do not execute")
     private boolean dryrun=false;
+    @Parameter(names={"--onentr"},description="just submit one NTR (for testing)")
+    private boolean onentr=false;
 
     /**
      * Create a word document with up to 30 open issues for the label. This is intended to be used
@@ -69,6 +71,9 @@ public class BatchGitPostCommand extends HPOCommand {
                     System.out.println("Issue: " + title + "; response=" + poster.getHttpResponse());
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+                if (onentr) {
+                    break;
                 }
             }
 
