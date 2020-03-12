@@ -42,7 +42,6 @@ public abstract class HPOCommand {
             conf.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.DEBUG);
         else
             conf.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.TRACE);
-
         ctx.updateLoggers(conf);
     }
 

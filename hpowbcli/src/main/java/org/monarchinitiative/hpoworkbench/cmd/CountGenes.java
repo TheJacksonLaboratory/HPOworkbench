@@ -31,19 +31,18 @@ public class CountGenes extends HPOCommand {
 
     private Set<Pair> geneDiseasePairSet;
 
-    private Multimap<TermId,TermId> geneToDiseaseMultimap;
 
     @Parameter(names={"--allgenes"}, required = true)
     String pathToGenesToPhenotypeFile;
 
-    @Parameter(names = {"--geneinfo"}, required = true)
-    String pathToGeneInfo;
+    @Parameter(names = {"--geneinfo"})
+    String pathToGeneInfo = "data/Homo_sapiens_gene_info.gz";
 
-    @Parameter(names = {"--orpha"}, required = true)
-    String pathToOrpha;
+    @Parameter(names = {"--orpha"})
+    String pathToOrpha = "data/en_product6.xml";
 
-    @Parameter(names = {"--mim2gene"}, required = true)
-    String pathToMim2Gene;
+    @Parameter(names = {"--mim2gene"})
+    String pathToMim2Gene = "data/mim2gene_medgen";
 
 
     public void run() {
@@ -62,6 +61,12 @@ public class CountGenes extends HPOCommand {
                 System.out.printf("[INFO] Could not find %s in Ch map.\n", geneId.getValue());
             }
         }
+
+        for (TermId geneId : geneToDiseaseMapCh.keys()) {
+            if (! geneToDiseaseMapPhenol.containsKey(geneId)) {
+                System.out.printf("[INFO] Could not find %s in Phenol map.\n", geneId.getValue());
+            }
+        }
     }
 
 
@@ -69,7 +74,7 @@ public class CountGenes extends HPOCommand {
     private void parsePhenolFiles() {
         Ontology ontology = OntologyLoader.loadOntology(new File(hpopath));
         HpoAssociationParser parser = new HpoAssociationParser(pathToGeneInfo, pathToMim2Gene, pathToOrpha, annotpath, ontology);
-        this.geneToDiseaseMultimap = parser.getGeneToDiseaseIdMap();
+        this.geneToDiseaseMapPhenol = parser.getGeneToDiseaseIdMap();
     }
 
 
