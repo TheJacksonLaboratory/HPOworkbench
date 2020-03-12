@@ -4,8 +4,8 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -22,7 +22,7 @@ public class HpoBestMatchCommand  extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
-    private Map<TermId,HpoDisease> diseaseMap =null;
+    private Map<TermId, HpoDisease> diseaseMap =null;
     @Parameter(names={"--target"},required = true,description = "file with target disease IDs")
     private String targetFile;
     @Parameter(names={"--source"},required = true,description = "file with source disease IDs")

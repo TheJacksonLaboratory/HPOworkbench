@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
-import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.io.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -30,7 +30,7 @@ public class HpoStats {
     private String annotpath;
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
-    private Map<TermId,HpoDisease> diseaseMap =null;
+    private Map<TermId, HpoDisease> diseaseMap =null;
     /** Set of all HPO terms that are descendents of {@link #termIdOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
     private Set<TermId> adultOnset=null;
@@ -63,7 +63,7 @@ public class HpoStats {
     /** Count of explicitly excluded HPO terms. */
     private int n_negated_annotations;
 
-    private int n_obsolete;
+    private int n_alternateIds;
     private int n_non_obsolete;
     private int n_relations;
 
@@ -116,8 +116,8 @@ public class HpoStats {
         return n_negated_annotations;
     }
 
-    public int getN_obsolete() {
-        return n_obsolete;
+    public int getN_alternateIds() {
+        return n_alternateIds;
     }
 
     public int getN_relations() {
@@ -174,11 +174,11 @@ public class HpoStats {
 
     private void calculateOntologyStats() {
 
-        n_obsolete=hpoOntology.countObsoleteTerms();
-        n_non_obsolete=hpoOntology.countNonObsoleteTerms();
+        n_alternateIds = hpoOntology.countAlternateTermIds();
+        n_non_obsolete = hpoOntology.countNonObsoleteTerms();
 
-        n_relations =hpoOntology.getRelationMap().size();
-        metadata=hpoOntology.getMetaInfo();
+        n_relations = hpoOntology.getRelationMap().size();
+        metadata = hpoOntology.getMetaInfo();
 
     }
 

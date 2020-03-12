@@ -10,7 +10,7 @@ public class MondoStats {
 
     private final Ontology mondo;
     private int n_termCount;
-    private int n_obsoleteTermCount;
+    private int n_alternateTermIdCount;
     private int n_nonObsoleteTermCount;
     private int n_relations;
     private int n_definition;
@@ -27,8 +27,8 @@ public class MondoStats {
         return n_termCount;
     }
 
-    public int getN_obsoleteTermCount() {
-        return n_obsoleteTermCount;
+    public int getN_alternateTermIdCount() {
+        return n_alternateTermIdCount;
     }
 
     public int getN_nonObsoleteTermCount() {
@@ -54,7 +54,7 @@ public class MondoStats {
     private void calculateCounts() {
         n_termCount= mondo.countAllTerms();
         n_nonObsoleteTermCount=mondo.countNonObsoleteTerms();
-        n_obsoleteTermCount=mondo.countObsoleteTerms();
+        n_alternateTermIdCount =mondo.countAlternateTermIds();
         n_relations=mondo.getRelationMap().size();
         metaInfo=mondo.getMetaInfo();
         n_definition=0;

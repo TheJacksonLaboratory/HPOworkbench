@@ -31,6 +31,7 @@ public class HpoWorkbench {
         Hpo2HpoCommand hpo2hpo = new Hpo2HpoCommand();
         HPO2CSVCommand csv = new HPO2CSVCommand();
         MatchTermsCommand matchterms = new MatchTermsCommand();
+        CountGenes count = new CountGenes();
 
 
         JCommander jc = JCommander.newBuilder().
@@ -42,6 +43,7 @@ public class HpoWorkbench {
                 addCommand("batch",batch).
                 addCommand("git",git).
                 addCommand("hpo2hpo",hpo2hpo).
+                addCommand("count", count).
                 addCommand("descendents",descendents).
                 addCommand("matchterms",matchterms).
                 addCommand("csv",csv).
@@ -85,6 +87,9 @@ public class HpoWorkbench {
                 break;
             case "countfreq":
                 hpocommand = countfreq;
+                break;
+            case "count":
+                hpocommand = count;
                 break;
             case "git":
                 hpocommand = git;

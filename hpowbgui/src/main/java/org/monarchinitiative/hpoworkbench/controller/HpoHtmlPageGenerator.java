@@ -2,11 +2,11 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 
 import com.google.common.collect.ImmutableList;
-import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
-import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.HpoOnset;
-import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
-import org.monarchinitiative.phenol.formats.hpo.category.HpoCategoryMap;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoOnset;
+import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory;
+import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategoryMap;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 import java.util.HashMap;

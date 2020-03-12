@@ -28,7 +28,7 @@ public class MondoStatsHtmlGenerator {
         sb.append("<li>Number of synonyms: ").append(stats.getN_synonyms()).append("</li>");
 
         sb.append("<li>Number of  relations: ").append(stats.getN_relations()).append("</li>");
-        sb.append("<li>Number of  obsolete terms: ").append(stats.getN_obsoleteTermCount()).append("</li>");
+        sb.append("<li>Number of  obsolete terms: ").append(stats.getN_alternateTermIdCount()).append("</li>");
         sb.append("<li>Number of  non-obsolete terms: ").append(stats.getN_nonObsoleteTermCount()).append("</li>");
         for (String key : stats.getMetaInfo().keySet()) {
             sb.append("<li>").append(key).append(": ").append(stats.getMetaInfo().get(key)).append("</li>");
