@@ -3,11 +3,12 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.LogManager;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Set;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  */
 @Parameters(commandDescription = "descendent. Generates a list of all terms that are descendents of a given term.")
 public class HpoListDescendentsCommand extends HPOCommand  {
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HpoListDescendentsCommand.class);
 
     private Ontology hpoOntology=null;
     /** Set of all HPO terms that are descendents of {@link #hpoTermId}. */

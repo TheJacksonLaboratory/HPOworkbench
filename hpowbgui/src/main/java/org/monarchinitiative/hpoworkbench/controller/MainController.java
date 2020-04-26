@@ -14,8 +14,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
@@ -26,6 +24,8 @@ import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.hpoworkbench.io.MondoParser;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import java.io.File;
@@ -38,7 +38,7 @@ import java.util.Properties;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class MainController {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     private final OptionalResources optionalResources;
 

@@ -1,10 +1,11 @@
 package org.monarchinitiative.hpoworkbench.github;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -20,7 +21,7 @@ import java.util.Scanner;
  * command-line only stage for now.
  */
 public class GitHubIssueRetriever {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(GitHubIssueRetriever.class);
 
     private final List<GitHubIssue> issues = new ArrayList<>();
 

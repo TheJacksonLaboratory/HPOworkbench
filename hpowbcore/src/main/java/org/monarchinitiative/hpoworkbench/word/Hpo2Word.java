@@ -1,11 +1,11 @@
 package org.monarchinitiative.hpoworkbench.word;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.poi.xwpf.usermodel.*;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.ontology.data.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.FileOutputStream;
@@ -25,7 +25,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getCh
  * @version 0.1.2
  */
 public class Hpo2Word {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hpo2Word.class);
     /** Number of unique terms we have output in this file. */
     private int n_terms_output=0;
     /** HPO Ontology object. */

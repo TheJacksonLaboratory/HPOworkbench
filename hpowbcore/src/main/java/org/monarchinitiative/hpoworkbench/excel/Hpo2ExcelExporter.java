@@ -1,14 +1,13 @@
 package org.monarchinitiative.hpoworkbench.excel;
 
 
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.monarchinitiative.phenol.ontology.data.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.FileOutputStream;
@@ -23,7 +22,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getPa
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class Hpo2ExcelExporter {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(Hpo2ExcelExporter.class);
 
     private final Ontology ontology;
 

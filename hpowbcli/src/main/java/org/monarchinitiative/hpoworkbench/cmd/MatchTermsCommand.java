@@ -3,13 +3,14 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 @Parameters(commandDescription = "match. Match HPO terms to a list of candidates.")
 public class MatchTermsCommand extends  HPOCommand {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(MatchTermsCommand.class);
 
     @Parameter(names = {"-f", "--file"},required = true, description = "TSV file with terms")
     private String path;

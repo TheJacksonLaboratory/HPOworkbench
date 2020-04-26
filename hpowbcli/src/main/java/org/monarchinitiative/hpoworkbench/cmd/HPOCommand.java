@@ -2,10 +2,7 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 
 import com.beust.jcommander.Parameter;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,23 +24,6 @@ public abstract class HPOCommand {
     protected String hpopath ="data/hp.obo";
 
     protected Map<String,String> defaults=new HashMap<>();
-
-
-    /**
-     * Set log level, depending on this.verbosity.
-     */
-    protected void setLogLevel(int verbosity) {
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        Configuration conf = ctx.getConfiguration();
-
-        if (verbosity <= 1)
-            conf.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.INFO);
-        else if (verbosity <= 2)
-            conf.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.DEBUG);
-        else
-            conf.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.TRACE);
-        ctx.updateLoggers(conf);
-    }
 
     /**
      * Function for the execution of the command.

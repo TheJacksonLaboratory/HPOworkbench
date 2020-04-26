@@ -1,8 +1,8 @@
 package org.monarchinitiative.hpoworkbench.io;
 
 import javafx.concurrent.Task;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,7 +18,7 @@ import java.net.URLConnection;
  * @version 0.2.0 (2017-10-20)
  */
 public class Downloader extends Task<Void> {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(Downloader.class);
 
     /**
      * The absolute path to the place (directory) where the downloaded file will be

@@ -5,8 +5,10 @@ import java.io.IOException;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import org.apache.logging.log4j.LogManager;
+
 import org.monarchinitiative.hpoworkbench.word.Hpo2Word;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A command class to coordinate the production and output of an RTF file containing information about
@@ -16,7 +18,7 @@ import org.monarchinitiative.hpoworkbench.word.Hpo2Word;
  */
 @Parameters(commandDescription = "Output subontology as word file (experimental)")
 public class WordCommand extends HPOCommand  {
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(WordCommand.class);
 
     private final String DEFAULT_OUTPUTNAME="hpotest.word";
     private static String DEFAULT_START_TERM="HP:0000118";

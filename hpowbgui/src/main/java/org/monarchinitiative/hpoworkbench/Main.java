@@ -12,9 +12,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.File;
@@ -35,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 
 public class Main extends Application {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static final String WINDOW_TITLE = "Human Phenotype Ontology Workbench";
 
