@@ -59,11 +59,7 @@ public class HpoWorkbench {
         String parsedCommand = jc.getParsedCommand();
 
         if ( workbench.usageHelpRequested) {
-            if (parsedCommand==null) {
-                jc.usage();
-            } else {
-                jc.usage(parsedCommand);
-            }
+            jc.usage();
             System.exit(1);
         }
         String command = jc.getParsedCommand();

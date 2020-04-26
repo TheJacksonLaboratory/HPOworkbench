@@ -73,7 +73,7 @@ public class DirectIndirectHpoAnnotationParser {
             return;
         }
         logger.trace("doParse in DirectIndirectParser");
-        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(this.pathToPhenotypeAnnotationTab,this.ontology);;
+        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(this.pathToPhenotypeAnnotationTab,this.ontology);
         directAnnotationMap=new HashMap<>();
         totalAnnotationMap=new HashMap<>();
         Map<TermId, Set<HpoDisease>> tempmap = new HashMap<>();

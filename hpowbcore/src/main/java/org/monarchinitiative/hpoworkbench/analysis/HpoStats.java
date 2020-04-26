@@ -188,7 +188,7 @@ public class HpoStats {
      * @param hpo Path to hp.obo file
      * @param annotations Path to phenotype.hpoa
      * @param term a string such as "HP:0000123"
-     * @throws HPOException
+     * @throws HPOException if the HPO string is malformed
      */
     public HpoStats(String hpo,String annotations,String term) throws HPOException {
         this.hpopath = hpo;

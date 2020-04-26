@@ -82,7 +82,7 @@ public class MainController {
         } catch (Exception e) {
             // do nothing
         }
-        if (version == null) version = "1.2.4"; // this works on a maven build but needs to be reassigned in intellij
+        if (version == null) version = "1.6.0"; // this works on a maven build but needs to be reassigned in intellij
         return version;
     }
 

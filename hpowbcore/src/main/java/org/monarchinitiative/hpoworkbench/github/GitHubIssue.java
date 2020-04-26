@@ -50,7 +50,7 @@ public class GitHubIssue {
 
 
     public String toString() {
-        return String.format("%s: %s [%s] %s",title,body,label,comments.stream().collect(Collectors.joining(";")));
+        return String.format("%s: %s [%s] %s",title,body,label, String.join(";", comments));
     }
 
 

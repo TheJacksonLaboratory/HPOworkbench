@@ -130,9 +130,9 @@ public class FileDownloader {
             // Try to get file size.
             FTPFile[] files = ftp.listFiles(fileName);
             long fileSize = -1;
-            for (int i = 0; i < files.length; ++i)
-                if (files[i].getName().equals(fileName))
-                    fileSize = files[i].getSize();
+            for (FTPFile file : files)
+                if (file.getName().equals(fileName))
+                    fileSize = file.getSize();
             ftp.pwd();
             ProgressBar pb = null;
             if (fileSize != -1)
@@ -145,7 +145,7 @@ public class FileDownloader {
                 throw new FileNotFoundException("Could not open connection for file " + fileName);
             out = new FileOutputStream(dest);
             BufferedInputStream inBf = new BufferedInputStream(in);
-            byte buffer[] = new byte[128 * 1024];
+            byte[] buffer = new byte[128 * 1024];
             int readCount;
             long pos = 0;
             if (pb != null)
@@ -164,20 +164,6 @@ public class FileDownloader {
             // if (!ftp.completePendingCommand())
             // throw new IOException("Could not finish download!");
 
-        } catch (FileNotFoundException e) {
-            dest.delete();
-            try {
-                ftp.logout();
-            } catch (IOException e1) {
-                // swallow, nothing we can do about it
-            }
-            try {
-                ftp.disconnect();
-            } catch (IOException e1) {
-                // swallow, nothing we can do about it
-                e1.printStackTrace();
-            }
-            throw new FileDownloadException("ERROR: problem downloading file.", e);
         } catch (IOException e) {
             dest.delete();
             try {
@@ -238,7 +224,7 @@ public class FileDownloader {
                 LOGGER.info("(server did not tell us the file size, no progress bar)");
 
             // Download file.
-            byte buffer[] = new byte[128 * 1024];
+            byte[] buffer = new byte[128 * 1024];
             int readCount;
             long pos = 0;
             if (pb != null)

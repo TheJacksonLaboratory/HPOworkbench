@@ -46,7 +46,7 @@ public class GitHubIssueRetriever {
         String label = jsonObject.get("label")==null?"none":jsonObject.get("label").toString();
         String number = jsonObject.get("number")==null?"?":jsonObject.get("number").toString();
         String comments_url = (String) jsonObject.get("comments_url");
-        List<String> comments = new ArrayList();
+        List<String> comments = new ArrayList<>();
         if (comments_url != null) {
             comments = getComments(comments_url);
         }
@@ -56,7 +56,7 @@ public class GitHubIssueRetriever {
 
 
     private List<String> getComments(String urlstring) {
-        List<String> comments = new ArrayList();
+        List<String> comments = new ArrayList<>();
         if (urlstring == null || urlstring.isEmpty()) {
            return comments;
         }

@@ -49,7 +49,7 @@ public class BatchGitPostCommand extends HPOCommand {
             String line;
             while ((line=br.readLine())!=null) {
                 System.out.println(line);
-                String F[] = line.split("\t");
+                String[] F = line.split("\t");
                 if (F.length<2) {
                     System.err.println("Malformed line, skipping: + line");
                     System.err.println("Input for batch-git must have two tab-separated fields");
