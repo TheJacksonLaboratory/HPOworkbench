@@ -19,14 +19,6 @@ public class HpoWorkbench {
     private boolean usageHelpRequested;
 
     public static void main(String[] args){
-       /* Commandline clp = new Commandline(argv);
-        HPOCommand command = clp.getCommand();
-        LOGGER.trace(String.format("running command %s",command));
-        command.run();
-
-        LOGGER.trace("Done");
-        */
-
 
         HpoWorkbench workbench = new HpoWorkbench();
         WordCommand word = new WordCommand();
@@ -39,6 +31,7 @@ public class HpoWorkbench {
         Hpo2HpoCommand hpo2hpo = new Hpo2HpoCommand();
         HPO2CSVCommand csv = new HPO2CSVCommand();
         MatchTermsCommand matchterms = new MatchTermsCommand();
+        CountGenes count = new CountGenes();
 
 
         JCommander jc = JCommander.newBuilder().
@@ -50,6 +43,7 @@ public class HpoWorkbench {
                 addCommand("batch",batch).
                 addCommand("git",git).
                 addCommand("hpo2hpo",hpo2hpo).
+                addCommand("count", count).
                 addCommand("descendents",descendents).
                 addCommand("matchterms",matchterms).
                 addCommand("csv",csv).
@@ -58,24 +52,21 @@ public class HpoWorkbench {
         try {
             jc.parse(args);
         } catch (ParameterException e) {
-            // Note that by default, JCommand is OK with -h download but
-            // not with download -h
-            // The following hack makes things work with either option.
-            String commandString=null;
-            jc.usage();
+            System.err.println("[ERROR] " + e.getMessage());
+            System.err.println("[ERROR] Enter java -jar HpoWorkbench.jar -h for help");
             System.exit(1);
         }
         String parsedCommand = jc.getParsedCommand();
 
         if ( workbench.usageHelpRequested) {
-            if (parsedCommand==null) {
-                jc.usage();
-            } else {
-                jc.usage(parsedCommand);
-            }
+            jc.usage();
             System.exit(1);
         }
         String command = jc.getParsedCommand();
+        if (command == null || command.isEmpty()) {
+            System.err.println("[ERROR] No command passed");
+            return;
+        }
         HPOCommand hpocommand=null;
         switch (command) {
             case "download":
@@ -92,6 +83,9 @@ public class HpoWorkbench {
                 break;
             case "countfreq":
                 hpocommand = countfreq;
+                break;
+            case "count":
+                hpocommand = count;
                 break;
             case "git":
                 hpocommand = git;

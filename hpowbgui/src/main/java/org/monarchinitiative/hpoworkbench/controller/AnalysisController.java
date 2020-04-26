@@ -70,7 +70,7 @@ public final class AnalysisController {
         this.optionalResources = optionalResources;
         this.properties = properties;
         this.primaryStage = primaryStage;
-         /** Unused, but still required.*/
+         // Unused, but still required.
          File hpoWorkbenchDir1 = hpoWorkbenchDir;
     }
 

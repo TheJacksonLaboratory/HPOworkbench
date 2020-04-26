@@ -70,7 +70,7 @@ public class Hpo2HpoCommand extends HPOCommand {
         Map<TermId,Double> mp2 = sortByValue(hm);
         for (Object t: mp2.keySet()) {
             TermId tid = (TermId) t;
-            double count = (double)mp2.get(t);
+            double count = mp2.get(t);
             String name =  ontology.getTermMap().get(tid).getName();
             System.out.println(name + " [" +tid.getValue() + "]: " + count);
         }

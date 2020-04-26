@@ -2,9 +2,10 @@ package org.monarchinitiative.hpoworkbench.analysis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
-import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
 
+
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
@@ -19,7 +20,7 @@ public class AnnotationTlc {
     private String annotpath;
     private final Ontology hpoOntology;
     /** All disease annotations for the entire ontology. */
-    private final Map<TermId,HpoDisease> diseaseMap;
+    private final Map<TermId, HpoDisease> diseaseMap;
 
     private Map<String,Integer> underannotatedDiseases;
     private Map<String,String> diseasesWithTooGeneralAnnotations;

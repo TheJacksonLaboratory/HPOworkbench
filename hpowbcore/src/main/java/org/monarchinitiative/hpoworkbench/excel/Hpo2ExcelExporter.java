@@ -99,14 +99,13 @@ public class Hpo2ExcelExporter {
 
 
     private String[] getHeader() {
-        String header[]={"Label","id","definition","comment","synonyms","xrefs","parents"};
-        return header;
+        return new String[]{"Label","id","definition","comment","synonyms","xrefs","parents"};
     }
 
 
     private String[] getRow(TermId tid) {
         Term term = ontology.getTermMap().get(tid);
-        String row[] = new String[7];
+        String[] row = new String[7];
         if (term == null) {
             logger.error("Could not get term object for tid=%s"+tid.getValue());
             return row;

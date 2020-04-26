@@ -1,7 +1,9 @@
 package org.monarchinitiative.hpoworkbench.annotation;
 
-import org.monarchinitiative.phenol.formats.hpo.HpoAnnotation;
-import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
+
+
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.ArrayList;
@@ -10,7 +12,7 @@ import java.util.Set;
 
 /**
  * This class represents the results of merging two diseases for one
- * {@link org.monarchinitiative.phenol.formats.hpo.category.HpoCategory}.
+ * {@link org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory}.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class CategoryMerge {

@@ -45,16 +45,67 @@ public class GitHubIssueRetriever {
         String body = jsonObject.get("body").toString();
         String label = jsonObject.get("label")==null?"none":jsonObject.get("label").toString();
         String number = jsonObject.get("number")==null?"?":jsonObject.get("number").toString();
-        GitHubIssue.Builder builder = new GitHubIssue.Builder(title).body(body).label(label).number(number);
+        String comments_url = (String) jsonObject.get("comments_url");
+        List<String> comments = new ArrayList<>();
+        if (comments_url != null) {
+            comments = getComments(comments_url);
+        }
+        GitHubIssue.Builder builder = new GitHubIssue.Builder(title).body(body).label(label).number(number).comments(comments);
         issues.add(builder.build());
     }
 
 
+    private List<String> getComments(String urlstring) {
+        List<String> comments = new ArrayList<>();
+        if (urlstring == null || urlstring.isEmpty()) {
+           return comments;
+        }
+        try {
+            URL url = new URL(urlstring);
+            if (httpconnection==null) {
+                httpconnection = (HttpURLConnection) url.openConnection();
+                httpconnection.setRequestMethod("GET");
+                httpconnection.connect();
+            }
+            Scanner scanner = new Scanner(url.openStream());
+            String response = scanner.useDelimiter("\\Z").next();
+            scanner.close();
+            Object obj = JSONValue.parse(response);
+            JSONArray jarray = (JSONArray)obj;
+            for (Object ob : jarray) {
+                String c = parseCommentElement(ob);
+                comments.add(c);
+            }
+            int code = httpconnection.getResponseCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (httpconnection!=null) {
+                httpconnection.disconnect();
+            }
+        }
+        return comments;
+    }
+
+
+
+    private String parseCommentElement(Object obj) {
+        JSONObject jo = (JSONObject) obj;
+        if (jo != null) {
+            String body = (String) jo.get("body");
+            if (body != null) {
+                return body;
+            }
+        }
+        return "";// the comment had no body of text
+    }
+
+
+
+
     private void decodeJSON(String s) {
-       // System.out.println(s);
         Object obj= JSONValue.parse(s);
         JSONArray jsonArray = (JSONArray) obj;
-        //Iterator<String> iterator = jsonArray.iterator();
         jsonArray.forEach(this::parseLabelElement);
     }
 

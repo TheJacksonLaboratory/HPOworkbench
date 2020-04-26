@@ -24,7 +24,7 @@ public abstract class HPOCommand {
     @Parameter(names={"-a", "--annot"},description = "path to phenol.hpoa")
     protected String annotpath="data/phenotype.hpoa";
     @Parameter(names={"-h", "--hpo"}, description = "path to hp.obo")
-    protected String hpopath ="data/hpo.obo";
+    protected String hpopath ="data/hp.obo";
 
     protected Map<String,String> defaults=new HashMap<>();
 
@@ -42,7 +42,6 @@ public abstract class HPOCommand {
             conf.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.DEBUG);
         else
             conf.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.TRACE);
-
         ctx.updateLoggers(conf);
     }
 

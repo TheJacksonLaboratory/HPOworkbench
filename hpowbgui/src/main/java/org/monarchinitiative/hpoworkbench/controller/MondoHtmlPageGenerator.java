@@ -7,8 +7,8 @@ import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
 import org.monarchinitiative.hpoworkbench.html.MondoTermHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.OmimOrphanetDiseaseHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.SingleDiseaseHTMLGenerator;
-import org.monarchinitiative.phenol.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.formats.hpo.category.HpoCategory;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 

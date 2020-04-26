@@ -6,12 +6,11 @@ import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssueRetriever;
 import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
-//import org.monarchinitiative.hpoworkbench.word.GitIssue2Word;
 
 import java.util.List;
 
 
-@Parameters(commandDescription = "batch. Post a batch of GitHub issues to the HPO tracker.")
+@Parameters(commandDescription = "git. Download GitHub issues and create a Word doc.")
 public class GitCommand  extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(GitCommand.class.getName());
     @Parameter(names={"-l","--label"},required = true,description = "git issue label")
@@ -30,7 +29,6 @@ public class GitCommand  extends HPOCommand {
 
         GitHubIssueRetriever iretriever = new GitHubIssueRetriever(issueLabel);
         List<GitHubIssue> issues = iretriever.getIssues();
-        //GitIssue2Word gi2w = new GitIssue2Word(issues, issueLabel);
         GitIssue2Doc4J gi2w = new GitIssue2Doc4J(issues,issueLabel);
         String filename=String.format("%s-open-issues.docx",issueLabel);
         gi2w.outputFile(filename);

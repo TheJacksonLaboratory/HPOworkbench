@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.monarchinitiative</groupId>
         <artifactId>HPOworkbench</artifactId>
-        <version>1.5.1</version>
+        <version>1.6.0</version>
     </parent>
     <version>${parent.version}</version>
 
@@ -44,16 +44,8 @@
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.72</version>
+            <version>1.78</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/me.xdrop/fuzzywuzzy -->
-        <dependency>
-            <groupId>me.xdrop</groupId>
-            <artifactId>fuzzywuzzy</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
 
     </dependencies>
 
@@ -72,16 +64,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
                 <configuration>
-                 <!--
-                 Incorrect here?
-                 <compilerArgs>
-                        <arg>-Xmaxerrs=1000</arg>
-                        <arg>-Xlint</arg>
-                        <arg>-J-Duser.language=en_us</arg>
-                    </compilerArgs>
-                    -->
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
@@ -93,8 +77,6 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
-
-
                 </configuration>
 
             </plugin>
@@ -154,7 +136,7 @@
                 zip/tar.gz file -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
                 <configuration>
                     <descriptors>
                         <descriptor>src/assembly/dep.xml</descriptor>

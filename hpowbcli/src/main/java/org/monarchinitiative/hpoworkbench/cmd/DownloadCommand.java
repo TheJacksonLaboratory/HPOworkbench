@@ -23,7 +23,7 @@ public final class DownloadCommand extends HPOCommand {
     private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
 
 
-    private final String PHENOTYPE_HPOA_URL="http://compbio.charite.de/jenkins/job/hpo.annotations.2018/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa";
+    private final String PHENOTYPE_HPOA_URL="http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/current/phenotype.hpoa";
 
     public String getName() { return "download"; }
 
@@ -101,9 +101,9 @@ public final class DownloadCommand extends HPOCommand {
             FileDownloader downloader = new FileDownloader();
             boolean result = downloader.copyURLToFile(url,f);
             if (result) {
-                LOGGER.trace("Downloaded hp.obo to "+ downloadLocation);
+                LOGGER.trace("Downloaded mim2gene_medgen to "+ downloadLocation);
             } else {
-                LOGGER.error("Could not download hp.obo to " + downloadLocation);
+                LOGGER.error("Could not download mim2gene_medgen to " + downloadLocation);
             }
         } catch (Exception e){
             e.printStackTrace();
