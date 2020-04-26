@@ -5,8 +5,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
@@ -16,6 +14,8 @@ import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationPars
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
@@ -28,7 +28,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.exist
  */
 @Parameters(commandDescription = "stats. Extract descriptive statistics about a subhierarchy of the HPO.")
 public class HpoStatsCommand extends HPOCommand  {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HpoStatsCommand.class);
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
     private Map<TermId, HpoDisease> diseaseMap =null;
@@ -301,7 +301,7 @@ public class HpoStatsCommand extends HPOCommand  {
         int n_orpha_annot=0;
         int n_decipher_annot=0;
         if (diseaseMap==null) {
-            LOGGER.fatal("Disease map was not properly initialized. Terminating program...");
+            LOGGER.error("Disease map was not properly initialized. Terminating program...");
             System.exit(1);
         }
         for (HpoDisease d:this.diseaseMap.values()) {

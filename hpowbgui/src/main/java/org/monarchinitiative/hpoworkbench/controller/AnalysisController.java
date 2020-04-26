@@ -8,8 +8,6 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.analysis.AnnotationTlc;
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
 import org.monarchinitiative.hpoworkbench.analysis.MondoStats;
@@ -20,6 +18,8 @@ import org.monarchinitiative.hpoworkbench.html.HpoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.MondoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class AnalysisController {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisController.class);
 
     private final OptionalResources optionalResources;
 

@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.monarchinitiative.hpoworkbench.annotation.AnnotationMerger;
 import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
 import org.monarchinitiative.hpoworkbench.html.MondoTermHtmlGenerator;
@@ -11,6 +10,8 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import java.util.Map;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 class MondoHtmlPageGenerator {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(MondoHtmlPageGenerator.class);
 
 
 

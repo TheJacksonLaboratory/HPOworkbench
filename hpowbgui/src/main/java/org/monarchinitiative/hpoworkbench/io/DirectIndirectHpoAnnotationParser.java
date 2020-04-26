@@ -3,8 +3,6 @@ package org.monarchinitiative.hpoworkbench.io;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
@@ -12,6 +10,8 @@ import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationPars
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -24,7 +24,7 @@ import java.util.*;
  * @version 0.2.14
  */
 public class DirectIndirectHpoAnnotationParser {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(DirectIndirectHpoAnnotationParser.class);
     /** Path to phenotyoe.hpoa */
     private final String pathToPhenotypeAnnotationTab;
     /** Reference to HPO ontology object. */

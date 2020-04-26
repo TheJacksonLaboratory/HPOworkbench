@@ -1,7 +1,5 @@
 package org.monarchinitiative.hpoworkbench.html;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.annotation.CategoryMerge;
 import org.monarchinitiative.hpoworkbench.annotation.SubClassTermPair;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
@@ -9,12 +7,14 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 public class OmimOrphanetDiseaseHtmlGenerator {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(OmimOrphanetDiseaseHtmlGenerator.class);
 
     private final static String EMPTY_STRING="";
 

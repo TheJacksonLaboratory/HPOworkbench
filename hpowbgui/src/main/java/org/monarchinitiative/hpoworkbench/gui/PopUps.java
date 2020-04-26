@@ -33,8 +33,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -45,7 +45,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PopUps {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(PopUps.class);
 
     /*
      * See this http://code.makery.ch/blog/javafx-dialogs-official/ to get a bit of inspiration

@@ -1,8 +1,6 @@
 package org.monarchinitiative.hpoworkbench.excel;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -13,7 +11,8 @@ import org.monarchinitiative.hpoworkbench.word.Pair;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.FileNotFoundException;
@@ -31,7 +30,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getCh
  * @version 0.2.13
  */
 public class HierarchicalExcelExporter {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(HierarchicalExcelExporter.class);
     private final Ontology ontology;
     /** The term of the subhierarchy of the HPO that we will export. */
     private final Term subhierarchyRoot;

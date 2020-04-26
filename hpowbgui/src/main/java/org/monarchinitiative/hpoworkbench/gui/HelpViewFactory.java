@@ -25,9 +25,8 @@ import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,7 +35,7 @@ import org.apache.logging.log4j.Logger;
  * @version 0.1.3 (2018-01-31)
  */
 public class HelpViewFactory {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(HelpViewFactory.class);
     private static final String READTHEDOCS_SITE = "http://hpo-workbench.readthedocs.io/en/latest/";
 
     private static String getHTML() {

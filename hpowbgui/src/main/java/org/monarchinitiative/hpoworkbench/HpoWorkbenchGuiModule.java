@@ -5,8 +5,6 @@ import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.controller.*;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
@@ -19,6 +17,8 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -44,8 +44,7 @@ import java.util.concurrent.Executors;
  * @since 0.1
  */
 public final class HpoWorkbenchGuiModule extends AbstractModule {
-
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HpoWorkbenchGuiModule.class);
 
     private static final String HPO_OBO_FILE="hp.obo";
     private static final String MONDO_OBO_FILE="mondo.obo";
@@ -157,7 +156,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
                 LOGGER.info("Loading app properties from {}", propertiesPath);
                 properties.load(new FileReader(propertiesPath));
             } catch (IOException e) {
-                LOGGER.warn(e);
+                LOGGER.error(e.toString());
             }
         } else {
             try {
@@ -165,7 +164,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
                 LOGGER.info("Loading app properties from bundled file {}", propertiesUrl.getPath());
                 properties.load(Main.class.getResourceAsStream("/" + PlatformUtil.HPO_WORKBENCH_SETTINGS_FILENAME));
             } catch (IOException e) {
-                LOGGER.warn(e);
+                LOGGER.error(e.toString());
             }
         }
         // property for the downloaded Mondo file, if available
@@ -217,7 +216,7 @@ public final class HpoWorkbenchGuiModule extends AbstractModule {
                 return workbenchdir;
         }
 
-        LOGGER.fatal("Unable to create HPO workbench directory at {}", workbenchdir);
+        LOGGER.error("Unable to create HPO workbench directory at {}", workbenchdir);
         Platform.exit();
         return null; // shouldn't get here, but we need to return something
     }

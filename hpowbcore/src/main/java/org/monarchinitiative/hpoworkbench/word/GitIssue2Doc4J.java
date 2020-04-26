@@ -1,20 +1,21 @@
 package org.monarchinitiative.hpoworkbench.word;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 public class GitIssue2Doc4J {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitIssue2Doc4J.class);
     private final List<GitHubIssue> issues;
     private final String githubLabel;
 
