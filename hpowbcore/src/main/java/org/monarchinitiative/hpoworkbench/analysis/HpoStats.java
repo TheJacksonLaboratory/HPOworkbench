@@ -6,6 +6,7 @@ import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -13,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDescendents;
 
@@ -94,6 +92,29 @@ public class HpoStats {
     public String getHpoDefinition() {
         Term term = hpoOntology.getTermMap().get(termIdOfInterest);
         return term.getDefinition();
+    }
+
+    /**
+     * Note that the OntologyAlgorithm.getDescendents includes the original term
+     * which is what we want herre
+     * @param t a term (should be a second level phenotype term)
+     * @param ontology reference to HPO
+     * @return count of all descendant terms from t including t
+     */
+    private int getSubontologyTermCount(TermId t, Ontology ontology) {
+        return OntologyAlgorithm.getDescendents(ontology, t).size();
+    }
+
+    public Map<String, Integer> getHpoSubTermCounts() {
+        Map<String, Integer> countsmap = new HashMap<>();
+        TermId phenotypicAbnormality = TermId.of("HP:0000118");
+        Set<TermId> firstListTerms = OntologyAlgorithm.getChildTerms(this.hpoOntology, phenotypicAbnormality, false);
+        for (TermId t : firstListTerms) {
+            String label = hpoOntology.getTermMap().get(t).getName();
+            int count = getSubontologyTermCount(t, hpoOntology);
+            countsmap.put(label, count);
+        }
+        return countsmap;
     }
 
 
