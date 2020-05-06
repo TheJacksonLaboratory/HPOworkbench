@@ -2,6 +2,8 @@ package org.monarchinitiative.hpoworkbench.html;
 
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
 
+import java.util.Map;
+
 public class HpoStatsHtmlGenerator {
 
 
@@ -50,8 +52,21 @@ public class HpoStatsHtmlGenerator {
         for (String key : hpostats.getMetadata().keySet()) {
             sb.append("<li>").append(key).append(": ").append(hpostats.getMetadata().get(key)).append("</li>");
         }
-        sb.append("</ol>");
+        sb.append("</ol>\n<br/>");
+        sb.append(getSubtermCounts(hpostats));
         return sb.toString();
+    }
+
+
+    private static String getSubtermCounts(HpoStats hstats) {
+       Map<String, Integer> countsmap = hstats.getHpoSubTermCounts();
+       StringBuilder sb = new StringBuilder();
+       sb.append("<ul>\n");
+       for (Map.Entry<String, Integer> e : countsmap.entrySet()) {
+           sb.append(String.format("<li>%s: %d</li>\n", e.getKey(), e.getValue()));
+       }
+        sb.append("</ul>\n");
+       return sb.toString();
     }
 
 }
