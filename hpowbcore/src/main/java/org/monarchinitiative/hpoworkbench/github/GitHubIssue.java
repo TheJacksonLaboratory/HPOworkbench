@@ -2,7 +2,6 @@ package org.monarchinitiative.hpoworkbench.github;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class encapsulates information about an issue and will be used to create a summary of the issue for

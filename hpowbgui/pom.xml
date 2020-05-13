@@ -5,7 +5,7 @@
     <parent>
         <artifactId>HPOworkbench</artifactId>
         <groupId>org.monarchinitiative</groupId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
     </parent>
     <version>${parent.version}</version>
     <modelVersion>4.0.0</modelVersion>

@@ -181,10 +181,8 @@ public class MainController {
         window.setTitle("MONDO download");
         window.setScene(scene);
 
-        //TODO the following is necessary because redirect is not working somehow
-        String MONDO_URL_HACK = "https://osf.io/e87hn/download";
-
-        Task<Void> mondodownload = new Downloader(dirpath, MONDO_URL_HACK, PlatformUtil.MONDO_OBO_FILENAME);
+        String MONDO_URL =  properties.getProperty("mondo.obo.url");
+        Task<Void> mondodownload = new Downloader(dirpath, MONDO_URL, PlatformUtil.MONDO_OBO_FILENAME);
         pb.progressProperty().bind(mondodownload.progressProperty());
 
         window.show();

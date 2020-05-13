@@ -134,8 +134,7 @@ public final class AnalysisController {
         final String pattern = "yyyy-MM-dd";
         final DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern(pattern);
-        StringConverter converter = new StringConverter<LocalDate>() {
-
+        StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
             @Override
             public String toString(LocalDate date) {
                 if (date != null) {
