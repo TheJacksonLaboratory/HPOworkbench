@@ -87,31 +87,31 @@ public final class MondoController {
 
     @FXML
     private RadioButton hpoTermRadioButton;
-
+    @FXML
     public RadioButton diseaseRadioButton;
-
+    @FXML
     public RadioButton newAnnotationRadioButton;
-
+    @FXML
     public Button goButton;
     @FXML
     public Button copyToClipboardButton;
-
+    @FXML
     public Button exportToExcelButton;
-
+    @FXML
     public Button suggestCorrectionToTermButton;
-
+    @FXML
     public Button suggestNewChildTermButton;
-
+    @FXML
     public Button suggestNewAnnotationButton;
-
+    @FXML
     public Button reportMistakenAnnotationButton;
-
+    @FXML
     public RadioButton allDatabaseButton;
-
+    @FXML
     public RadioButton orphanetButton;
-
+    @FXML
     public RadioButton omimButton;
-
+    @FXML
     public RadioButton decipherButton;
 
     /**
@@ -126,7 +126,7 @@ public final class MondoController {
     private TreeView<GenericTermWrapper> mondoOntologyTreeView;
 
     /**
-     * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
+     * Key: a term name such as "Myocardial infarction"; value: the corresponding MONDO id as a {@link TermId}.
      */
     private final Map<String, TermId> labelsAndMondoIds = new HashMap<>();
 
@@ -149,8 +149,10 @@ public final class MondoController {
 
 
     @Inject
-    public MondoController(OptionalResources optionalResources, Properties properties,
-                           @Named("mainWindow") Stage primaryStage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
+    public MondoController(OptionalResources optionalResources,
+                           Properties properties,
+                           @Named("mainWindow") Stage primaryStage,
+                           @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
         this.properties = properties;
         this.primaryStage = primaryStage;
@@ -159,12 +161,9 @@ public final class MondoController {
 
     @FXML
     public void initialize() {
-
         // this binding evaluates to true, if ontology or annotations files are missing (null)
         BooleanBinding mondoResourceIsMissing = optionalResources.mondoResourceMissing();
-
-
-        logger.error("Initializing MondoController, missing = " + mondoResourceIsMissing.toString());
+        logger.trace("Initializing MondoController, missing = " + mondoResourceIsMissing.get());
         hpoTermRadioButton.disableProperty().setValue(false);
         diseaseRadioButton.disableProperty().setValue(false);
         newAnnotationRadioButton.disableProperty().setValue(false);
@@ -187,7 +186,6 @@ public final class MondoController {
                 deactivate();
             }
         });
-
 
         if (!mondoResourceIsMissing.get()) {
             activate();
