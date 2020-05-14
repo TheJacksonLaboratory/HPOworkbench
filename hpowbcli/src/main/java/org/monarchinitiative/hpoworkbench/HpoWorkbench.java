@@ -33,6 +33,7 @@ public class HpoWorkbench {
         HPO2CSVCommand csv = new HPO2CSVCommand();
         MatchTermsCommand matchterms = new MatchTermsCommand();
         CountGenes count = new CountGenes();
+        HPOCommand ranges = new CountHpoIdRanges();
 
 
         JCommander jc = JCommander.newBuilder().
@@ -48,6 +49,7 @@ public class HpoWorkbench {
                 addCommand("descendents",descendents).
                 addCommand("matchterms",matchterms).
                 addCommand("csv",csv).
+                addCommand("ranges", ranges).
                 build();
         jc.setProgramName("java -jar HpoWorkbench.jar");
         try {
@@ -90,6 +92,9 @@ public class HpoWorkbench {
                 break;
             case "git":
                 hpocommand = git;
+                break;
+            case "ranges":
+                hpocommand = ranges;
                 break;
             case "descendents":
                 hpocommand = descendents;
