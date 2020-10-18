@@ -72,7 +72,7 @@ public class GitHubPoster {
 
 
 
-    /** TODO create our won escape formated (new line, quotation mark etc. */
+    /** This escapes new lines, quotation mark etc. in order to have correct JSON */
     private String jsonFormat(String s) {
         return JSONValue.escape(s);
     }
@@ -84,11 +84,9 @@ public class GitHubPoster {
      * @return A JSONified String with a list of GitHub labels
      */
     private String labelsArray4Json(List<String> labels) {
-
         if (labels.size() == 1) {
             return "\"" + labels.get(0) + "\"";
         }
-
         if (labels.size() > 1) {
             StringBuilder sb = new StringBuilder();
             sb.append("\"").append(labels.get(0)).append("\"");
@@ -97,9 +95,7 @@ public class GitHubPoster {
             }
             return sb.toString();
         }
-
         return null;
-
     }
 
 

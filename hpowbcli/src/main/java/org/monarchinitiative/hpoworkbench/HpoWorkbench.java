@@ -109,7 +109,7 @@ public class HpoWorkbench {
                 hpocommand = csv;
                 break;
             default:
-                System.err.println(String.format("[ERROR] command \"%s\" not recognized",command));
+                System.err.printf("[ERROR] command \"%s\" not recognized%n",command);
                 jc.usage();
                 System.exit(1);
         }

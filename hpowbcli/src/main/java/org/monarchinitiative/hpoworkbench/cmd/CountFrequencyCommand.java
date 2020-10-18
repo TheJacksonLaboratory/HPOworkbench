@@ -109,7 +109,7 @@ public class CountFrequencyCommand extends HPOCommand {
         System.out.println();
         System.out.println("Annotation counts for " + termS);
         System.out.println("\tNumber of descendent terms: " + descendentTermCount);
-        System.out.print(String.format("\tTotal annotations to any descendent of %s: %d ", termS, totalAnnotationCount));
+        System.out.printf("\tTotal annotations to any descendent of %s: %d ", termS, totalAnnotationCount);
         System.out.println();
 
         for (Object t : mp2.keySet()) {
