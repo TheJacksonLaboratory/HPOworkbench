@@ -1,4 +1,9 @@
 # HPO Workbench Changelog
+
+## v1.6.4
+* Update to phenol 1.6.2
+* fixing download problem
+
 ## v1.6.0
 * Update to phenol 1.5.0
 * fixing out-of-data URL for annotations file

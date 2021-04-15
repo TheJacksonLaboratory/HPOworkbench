@@ -72,36 +72,13 @@ public class Downloader extends Task<Void> {
     @Override
     protected Void call() throws Exception {
         logger.debug("[INFO] Downloading: \"" + urlstring + "\"");
-        InputStream reader;
-        FileOutputStream writer;
 
-        int threshold = 0;
-        int block = 250000;
+
         try {
             URL url = new URL(urlstring);
-            URLConnection urlc = url.openConnection();
-            reader = urlc.getInputStream();
-            logger.trace("URL host: "+ url.getHost() + "\n reader available="+reader.available());
-            logger.trace("LocalFilePath: "+localFilePath);
-            writer = new FileOutputStream(localFilePath);
-            byte[] buffer = new byte[153600];
-            int totalBytesRead = 0;
-            int bytesRead;
-            int size = urlc.getContentLength();
-            logger.trace("Size of file to be downloaded: "+size);
-            if (size >= 0)
-                block = size /100;
-            while ((bytesRead = reader.read(buffer)) > 0) {
-                writer.write(buffer, 0, bytesRead);
-                buffer = new byte[153600];
-                totalBytesRead += bytesRead;
-                if (size>0 && totalBytesRead > threshold) {
-                    updateProgress((double)totalBytesRead/size, 1); // Task has updateProgressProperty
-                    threshold += block;
-                }
-            }
-            logger.info("Successful download from "+urlstring+": " + (totalBytesRead) + "(" + size + ") bytes read.");
-            writer.close();
+            FileDownloader fileDownloader = new FileDownloader();
+            fileDownloader.copyURLToFile(url,localFilePath);
+
         } catch (MalformedURLException e) {
             updateProgress(0.00, 1);
             throw new Exception(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
