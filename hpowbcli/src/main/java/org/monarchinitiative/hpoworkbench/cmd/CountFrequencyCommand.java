@@ -4,6 +4,7 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
+
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
@@ -109,7 +110,7 @@ public class CountFrequencyCommand extends HPOCommand {
         System.out.println();
         System.out.println("Annotation counts for " + termS);
         System.out.println("\tNumber of descendent terms: " + descendentTermCount);
-        System.out.print(String.format("\tTotal annotations to any descendent of %s: %d ", termS, totalAnnotationCount));
+        System.out.printf("\tTotal annotations to any descendent of %s: %d ", termS, totalAnnotationCount);
         System.out.println();
 
         for (Object t : mp2.keySet()) {

@@ -4,16 +4,19 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.collect.ImmutableSet;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Set;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 /**
  * Generates a list of all terms that are descendents of a given term.
@@ -42,6 +45,55 @@ public class HpoListDescendentsCommand extends HPOCommand  {
         hpoOntology=parser.getHPO();
     }
 
+    private void parsePhenotypeHpoa() {
+        String path = "data/phenotype.hpoa";
+        File f = new File(path);
+        if (!f.exists()) {
+            throw new PhenolRuntimeException("Could not find phenotype.hpoa. Run the download command");
+        }
+        int n_omim = 0;
+        int n_orpha = 0;
+        int n_decipher = 0;
+        int n_omim_total = 0;
+        int n_orpha_total = 0;
+        int n_decipher_total = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String line;
+            while ((line=br.readLine()) != null) {
+                //System.out.println(line);
+                if (line.startsWith("#") ) {
+                    continue; // skip comments
+                }
+                if (line.startsWith("OMIM")) n_omim_total++;
+                if (line.startsWith("ORPHA")) n_orpha_total++;
+                if (line.startsWith("DECIPHER")) n_decipher_total++;
+                String [] fields = line.split("\t");
+                TermId t = TermId.of(fields[3]);
+                System.out.println(t.getValue());
+                if (descendentsOfTheTermOfInterest.contains(t)) {
+                    if (line.startsWith("OMIM")){
+                        n_omim++;
+                    } else if (line.startsWith("ORPHA")) {
+                        n_orpha++;
+                    } else if (line.startsWith("DECIPHER")) {
+                        n_decipher++;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.printf("Total of %d terms descend from %s\n", descendentsOfTheTermOfInterest.size(), hpoTermId);
+        System.out.printf("Annotations: OMIM: %d, ORPHA: %d, DECIPHER: %d\n", n_omim, n_orpha, n_decipher);
+        System.out.printf("Percent omim %f%% (%d/%d)\n",(100.0*(double)n_omim/n_omim_total),n_omim,n_omim_total);
+        System.out.printf("Percent orpha %f%% (%d/%d)\n",(100.0*(double)n_orpha/n_orpha_total),n_orpha,n_orpha_total);
+        System.out.printf("Percent decipher %f%% (%d/%d)\n",(100.0*(double)n_decipher/n_decipher_total),n_decipher,n_decipher_total);
+        int prenatal = n_omim + n_orpha + n_decipher;
+        int total = n_omim_total + n_orpha_total + n_decipher_total;
+        System.out.printf("Total: %f%% (%d/%d)\n",(100.0*(double)prenatal/total),prenatal,total);
+
+    }
+
     @Override
     public  void run() {
         if (! hpoTermId.startsWith("HP:") || hpoTermId.length()!=10) {
@@ -55,10 +107,7 @@ public class HpoListDescendentsCommand extends HPOCommand  {
 
         inputHPOdata();
         getDescendentsOfTermOfInterest(termOfInterest);
-        String desclist=descendentsOfTheTermOfInterest.stream().
-                map(TermId::getValue).
-                collect(Collectors.joining("\"), TermId.of(\""));
-        System.out.println(desclist);
+        parsePhenotypeHpoa();
 
     }
 

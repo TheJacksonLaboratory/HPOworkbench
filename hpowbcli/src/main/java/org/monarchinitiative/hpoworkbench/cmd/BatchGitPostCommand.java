@@ -29,8 +29,8 @@ public class BatchGitPostCommand extends HPOCommand {
     /** Github password */
     @Parameter(names={"-p","--password"},required = true,description = "github password")
     private String gitPword;
-    @Parameter(names={"--dryrun"},description="print to shell but do not execute")
-    private boolean dryrun=false;
+    @Parameter(names={"--forreal"},description="execute for real (otherwise, we do a dry run)")
+    private boolean forReal=false;
     @Parameter(names={"--onentr"},description="just submit one NTR (for testing)")
     private boolean onentr=false;
 
@@ -62,7 +62,7 @@ public class BatchGitPostCommand extends HPOCommand {
                 labs.add(this.issueLabel);
                /// labs.add("NIAID"); add as many as desired.
                 poster.setLabel(labs);
-                if (dryrun) {
+                if (! forReal) {
                     poster.setDryRun();
                 }
                 try {

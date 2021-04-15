@@ -33,6 +33,7 @@ public class HpoWorkbench {
         HPO2CSVCommand csv = new HPO2CSVCommand();
         MatchTermsCommand matchterms = new MatchTermsCommand();
         CountGenes count = new CountGenes();
+        HPOCommand ranges = new CountHpoIdRanges();
 
 
         JCommander jc = JCommander.newBuilder().
@@ -48,6 +49,7 @@ public class HpoWorkbench {
                 addCommand("descendents",descendents).
                 addCommand("matchterms",matchterms).
                 addCommand("csv",csv).
+                addCommand("ranges", ranges).
                 build();
         jc.setProgramName("java -jar HpoWorkbench.jar");
         try {
@@ -91,6 +93,9 @@ public class HpoWorkbench {
             case "git":
                 hpocommand = git;
                 break;
+            case "ranges":
+                hpocommand = ranges;
+                break;
             case "descendents":
                 hpocommand = descendents;
                 break;
@@ -104,7 +109,7 @@ public class HpoWorkbench {
                 hpocommand = csv;
                 break;
             default:
-                System.err.println(String.format("[ERROR] command \"%s\" not recognized",command));
+                System.err.printf("[ERROR] command \"%s\" not recognized%n",command);
                 jc.usage();
                 System.exit(1);
         }
