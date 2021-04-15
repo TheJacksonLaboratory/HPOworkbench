@@ -103,6 +103,7 @@
             </plugin>
             <!-- Specify the resources which need to be made accessible to the user -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
@@ -135,6 +136,7 @@
             <!--This plugin assembles the various elements together into a redistributable
                 zip/tar.gz file -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
