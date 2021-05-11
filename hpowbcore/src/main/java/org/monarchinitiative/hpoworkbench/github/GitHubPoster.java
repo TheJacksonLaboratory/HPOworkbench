@@ -1,5 +1,6 @@
 package org.monarchinitiative.hpoworkbench.github;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.simple.JSONValue;
 
 import java.io.OutputStream;
@@ -134,7 +135,11 @@ public class GitHubPoster {
         URL url = new URL("https://api.github.com/repos/obophenotype/human-phenotype-ontology/issues");
         URLConnection con = url.openConnection();
         String userpass = String.format("%s:%s",username,password);
-        String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+        //String token = replace with GitHub AUTH token;
+        String token = "???-REPLACEME-???";
+        token = token + ":x-oauth-basic";
+        String authString = "Basic " + Base64.encodeBase64String(token.getBytes());
+
         HttpURLConnection http = (HttpURLConnection)con;
         http.setRequestMethod("POST"); // PUT is another valid option
         http.setDoOutput(true);
@@ -146,7 +151,7 @@ public class GitHubPoster {
         int length = out.length;
         http.setFixedLengthStreamingMode(length);
         http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        http.setRequestProperty("Authorization",basicAuth);
+        http.setRequestProperty("Authorization",authString);
         http.connect();
         try(OutputStream os = http.getOutputStream()) {
             os.write(out);
