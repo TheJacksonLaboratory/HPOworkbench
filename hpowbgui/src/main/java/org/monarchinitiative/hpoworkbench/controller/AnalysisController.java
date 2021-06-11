@@ -188,7 +188,7 @@ public final class AnalysisController {
                     LocalDate curationData =  LocalDate.parse(m,dateFormatter);
                     if (curationData.isAfter(d)) {
                         newannot_count++;
-                        System.out.println("target: "+d.toString() + ", new="+ curationData.toString());
+                        System.out.println("target: "+ d + ", new="+ curationData);
                         counter.putIfAbsent(curationData,0);
                         Integer count = 1 + counter.get(curationData);
                         counter.put(curationData,count);

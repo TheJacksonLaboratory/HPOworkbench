@@ -28,11 +28,11 @@ public class CategoryMerge {
     private List<HpoAnnotation> disease1allTerms;
     private List<HpoAnnotation> disease2allTerms;
 
-    private List<TermId> disease1onlyTerms;
+    private final List<TermId> disease1onlyTerms;
     private final List<TermId> disease2onlyTerms;
-    private List<TermId> commonTerms;
-    private List<SubClassTermPair> d1subclassOfd2;
-    private List<SubClassTermPair> d2subclassOfd1;
+    private final List<TermId> commonTerms;
+    private final List<SubClassTermPair> d1subclassOfd2;
+    private final List<SubClassTermPair> d2subclassOfd1;
 
     public String getDb1() {
         return db1;
@@ -160,10 +160,10 @@ public class CategoryMerge {
     }
 
     public String getCounts() {
-        int total=0;
-        int identical=0;
-        int subclazz=0;
-        int unrelated=0;
+        int total;
+        int identical;
+        int subclazz;
+        int unrelated;
         identical=this.commonTerms.size();
         subclazz=this.d1subclassOfd2.size()+d2subclassOfd1.size();
         unrelated=this.disease1onlyTerms.size()+disease2onlyTerms.size();

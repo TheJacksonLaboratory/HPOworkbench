@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 
 
@@ -11,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 
@@ -19,13 +19,17 @@ import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
+import picocli.CommandLine;
 
 /**
  * Make a CSV file representing the HPO hp.obo file
  * Created by robinp on 6/23/17.
  */
-@Parameters(commandDescription = "csv.  Make a CSV file representing the HPO hp.obo file")
-public class HPO2CSVCommand extends HPOCommand {
+
+@CommandLine.Command(name = "csv",
+        mixinStandardHelpOptions = true,
+        description = "Make a CSV file representing the HPO hp.obo file.")
+public class HPO2CSVCommand extends HPOCommand implements Callable<Integer> {
     private static Logger LOGGER = Logger.getLogger(HPO2CSVCommand.class.getName());
     /** name of this command */
     private final static String name = "csv";
@@ -65,7 +69,7 @@ public class HPO2CSVCommand extends HPOCommand {
      * Perform the downloading.
      */
     @Override
-    public void run()  {
+    public Integer call()  {
         Ontology ontology=null;
 
         if (hpopath==null) {
@@ -76,7 +80,7 @@ public class HPO2CSVCommand extends HPOCommand {
         try {
             ontology = hpoparser.getHPO();
         } catch (Exception e) {
-            System.err.println("[ERROR] could not partse hp.obo file.\n"+e.toString() );
+            System.err.println("[ERROR] could not partse hp.obo file.\n"+ e);
             System.exit(1);
         }
 
@@ -112,6 +116,7 @@ public class HPO2CSVCommand extends HPOCommand {
             e.printStackTrace();
             System.exit(1);
         }
+        return 0;
     }
 
 

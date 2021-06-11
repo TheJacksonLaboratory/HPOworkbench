@@ -1,33 +1,36 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import picocli.CommandLine;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getParentTerms;
 
-@Parameters(commandDescription = "hpo best match.")
-public class HpoBestMatchCommand  extends HPOCommand {
+
+@CommandLine.Command(name = "best",
+        mixinStandardHelpOptions = true,
+        description = "hpo best match.")
+public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer> {
     private static final Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
     private Map<TermId, HpoDisease> diseaseMap =null;
-    @Parameter(names={"--target"},required = true,description = "file with target disease IDs")
+    @CommandLine.Option(names={"--target"},required = true,description = "file with target disease IDs")
     private String targetFile;
-    @Parameter(names={"--source"},required = true,description = "file with source disease IDs")
+    @CommandLine.Option(names={"--source"},required = true,description = "file with source disease IDs")
     private String sourceFile;
-    @Parameter(names={"--minhits"}, description = "minimum number of diseases in source with term")
+    @CommandLine.Option(names={"--minhits"}, description = "minimum number of diseases in source with term")
     private int minhits = 2;
 
     private Set<TermId> targets;
@@ -42,12 +45,14 @@ public class HpoBestMatchCommand  extends HPOCommand {
     /**
      * Function for the execution of the command.
      */
-    @Override public  void run() {
+    @Override
+    public Integer call() {
         inputHPOdata();
         inputTargets();
         inputSources();
         countSourcePhenos();
         getBestMatches();
+        return 0;
     }
 
 
@@ -204,6 +209,5 @@ public class HpoBestMatchCommand  extends HPOCommand {
         LOGGER.trace("Diseases imported: " + diseaseMap.size());
     }
 
-    @Override public String getName() { return "hpo-bestmatch"; }
 
 }

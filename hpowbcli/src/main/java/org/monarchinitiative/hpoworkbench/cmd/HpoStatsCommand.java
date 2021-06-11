@@ -1,11 +1,9 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.monarchinitiative.hpoworkbench.io.HPOParser;
+import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
 import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
@@ -16,9 +14,12 @@ import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.existsPath;
 
@@ -26,8 +27,11 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.exist
  * Extract descriptive statistics about a a certain subhierarchy of the HPO.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
-@Parameters(commandDescription = "stats. Extract descriptive statistics about a subhierarchy of the HPO.")
-public class HpoStatsCommand extends HPOCommand  {
+
+@CommandLine.Command(name = "stats",
+        mixinStandardHelpOptions = true,
+        description = "Extract descriptive statistics about a subhierarchy of the HPO.")
+public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(HpoStatsCommand.class);
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
@@ -50,8 +54,8 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
     /** the root of the subhierarchy for which we are calculating the descriptive statistics. */
-    @Parameter(names={"-t","--term"},description = "the root of the subhierarchy for which we are calculating the descriptive statistics.")
-    private String term;
+    @CommandLine.Option(names={"-t","--term"},description = "the root of the subhierarchy for which we are calculating the descriptive statistics.")
+    private String term = null;
 
 
     private TermId termOfInterest;
@@ -63,7 +67,7 @@ public class HpoStatsCommand extends HPOCommand  {
     }
 
     @Override
-    public  void run() {
+    public  Integer call() {
 
         if (hpopath==null) {
             hpopath = this.downloadDirectory + File.separator + "hp.obo";
@@ -71,33 +75,30 @@ public class HpoStatsCommand extends HPOCommand  {
         if (annotpath==null) {
             annotpath = this.downloadDirectory + File.separator + "phenotype.hpoa";
         }
+        HpoStats hpoStats = new HpoStats(hpopath, annotpath);
+        PrintWriter writer = new PrintWriter(System.out);
+        hpoStats.outputOntologyStats(writer);
 
-        LOGGER.trace(String.format("HPO path: %s, annotations: %s",hpopath,annotpath ));
-        if (! term.startsWith("HP:") || term.length()!=10) {
-            LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...",term ));
-            System.exit(1);
+        if (term != null) {
+            LOGGER.trace(String.format("HPO path: %s, annotations: %s", hpopath, annotpath));
+            if (!term.startsWith("HP:") || term.length() != 10) {
+                LOGGER.error(String.format("Malformed HPO id: \"%s\". Terminating program...", term));
+                System.exit(1);
+            }
+            this.termOfInterest = TermId.of(term);
+            LOGGER.trace("Term of interest: " + termOfInterest.getValue());
+            omim = new ArrayList<>();
+            orphanet = new ArrayList<>();
+            decipher = new ArrayList<>();
+
+            getDescendentsOfTermOfInterest();
+            filterDiseasesAccordingToDatabase();
+            qcInheritanceModesForDiseases();
+            countDiseasesWithAndWithoutAssociatedGenes();
+        } else {
+            System.err.println("[WARN] No HPO term passed for stats");
         }
-        this.termOfInterest=TermId.of(term);
-        LOGGER.trace("Term of interest: "+termOfInterest.getValue());
-        omim=new ArrayList<>();
-        orphanet=new ArrayList<>();
-        decipher=new ArrayList<>();
-        inputHPOdata();
-        getDescendentsOfTermOfInterest();
-        filterDiseasesAccordingToDatabase();
-        /*initializeAdultOnsetTerms();
-        initializeChildhoodOnsetTerms();
-        LOGGER.trace("Getting OMIM diseases according to onset");
-        filterDiseasesAccordingToOnset(this.omim);
-        LOGGER.trace("Getting ORPHANET diseases according to onset");
-        filterDiseasesAccordingToOnset(this.orphanet);
-        LOGGER.trace("Getting DECIPER diseases according to onset");
-        filterDiseasesAccordingToOnset(this.decipher);
-        */
-
-        qcInheritanceModesForDiseases();
-        countDiseasesWithAndWithoutAssociatedGenes();
-
+        return 0;
     }
 
 
@@ -168,23 +169,7 @@ public class HpoStatsCommand extends HPOCommand  {
 
 
 
-    private void inputHPOdata() {
-        File f = new File(hpopath);
-        if (! f.exists()) {
-            LOGGER.error(String.format("Could not find hpo ontology file at\"%s\". Terminating program...", hpopath ));
-            System.exit(1);
-        }
-        f=new File(annotpath);
-        if (! f.exists()) {
-            LOGGER.error(String.format("Could not find phenotype annotation file at\"%s\". Terminating program...", annotpath ));
-            System.exit(1);
-        }
-        LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
-        HPOParser parser = new HPOParser(hpopath);
-        hpoOntology=parser.getHPO();
-        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath, hpoOntology);
-        LOGGER.trace("Diseases imported: " + diseaseMap.size());
-    }
+
 
     private void getDescendentsOfTermOfInterest() {
         String name = String.format("%s [%s]",hpoOntology.getTermMap().get(termOfInterest).getName(),termOfInterest.getValue() );
@@ -373,11 +358,7 @@ public class HpoStatsCommand extends HPOCommand  {
         LOGGER.trace(String.format("\tChildhood: %d",early_onset));
         LOGGER.trace(String.format("\tAdult: %d",adult_onset));
         LOGGER.trace(String.format("\tNo data: %d",no_onset));
-
     }
 
-
-    @Override
-    public String getName() {return "stats";}
 
 }

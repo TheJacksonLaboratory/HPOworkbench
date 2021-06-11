@@ -158,7 +158,7 @@ public class GitHubPoster {
         }
         if (http.getResponseCode()==400) {
             String erro=String.format("URL:%s\nPayload=%s\nServer response: %s [%d]",
-                    http.toString(),
+                    http,
                     payload,
                     http.getResponseMessage(),
                     http.getResponseCode());
@@ -189,7 +189,7 @@ public class GitHubPoster {
         }
         if (http.getResponseCode()==400) {
             String erro=String.format("URL:%s\nPayload=%s\nServer response: %s [%d]",
-                    http.toString(),
+                    http,
                     payload,
                     http.getResponseMessage(),
                     http.getResponseCode());

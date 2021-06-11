@@ -1,128 +1,47 @@
 package org.monarchinitiative.hpoworkbench;
 
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import org.monarchinitiative.hpoworkbench.cmd.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+
+import java.util.concurrent.Callable;
 
 /**
  * A collection of utilities for working with the HPO.
+ *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.0
  */
-public class HpoWorkbench {
+@CommandLine.Command(name = "lcp", mixinStandardHelpOptions = true, version = "lcp 0.0.1",
+        description = "long covid phenottype")
+public class HpoWorkbench implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(HpoWorkbench.class);
 
-    @Parameter(names = {"-h", "--help"}, help = true, arity = 0,description = "display this help message")
-    private boolean usageHelpRequested;
-
-    public static void main(String[] args){
-
-        HpoWorkbench workbench = new HpoWorkbench();
-        WordCommand word = new WordCommand();
-        HpoStatsCommand stats = new HpoStatsCommand();
-        DownloadCommand download = new DownloadCommand();
-        BatchGitPostCommand batch = new BatchGitPostCommand();
-        CountFrequencyCommand countfreq = new CountFrequencyCommand();
-        GitCommand git = new GitCommand();
-        HpoListDescendentsCommand descendents = new HpoListDescendentsCommand();
-        Hpo2HpoCommand hpo2hpo = new Hpo2HpoCommand();
-        HPO2CSVCommand csv = new HPO2CSVCommand();
-        MatchTermsCommand matchterms = new MatchTermsCommand();
-        CountGenes count = new CountGenes();
-        HPOCommand ranges = new CountHpoIdRanges();
-
-
-        JCommander jc = JCommander.newBuilder().
-                addObject(workbench).
-                addCommand("word",word).
-                addCommand("stats",stats).
-                addCommand("download",download).
-                addCommand("countfreq",countfreq).
-                addCommand("batch",batch).
-                addCommand("git",git).
-                addCommand("hpo2hpo",hpo2hpo).
-                addCommand("count", count).
-                addCommand("descendents",descendents).
-                addCommand("matchterms",matchterms).
-                addCommand("csv",csv).
-                addCommand("ranges", ranges).
-                build();
-        jc.setProgramName("java -jar HpoWorkbench.jar");
-        try {
-            jc.parse(args);
-        } catch (ParameterException e) {
-            System.err.println("[ERROR] " + e.getMessage());
-            System.err.println("[ERROR] Enter java -jar HpoWorkbench.jar -h for help");
-            System.exit(1);
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            // if the user doesn't pass any command or option, add -h to show help
+            args = new String[]{"-h"};
         }
-        String parsedCommand = jc.getParsedCommand();
-
-        if ( workbench.usageHelpRequested) {
-            jc.usage();
-            System.exit(1);
-        }
-        String command = jc.getParsedCommand();
-        if (command == null || command.isEmpty()) {
-            System.err.println("[ERROR] No command passed");
-            return;
-        }
-        HPOCommand hpocommand=null;
-        switch (command) {
-            case "download":
-                hpocommand= download;
-                break;
-            case "stats":
-                hpocommand = stats;
-                break;
-            case "word":
-                hpocommand = word;
-                break;
-            case "batch":
-                hpocommand = batch;
-                break;
-            case "countfreq":
-                hpocommand = countfreq;
-                break;
-            case "count":
-                hpocommand = count;
-                break;
-            case "git":
-                hpocommand = git;
-                break;
-            case "ranges":
-                hpocommand = ranges;
-                break;
-            case "descendents":
-                hpocommand = descendents;
-                break;
-            case "hpo2hpo":
-                hpocommand = hpo2hpo;
-                break;
-            case "matchterms":
-                hpocommand = matchterms;
-                break;
-            case "csv":
-                hpocommand = csv;
-                break;
-            default:
-                System.err.printf("[ERROR] command \"%s\" not recognized%n",command);
-                jc.usage();
-                System.exit(1);
-        }
-        logger.trace("Running command " + command);
-
-        try {
-        hpocommand.run();
-    } catch (Exception e) {
-        e.printStackTrace();
+        CommandLine cline = new CommandLine(new HpoWorkbench())
+                .addSubcommand("word", new WordCommand())
+                .addSubcommand("stats", new HpoStatsCommand())
+                .addSubcommand("download", new DownloadCommand())
+                .addSubcommand("batch", new BatchGitPostCommand())
+                .addSubcommand("countfreq", new CountFrequencyCommand())
+                .addSubcommand("git", new GitCommand())
+                .addSubcommand("descendents", new HpoListDescendentsCommand())
+                .addSubcommand("hpo2hpo", new Hpo2HpoCommand())
+                .addSubcommand("csv", new HPO2CSVCommand())
+                .addSubcommand("matchterms", new MatchTermsCommand())
+                .addSubcommand("count", new CountGenes())
+                .addSubcommand("ranges", new CountHpoIdRanges());
+        cline.setToggleBooleanFlags(false);
+        int exitCode = cline.execute(args);
+        System.exit(exitCode);
     }
 
-
-    }
 
     public static String getVersion() {
         String version = "0.0.0";// default, should be overwritten by the following.
@@ -133,6 +52,13 @@ public class HpoWorkbench {
             // do nothing
         }
         return version;
+    }
+
+
+    @Override
+    public Integer call() {
+        // work done in subcommands
+        return 0;
     }
 
 

@@ -1,21 +1,17 @@
 package org.monarchinitiative.hpoworkbench.io;
 
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -27,11 +23,8 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:manuel.holtgrewe@charite.de">Manuel Holtgrewe</a>
  */
 public class FileDownloader {
-
-    /** the logger object to use */
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileDownloader.class);
-
-    public static class ProxyOptions {
+    private static final Logger logger = LoggerFactory.getLogger(FileDownloader.class);
+    static class ProxyOptions {
         String host = null;
         int port = -1;
         String user = null;
@@ -41,7 +34,7 @@ public class FileDownloader {
     /**
      * Configuration for the {@link FileDownloader}.
      */
-    public static class Options {
+    static class Options {
         boolean printProgressBar = false;
         ProxyOptions http = new ProxyOptions();
         ProxyOptions https = new ProxyOptions();
@@ -49,7 +42,7 @@ public class FileDownloader {
     }
 
     /** configuration for the downloader */
-    private Options options;
+    private final Options options;
 
     /** Initializer FileDownloader with the given options string */
     public FileDownloader(Options options) {
@@ -62,8 +55,8 @@ public class FileDownloader {
     }
 
     /**
-     * This method downloads a file to the specified local file path. If the file already exists, it emits a warning
-     * message and does nothing.
+     * This method downloads a file to the specified local file path. If the file already exists, it will
+     * overwrite it and emit a warning.
      *
      * @param src
      *            {@link URL} with file to download
@@ -74,10 +67,13 @@ public class FileDownloader {
      *             on problems with downloading
      */
     public boolean copyURLToFile(URL src, File dest) throws FileDownloadException {
-        if (dest.exists())
-            return false;
+        if (dest.exists()) {
+            logger.warn("Overwriting file at "+dest);
+        }
+        logger.trace("copyURLToFile dest="+dest);
+        logger.trace("dest.getParentFile()="+dest.getParentFile());
         if (!dest.getParentFile().exists()) {
-            LOGGER.info("Creating directory {}", dest.getParentFile());
+            logger.info("Creating directory {}"+ dest.getParentFile().getAbsolutePath());
             dest.getParentFile().mkdirs();
         }
 
@@ -99,7 +95,7 @@ public class FileDownloader {
             if (!ftp.login("anonymous", "anonymous@example.com"))
                 throw new IOException("Could not login with anonymous:anonymous@example.com");
             if (!ftp.isConnected())
-                LOGGER.error("Weird, not connected!");
+                logger.error("Weird, not connected!");
         } catch (IOException e) {
             throw new FileDownloadException("ERROR: problem connecting when downloading file.", e);
         }
@@ -108,15 +104,9 @@ public class FileDownloader {
         } catch (IOException e) {
             try {
                 ftp.logout();
-            } catch (IOException e1) {
-                // swallow, nothing we can do about it
-                e1.printStackTrace();
-            }
-            try {
                 ftp.disconnect();
             } catch (IOException e1) {
                 // swallow, nothing we can do about it
-                e1.printStackTrace();
             }
             throw new FileDownloadException("ERROR: could not use binary transfer.", e);
         }
@@ -130,22 +120,25 @@ public class FileDownloader {
             // Try to get file size.
             FTPFile[] files = ftp.listFiles(fileName);
             long fileSize = -1;
-            for (FTPFile file : files)
-                if (file.getName().equals(fileName))
-                    fileSize = file.getSize();
+            for (FTPFile ftpfile : files) {
+                if (ftpfile.getName().equals(fileName)) {
+                    fileSize=ftpfile.getSize();
+                    break;
+                }
+            }
             ftp.pwd();
             ProgressBar pb = null;
             if (fileSize != -1)
                 pb = new ProgressBar(0, fileSize, options.printProgressBar);
             else
-                LOGGER.info("(server did not tell us the file size, no progress bar)");
+                logger.info("(server did not tell us the file size, no progress bar)");
             // Download file.
             in = ftp.retrieveFileStream(fileName);
             if (in == null)
                 throw new FileNotFoundException("Could not open connection for file " + fileName);
             out = new FileOutputStream(dest);
             BufferedInputStream inBf = new BufferedInputStream(in);
-            byte[] buffer = new byte[128 * 1024];
+            byte [] buffer = new byte[128 * 1024];
             int readCount;
             long pos = 0;
             if (pb != null)
@@ -161,10 +154,8 @@ public class FileDownloader {
             out.close();
             if (pb != null && pos != pb.getMax())
                 pb.print(fileSize);
-            // if (!ftp.completePendingCommand())
-            // throw new IOException("Could not finish download!");
 
-        } catch (IOException e) {
+        } catch (FileNotFoundException e) {
             dest.delete();
             try {
                 ftp.logout();
@@ -175,7 +166,15 @@ public class FileDownloader {
                 ftp.disconnect();
             } catch (IOException e1) {
                 // swallow, nothing we can do about it
-                e1.printStackTrace();
+            }
+            throw new FileDownloadException("ERROR: problem downloading file.", e);
+        } catch (IOException e) {
+            dest.delete();
+            try {
+                ftp.logout();
+                ftp.disconnect();
+            } catch (IOException e1) {
+                // swallow, nothing we can do about it
             }
             throw new FileDownloadException("ERROR: problem downloading file.", e);
         } finally {
@@ -189,15 +188,13 @@ public class FileDownloader {
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e1) {
+                } catch (IOException e) {
                     // swallow, nothing we can do
-                    e1.printStackTrace();
                 }
             }
         }
         return false;
     }
-
 
     /**
      * Copy contents of a URL to a file using the {@link URL} class.
@@ -209,10 +206,13 @@ public class FileDownloader {
         setProxyProperties();
 
         // actually copy the file
-        BufferedInputStream in = null;
-        FileOutputStream out = null;
+        BufferedInputStream in;
+        FileOutputStream out;
         try {
-            URLConnection connection =  src.openConnection();
+            int connectionTimeout = 5000; // 5 seconds should be more than enough to connect to a server
+            final String TEXTPLAIN_REQUEST_TYPE = ", text/plain; q=0.1";
+            String actualAcceptHeaders = TEXTPLAIN_REQUEST_TYPE;
+            URLConnection connection =  connect(src.openConnection(),connectionTimeout,actualAcceptHeaders,new HashSet<>());
             final int fileSize = connection.getContentLength();
             in = new BufferedInputStream(connection.getInputStream());
             out = new FileOutputStream(dest);
@@ -221,10 +221,10 @@ public class FileDownloader {
             if (fileSize != -1)
                 pb = new ProgressBar(0, fileSize, options.printProgressBar);
             else
-                LOGGER.info("(server did not tell us the file size, no progress bar)");
+                logger.info("(server did not tell us the file size, no progress bar)");
 
             // Download file.
-            byte[] buffer = new byte[128 * 1024];
+            byte [] buffer = new byte[128 * 1024];
             int readCount;
             long pos = 0;
             if (pb != null)
@@ -240,11 +240,53 @@ public class FileDownloader {
             out.close();
             if (pb != null && pos != pb.getMax())
                 pb.print(fileSize);
-        } catch (IOException e) {
+        } catch (IOException | IllegalStateException e) {
+            logger.error(String.format("Failed to downloaded file from %s",src.getHost()),e);
             throw new FileDownloadException("ERROR: Problem downloading file: " + e.getMessage());
         }
         return true;
     }
+
+
+    protected static URLConnection connect(URLConnection conn, int connectionTimeout, String acceptHeaders, Set<String> visited)
+            throws IOException {
+        if (conn instanceof HttpURLConnection) {
+            // follow redirects to HTTPS
+            HttpURLConnection con = (HttpURLConnection) conn;
+            con.connect();
+            int responseCode = con.getResponseCode();
+            // redirect
+            if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP
+                    || responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || responseCode == HttpURLConnection.HTTP_SEE_OTHER
+                    // no constants for temporary and permanent redirect in HttpURLConnection
+                    || responseCode == 307 || responseCode == 308) {
+                String location = con.getHeaderField("Location");
+                if (visited.add(location)) {
+                    URL newURL = new URL(location);
+                    return connect(rebuildConnection(connectionTimeout, newURL, acceptHeaders),
+                            connectionTimeout, acceptHeaders, visited);
+                } else {
+                    throw new IllegalStateException(
+                            "Infinite loop: redirect cycle detected. " + visited);
+                }
+            }
+        }
+        return conn;
+    }
+
+    protected static URLConnection rebuildConnection(int connectionTimeout, URL newURL, String acceptHeaders) throws IOException {
+        URLConnection conn;
+        conn = newURL.openConnection();
+        final String ACCEPTABLE_CONTENT_ENCODING = "xz,gzip,deflate";
+        conn.addRequestProperty("Accept", acceptHeaders);
+        conn.setRequestProperty("Accept-Encoding", ACCEPTABLE_CONTENT_ENCODING);
+        conn.setConnectTimeout(connectionTimeout);
+        return conn;
+    }
+
+
+
 
     /**
      * Set system properties from {@link #options}.
@@ -279,3 +321,4 @@ public class FileDownloader {
     }
 
 }
+

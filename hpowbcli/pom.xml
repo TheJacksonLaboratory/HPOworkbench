@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.monarchinitiative</groupId>
         <artifactId>HPOworkbench</artifactId>
-        <version>1.6.4</version>
+        <version>1.6.5</version>
     </parent>
     <version>${parent.version}</version>
 
@@ -42,9 +42,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.78</version>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.5.2</version>
         </dependency>
 
     </dependencies>

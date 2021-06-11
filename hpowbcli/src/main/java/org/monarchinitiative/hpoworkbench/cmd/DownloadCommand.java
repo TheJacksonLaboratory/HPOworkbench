@@ -1,12 +1,13 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.FileDownloader;
+import picocli.CommandLine;
 
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -18,12 +19,17 @@ import java.net.URL;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.0.1 (May 10, 2017)
  */
-@Parameters(commandDescription = "download. Download HPO/MONDO/medgen files.")
-public final class DownloadCommand extends HPOCommand {
+
+@CommandLine.Command(name = "download",
+        mixinStandardHelpOptions = true,
+        description = "Download HPO/MONDO/medgen files.")
+public final class DownloadCommand extends HPOCommand implements Callable<Integer> {
     private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
 
 
-    private final String PHENOTYPE_HPOA_URL="http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/current/phenotype.hpoa";
+    private final String PHENOTYPE_HPOA_URL="http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa";
+
+
 
     public String getName() { return "download"; }
 
@@ -37,12 +43,13 @@ public final class DownloadCommand extends HPOCommand {
      * Perform the downloading.
      */
     @Override
-    public void run()  {
+    public Integer call()  {
         createDownloadDir(downloadDirectory);
         downloadHpObo();
         downloadPhenotypeDotHpoa();
         downloadMedgen();
         downloadGeneInfo();
+        return 0;
     }
 
     /** Download the phenotype.hpoa file. */

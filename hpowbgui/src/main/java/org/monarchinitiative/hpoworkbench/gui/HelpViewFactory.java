@@ -102,7 +102,7 @@ public class HelpViewFactory {
             window.setScene(scene);
             window.show();
         } catch (Exception e){
-            logger.error(String.format("Could not open browser to show RTD: %s",e.toString()));
+            logger.error(String.format("Could not open browser to show RTD: %s", e));
             e.printStackTrace();
         }
     }

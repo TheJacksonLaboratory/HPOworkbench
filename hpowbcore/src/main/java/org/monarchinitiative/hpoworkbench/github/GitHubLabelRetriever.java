@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 public class GitHubLabelRetriever {
 
-    private List<String> labels;
+    private final List<String> labels;
 
     public GitHubLabelRetriever() {
         labels=new ArrayList<>();

@@ -1,7 +1,7 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import com.beust.jcommander.Parameter;
+import picocli.CommandLine;
 
 
 import java.util.HashMap;
@@ -14,22 +14,15 @@ import java.util.Map;
  */
 public abstract class HPOCommand {
 
-    public abstract String getName();
 
-    @Parameter(names={"-d","--download"},description = "directory to download HPO data")
+    @CommandLine.Option(names={"-d","--download"},description = "directory to download HPO data")
     protected String downloadDirectory="data";
-    @Parameter(names={"-a", "--annot"},description = "path to phenol.hpoa")
+    @CommandLine.Option(names={"-a", "--annot"},description = "path to phenol.hpoa")
     protected String annotpath="data/phenotype.hpoa";
-    @Parameter(names={"-h", "--hpo"}, description = "path to hp.obo")
+    @CommandLine.Option(names={"--hpo"}, description = "path to hp.obo")
     protected String hpopath ="data/hp.obo";
 
     protected Map<String,String> defaults=new HashMap<>();
-
-    /**
-     * Function for the execution of the command.
-     */
-    public abstract void run();
-
 
 
     public HPOCommand setDefaultValue(String key,String value) {
@@ -37,8 +30,5 @@ public abstract class HPOCommand {
         return this;
     }
 
-    public String toString() {
-        return getName();
-    }
 
 }

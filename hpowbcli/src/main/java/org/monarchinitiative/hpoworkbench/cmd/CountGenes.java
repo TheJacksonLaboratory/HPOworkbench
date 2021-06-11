@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
@@ -10,6 +9,7 @@ import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationParser;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import picocli.CommandLine;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,9 +18,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
-@Parameters(commandDescription = "count.  Count and compare gene to disease associations")
-public class CountGenes extends HPOCommand {
+
+@CommandLine.Command(name = "count",
+        mixinStandardHelpOptions = true,
+        description = "Count and compare gene to disease associations.")
+public class CountGenes extends HPOCommand implements Callable<Integer> {
     private static final Logger LOGGER = Logger.getLogger(CountGenes.class.getName());
 
     private Multimap<TermId, TermId> geneToDiseaseMapPhenol;
@@ -29,24 +33,25 @@ public class CountGenes extends HPOCommand {
     private Set<Pair> geneDiseasePairSet;
 
 
-    @Parameter(names={"--allgenes"}, required = true)
+    @CommandLine.Option(names={"--allgenes"}, required = true)
     String pathToGenesToPhenotypeFile;
 
-    @Parameter(names = {"--geneinfo"})
+    @CommandLine.Option(names = {"--geneinfo"})
     String pathToGeneInfo = "data/Homo_sapiens_gene_info.gz";
 
-    @Parameter(names = {"--orpha"})
+    @CommandLine.Option(names = {"--orpha"})
     String pathToOrpha = "data/en_product6.xml";
 
-    @Parameter(names = {"--mim2gene"})
+    @CommandLine.Option(names = {"--mim2gene"})
     String pathToMim2Gene = "data/mim2gene_medgen";
 
-
-    public void run() {
+    @Override
+    public Integer call() {
         LOGGER.trace("Count genes command");
         parseGeneToPhenotypeFile(pathToGenesToPhenotypeFile);
         parsePhenolFiles();
         compare();
+        return 0;
     }
 
 
@@ -135,8 +140,5 @@ public class CountGenes extends HPOCommand {
         }
     }
 
-    @Override
-    public String getName() {
-        return "count";
-    }
+
 }

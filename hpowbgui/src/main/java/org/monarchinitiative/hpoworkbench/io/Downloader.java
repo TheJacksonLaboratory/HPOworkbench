@@ -5,12 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * This class is used to download files to the local file system of the user (chromFa.tar.gz and refGene.txt.gz).
@@ -81,7 +78,7 @@ public class Downloader extends Task<Void> {
 
         } catch (MalformedURLException e) {
             updateProgress(0.00, 1);
-            throw new Exception(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
+            throw new Exception(String.format("Malformed url: \"%s\"\n%s", urlstring, e));
         } catch (IOException e) {
             updateProgress(0.00, 1);
             throw new Exception(String.format("IO Exception reading from URL: \"%s\" to local file \"%s\"\n%s", urlstring,localFilePath, e.toString()));

@@ -1,8 +1,6 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
@@ -10,9 +8,11 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.*;
+import picocli.CommandLine;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDescendents;
@@ -24,11 +24,14 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDe
  *
  * @author <a href="mailto:peter.robinson">Peter Robinson</a>
  */
-@Parameters(commandDescription = "countfreq. Count freqeuncy of annotations.")
-public class CountFrequencyCommand extends HPOCommand {
+
+@CommandLine.Command(name = "countfreq",
+        mixinStandardHelpOptions = true,
+        description = "Count freqeuncy of annotations.")
+public class CountFrequencyCommand extends HPOCommand implements Callable<Integer> {
     private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
 
-    @Parameter(names={"-t","--term"},required = true,description = "TermId of interest")
+    @CommandLine.Option(names={"-t","--term"},required = true,description = "TermId of interest")
     private String hpoTermId;
 
     private TermId termId;
@@ -45,7 +48,7 @@ public class CountFrequencyCommand extends HPOCommand {
 
     }
 
-    public void run() {
+    public Integer call() {
 
         String hpOboPath = this.downloadDirectory + File.separator + this.hpopath;
         String annotationPath = this.downloadDirectory + File.separator + annotpath;
@@ -79,7 +82,7 @@ public class CountFrequencyCommand extends HPOCommand {
             }
         }
         outputCounts(annotationCounts, weightedAnnotationCounts, ontology);
-
+        return 0;
     }
 
     /**
@@ -113,9 +116,8 @@ public class CountFrequencyCommand extends HPOCommand {
         System.out.printf("\tTotal annotations to any descendent of %s: %d ", termS, totalAnnotationCount);
         System.out.println();
 
-        for (Object t : mp2.keySet()) {
-            TermId tid = (TermId) t;
-            int count = mp2.get(t);
+        for (TermId tid : mp2.keySet()) {
+            int count = mp2.get(tid);
             String name = ontology.getTermMap().get(tid).getName();
             System.out.println(name + " [" + tid.getValue() + "]: " + count + " (" + weightedmap.get(tid) + ")");
         }

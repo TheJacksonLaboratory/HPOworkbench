@@ -53,14 +53,14 @@ public class AnnotationMerger {
             logger.trace("disease 1 == null");
         } else {
             diseaseName1=disease1.getName();
-            logger.trace("disease 1 ok, {}" , disease1.toString());
+            logger.trace("disease 1 ok, {}" , disease1);
         }
         if (disease2==null) {
             logger.trace("disease 2 == null");
             diseaseName2="";
         } else {
             diseaseName2=disease2.getName();
-            logger.trace("disease 2 ok, {}" , disease2.toString());
+            logger.trace("disease 2 ok, {}" , disease2);
         }
 
         ontology=honto;

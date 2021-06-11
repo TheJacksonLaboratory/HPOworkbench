@@ -1,7 +1,5 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 import org.monarchinitiative.phenol.io.OntologyLoader;
@@ -11,16 +9,21 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-@Parameters(commandDescription = "match. Match HPO terms to a list of candidates.")
-public class MatchTermsCommand extends  HPOCommand {
+
+@CommandLine.Command(name = "match",
+        mixinStandardHelpOptions = true,
+        description = "Match HPO terms to a list of candidates.")
+public class MatchTermsCommand extends  HPOCommand implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(MatchTermsCommand.class);
 
-    @Parameter(names = {"-f", "--file"},required = true, description = "TSV file with terms")
+    @CommandLine.Option(names = {"-f", "--file"},required = true, description = "TSV file with terms")
     private String path;
 
     private String hpopath=null;
@@ -31,8 +34,8 @@ public class MatchTermsCommand extends  HPOCommand {
 
 
 
-
-    public void run() {
+    @Override
+    public Integer call() {
         logger.trace("Processing input file {}", path);
         initHPOontology();
         logger.trace("Got HPO with {} terms", hpo.countAllTerms());
@@ -62,6 +65,7 @@ public class MatchTermsCommand extends  HPOCommand {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return 0;
     }
 
 

@@ -146,8 +146,6 @@ public class FileDownloader {
             }
             in.close();
             out.close();
-            // if (!ftp.completePendingCommand())
-            // throw new IOException("Could not finish download!");
 
         } catch (FileNotFoundException e) {
             dest.delete();

@@ -220,7 +220,7 @@ public final class MondoController {
             logger.error("Mondo root term was null");
             return;
         }
-        logger.trace("Initializing Mondo tree with RootTerm {}", rootTerm.toString());
+        logger.trace("Initializing Mondo tree with RootTerm {}", rootTerm);
         TreeItem<GenericTermWrapper> root = new MondoController.GenericTermTreeItem(new GenericTermWrapper(rootTerm));
         root.setExpanded(true);
         mondoOntologyTreeView.setShowRoot(false);
@@ -303,8 +303,8 @@ public final class MondoController {
         if (omimDisease == null || orphaDisease == null) {
             logger.warn("Could not init diseases");
         } else {
-            logger.trace("Got mim " + omimDisease.toString());
-            logger.trace("Got orph " + orphaDisease.toString());
+            logger.trace("Got mim " + omimDisease);
+            logger.trace("Got orph " + orphaDisease);
         }
 
 

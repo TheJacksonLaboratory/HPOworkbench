@@ -72,7 +72,7 @@ class HpoHtmlPageGenerator {
                     "      </tr>", s.getName(), s.getDiseaseDatabaseId().getValue(), s.getName());
             sb.append(row);
         }
-        return String.format("%s<tbody>%s</tbody></table></div>", header, sb.toString());
+        return String.format("%s<tbody>%s</tbody></table></div>", header, sb);
     }
 
 
@@ -130,7 +130,7 @@ class HpoHtmlPageGenerator {
             sb.append("</br>Modifiers: ").append(String.join("; ",names));
         }
         if (onset.available()) {
-            sb.append("</br>").append(onset.toString());
+            sb.append("</br>").append(onset);
         }
         sb.append("</br>Source: ").append(String.join("; ",annot.getCitations()));
         return String.format("<tr>\n" +
@@ -143,7 +143,7 @@ class HpoHtmlPageGenerator {
                 term.getId().getValue(),
                 label,
                 definition,
-                sb.toString());
+                sb);
     }
 
 

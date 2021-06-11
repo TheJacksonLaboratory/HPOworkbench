@@ -1,19 +1,21 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssueRetriever;
 import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
+import picocli.CommandLine;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 
-@Parameters(commandDescription = "git. Download GitHub issues and create a Word doc.")
-public class GitCommand  extends HPOCommand {
+@CommandLine.Command(name = "git",
+        mixinStandardHelpOptions = true,
+        description = "Download GitHub issues and create a Word doc.")
+public class GitCommand  extends HPOCommand implements Callable<Integer> {
     private static final Logger LOGGER = Logger.getLogger(GitCommand.class.getName());
-    @Parameter(names={"-l","--label"},required = true,description = "git issue label")
+    @CommandLine.Option(names={"-l","--label"},required = true,description = "git issue label")
     private  String issueLabel;
 
     /**
@@ -24,7 +26,7 @@ public class GitCommand  extends HPOCommand {
     public GitCommand() {
     }
 
-    public void run() {
+    public Integer call() {
         LOGGER.trace("git get issues for " + issueLabel);
 
         GitHubIssueRetriever iretriever = new GitHubIssueRetriever(issueLabel);
@@ -32,6 +34,7 @@ public class GitCommand  extends HPOCommand {
         GitIssue2Doc4J gi2w = new GitIssue2Doc4J(issues,issueLabel);
         String filename=String.format("%s-open-issues.docx",issueLabel);
         gi2w.outputFile(filename);
+        return 0;
     }
 
     public String getName(){ return "git";}
