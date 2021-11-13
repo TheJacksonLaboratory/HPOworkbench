@@ -27,8 +27,6 @@ public class StageInitializer implements ApplicationListener<HpoWorkbenchApplica
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StageInitializer.class);
 
-    @Value("classpath:/fenominal-main.fxml")
-    private Resource fenominalFxmResource;
     private final String applicationTitle;
 
     private final ApplicationContext applicationContext;

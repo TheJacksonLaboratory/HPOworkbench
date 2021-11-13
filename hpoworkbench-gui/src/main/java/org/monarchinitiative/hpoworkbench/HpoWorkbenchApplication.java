@@ -58,9 +58,9 @@ public class HpoWorkbenchApplication extends Application {
     public void stop() throws Exception {
         super.stop();
         //final Properties pgProperties = applicationContext.getBean("pgProperties", Properties.class);
-        final Path configFilePath = applicationContext.getBean("configFilePath", Path.class);
-        try (OutputStream os = Files.newOutputStream(configFilePath)) {
-            pgProperties.store(os, "Fenominal properties");
+        final File configFile = applicationContext.getBean("appHomeDir", File.class);
+        try (OutputStream os = Files.newOutputStream(configFile.toPath())) {
+            pgProperties.store(os, "HpoWorkbench properties");
         }
         Platform.exit();
         // close the context

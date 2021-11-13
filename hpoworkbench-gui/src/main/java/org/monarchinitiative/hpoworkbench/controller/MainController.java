@@ -14,14 +14,13 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
+import org.monarchinitiative.hpoworkbench.exception.HpoWorkbenchRuntimeException;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
 import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
-import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
-import org.monarchinitiative.hpoworkbench.io.Downloader;
-import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.hpoworkbench.io.MondoParser;
+import org.monarchinitiative.hpoworkbench.io.*;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,12 +52,7 @@ public class MainController {
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
      * resides in the classpath.
      */
-    private final Properties properties;
-
-    /**
-     * Reference to the primary stage of the App.
-     */
-
+    private final Properties pgProperties;
     /**
      * Place at the bottom of the window controlled by {@link StatusController} for showing messages to user
      */
@@ -71,7 +65,7 @@ public class MainController {
                           @Qualifier("configProperties") Properties properties,
                           @Qualifier("appHomeDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
-        this.properties = properties;
+        this.pgProperties = properties;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
     }
 
@@ -111,7 +105,7 @@ public class MainController {
 
         HPOParser parser = new HPOParser(hpoOboPath);
         optionalResources.setHpoOntology(parser.getHPO());
-        properties.setProperty("hpo.obo.path", hpoOboPath);
+        pgProperties.setProperty("hpo.obo.path", hpoOboPath);
     }
 
     @FXML
@@ -128,38 +122,15 @@ public class MainController {
             logger.trace("Cannot download hp.obo, because directory not existing at " + f.getAbsolutePath());
             return;
         }
-
-        ProgressIndicator pb = new ProgressIndicator();
-        javafx.scene.control.Label label = new javafx.scene.control.Label("downloading hp.obo...");
-        FlowPane root = new FlowPane();
-        root.setPadding(new Insets(10));
-        root.setHgap(10);
-        root.getChildren().addAll(label, pb);
-        Scene scene = new Scene(root, 400, 100);
-        Stage window = new Stage();
-        Stage primaryStage = (Stage)((Node) e.getSource()).getScene().getWindow();
-        window.initOwner(primaryStage);
-        window.setTitle("HPO download");
-        window.setScene(scene);
-
-        Task<Void> hpodownload = new Downloader(dirpath, properties.getProperty("hpo.obo.url"), PlatformUtil.HPO_OBO_FILENAME);
-        pb.progressProperty().bind(hpodownload.progressProperty());
-        window.show();
-        hpodownload.setOnSucceeded(event -> {
-            window.close();
-            logger.info(String.format("Successfully downloaded hpo to %s", dirpath));
-            String hpoOboPath = dirpath + File.separator + PlatformUtil.HPO_OBO_FILENAME;
-            optionalResources.setHpoOntology(new HPOParser(hpoOboPath).getHPO());
-            properties.setProperty("hpo.obo.path", hpoOboPath);
-        });
-        hpodownload.setOnFailed(event -> {
-            window.close();
-            logger.error("Unable to download HPO obo file");
-            optionalResources.setHpoOntology(null);
-            properties.remove("hpo.obo.path");
-        });
-        Thread thread = new Thread(hpodownload);
-        thread.start();
+        HpoMenuDownloader downloader = new HpoMenuDownloader(dirpath);
+        try {
+            String hpoPath = downloader.downloadHpo();
+            Ontology ontology = OntologyLoader.loadOntology(new File(hpoPath));
+            optionalResources.setHpoOntology(ontology);
+            pgProperties.setProperty("hpo.obo.path", hpoPath);
+        } catch (HpoWorkbenchRuntimeException ex) {
+            ex.printStackTrace();
+        }
         e.consume();
     }
 
@@ -185,7 +156,7 @@ public class MainController {
         window.setTitle("MONDO download");
         window.setScene(scene);
 
-        String MONDO_URL =  properties.getProperty("mondo.obo.url");
+        String MONDO_URL =  pgProperties.getProperty("mondo.obo.url");
         Task<Void> mondodownload = new Downloader(dirpath, MONDO_URL, PlatformUtil.MONDO_OBO_FILENAME);
         pb.progressProperty().bind(mondodownload.progressProperty());
 
@@ -198,14 +169,14 @@ public class MainController {
             MondoParser parser = new MondoParser(mondoOboPath);
             Ontology mondo = parser.getMondo();
             optionalResources.setMondoOntology(mondo);
-            properties.setProperty("mondo.obo.path", mondoOboPath);
+            pgProperties.setProperty("mondo.obo.path", mondoOboPath);
 
         });
         mondodownload.setOnFailed(event -> {
             window.close();
             logger.error("Unable to download MONDO obo file");
             optionalResources.setMondoOntology(null);
-            properties.remove("mondo.obo.path");
+            pgProperties.remove("mondo.obo.path");
         });
         Thread thread = new Thread(mondodownload);
         thread.start();
@@ -232,7 +203,7 @@ public class MainController {
         window.setTitle("HPO annotation download");
         window.setScene(scene);
 
-        Task<Void> hpodownload = new Downloader(dirpath, properties.getProperty("hpo.phenotype.annotations.url"),
+        Task<Void> hpodownload = new Downloader(dirpath, pgProperties.getProperty("hpo.phenotype.annotations.url"),
                 PlatformUtil.HPO_ANNOTATIONS_FILENAME);
         pb.progressProperty().bind(hpodownload.progressProperty());
         window.show();
@@ -247,7 +218,7 @@ public class MainController {
                 parser.doParse();
                 optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
                 optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
-                properties.setProperty("hpo.annotations.path", hpoAnnotationsFileName);
+                pgProperties.setProperty("hpo.annotations.path", hpoAnnotationsFileName);
             } catch (HPOWorkbenchException exc) {
                 exc.printStackTrace(); // TODO Popup window warning
             }
@@ -257,7 +228,7 @@ public class MainController {
             logger.error("Unable to download phenotype_annotation.tab file");
             optionalResources.setIndirectAnnotMap(null);
             optionalResources.setDirectAnnotMap(null);
-            properties.remove("hpo.annotations.path");
+            pgProperties.remove("hpo.annotations.path");
         });
         Thread thread = new Thread(hpodownload);
         thread.start();
