@@ -5,6 +5,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressIndicator;
@@ -57,7 +58,6 @@ public class MainController {
     /**
      * Reference to the primary stage of the App.
      */
-    private final Stage primaryStage;
 
     /**
      * Place at the bottom of the window controlled by {@link StatusController} for showing messages to user
@@ -68,12 +68,10 @@ public class MainController {
 
     @Autowired
     public MainController(OptionalResources optionalResources,
-                          Properties properties,
-                          @Qualifier("mainWindow") Stage primaryStage,
-                          @Qualifier("hpoWorkbenchDir") File hpoWorkbenchDir) {
+                          @Qualifier("configProperties") Properties properties,
+                          @Qualifier("appHomeDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
         this.properties = properties;
-        this.primaryStage = primaryStage;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
     }
 
@@ -102,7 +100,8 @@ public class MainController {
         chooser.setTitle("Import local hp.obo file");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HPO OBO file (*.obo)", "*.obo");
         chooser.getExtensionFilters().add(extFilter);
-        File f = chooser.showOpenDialog(primaryStage);
+        Stage stage = (Stage)((Node) e.getSource()).getScene().getWindow();
+        File f = chooser.showOpenDialog(stage);
         if (f == null) {
             logger.error("Unable to obtain path to local HPO OBO file");
             PopUps.showInfoMessage("Unable to obtain path to local HPO OBO file", "Error");
@@ -138,6 +137,7 @@ public class MainController {
         root.getChildren().addAll(label, pb);
         Scene scene = new Scene(root, 400, 100);
         Stage window = new Stage();
+        Stage primaryStage = (Stage)((Node) e.getSource()).getScene().getWindow();
         window.initOwner(primaryStage);
         window.setTitle("HPO download");
         window.setScene(scene);
@@ -180,6 +180,7 @@ public class MainController {
         root.getChildren().addAll(label, pb);
         Scene scene = new Scene(root, 400, 100);
         Stage window = new Stage();
+        Stage primaryStage = (Stage)((Node) e.getSource()).getScene().getWindow();
         window.initOwner(primaryStage);
         window.setTitle("MONDO download");
         window.setScene(scene);

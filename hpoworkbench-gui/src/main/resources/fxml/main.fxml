@@ -10,7 +10,9 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.111"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
         <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
             <MenuBar minHeight="30.0" minWidth="120.0" prefWidth="120.0" styleClass="mymenu"

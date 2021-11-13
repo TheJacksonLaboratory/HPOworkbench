@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,6 +34,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public final class AnalysisController {
     private static final Logger logger = LoggerFactory.getLogger(AnalysisController.class);
 
@@ -60,18 +62,12 @@ public final class AnalysisController {
      */
     @Autowired
     private Properties pgProperties;
-    /**
-     * Reference to the primary stage of the App.
-     */
-    private final Stage primaryStage;
+
 
     @Autowired
     public AnalysisController(OptionalResources optionalResources,
-                              @Qualifier("mainWindow") Stage primaryStage,
-                              @Qualifier("hpoWorkbenchDir") File hpoWorkbenchDir) {
+                              @Qualifier("appHomeDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
-        this.primaryStage = primaryStage;
-         // Unused, but still required.
          File hpoWorkbenchDir1 = hpoWorkbenchDir;
     }
 

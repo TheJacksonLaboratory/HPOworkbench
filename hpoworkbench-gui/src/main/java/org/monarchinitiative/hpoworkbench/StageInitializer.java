@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,8 @@ public class StageInitializer implements ApplicationListener<HpoWorkbenchApplica
     @Override
     public void onApplicationEvent(HpoWorkbenchApplication.StageReadyEvent event) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(fenominalFxmResource.getURL());
+            ClassPathResource hpowbResource = new ClassPathResource("fxml/main.fxml");
+            FXMLLoader fxmlLoader = new FXMLLoader(hpowbResource.getURL());
             fxmlLoader.setControllerFactory(applicationContext::getBean);
             Parent parent = fxmlLoader.load();
             Stage stage = event.getStage();

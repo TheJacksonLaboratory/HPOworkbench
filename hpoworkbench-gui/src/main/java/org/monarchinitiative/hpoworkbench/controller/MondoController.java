@@ -5,8 +5,10 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -25,6 +27,9 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -47,6 +52,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
  *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
+@Component
 public final class MondoController {
     private static final Logger logger = LoggerFactory.getLogger(MondoController.class);
 
@@ -79,11 +85,6 @@ public final class MondoController {
      * resides in the classpath.
      */
     private final Properties properties;
-
-    /**
-     * Reference to the primary stage of the App.
-     */
-    private final Stage primaryStage;
 
     @FXML
     private RadioButton hpoTermRadioButton;
@@ -148,14 +149,12 @@ public final class MondoController {
     private WebEngine infoWebEngine;
 
 
-    @Inject
+    @Autowired
     public MondoController(OptionalResources optionalResources,
                            Properties properties,
-                           @Named("mainWindow") Stage primaryStage,
-                           @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
+                           @Qualifier("appHomeDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
         this.properties = properties;
-        this.primaryStage = primaryStage;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
     }
 
@@ -491,7 +490,7 @@ public final class MondoController {
      * Post an issue on the MONDO tracker to suggest a correction to a term.
      */
     @FXML
-    private void suggestCorrectionToTerm() {
+    private void suggestCorrectionToTerm(ActionEvent e) {
         if (getSelectedTerm() == null) {
             logger.error("Select a term before creating GitHub issue");
             PopUps.showInfoMessage("Please select a MONDO term before creating GitHub issue",
@@ -505,6 +504,7 @@ public final class MondoController {
         // initializeGitHubLabelsIfNecessary();
         // popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
+        Stage primaryStage =  (Stage)((Node) e.getSource()).getScene().getWindow();
         popup.displayWindow(primaryStage);
         String githubissue = popup.retrieveGitHubIssue();
         if (popup.wasCancelled()) {

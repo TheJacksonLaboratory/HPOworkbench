@@ -7,6 +7,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.ResourceBundle;
@@ -21,13 +23,12 @@ enum MessageType {INFO, WARNING, ERROR}
  * @version 0.1.10
  * @since 0.1
  */
+@Component
 public final class StatusController {
 
     private static final int MAX_MESSAGES = 1;
 
     private final OptionalResources optionalResources;
-
-    private final ResourceBundle resourceBundle;
 
     @FXML
     private Label copyrightLabel;
@@ -35,10 +36,9 @@ public final class StatusController {
     @FXML
     public HBox statusHBox;
 
-    @Inject
-    StatusController(OptionalResources optionalResources, ResourceBundle resourceBundle) {
+    @Autowired
+    StatusController(OptionalResources optionalResources) {
         this.optionalResources = optionalResources;
-        this.resourceBundle = resourceBundle;
     }
 
     /**
@@ -63,15 +63,15 @@ public final class StatusController {
      */
     private void checkAll() {
         if (optionalResources.getHpoOntology() == null) { // hpo obo file is missing
-            publishMessage(resourceBundle.getString("status.download.hpo"), MessageType.ERROR);
-        } else if (optionalResources.getDirectAnnotMap() == null || // annotations file is missing
+            publishMessage("hpo obo file is missing", MessageType.ERROR);
+        } else if (optionalResources.getDirectAnnotMap() == null || //
                 optionalResources.getIndirectAnnotMap() == null) {
-            publishMessage(resourceBundle.getString("status.download.annotations"), MessageType.ERROR);
+            publishMessage("annotations file is missing", MessageType.ERROR);
         } else if (optionalResources.getMondoOntology() == null) {
-            publishMessage(resourceBundle.getString("status.download.mondo"), MessageType.ERROR);
+            publishMessage("Mondo file missing", MessageType.ERROR);
         } else { // since we check only 2 resources, we should be
             // fine here
-            publishMessage(resourceBundle.getString("status.all.set"), MessageType.INFO);
+            publishMessage("Ready to go", MessageType.INFO);
         }
     }
 

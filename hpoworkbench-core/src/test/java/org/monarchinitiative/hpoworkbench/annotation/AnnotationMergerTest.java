@@ -1,9 +1,9 @@
 package org.monarchinitiative.hpoworkbench.annotation;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -12,7 +12,8 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 /**
  * Tests mergin of some diseases with no metadata for the terms.
@@ -43,7 +44,7 @@ public class AnnotationMergerTest {
     private static HpoDisease CCAIDCMS_OMIM;
     private static Ontology ontology;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         // Input HPO ontology object
         /*
@@ -151,7 +152,7 @@ public class AnnotationMergerTest {
                         emptyList);
     }
 
-    @Ignore
+  /*
     @Test
     public void testMergeOsteomesopyknosis() {
         assertNotNull(OSTEOMESOPYKNOSIS_OMIM);
@@ -161,12 +162,14 @@ public class AnnotationMergerTest {
     }
 
 
-    @Ignore  @Test
+    @Test
     public void testMergeCCAIDCMS() {
         assertNotNull(CCAIDCMS_OMIM);
         AnnotationMerger merger = new AnnotationMerger(CCAIDCMS_OMIM,CCAIDCMS_ORPHA,ontology);
         merger.merge();
     }
+
+   */
 
 
 }

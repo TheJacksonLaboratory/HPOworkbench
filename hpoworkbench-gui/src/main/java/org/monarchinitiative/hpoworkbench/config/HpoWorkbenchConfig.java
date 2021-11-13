@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class HpoWorkbenchConfig {
      * @return {@link Properties} with user configuration
      */
     @Bean(value="configProperties")
+    @Primary
     public Properties pgProperties(@Qualifier("configFilePath") File configFilePath) {
         Properties properties = new Properties();
         if (configFilePath.isFile()) {

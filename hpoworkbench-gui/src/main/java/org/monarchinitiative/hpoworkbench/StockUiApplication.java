@@ -18,7 +18,7 @@ public class StockUiApplication {
     /*
      private static final String WINDOW_TITLE = "Human Phenotype Ontology Workbench";
 
-    private Injector injector;
+
 
     public static void main(String[] args) {
         launch(args);
