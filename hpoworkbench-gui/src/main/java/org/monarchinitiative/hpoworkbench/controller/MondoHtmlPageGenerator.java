@@ -24,35 +24,29 @@ class MondoHtmlPageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MondoHtmlPageGenerator.class);
 
 
+    // the Mondo , summary, and the annotation HTML code go here
+    private static final String HTML_TEMPLATE = """
+            <!DOCTYPE html><html lang="en"><head><style>%s</style>
+            <meta charset="UTF-8"><title>Mondo browser</title></head><body>%s %s %s
+            </body></html>""";
 
-
-    private static final String HTML_TEMPLATE = "<!DOCTYPE html>" +
-            "<html lang=\"en\"><head>" +
-            "<style>%s</style>\n" +
-            "<meta charset=\"UTF-8\"><title>Mondo browser</title></head>" +
-            "<body>" +
-            "%s %s %s\n" + // the Mondo , summary, and the annotation HTML code go here
-            "</body></html>";
-
-    private static final String CSS = "body {\n" +
-            "  font: normal medium/1.4 sans-serif;\n" +
-            "}\n" +
-            "table {\n" +
-            "  border-collapse: collapse;\n" +
-            "  width: 100%;\n" +
-            "}\n" +
-            "th, td {\n" +
-            "  padding: 0.25rem;\n" +
-            "  text-align: left;\n" +
-            "  border: 1px solid #ccc;\n" +
-            "}\n" +
-            "tr.myheader {background:#fff} "+
-            "tr.shared { background:#3ff} " +
-            "tr.subclazz { background:#f3f} " +
-            "tr.unrelated { background:#ff3} " +
-           // "tbody tr:nth-child(odd) {\n" +
-            //"  background: #eee;\n" +
-            "}";
+    // "tbody tr:nth-child(odd) {\n" +
+    //"  background: #eee;\n" +
+    private static final String CSS = """
+            body {
+              font: normal medium/1.4 sans-serif;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            th, td {
+              padding: 0.25rem;
+              text-align: left;
+              border: 1px solid #ccc;
+            }
+            tr.myheader {background:#fff} tr.shared { background:#3ff} tr.subclazz { background:#f3f}
+            tr.unrelated { background:#ff3} }""";
 
 
 

@@ -30,8 +30,6 @@ public class CountGenes extends HPOCommand implements Callable<Integer> {
     private Multimap<TermId, TermId> geneToDiseaseMapPhenol;
     private Multimap<TermId, TermId> geneToDiseaseMapCh;
 
-    private Set<Pair> geneDiseasePairSet;
-
 
     @CommandLine.Option(names={"--allgenes"}, required = true)
     String pathToGenesToPhenotypeFile;
@@ -87,7 +85,7 @@ public class CountGenes extends HPOCommand implements Callable<Integer> {
 
 
     private void parseGeneToPhenotypeFile(String path) {
-        geneDiseasePairSet = new HashSet<>();
+        Set<Pair> geneDiseasePairSet = new HashSet<>();
         ImmutableSet.Builder<Pair> builder = new ImmutableSet.Builder<>();
         try (BufferedReader br = new BufferedReader(new FileReader(pathToGenesToPhenotypeFile))) {
             String line;
@@ -103,7 +101,7 @@ public class CountGenes extends HPOCommand implements Callable<Integer> {
                 TermId geneTid = TermId.of("NCBIGene", geneid);
                 String diseaseid = fields[8];
                 TermId diseaseTid = TermId.of(diseaseid);
-                this.geneDiseasePairSet.add(new Pair(geneTid, diseaseTid));
+                geneDiseasePairSet.add(new Pair(geneTid, diseaseTid));
             }
         } catch (IOException e) {
             e.printStackTrace();

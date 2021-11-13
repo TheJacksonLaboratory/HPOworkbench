@@ -13,12 +13,14 @@ import java.util.stream.Collectors;
 public class MondoTermHtmlGenerator {
     private final static String EMPTY_STRING="";
 
-    private final static String TEMPLATE="<h1>%s</h1>\n" +
-            "            <p><b>ID:</b> %s</p>\n" +
-            "            <p><b>Definition:</b> %s</p>\n" +
-            "            <p><b>Dbxref:</b> %s</p>" +
-            "            <p><b>Synonyms:</b> %s</p>\n"+
-            "            <p><b>Comment:</b> %s</p>\n";
+    private final static String TEMPLATE= """
+            <h1>%s</h1>
+             <p><b>ID:</b> %s</p>
+             <p><b>Definition:</b> %s</p>
+             <p><b>Dbxref:</b> %s</p>
+             <p><b>Synonyms:</b> %s</p>
+             <p><b>Comment:</b> %s</p>
+            """;
 
 
     public static String getHTML(Term mondoTerm) {

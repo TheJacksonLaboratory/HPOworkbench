@@ -3,7 +3,7 @@ package org.monarchinitiative.hpoworkbench;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationEvent;
@@ -25,6 +25,9 @@ public class HpoWorkbenchApplication extends Application {
 
     static public final String HPOWB_VERSION_PROP_KEY = "hpowb.version";
 
+    @Autowired
+    @Qualifier("configProperties")
+    private Properties pgProperties;
 
     @Override
     public void start(Stage stage) {
@@ -54,9 +57,7 @@ public class HpoWorkbenchApplication extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        // save properties
-        final Properties pgProperties = BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getBeanFactory(),
-                Properties.class, "pgProperties");
+        //final Properties pgProperties = applicationContext.getBean("pgProperties", Properties.class);
         final Path configFilePath = applicationContext.getBean("configFilePath", Path.class);
         try (OutputStream os = Files.newOutputStream(configFilePath)) {
             pgProperties.store(os, "Fenominal properties");

@@ -7,12 +7,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
@@ -32,7 +30,6 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,7 +37,6 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
 
 import java.io.File;
-import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -642,21 +638,11 @@ public final class HpoController {
                         }
                         if (userdata==null) return;
                         switch (userdata) {
-                            case "orphanet":
-                                selectedDatabase = DiseaseDatabase.ORPHANET;
-                                break;
-                            case "omim":
-                                selectedDatabase = DiseaseDatabase.OMIM;
-                                break;
-                            case "all":
-                                selectedDatabase = DiseaseDatabase.ALL;
-                                break;
-                            case "decipher":
-                                selectedDatabase = DiseaseDatabase.DECIPHER;
-                                break;
-                            default:
-                                LOGGER.warn("did not recognize database " + userdata);
-                                break;
+                            case "orphanet" -> selectedDatabase = DiseaseDatabase.ORPHANET;
+                            case "omim" -> selectedDatabase = DiseaseDatabase.OMIM;
+                            case "all" -> selectedDatabase = DiseaseDatabase.ALL;
+                            case "decipher" -> selectedDatabase = DiseaseDatabase.DECIPHER;
+                            default -> LOGGER.warn("did not recognize database " + userdata);
                         }
                     }
                 });

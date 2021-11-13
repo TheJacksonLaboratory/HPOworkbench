@@ -24,18 +24,12 @@ public enum DiseaseDatabase {
     }
 
     public DiseaseDatabase fromString(String db) {
-        switch (db) {
-            case "OMIM":
-            case "omim":
-                return OMIM;
-            case "ORPHA":
-            case "ORPHANET":
-                return ORPHANET;
-            case "DECIPHER":
-                return DECIPHER;
-            default:
-                return ALL;
-        }
+        return switch (db) {
+            case "OMIM", "omim" -> OMIM;
+            case "ORPHA", "ORPHANET" -> ORPHANET;
+            case "DECIPHER" -> DECIPHER;
+            default -> ALL;
+        };
     }
 
 }

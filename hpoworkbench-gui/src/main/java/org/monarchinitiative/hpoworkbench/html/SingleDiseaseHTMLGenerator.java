@@ -50,18 +50,19 @@ public class SingleDiseaseHTMLGenerator {
         for (HpoCategory cat : hpocatlist) {
             String template=cat.getNumberOfAnnotations()>1?"%s (%d annotations)":"%s (%d annotation)";
             String title = String.format(template, cat.getLabel(), cat.getNumberOfAnnotations());
-            sb.append(String.format("<table class=\"zebra\">\n" +
-                    "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">%s</caption>\n" +
-                    "    <thead>\n" +
-                    "      <tr>\n" +
-                    "        <th>Id</th><th>Label</th><th>Definition</th>\n" +
-                    "      </tr>\n" +
-                    "    </thead>\n" +
-                    "    <tfoot>\n" +
-                    "      <tr>\n" +
-                    "        <td colspan=\"3\">More information: <a href=\"http://www.human-phenotype-ontology.org\">HPO Website</a></td>\n" +
-                    "      </tr>\n" +
-                    "    </tfoot><br/>", title));
+            sb.append(String.format("""
+                    <table class="zebra">
+                        <caption  style="color:#222;text-shadow:0px 1px 2px #555;font-size:24px;">%s</caption>
+                        <thead>
+                          <tr>
+                            <th>Id</th><th>Label</th><th>Definition</th>
+                          </tr>
+                        </thead>
+                        <tfoot>
+                          <tr>
+                            <td colspan="3">More information: <a href="http://www.human-phenotype-ontology.org">HPO Website</a></td>
+                          </tr>
+                        </tfoot><br/>""", title));
             List<TermId> termIdList = cat.getAnnotatingTermIds();
             for (TermId tid : termIdList) {
                 Term term = ontology.getTermMap().get(tid);

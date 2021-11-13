@@ -452,11 +452,7 @@ public final class MondoController {
     @FXML
     public void copyHtmlToSystemClipboard(Event e) {
         String str;
-        if (this.htmlContent==null) {
-            str="no MONDO disease seleced";
-        } else {
-            str=this.htmlContent;
-        }
+        str = Objects.requireNonNullElse(this.htmlContent, "no MONDO disease seleced");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Clipboard clipboard = toolkit.getSystemClipboard();
         StringSelection strSel = new StringSelection(str);

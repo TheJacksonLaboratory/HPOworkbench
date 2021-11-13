@@ -133,7 +133,7 @@ public class Platform {
         OSX("Os X"),
         UNKNOWN("Unknown");
 
-        private String name;
+        private final String name;
 
         CurrentPlatform(String n) {this.name = n; }
 

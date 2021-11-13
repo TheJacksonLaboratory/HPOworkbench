@@ -20,6 +20,8 @@ import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -58,17 +60,18 @@ public final class AnalysisController {
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
      * resides in the classpath.
      */
-    private final Properties properties;
+    @Autowired
+    private Properties pgProperties;
     /**
      * Reference to the primary stage of the App.
      */
     private final Stage primaryStage;
 
-    @Inject
-    public AnalysisController(OptionalResources optionalResources, Properties properties,
-                              @Named("mainWindow") Stage primaryStage, @Named("hpoWorkbenchDir") File hpoWorkbenchDir) {
+    @Autowired
+    public AnalysisController(OptionalResources optionalResources,
+                              @Qualifier("mainWindow") Stage primaryStage,
+                              @Qualifier("hpoWorkbenchDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
-        this.properties = properties;
         this.primaryStage = primaryStage;
          // Unused, but still required.
          File hpoWorkbenchDir1 = hpoWorkbenchDir;
@@ -134,7 +137,7 @@ public final class AnalysisController {
         final String pattern = "yyyy-MM-dd";
         final DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern(pattern);
-        StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
+        StringConverter<LocalDate> converter = new StringConverter<>() {
             @Override
             public String toString(LocalDate date) {
                 if (date != null) {
@@ -143,6 +146,7 @@ public final class AnalysisController {
                     return "";
                 }
             }
+
             @Override
             public LocalDate fromString(String string) {
                 if (string != null && !string.isEmpty()) {

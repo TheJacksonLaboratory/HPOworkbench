@@ -1,8 +1,6 @@
 package org.monarchinitiative.hpoworkbench;
 
 import javafx.concurrent.Task;
-import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
-import org.monarchinitiative.hpoworkbench.exception.HpoWorkbenchRuntimeException;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;

@@ -38,7 +38,7 @@ public class HpoWorkbenchConfig {
      * @param configFilePath path where the properties file is supposed to be present (it's ok if the file itself doesn't exist).
      * @return {@link Properties} with user configuration
      */
-    @Bean
+    @Bean(value="configProperties")
     public Properties pgProperties(@Qualifier("configFilePath") File configFilePath) {
         Properties properties = new Properties();
         if (configFilePath.isFile()) {
