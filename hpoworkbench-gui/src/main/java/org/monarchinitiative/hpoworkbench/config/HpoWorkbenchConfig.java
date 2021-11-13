@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 public class HpoWorkbenchConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(HpoWorkbenchConfig.class);
 
-    public static final String CONFIG_FILE_BASENAME = "fenominal.properties";
+    public static final String CONFIG_FILE_BASENAME = "hpowb.properties";
 
 
     @Bean
@@ -62,13 +62,13 @@ public class HpoWorkbenchConfig {
         String osName = System.getProperty("os.name").toLowerCase();
         File appHomeDir;
         if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) { // Unix
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".fenominal");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".hpowb");
         } else if (osName.contains("win")) { // Windows
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + "fenominal");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + "hpowb");
         } else if (osName.contains("mac")) { // OsX
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".fenominal");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".hpowb");
         } else { // unknown platform
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + "fenominal");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + "hpowb");
         }
 
         if (!appHomeDir.exists()) {

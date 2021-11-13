@@ -197,38 +197,46 @@ public class GitHubPopup {
 
     private String getInitialText() {
         if (suggestNewChildTerm) {
-            return String.format("Suggest creating new child term of %s [%s] \n" +
-                    "New term label:\n" +
-                    "New term definition:\n" +
-                    "New term comment (if any):\n" +
-                    "New term synonyms(if any):\n" +
-                    "New term lay person synonyms (if any):\n" +
-                    "Reference (e.g., PubMed ID):\n" +
-                    "Your biocurator ID for nanoattribution (if desired):", termlabel, termid);
+            return String.format("""
+                    Suggest creating new child term of %s [%s]\s
+                    New term label:
+                    New term definition:
+                    New term comment (if any):
+                    New term synonyms(if any):
+                    New term lay person synonyms (if any):
+                    Reference (e.g., PubMed ID):
+                    Your biocurator ID for nanoattribution (if desired):""", termlabel, termid);
         } else if (mistakenAnnotation) {
-            return String.format("Erroneous annotation for disease %s [%s] \n" +
-                            "Erroneous annotation: %s [%s]\n" +
-                            "Reference (e.g., PubMed ID):\n" +
-                            "Your biocurator ID for nanoattribution (if desired):\n" +
-                            "Anything else (replacement?):",
+            return String.format("""
+                            Erroneous annotation for disease %s [%s]\s
+                            Erroneous annotation: %s [%s]
+                            Reference (e.g., PubMed ID):
+                            Your biocurator ID for nanoattribution (if desired):
+                            Anything else (replacement?):""",
                     dmodel.getName(),
                     dmodel.getDiseaseDatabaseId().getValue(),
                     termlabel, termid);
         } else if (newAnnotation) {
-            return String.format("Suggest creating new annotation for disease %s [%s] \n" +
-                            "New annotation: %s [%s]\n" +
-                            "Reference (e.g., PubMed ID):\n" +
-                            "Frequency (e.g., 3/7 or 42%%):\n" +
-                            "Age of onset:\n" +
-                            "Your biocurator ID for nanoattribution (if desired):\n" +
-                            "Anything else:",
+            return String.format("""
+                            Suggest creating new annotation for disease %s [%s]\s
+                            New annotation: %s [%s]
+                            Reference (e.g., PubMed ID):
+                            Frequency (e.g., 3/7 or 42%%):
+                            Age of onset:
+                            Your biocurator ID for nanoattribution (if desired):
+                            Anything else:""",
                     shortName(dmodel.getName()),
                     dmodel.getDiseaseDatabaseId().getValue(),
                     termlabel, termid);
         } else {
-            return String.format("Suggestion about term %s [%s]\nCurrent definition: %s\n" +
-                            "Current comment: %s\nCurrent synonym list: %s\n\n" +
-                            "My suggestion: \n",
+            return String.format("""
+                            Suggestion about term %s [%s]
+                            Current definition: %s
+                            Current comment: %s
+                            Current synonym list: %s
+
+                            My suggestion:\s
+                            """,
                     termlabel,
                     termid,
                     definition != null ? definition : "no definition available",

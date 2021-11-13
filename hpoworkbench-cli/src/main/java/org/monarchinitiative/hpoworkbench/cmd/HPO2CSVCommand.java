@@ -1,8 +1,6 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import org.apache.log4j.Logger;
-
 
 
 import java.io.BufferedWriter;
@@ -19,6 +17,8 @@ import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 /**
@@ -30,7 +30,7 @@ import picocli.CommandLine;
         mixinStandardHelpOptions = true,
         description = "Make a CSV file representing the HPO hp.obo file.")
 public class HPO2CSVCommand extends HPOCommand implements Callable<Integer> {
-    private static Logger LOGGER = Logger.getLogger(HPO2CSVCommand.class.getName());
+    private static Logger LOGGER = LoggerFactory.getLogger(HPO2CSVCommand.class);
     /** name of this command */
     private final static String name = "csv";
     private Map<String,String> hpoName2IDmap=null;

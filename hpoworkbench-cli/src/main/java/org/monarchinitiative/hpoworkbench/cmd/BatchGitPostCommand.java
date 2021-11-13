@@ -1,7 +1,8 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -20,7 +21,7 @@ import java.util.concurrent.Callable;
         mixinStandardHelpOptions = true,
         description = "Post a batch of GitHub issues to the HPO tracker.")
 public class BatchGitPostCommand extends HPOCommand implements Callable<Integer> {
-    private static final Logger logger = Logger.getLogger(BatchGitPostCommand.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BatchGitPostCommand.class.getName());
     @CommandLine.Option(names={"-l","--label"},required = true,description = "github issue label")
     private String issueLabel;
     @CommandLine.Option(names={"-i","--input-file"},required = true,description = "path to input file")

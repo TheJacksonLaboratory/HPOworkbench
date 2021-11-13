@@ -1,9 +1,10 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import org.apache.log4j.Logger;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -21,7 +22,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getCh
         mixinStandardHelpOptions = true,
         description = "term cross-correlation analysis.")
 public class Hpo2HpoCommand extends HPOCommand implements Callable<Integer>  {
-    private static Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
+    private static Logger LOGGER = LoggerFactory.getLogger(Hpo2HpoCommand.class.getName());
 
     /** All of the ancestor terms of {@link #hpoTermId}. */
     private Set<TermId> descendents=null;

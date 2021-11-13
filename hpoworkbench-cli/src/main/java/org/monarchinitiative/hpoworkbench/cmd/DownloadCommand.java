@@ -1,8 +1,9 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.FileDownloader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -24,7 +25,7 @@ import java.util.concurrent.Callable;
         mixinStandardHelpOptions = true,
         description = "Download HPO/MONDO/medgen files.")
 public final class DownloadCommand extends HPOCommand implements Callable<Integer> {
-    private static final Logger LOGGER = Logger.getLogger(DownloadCommand.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadCommand.class.getName());
 
 
     private final String PHENOTYPE_HPOA_URL="http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa";

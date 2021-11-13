@@ -4,11 +4,12 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.apache.log4j.Logger;
 import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationParser;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -25,7 +26,7 @@ import java.util.concurrent.Callable;
         mixinStandardHelpOptions = true,
         description = "Count and compare gene to disease associations.")
 public class CountGenes extends HPOCommand implements Callable<Integer> {
-    private static final Logger LOGGER = Logger.getLogger(CountGenes.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CountGenes.class);
 
     private Multimap<TermId, TermId> geneToDiseaseMapPhenol;
     private Multimap<TermId, TermId> geneToDiseaseMapCh;

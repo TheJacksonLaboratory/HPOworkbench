@@ -1,11 +1,12 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -22,7 +23,7 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getPa
         mixinStandardHelpOptions = true,
         description = "hpo best match.")
 public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer> {
-    private static final Logger LOGGER = Logger.getLogger(Hpo2HpoCommand.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hpo2HpoCommand.class);
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
     private Map<TermId, HpoDisease> diseaseMap =null;

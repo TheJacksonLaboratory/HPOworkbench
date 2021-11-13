@@ -8,8 +8,6 @@ import org.monarchinitiative.hpoworkbench.exception.HPOException;
  * @author <a href="mailto:marten.jaeger@charite.de">Marten Jaeger</a>
  */
 public class FileDownloadException extends HPOException {
-    private static final long serialVersionUID = 1L;
-
     public FileDownloadException() {
         super();
     }

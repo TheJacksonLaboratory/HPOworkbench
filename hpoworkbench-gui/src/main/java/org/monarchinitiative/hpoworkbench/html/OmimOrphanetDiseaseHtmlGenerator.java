@@ -26,18 +26,19 @@ public class OmimOrphanetDiseaseHtmlGenerator {
 
 
     private static String getTableFramework(String title, String disease1name, String disease2name) {
-        return String.format("<table class=\"zebra\">\n" +
-                "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">%s</caption>\n" +
-                "    <thead>\n" +
-                "      <tr class=\"myheader\">\n" +
-                "        <th>Id</th><th>definition</th>\n" +
-                "      </tr>\n" +
-                "    </thead>\n" +
-                "    <tfoot>\n" +
-                "      <tr>\n" +
-                "        <td colspan=\"3\">More information: <a href=\"http://www.human-phenotype-ontology.org\">HPO Website</a></td>\n" +
-                "      </tr>\n" +
-                "    </tfoot>", title);
+        return String.format("""
+                <table class="zebra">
+                    <caption  style="color:#222;text-shadow:0px 1px 2px #555;font-size:24px;">%s</caption>
+                    <thead>
+                      <tr class="myheader">
+                        <th>Id</th><th>definition</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr>
+                        <td colspan="3">More information: <a href="http://www.human-phenotype-ontology.org">HPO Website</a></td>
+                      </tr>
+                    </tfoot>""", title);
     }
 
     /**
@@ -53,10 +54,12 @@ public class OmimOrphanetDiseaseHtmlGenerator {
         sb.append(row1);
         for (TermId tid : termIdList) {
             Term term = ontology.getTermMap().get(tid);
-            String row = String.format("<tr class=\"shared\">\n" +
-                            "        <td><a href=\"%s\">%s [%s]</a></td>\n" +
-                            "        <td>%s</td>\n" +
-                            "      </tr>\n",
+            String row = String.format("""
+                            <tr class="shared">
+                                    <td><a href="%s">%s [%s]</a></td>
+                                    <td>%s</td>
+                                  </tr>
+                            """,
                     term.getId().getValue(),
                     term.getName(),
                     term.getId().getValue(),

@@ -1,9 +1,10 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import org.apache.log4j.Logger;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssue;
 import org.monarchinitiative.hpoworkbench.github.GitHubIssueRetriever;
 import org.monarchinitiative.hpoworkbench.word.GitIssue2Doc4J;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.concurrent.Callable;
         mixinStandardHelpOptions = true,
         description = "Download GitHub issues and create a Word doc.")
 public class GitCommand  extends HPOCommand implements Callable<Integer> {
-    private static final Logger LOGGER = Logger.getLogger(GitCommand.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitCommand.class.getName());
     @CommandLine.Option(names={"-l","--label"},required = true,description = "git issue label")
     private  String issueLabel;
 

@@ -101,20 +101,22 @@ public class GitHubPoster {
 
 
     private void reformatPayloadWithLabel(String label) {
-        this.payload = String.format("{\n" +
-                        "\"title\": \"%s\",\n" +
-                        "\"body\": \"%s\",\n" +
-                        "\"labels\": [ \"%s\"] }",
+        this.payload = String.format("""
+                        {
+                        "title": "%s",
+                        "body": "%s",
+                        "labels": [ "%s"] }""",
                 JSONValue.escape(this.githubTitle),
                 JSONValue.escape(this.githubBody),
                 JSONValue.escape(this.githubLabel));
     }
 
     private void reformatPayloadWithLabel(List<String> labels) {
-        this.payload = String.format("{\n" +
-                        "\"title\": \"%s\",\n" +
-                        "\"body\": \"%s\",\n" +
-                        "\"labels\": [ %s] }",
+        this.payload = String.format("""
+                        {
+                        "title": "%s",
+                        "body": "%s",
+                        "labels": [ %s] }""",
                 JSONValue.escape(this.githubTitle),
                 JSONValue.escape(this.githubBody),
                 labelsArray4Json(this.githubLabels));
@@ -123,9 +125,10 @@ public class GitHubPoster {
 
 
     private String formatPayload(String title, String messagebody) {
-        return String.format("{\n" +
-                        "\"title\": \"%s\",\n" +
-                        "\"body\": \"%s\"}",
+        return String.format("""
+                        {
+                        "title": "%s",
+                        "body": "%s"}""",
                 JSONValue.escape(title),JSONValue.escape(messagebody));
     }
 

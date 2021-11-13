@@ -50,16 +50,17 @@ class HpoRtfTableRow {
      * @return A Table header for showing HPO terms.
      */
     static String header() {
-        return "\\trowd\n" +
-                "\\cellx1000\n" +
-                "\\cellx3000\n" +
-                "\\cellx6000\n" +
-                "\\cellx9000\n" +
-                "\\b term\\b0\\intbl\\cell\n" +
-                "\\b definition\\b0\\intbl\\cell\n" +
-                "\\b comment\\b0\\intbl\\cell\n" +
-                "\\b synonyms\\b0 \\intbl\\cell\n" +
-                "\\row";
+        return """
+                \\trowd
+                \\cellx1000
+                \\cellx3000
+                \\cellx6000
+                \\cellx9000
+                \\b term\\b0\\intbl\\cell
+                \\b definition\\b0\\intbl\\cell
+                \\b comment\\b0\\intbl\\cell
+                \\b synonyms\\b0 \\intbl\\cell
+                \\row""";
     }
 
     /**

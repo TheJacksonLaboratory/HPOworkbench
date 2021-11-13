@@ -66,11 +66,13 @@ public class SingleDiseaseHTMLGenerator {
             List<TermId> termIdList = cat.getAnnotatingTermIds();
             for (TermId tid : termIdList) {
                 Term term = ontology.getTermMap().get(tid);
-                String row = String.format("<tr>\n" +
-                                "        <td><a href=\"%s\">%s</a></td>\n" +
-                                "        <td>%s</td>\n" +
-                                "        <td>%s</td>\n" +
-                                "      </tr>\n",
+                String row = String.format("""
+                                <tr>
+                                        <td><a href="%s">%s</a></td>
+                                        <td>%s</td>
+                                        <td>%s</td>
+                                      </tr>
+                                """,
                         term.getId().getValue(),
                         term.getId().getValue(),
                         term.getName(),

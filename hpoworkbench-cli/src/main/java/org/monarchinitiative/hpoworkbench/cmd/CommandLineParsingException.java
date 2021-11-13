@@ -20,6 +20,4 @@ public class CommandLineParsingException extends Exception {
         super(msg, cause);
     }
 
-    private static final long serialVersionUID = 1L;
-
 }
