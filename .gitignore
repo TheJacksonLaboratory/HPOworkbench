@@ -25,28 +25,32 @@ hpoapi-cli/dependency-reduced-pom.xml
 hp.tsv
 data/
 /hpoapi-cli/hpoapi-cli.iml
-/hpowbcli/hpowbcli.iml
+/hpoworkbench-cli/hpowbcli.iml
 .DS_Store
 hpo.rtf
 hpotest.rtf
-hpowbcli/hpowbcli.iml
-hpowbcli/target/classes/default_sources.ini
-hpowbcli/target/classes/log4j2.xml
-hpowbcli/target/generated-sources/
-hpowbcore/hpowbcore.iml
-hpowbcore/target/generated-sources/
-hpowbcore/target/generated-test-sources/
-hpowbcore/target/test-classes/hp-smalltest.obo
-hpowbcore/target/test-classes/small-annotationfile1.tab
+hpoworkbench-cli/hpowbcli.iml
+hpoworkbench-cli/target/classes/default_sources.ini
+hpoworkbench-cli/target/classes/log4j2.xml
+hpoworkbench-cli/target/generated-sources/
+hpoworkbench-core/hpowbcore.iml
+hpoworkbench-core/target/generated-sources/
+hpoworkbench-core/target/generated-test-sources/
+hpoworkbench-core/target/test-classes/hp-smalltest.obo
+hpoworkbench-core/target/test-classes/small-annotationfile1.tab
 target/
 ~$potest.rtf
-/hpowbcore/hpowbcore.iml
-/hpowbgui/hpowbgui.iml
-hpowbcli/dependency-reduced-pom.xml
+/hpoworkbench-core/hpowbcore.iml
+/hpoworkbench-gui/hpowbgui.iml
+hpoworkbench-cli/dependency-reduced-pom.xml
 /HPOworkbench.iml
 HPOworkbench.iml
 
 /.idea/modules.xml
-/hpowbgui/dependency-reduced-pom.xml
+/hpoworkbench-gui/dependency-reduced-pom.xml
 Abnormality of adipose tissue.xlsx
 Flexion contracture.xlsx
+/smallfile-qc.txt
+/hpoworkbench-gui/hpoworkbench-gui.iml
+/hpoworkbench-cli/hpoworkbench-cli.iml
+/hpoworkbench-core/hpoworkbench-core.iml
