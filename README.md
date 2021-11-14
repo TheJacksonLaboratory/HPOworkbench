@@ -8,13 +8,15 @@ through the hierarchy and displaying the term definition etc.
 
 Please see the [full documentation](http://hpo-workbench.readthedocs.io/en/latest/).
 
+## Version 2
+
+We are working on a version 2 using Java 16 and Spring Boot. To run HPO Workbench, you will need
+to have Java 16 and maven installed and to buld the application with the standard ``mvn package``
+command. The app can then be started with
+```bazaar
+java -jar hpoworkbench-gui/target/HpoWorkbench.jar
+```
+
 ## Download current release
 
-A cross-platform executable Jar file (HPOWorkbench.jar) is recommended for most users. Assuming you have Java 8 or higher installed on your computer, you should be able to start HPOWorkbench by double-clicking on this file.
-The Jar file should work on Windows, Mac, and linux.
-
-https://github.com/TheJacksonLaboratory/HPOworkbench/releases/
-
-A double click on these files should start the program. The app will remind you to
-download the HPO hpoOntology file (hp.obo) and the HPO annotations from the edit menu
-the first time you use HPO Workbench. 
+We are working on releasing native apps for Windows and Mac. 
