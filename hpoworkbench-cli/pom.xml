@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>hpoworkbench</artifactId>
+        <groupId>org.monarchinitiative.hpoworkbench</groupId>
+        <version>2.0.0</version>
+    </parent>
+    <artifactId>hpoworkbench-cli</artifactId>
+    <version>2.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>hpoworkbench-cli is the command line interface for HPOAPI</description>
+    <url>https://github.com/TheJacksonLaboratory/HPOAPI/</url>
+
+
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <itext.version>7.1.0</itext.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.monarchinitiative.hpoworkbench</groupId>
+            <artifactId>hpoworkbench-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>20030805.205232</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.6.2</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>HPOWorkbench</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!--Use filtering so that maven will replace placeholders with values
+                    from the pom e.g. ${project.version} -->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
