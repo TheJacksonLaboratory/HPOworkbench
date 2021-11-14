@@ -2,11 +2,13 @@ package org.monarchinitiative.hpoworkbench;
 
 import javafx.concurrent.Task;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
+import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.Properties;
@@ -92,6 +94,9 @@ public final class StartupTask extends Task<Void> {
             }
         }
         if (hpoAnnotPath != null) {
+            String msg = String.format("Loading phenotype.hpoa from file '%s'", hpoAnnotPath);
+            updateMessage(msg);
+            LOGGER.info(msg);
             final File hpoAnnotFile = new File(hpoAnnotPath);
             if (optionalResources.getHpoOntology() == null) {
                 LOGGER.error("Cannot load phenotype.hpoa because HP ontology not loaded");
@@ -102,10 +107,15 @@ public final class StartupTask extends Task<Void> {
                         new DirectIndirectHpoAnnotationParser(hpoAnnotPath, optionalResources.getHpoOntology());
                 optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
                 optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
+                //optionalResources.setDisease2annotationMap(parser.);
+                LOGGER.info("Loaded annotation maps");
             } else {
                 optionalResources.setDirectAnnotMap(null);
                 optionalResources.setIndirectAnnotMap(null);
+                LOGGER.error("Cannot load phenotype.hpoa File was null");
             }
+        } else {
+            LOGGER.error("Cannot load phenotype.hpoa File path not found");
         }
         return null;
     }

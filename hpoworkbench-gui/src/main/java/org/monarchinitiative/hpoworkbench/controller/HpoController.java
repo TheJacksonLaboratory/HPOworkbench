@@ -2,6 +2,8 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -62,6 +64,10 @@ public final class HpoController {
      * Object that stores the ontology data etc. if available.
      */
     private final OptionalResources optionalResources;
+    @FXML
+    public Button goAutocomplete;
+    @FXML
+    public Button clearDiseaseButton;
 
     /**
      * Current behavior of HPO Workbench. See {@link MainController.mode}.
@@ -142,6 +148,8 @@ public final class HpoController {
         this.model = model;
     }
 
+    BooleanProperty notInitializedYet = new SimpleBooleanProperty("not initialzied Yet", "false");
+
     @FXML
     public void initialize() {
         LOGGER.trace("initialize HpoController");
@@ -149,13 +157,14 @@ public final class HpoController {
 
         // this binding evaluates to true, if ontology or annotations files are missing (null)
         BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
-
-//        hpoTermRadioButton.disableProperty().bind(hpoResourceMissing);
-//        diseaseRadioButton.disableProperty().bind(hpoResourceMissing);
-//        newAnnotationRadioButton.disableProperty().bind(hpoResourceMissing);
+        notInitializedYet.bind(hpoResourceMissing);
+        goButton.disableProperty().bindBidirectional(notInitializedYet);
+        goAutocomplete.disableProperty().bindBidirectional(notInitializedYet);
+        clearDiseaseButton.disableProperty().bindBidirectional(notInitializedYet);
 
         hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
         goButton.disableProperty().bind(hpoResourceMissing);
+        goAutocomplete.disableProperty().bind(hpoResourceMissing);
         ontologyTreeView.disableProperty().bind(hpoResourceMissing);
 
         exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
@@ -164,7 +173,7 @@ public final class HpoController {
         suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
         suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
         reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
-        activate(); // update for first time
+
 
         hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
             if (!newValue) { // nothing is missing anymore
@@ -173,11 +182,10 @@ public final class HpoController {
                 deactivate();
             }
         }));
-
-
-        if (!hpoResourceMissing.get()) {
+        Platform.runLater(() -> {
             activate();
-        }
+        });
+
     }
 
     @FXML
@@ -394,9 +402,11 @@ public final class HpoController {
 
     /** FUnction is called once all of the resources are found (hp obo, disease annotations, mondo). */
     private void activate() {
-        initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
-        WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
-        WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, model.getDiseases().keySet());
+        Platform.runLater(()->{
+            initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
+            WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
+            WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, model.getDiseases().keySet());
+        });
     }
 
     private void deactivate() {
@@ -413,9 +423,6 @@ public final class HpoController {
      */
     private void updateDescriptionToDiseaseModel(HpoDisease dmodel) {
         LOGGER.trace("TOP OF updateDescriptionToDiseaseModel");
-//        String dbName = dmodel.getDiseaseDatabaseId().getIdWithPrefix();
-//        String diseaseName = dmodel.getName();
-//        List<Term> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
         String content = HpoHtmlPageGenerator.getDiseaseHTML(dmodel, optionalResources.getHpoOntology());
         infoWebEngine.loadContent(content);
         infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener<Worker.State>()

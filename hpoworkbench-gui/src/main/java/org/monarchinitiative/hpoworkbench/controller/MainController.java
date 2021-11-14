@@ -91,18 +91,11 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        // NO-OP
         logger.info("Initializing main controller");
         StartupTask task = new StartupTask(optionalResources, pgProperties);
-
-//        this.hpoReadyLabel.textProperty().bind(task.messageProperty());
-//        task.setOnSucceeded(e -> this.hpoReadyLabel.textProperty().unbind());
+        task.setOnSucceeded(e -> publishMessage("Successfully loaded files"));
+        task.setOnFailed(e -> publishMessage("Unable to load ontologies/annotations", MessageType.ERROR));
         this.executor.submit(task);
-        // only enable analyze if Ontology downloaded (enabled property watches
-//        this.setupButton.disableProperty().bind(optionalResources.ontologyProperty().isNull());
-//        this.parseButton.setDisable(true);
-//        this.previwButton.setDisable(true);
-//        this.outputButton.setDisable(true);
         String ver = MainController.getVersion();
         copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2021");
 
@@ -121,10 +114,9 @@ public class MainController {
      */
     private void checkAll() {
         if (optionalResources.getHpoOntology() == null) { // hpo obo file is missing
-            publishMessage("hpo obo file is missing", MessageType.ERROR);
-        } else if (optionalResources.getDirectAnnotMap() == null || //
-                optionalResources.getIndirectAnnotMap() == null) {
-            publishMessage("annotations file is missing", MessageType.ERROR);
+            publishMessage("hpo json file is missing", MessageType.ERROR);
+        } else if (optionalResources.getAnnotationPath() == null ) {
+            publishMessage("phenotype.hpoa file is missing", MessageType.ERROR);
         } else if (optionalResources.getMondoOntology() == null) {
             publishMessage("Mondo file missing", MessageType.ERROR);
         } else { // since we check only 2 resources, we should be
@@ -150,7 +142,7 @@ public class MainController {
      * @param type message type
      */
     private void publishMessage(String msg, MessageType type) {
-        int MAX_MESSAGES = 3;
+        int MAX_MESSAGES = 1;
         Platform.runLater(()->{
             if (statusHBox.getChildren().size() == MAX_MESSAGES) {
                 statusHBox.getChildren().remove(MAX_MESSAGES - 1);
