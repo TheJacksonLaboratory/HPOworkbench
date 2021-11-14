@@ -3,10 +3,14 @@ package org.monarchinitiative.hpoworkbench.config;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +21,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Configuration
+@PropertySource("classpath:application.properties")
 public class HpoWorkbenchConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(HpoWorkbenchConfig.class);
 
     public static final String CONFIG_FILE_BASENAME = "hpowb.properties";
+
+
 
 
     @Bean
@@ -91,6 +98,8 @@ public class HpoWorkbenchConfig {
         }
         return appHomeDir;
     }
+
+
 
 
 //    @Bean("appNameVersion")

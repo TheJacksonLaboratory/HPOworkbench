@@ -11,6 +11,7 @@ import javafx.scene.control.Tab;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -31,10 +32,14 @@ import java.util.stream.Stream;
  * @see ResourceValidator
  * @since 0.1
  */
+
 public final class OptionalResources {
     public static final String DEFAULT_HPO_FILE_NAME = "hp.json";
     public static final String BIOCURATOR_ID_PROPERTY = "biocurator.id";
-    public static final String ONTOLOGY_PATH_PROPERTY = "hp.json.path";
+    public static final String HP_JSON_PATH_PROPERTY = "hp.json.path";
+    public static final String MONDO_PATH_PROPERTY = "mondo.json.path";
+    public static final String HPOA_PATH_PROPERTY = "hpoa.path";
+    static public final String HPOA_URL_KEY = "hpo.phenotype.annotations.url";
     /**
      * This binding evaluates as true when a resource required for a {@link Tab} controlled by
      * {@link org.monarchinitiative.hpoworkbench.controller.MondoController} is missing.
@@ -51,6 +56,10 @@ public final class OptionalResources {
 
     private final ObjectProperty<Ontology> mondoOntology
             = new SimpleObjectProperty<>(this, "mondoOntology", null);
+
+    private final StringProperty statusLabelProperty =
+            new SimpleStringProperty(this, "status", "");
+
 
     private final ObjectProperty<Map<TermId, List<HpoDisease>>> indirectAnnotMap =
             new SimpleObjectProperty<>(this, "indirectAnnotMap", null);

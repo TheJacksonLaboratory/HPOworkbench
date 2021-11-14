@@ -46,7 +46,7 @@ public final class StatusController {
      */
     public void initialize() {
         String ver = MainController.getVersion();
-        copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2020");
+        copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2021");
 
         ChangeListener<? super Object> listener = (obs, oldval, newval) -> checkAll();
 

@@ -20,47 +20,29 @@ public class Downloader extends Task<Void> {
     /**
      * The absolute path to the place (directory) where the downloaded file will be
      * saved in the local filesystem.*/
-    private File localDir=null;
+    private final File localDir;
 
     /**
      * The full local path of the file we will download. It should be set to be identical
      * to {@link #localDir} except for the final file base name.
      */
-    private File localFilePath=null;
+    private final File localFilePath;
 
 
     /** This is the URL of the file we want to download */
-    private String urlstring=null;
+    private final String urlstring;
 
     public Downloader(File directoryPath, String url, String basename) {
         this.localDir = directoryPath;
         this.urlstring=url;
-        setLocalFilePath(basename);
+        this.localFilePath = new File(this.localDir + File.separator + basename);
     }
 
     public Downloader(String path, String url, String basename) {
         this(new File(path),url,basename);
     }
 
-    public Downloader(File path, String url){
-        this(path,url,"");
-    }
-
-
     private File getLocalFilePath() { return  this.localFilePath; }
-
-    private void setLocalFilePath (String bname) {
-        this.localFilePath = new File(this.localDir + File.separator + bname);
-        logger.debug("setLocalFilepath for download to: "+localFilePath);
-    }
-
-    /**
-     * @param url Subclasses need to set this to the URL of the resource to be downloaded. Alternatively,
-     * client code needs to set it.
-     */
-    public void setURL(String url) {
-        this.urlstring=url;
-    }
 
     /**
      * This method downloads a file to the specified local file path. If the file already exists, it emits a warning
@@ -69,8 +51,6 @@ public class Downloader extends Task<Void> {
     @Override
     protected Void call() throws Exception {
         logger.debug("[INFO] Downloading: \"" + urlstring + "\"");
-
-
         try {
             URL url = new URL(urlstring);
             FileDownloader fileDownloader = new FileDownloader();

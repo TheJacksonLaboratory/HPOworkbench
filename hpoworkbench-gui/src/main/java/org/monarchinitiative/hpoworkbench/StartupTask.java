@@ -6,7 +6,6 @@ import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.Properties;
@@ -27,14 +26,15 @@ import java.util.Properties;
 public final class StartupTask extends Task<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartupTask.class);
-    @Autowired
-    private OptionalResources optionalResources;
+
+    private final OptionalResources optionalResources;
 
     private final Properties pgProperties;
 
 
-    public StartupTask(Properties pgProperties) {
+    public StartupTask(OptionalResources optionalResources, Properties pgProperties) {
         this.pgProperties = pgProperties;
+        this.optionalResources = optionalResources;
     }
 
     /**
@@ -54,7 +54,7 @@ public final class StartupTask extends Task<Void> {
         This way we ensure that GUI elements dependent on ontology presence (labels, buttons) stay disabled
         and that the user will be notified about the fact that the ontology is missing.
          */
-        String ontologyPath = pgProperties.getProperty(OptionalResources.ONTOLOGY_PATH_PROPERTY);
+        String ontologyPath = pgProperties.getProperty(OptionalResources.HP_JSON_PATH_PROPERTY);
         if (ontologyPath != null) {
             final File hpJsonFile = new File(ontologyPath);
             if (hpJsonFile.isFile()) {

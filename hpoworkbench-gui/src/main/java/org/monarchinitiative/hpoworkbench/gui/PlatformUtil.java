@@ -12,13 +12,12 @@ import java.io.File;
  */
 public class PlatformUtil {
 
-    public static final String HPO_OBO_FILENAME = "hp.obo";
+    public static final String HPO_JSON_FILENAME = "hp.json";
 
-    public static final String MONDO_OBO_FILENAME = "mondo.obo";
+    public static final String MONDO_JSON_FILENAME = "mondo.json";
 
     public static final String HPO_ANNOTATIONS_FILENAME = "phenotype.hpoa";
 
-    public static final String HPO_WORKBENCH_SETTINGS_FILENAME = "application.properties";
 
     /**
      * Get path to directory where HRMD-gui stores global settings.
@@ -51,7 +50,7 @@ public class PlatformUtil {
 
     public static String getLocalHPOPath() {
         File dir = getHpoWorkbenchDir();
-        return dir + File.separator + HPO_OBO_FILENAME;
+        return dir + File.separator + HPO_JSON_FILENAME;
     }
 
     /** Return the absolute path to the settings file, which is kept in the .loinc2hpo directory in the

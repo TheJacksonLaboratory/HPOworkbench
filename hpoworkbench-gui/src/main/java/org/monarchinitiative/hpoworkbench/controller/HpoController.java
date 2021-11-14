@@ -142,6 +142,44 @@ public final class HpoController {
     }
 
     @FXML
+    public void initialize() {
+        LOGGER.trace("initialize HpoController");
+        initRadioButtons();
+
+        // this binding evaluates to true, if ontology or annotations files are missing (null)
+        BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
+
+//        hpoTermRadioButton.disableProperty().bind(hpoResourceMissing);
+//        diseaseRadioButton.disableProperty().bind(hpoResourceMissing);
+//        newAnnotationRadioButton.disableProperty().bind(hpoResourceMissing);
+
+        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
+        goButton.disableProperty().bind(hpoResourceMissing);
+        ontologyTreeView.disableProperty().bind(hpoResourceMissing);
+
+        exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
+        exportToExcelButton.disableProperty().bind(hpoResourceMissing);
+        suggestCorrectionToTermButton.disableProperty().bind(hpoResourceMissing);
+        suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
+        suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
+        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
+
+
+        hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
+            if (!newValue) { // nothing is missing anymore
+                activate();
+            } else { // invalidate model and anything in the background. Controls should be disabled automatically
+                deactivate();
+            }
+        }));
+
+
+        if (!hpoResourceMissing.get()) {
+            activate();
+        }
+    }
+
+    @FXML
     public void goButtonAction() {
             TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
             if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
@@ -352,46 +390,7 @@ public final class HpoController {
     }
 
 
-    public void initialize() {
-        //logger.trace("initialize");
-//        // This action will be run after user approves a PhenotypeTerm in the ontologyTreePane
-//        Consumer<HpoTerm> addHook = (ph -> logger.trace(String.format("Hook for %s", ph.getName())));
 
-        initRadioButtons();
-
-        // this binding evaluates to true, if ontology or annotations files are missing (null)
-        BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
-
-//        hpoTermRadioButton.disableProperty().bind(hpoResourceMissing);
-//        diseaseRadioButton.disableProperty().bind(hpoResourceMissing);
-//        newAnnotationRadioButton.disableProperty().bind(hpoResourceMissing);
-
-        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
-        goButton.disableProperty().bind(hpoResourceMissing);
-        ontologyTreeView.disableProperty().bind(hpoResourceMissing);
-
-        exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
-        exportToExcelButton.disableProperty().bind(hpoResourceMissing);
-        suggestCorrectionToTermButton.disableProperty().bind(hpoResourceMissing);
-        suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
-        suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
-        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
-
-
-        hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
-            if (!newValue) { // nothing is missing anymore
-                activate();
-            } else { // invalidate model and anything in the background. Controls should be disabled automatically
-                deactivate();
-            }
-        }));
-
-
-        if (!hpoResourceMissing.get()) {
-            activate();
-        }
-
-    }
     /** FUnction is called once all of the resources are found (hp obo, disease annotations, mondo). */
     private void activate() {
         initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
