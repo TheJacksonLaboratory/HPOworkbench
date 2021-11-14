@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench;
 
 import javafx.concurrent.Task;
+import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -54,24 +55,57 @@ public final class StartupTask extends Task<Void> {
         This way we ensure that GUI elements dependent on ontology presence (labels, buttons) stay disabled
         and that the user will be notified about the fact that the ontology is missing.
          */
-        String ontologyPath = pgProperties.getProperty(OptionalResources.HP_JSON_PATH_PROPERTY);
-        if (ontologyPath != null) {
-            final File hpJsonFile = new File(ontologyPath);
+        String hpoJsonPath = pgProperties.getProperty(OptionalResources.HP_JSON_PATH_PROPERTY);
+        String hpoAnnotPath = pgProperties.getProperty(OptionalResources.HPOA_PATH_PROPERTY);
+        String mondoJsonPath = pgProperties.getProperty(OptionalResources.MONDO_PATH_PROPERTY);
+        if (hpoJsonPath != null) {
+            final File hpJsonFile = new File(hpoJsonPath);
             if (hpJsonFile.isFile()) {
                 String msg = String.format("Loading HPO from file '%s'", hpJsonFile.getAbsoluteFile());
                 updateMessage(msg);
                 LOGGER.info(msg);
                 final Ontology ontology = OntologyLoader.loadOntology(hpJsonFile);
                 optionalResources.setHpoOntology(ontology);
-                updateMessage("Ontology loaded");
+                updateMessage("HPO loaded");
+                LOGGER.info("Loaded HPO ontology");
             } else {
                 optionalResources.setHpoOntology(null);
             }
         } else {
-            String msg = "Need to set path to hp.obo file (See edit menu)";
+            String msg = "Need to set path to hp.json file (See edit menu)";
             updateMessage(msg);
             LOGGER.info(msg);
             optionalResources.setHpoOntology(null);
+        }
+        if (mondoJsonPath != null) {
+            final File mondoJsonFile = new File(mondoJsonPath);
+            if (mondoJsonFile.isFile()) {
+                String msg = String.format("Loading Mondo from file '%s'", mondoJsonFile.getAbsoluteFile());
+                updateMessage(msg);
+                LOGGER.info(msg);
+                final Ontology mondo = OntologyLoader.loadOntology(mondoJsonFile);
+                optionalResources.setMondoOntology(mondo);
+                updateMessage("Mondo loaded");
+                LOGGER.info("Loaded Mondo ontology");
+            } else {
+                optionalResources.setHpoOntology(null);
+            }
+        }
+        if (hpoAnnotPath != null) {
+            final File hpoAnnotFile = new File(hpoAnnotPath);
+            if (optionalResources.getHpoOntology() == null) {
+                LOGGER.error("Cannot load phenotype.hpoa because HP ontology not loaded");
+                return null;
+            }
+            if (hpoAnnotFile.isFile()) {
+                DirectIndirectHpoAnnotationParser parser =
+                        new DirectIndirectHpoAnnotationParser(hpoAnnotPath, optionalResources.getHpoOntology());
+                optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
+                optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
+            } else {
+                optionalResources.setDirectAnnotMap(null);
+                optionalResources.setIndirectAnnotMap(null);
+            }
         }
         return null;
     }

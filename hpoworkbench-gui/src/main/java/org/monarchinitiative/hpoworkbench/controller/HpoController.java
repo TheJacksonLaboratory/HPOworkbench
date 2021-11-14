@@ -122,7 +122,7 @@ public final class HpoController {
      */
     private final Map<String, TermId> labelsAndHpoIds = new HashMap<>();
 
-    private Model model;
+    private final Model model;
     /**
      * The term that is currently selected in the Browser window.
      */
@@ -137,8 +137,9 @@ public final class HpoController {
     private String githubPassword;
 
     @Autowired
-    public HpoController(OptionalResources optionalResources) {
+    public HpoController(OptionalResources optionalResources, Model model) {
         this.optionalResources = optionalResources;
+        this.model = model;
     }
 
     @FXML
@@ -163,7 +164,7 @@ public final class HpoController {
         suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
         suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
         reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
-
+        activate(); // update for first time
 
         hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
             if (!newValue) { // nothing is missing anymore
@@ -242,7 +243,7 @@ public final class HpoController {
             return;
         }
         LOGGER.trace(String.format("Exporting hierarchical summary starting from term %s", selectedTerm.toString()));
-        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(model.getHpoOntology(), selectedTerm);
+        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(optionalResources.getHpoOntology(), selectedTerm);
         try {
             exporter.exportToExcel(f.getAbsolutePath());
         } catch (HPOException e) {
@@ -265,7 +266,7 @@ public final class HpoController {
         if (f != null) {
             String path = f.getAbsolutePath();
             LOGGER.trace(String.format("Setting path to export HPO as excel file at: %s", path));
-            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getHpoOntology());
+            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(optionalResources.getHpoOntology());
             exporter.exportToExcelFile(path);
         } else {
             LOGGER.error("Unable to obtain path to Excel export file");
@@ -394,15 +395,12 @@ public final class HpoController {
     /** FUnction is called once all of the resources are found (hp obo, disease annotations, mondo). */
     private void activate() {
         initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
-        this.model = new Model(optionalResources.getHpoOntology(), optionalResources.getIndirectAnnotMap(),
-                optionalResources.getDirectAnnotMap());
         WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
         WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, model.getDiseases().keySet());
     }
 
     private void deactivate() {
         initTree(null, k -> System.out.println("Consumed " + k));
-        this.model = new Model(null, null, null);
     }
 
 

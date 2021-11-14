@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.111"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
         <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
-            <MenuBar minHeight="30.0" minWidth="120.0" prefWidth="120.0" styleClass="mymenu"
-                     stylesheets="@../css/style.css">
+            <MenuBar minHeight="30.0" minWidth="200.0" prefWidth="200.0" styleClass="mymenu" stylesheets="@../css/style.css">
                 <Menu mnemonicParsing="false" text="File">
-                    <MenuItem mnemonicParsing="false" onAction="#close" text="Quit"/>
+                    <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
-                    <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO"/>
-                    <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations"
-                              text="Download HPO annotations"/>
-                    <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo"/>
-                    <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo"
-                              text="Import local copy of hp.obo"/>
+                    <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
+                    <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
+                    <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo" />
+                    <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
                 </Menu>
+            <Menu mnemonicParsing="false" text="Settings">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Show settings" />
+              </items>
+            </Menu>
             </MenuBar>
             <Region minHeight="30.0" styleClass="fx-menubar" HBox.hgrow="ALWAYS" />
             <MenuBar minHeight="30.0" minWidth="70.0" HBox.hgrow="NEVER">
                 <Menu mnemonicParsing="false" text="Help">
-                    <MenuItem mnemonicParsing="false" onAction="#helpWindow" text="Help"/>
-                    <MenuItem mnemonicParsing="false" onAction="#aboutWindow" text="About"/>
+                    <MenuItem mnemonicParsing="false" onAction="#helpWindow" text="Help" />
+                    <MenuItem mnemonicParsing="false" onAction="#aboutWindow" text="About" />
                 </Menu>
             </MenuBar>
         </HBox>
@@ -52,8 +55,17 @@
         </TabPane>
     </center>
     <bottom>
-        <StackPane fx:id="statusStackPane" BorderPane.alignment="CENTER_LEFT">
-            <fx:include source="status.fxml" />
+        <StackPane BorderPane.alignment="CENTER_LEFT">
+            <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="140.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+                <HBox fx:id="statusHBox" alignment="CENTER_LEFT" />
+                <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Label fx:id="copyrightLabel" minHeight="20.0" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+            </AnchorPane>
         </StackPane>
     </bottom>
 </BorderPane>
