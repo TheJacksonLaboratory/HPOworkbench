@@ -17,7 +17,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<SplitPane id="splitPaneMondo" dividerPositions="0.5" focusTraversable="true" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MondoController">
+<SplitPane fx:id="splitPaneMondo" dividerPositions="0.5" focusTraversable="true"
+           xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.monarchinitiative.hpoworkbench.controller.MondoTabController">
 
     <VBox BorderPane.alignment="CENTER">
         <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse MONDO Terms or Diseases">

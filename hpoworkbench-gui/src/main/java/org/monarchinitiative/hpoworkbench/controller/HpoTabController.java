@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -53,8 +52,8 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
  * @since 0.1
  */
 @Component
-public final class HpoController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HpoController.class);
+public final class HpoTabController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HpoTabController.class);
 
     private static final String EVENT_TYPE_CLICK = "click";
     private static final String EVENT_TYPE_MOUSEOVER = "mouseover";
@@ -143,7 +142,7 @@ public final class HpoController {
     private String githubPassword;
 
     @Autowired
-    public HpoController(OptionalResources optionalResources, Model model) {
+    public HpoTabController(OptionalResources optionalResources, Model model) {
         this.optionalResources = optionalResources;
         this.model = model;
     }
@@ -155,33 +154,33 @@ public final class HpoController {
         LOGGER.trace("initialize HpoController");
         initRadioButtons();
 
-        // this binding evaluates to true, if ontology or annotations files are missing (null)
-        BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
-        notInitializedYet.bind(hpoResourceMissing);
-        goButton.disableProperty().bindBidirectional(notInitializedYet);
-        goAutocomplete.disableProperty().bindBidirectional(notInitializedYet);
-        clearDiseaseButton.disableProperty().bindBidirectional(notInitializedYet);
+//        // this binding evaluates to true, if ontology or annotations files are missing (null)
+//        BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
+//        notInitializedYet.bind(hpoResourceMissing);
+//        goButton.disableProperty().bindBidirectional(notInitializedYet);
+//        goAutocomplete.disableProperty().bindBidirectional(notInitializedYet);
+//        clearDiseaseButton.disableProperty().bindBidirectional(notInitializedYet);
+//
+//        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
+//        goButton.disableProperty().bind(hpoResourceMissing);
+//        goAutocomplete.disableProperty().bind(hpoResourceMissing);
+//        ontologyTreeView.disableProperty().bind(hpoResourceMissing);
 
-        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
-        goButton.disableProperty().bind(hpoResourceMissing);
-        goAutocomplete.disableProperty().bind(hpoResourceMissing);
-        ontologyTreeView.disableProperty().bind(hpoResourceMissing);
-
-        exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
-        exportToExcelButton.disableProperty().bind(hpoResourceMissing);
-        suggestCorrectionToTermButton.disableProperty().bind(hpoResourceMissing);
-        suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
-        suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
-        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
+//        exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
+//        exportToExcelButton.disableProperty().bind(hpoResourceMissing);
+//        suggestCorrectionToTermButton.disableProperty().bind(hpoResourceMissing);
+//        suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
+//        suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
+//        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
 
 
-        hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
-            if (!newValue) { // nothing is missing anymore
-                activate();
-            } else { // invalidate model and anything in the background. Controls should be disabled automatically
-                deactivate();
-            }
-        }));
+//        hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
+//            if (!newValue) { // nothing is missing anymore
+//                activate();
+//            } else { // invalidate model and anything in the background. Controls should be disabled automatically
+//                deactivate();
+//            }
+//        }));
         Platform.runLater(() -> {
             activate();
         });
@@ -190,6 +189,7 @@ public final class HpoController {
 
     @FXML
     public void goButtonAction() {
+        activate();
             TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
             if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
             expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
@@ -400,7 +400,7 @@ public final class HpoController {
 
 
 
-    /** FUnction is called once all of the resources are found (hp obo, disease annotations, mondo). */
+    /** Function is called once all of the resources are found (hp obo, disease annotations, mondo). */
     private void activate() {
         Platform.runLater(()->{
             initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));

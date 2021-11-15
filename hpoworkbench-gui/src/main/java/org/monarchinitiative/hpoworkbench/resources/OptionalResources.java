@@ -8,16 +8,16 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tab;
+import org.monarchinitiative.hpoworkbench.controller.HpoTabController;
+import org.monarchinitiative.hpoworkbench.controller.MondoTabController;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -43,13 +43,13 @@ public final class OptionalResources {
     static public final String HPOA_URL_KEY = "hpo.phenotype.annotations.url";
     /**
      * This binding evaluates as true when a resource required for a {@link Tab} controlled by
-     * {@link org.monarchinitiative.hpoworkbench.controller.MondoController} is missing.
+     * {@link MondoTabController} is missing.
      */
     private final BooleanBinding mondoResourceIsMissing;
 
     /**
      * This binding evaluates as true when a resource required for a {@link Tab} controlled by
-     * {@link org.monarchinitiative.hpoworkbench.controller.HpoController} is missing.
+     * {@link HpoTabController} is missing.
      */
     private final BooleanBinding hpoResourceIsMissing;
 
@@ -118,6 +118,7 @@ public final class OptionalResources {
 
     public void setIndirectAnnotMap(Map<TermId, List<HpoDisease>> indirectAnnotMap) {
         this.indirectAnnotMap.set(indirectAnnotMap);
+        LOGGER.info("Set indirectAnnotMap in OptionalResources");
     }
 
     public void setDisease2annotationMap(Map<TermId, HpoDisease> d2amap) {
@@ -137,6 +138,7 @@ public final class OptionalResources {
 
     public void setDirectAnnotMap(Map<TermId, List<HpoDisease>> directAnnotMap) {
         this.directAnnotMap.set(directAnnotMap);
+        LOGGER.info("Set directAnnotMap in OptionalResources");
     }
 
     public void setAnnotationPath(String path) {

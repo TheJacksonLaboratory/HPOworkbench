@@ -1,6 +1,8 @@
 package org.monarchinitiative.hpoworkbench;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+import org.monarchinitiative.hpoworkbench.controller.MainController;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
@@ -34,6 +36,8 @@ public final class StartupTask extends Task<Void> {
 
     private final Properties pgProperties;
 
+    @Autowired
+    private MainController mainController;
 
     public StartupTask(OptionalResources optionalResources, Properties pgProperties) {
         this.pgProperties = pgProperties;

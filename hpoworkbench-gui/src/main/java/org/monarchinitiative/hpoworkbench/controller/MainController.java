@@ -77,6 +77,9 @@ public class MainController {
     @FXML
     public HBox statusHBox;
 
+    @FXML HpoTabController hpoTabController;
+    @FXML MondoTabController mondoTabController;
+    @FXML AnalysisTabController analysisTabController;
 
     @Autowired
     public MainController(OptionalResources optionalResources,
@@ -107,6 +110,14 @@ public class MainController {
         optionalResources.mondoOntologyProperty().addListener(listener);
         logger.info("Done initialization");
         checkAll();
+    }
+
+    public void initTabs() {
+     logger.info("initTabs");
+            hpoTabController.initialize();
+            mondoTabController.initialize();
+            analysisTabController.initialize();
+
     }
 
     /**
