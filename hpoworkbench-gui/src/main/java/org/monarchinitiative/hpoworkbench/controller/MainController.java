@@ -8,7 +8,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
@@ -65,15 +65,12 @@ public class MainController {
     @FXML
     public HBox statusHBox;
 
-    @FXML HpoTabController hpoTabController;
-    @FXML MondoTabController mondoTabController;
-    @FXML AnalysisTabController analysisTabController;
-    @FXML
-    private Tab hpoTab;
-    @FXML
-    private Tab mondoTab;
-    @FXML
-    private Tab analysisTab;
+    @FXML private HpoTabController hpoTabController;
+    @FXML private MondoTabController mondoTabController;
+    @FXML private AnalysisTabController analysisTabController;
+    @FXML private SplitPane hpoTab;
+    @FXML private SplitPane mondoTab;
+    @FXML private SplitPane analysisTab;
 
     @Autowired
     public MainController(OptionalResources optionalResources,
@@ -104,14 +101,6 @@ public class MainController {
         optionalResources.mondoOntologyProperty().addListener(listener);
         logger.info("Done initialization");
         checkAll();
-    }
-
-    public void initTabs() {
-     logger.info("initTabs");
-            hpoTabController.initialize();
-            mondoTabController.initialize();
-            analysisTabController.initialize();
-
     }
 
     /**
