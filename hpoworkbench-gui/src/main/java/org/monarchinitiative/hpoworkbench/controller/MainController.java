@@ -103,14 +103,6 @@ public class MainController {
         checkAll();
     }
 
-    public void initTabs() {
-     logger.info("initTabs");
-            hpoTabController.initialize();
-            mondoTabController.initialize();
-            analysisTabController.initialize();
-
-    }
-
     /**
      * Check availability of tracked resources and publish an appropriate message.
      */
