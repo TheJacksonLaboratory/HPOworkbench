@@ -1,8 +1,6 @@
 package org.monarchinitiative.hpoworkbench.model;
 
 
-import com.google.common.collect.ImmutableList;
-
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.*;
@@ -39,13 +37,13 @@ public class Model {
             return List.of();
         }
         Map<TermId,List<HpoDisease>> annotmap = optionalResources.getIndirectAnnotMap();
-        List<HpoDisease> diseases=new ArrayList<>();
+        List<HpoDisease> diseases;
         Optional<TermId> opt = string2TermId(hpoTermId);
         if (opt.isEmpty()) return List.of();
         TermId tid = opt.get();
-        diseases=annotmap.get(tid);
-        if (diseases==null) return List.of();
-        if (dbase== DiseaseDatabase.ALL) return diseases;
+        diseases = annotmap.get(tid);
+        if (diseases == null) return List.of();
+        if (dbase == DiseaseDatabase.ALL) return diseases;
         // TODO can we replace dbase.toString() ?
         return diseases.stream().filter(d -> d.getDatabase().equals(dbase.toString())).collect(Collectors.toList());
     }
@@ -54,7 +52,7 @@ public class Model {
     private Optional<TermId> string2TermId(String termstring) {
         Ontology hpo = optionalResources.getHpoOntology(); // assume we will not call this unless HPO initialized
         if (termstring.length()!=10) {
-            logger.error("Malformed termstring: "+termstring);
+            logger.error("Malformed termstring: " + termstring);
             return Optional.empty();
         }
         TermId tid = TermId.of(termstring);

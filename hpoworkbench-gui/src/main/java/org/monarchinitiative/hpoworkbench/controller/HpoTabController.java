@@ -181,9 +181,7 @@ public final class HpoTabController {
 //                deactivate();
 //            }
 //        }));
-        Platform.runLater(() -> {
-            activate();
-        });
+        Platform.runLater(this::activate);
 
     }
 

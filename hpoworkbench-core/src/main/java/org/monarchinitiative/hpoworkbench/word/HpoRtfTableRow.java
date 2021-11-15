@@ -69,16 +69,17 @@ class HpoRtfTableRow {
      */
     String row() {
         String levelAndId = getLevelAndId();
-        return String.format("\\trowd\n" +
-                "\\cellx1000\n" +
-                "\\cellx3000\n" +
-                "\\cellx6000\n" +
-                "\\cellx9000\n" +
-                "%s\\intbl\\cell\n" +
-                "%s\\intbl\\cell\n" +
-                "%s\\intbl\\cell\n" +
-                "%s\\intbl\\cell\n" +
-                "\\row", levelAndId, definition, comment,synonyms);
+        return String.format("""
+                \\trowd
+                \\cellx1000
+                \\cellx3000
+                \\cellx6000
+                \\cellx9000
+                %s\\intbl\\cell
+                %s\\intbl\\cell
+                %s\\intbl\\cell
+                %s\\intbl\\cell
+                \\row""", levelAndId, definition, comment,synonyms);
     }
 
     /**

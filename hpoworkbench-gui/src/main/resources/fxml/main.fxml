@@ -26,11 +26,9 @@
                     <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo" />
                     <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
                 </Menu>
-            <Menu mnemonicParsing="false" text="Settings">
-              <items>
-                <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Show settings" />
-              </items>
-            </Menu>
+                <Menu mnemonicParsing="false" text="Settings">
+                    <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Show settings"/>
+                </Menu>
             </MenuBar>
             <Region minHeight="30.0" styleClass="fx-menubar" HBox.hgrow="ALWAYS" />
             <MenuBar minHeight="30.0" minWidth="70.0" HBox.hgrow="NEVER">

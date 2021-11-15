@@ -1,18 +1,9 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
-import java.util.ResourceBundle;
-
 
 
 /**

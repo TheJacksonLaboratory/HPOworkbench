@@ -2,44 +2,32 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.StartupTask;
-import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
-import org.monarchinitiative.hpoworkbench.exception.HpoWorkbenchRuntimeException;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
-import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.webpopup.SettingsPopup;
 import org.monarchinitiative.hpoworkbench.io.*;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
-import org.monarchinitiative.phenol.io.OntologyLoader;
-import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -80,6 +68,12 @@ public class MainController {
     @FXML HpoTabController hpoTabController;
     @FXML MondoTabController mondoTabController;
     @FXML AnalysisTabController analysisTabController;
+    @FXML
+    private Tab hpoTab;
+    @FXML
+    private Tab mondoTab;
+    @FXML
+    private Tab analysisTab;
 
     @Autowired
     public MainController(OptionalResources optionalResources,
