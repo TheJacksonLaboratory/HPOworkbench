@@ -1,6 +1,5 @@
 package org.monarchinitiative.hpoworkbench.config;
 
-import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +23,6 @@ public class HpoWorkbenchConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(HpoWorkbenchConfig.class);
 
     public static final String CONFIG_FILE_BASENAME = "hpowb.properties";
-
-
-    @Bean
-    public Model model(OptionalResources optionalResources) {
-        return new Model(optionalResources);
-    }
 
     @Bean
     public OptionalResources optionalResources() {

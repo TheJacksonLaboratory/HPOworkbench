@@ -63,14 +63,18 @@ public final class StartupTask extends Task<Void> {
         String hpoJsonPath = pgProperties.getProperty(OptionalResources.HP_JSON_PATH_PROPERTY);
         String hpoAnnotPath = pgProperties.getProperty(OptionalResources.HPOA_PATH_PROPERTY);
         String mondoJsonPath = pgProperties.getProperty(OptionalResources.MONDO_PATH_PROPERTY);
+        updateProgress(0.02, 1);
         if (hpoJsonPath != null) {
             final File hpJsonFile = new File(hpoJsonPath);
+            updateProgress(0.03, 1);
             if (hpJsonFile.isFile()) {
                 String msg = String.format("Loading HPO from file '%s'", hpJsonFile.getAbsoluteFile());
                 updateMessage(msg);
                 LOGGER.info(msg);
                 final Ontology ontology = OntologyLoader.loadOntology(hpJsonFile);
+                updateProgress(0.25, 1);
                 optionalResources.setHpoOntology(ontology);
+                updateProgress(0.30, 1);
                 updateMessage("HPO loaded");
                 LOGGER.info("Loaded HPO ontology");
             } else {
@@ -84,12 +88,15 @@ public final class StartupTask extends Task<Void> {
         }
         if (mondoJsonPath != null) {
             final File mondoJsonFile = new File(mondoJsonPath);
+            updateProgress(0.33, 1);
             if (mondoJsonFile.isFile()) {
                 String msg = String.format("Loading Mondo from file '%s'", mondoJsonFile.getAbsoluteFile());
                 updateMessage(msg);
                 LOGGER.info(msg);
                 final Ontology mondo = OntologyLoader.loadOntology(mondoJsonFile);
+                updateProgress(0.62, 1);
                 optionalResources.setMondoOntology(mondo);
+                updateProgress(0.68, 1);
                 updateMessage("Mondo loaded");
                 LOGGER.info("Loaded Mondo ontology");
             } else {
@@ -101,6 +108,7 @@ public final class StartupTask extends Task<Void> {
             updateMessage(msg);
             LOGGER.info(msg);
             final File hpoAnnotFile = new File(hpoAnnotPath);
+            updateProgress(0.71, 1);
             if (optionalResources.getHpoOntology() == null) {
                 LOGGER.error("Cannot load phenotype.hpoa because HP ontology not loaded");
                 return null;
@@ -108,9 +116,11 @@ public final class StartupTask extends Task<Void> {
             if (hpoAnnotFile.isFile()) {
                 DirectIndirectHpoAnnotationParser parser =
                         new DirectIndirectHpoAnnotationParser(hpoAnnotPath, optionalResources.getHpoOntology());
+                updateProgress(0.88, 1);
                 optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
+                updateProgress(0.91, 1);
                 optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
-                //optionalResources.setDisease2annotationMap(parser.);
+                updateProgress(0.95, 1);
                 LOGGER.info("Loaded annotation maps");
             } else {
                 optionalResources.setDirectAnnotMap(null);
@@ -120,6 +130,7 @@ public final class StartupTask extends Task<Void> {
         } else {
             LOGGER.error("Cannot load phenotype.hpoa File path not found");
         }
+        updateProgress(1, 1);
         return null;
     }
 }

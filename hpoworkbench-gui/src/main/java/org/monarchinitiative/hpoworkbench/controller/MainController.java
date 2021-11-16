@@ -2,12 +2,14 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -15,6 +17,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.StartupTask;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
+import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.webpopup.SettingsPopup;
 import org.monarchinitiative.hpoworkbench.io.*;
@@ -65,18 +68,24 @@ public class MainController {
     @FXML
     public HBox statusHBox;
 
-    @FXML private HpoTabController hpoTabController;
-    @FXML private MondoTabController mondoTabController;
-    @FXML private AnalysisTabController analysisTabController;
-    @FXML private SplitPane hpoTab;
-    @FXML private SplitPane mondoTab;
-    @FXML private SplitPane analysisTab;
+    @FXML
+    private HpoTabController hpoTabController;
+    @FXML
+    private MondoTabController mondoTabController;
+    @FXML
+    private AnalysisTabController analysisTabController;
+    @FXML
+    private SplitPane hpoTab;
+    @FXML
+    private SplitPane mondoTab;
+    @FXML
+    private SplitPane analysisTab;
 
     @Autowired
     public MainController(OptionalResources optionalResources,
                           @Qualifier("configProperties") Properties properties,
                           @Qualifier("appHomeDir") File hpoWorkbenchDir,
-                            ExecutorService executorService) {
+                          ExecutorService executorService) {
         this.optionalResources = optionalResources;
         this.pgProperties = properties;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
@@ -86,15 +95,26 @@ public class MainController {
     @FXML
     public void initialize() {
         logger.info("Initializing main controller");
-       StartupTask task = new StartupTask(optionalResources, pgProperties);
-       task.setOnSucceeded(e -> {
-           publishMessage("Successfully loaded files");
-           hpoTabController.activate();
-           mondoTabController.initialize();
-           analysisTabController.initialize();
-       });
-       task.setOnFailed(e -> publishMessage("Unable to load ontologies/annotations", MessageType.ERROR));
-       this.executor.submit(task);
+        StartupTask task = new StartupTask(optionalResources, pgProperties);
+        ProgressIndicator pb = new ProgressIndicator();
+        pb.setProgress(0);
+        pb.progressProperty().unbind();
+        pb.progressProperty().bind(task.progressProperty());
+        Stage window = PopUps.setupProgressDialog("Initializing", "Loading resources...", pb);
+        window.show();
+        window.toFront();
+        task.setOnSucceeded(e -> {
+            publishMessage("Successfully loaded files");
+            hpoTabController.activate();
+            mondoTabController.initialize();
+            analysisTabController.initialize();
+            window.close();
+        });
+        task.setOnFailed(e -> {
+            publishMessage("Unable to load ontologies/annotations", MessageType.ERROR);
+            window.close();
+        });
+        this.executor.submit(task);
         String ver = MainController.getVersion();
         copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2021");
 
@@ -119,7 +139,7 @@ public class MainController {
     private void checkAll() {
         if (optionalResources.getHpoOntology() == null) { // hpo obo file is missing
             publishMessage("hpo json file is missing", MessageType.ERROR);
-        } else if (optionalResources.getAnnotationPath() == null ) {
+        } else if (optionalResources.getAnnotationPath() == null) {
             publishMessage("phenotype.hpoa file is missing", MessageType.ERROR);
         } else if (optionalResources.getMondoOntology() == null) {
             publishMessage("Mondo file missing", MessageType.ERROR);
@@ -147,7 +167,7 @@ public class MainController {
      */
     private void publishMessage(String msg, MessageType type) {
         int MAX_MESSAGES = 1;
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             if (statusHBox.getChildren().size() == MAX_MESSAGES) {
                 statusHBox.getChildren().remove(MAX_MESSAGES - 1);
             }
@@ -162,7 +182,6 @@ public class MainController {
      * <code>type</code>
      *
      * @param type of the message to be displayed
-     *
      * @return {@link Label} styled according to the message type
      */
     private Label prepareContainer(MessageType type) {
@@ -212,7 +231,7 @@ public class MainController {
         chooser.setTitle("Import local hp.obo file");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HPO OBO file (*.obo)", "*.obo");
         chooser.getExtensionFilters().add(extFilter);
-        Stage stage = (Stage)((Node) e.getSource()).getScene().getWindow();
+        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         File f = chooser.showOpenDialog(stage);
         if (f == null) {
             logger.error("Unable to obtain path to local HPO OBO file");
@@ -266,8 +285,11 @@ public class MainController {
         e.consume();
     }
 
-    /** Show the about message */
-    @FXML private void aboutWindow(ActionEvent e) {
+    /**
+     * Show the about message
+     */
+    @FXML
+    private void aboutWindow(ActionEvent e) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("HPO Workbench");
         alert.setHeaderText("Human Phenotype Ontology Workbench");

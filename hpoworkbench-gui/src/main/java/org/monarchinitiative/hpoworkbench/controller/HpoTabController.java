@@ -17,13 +17,11 @@ import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
-import org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever;
 import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
 import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
 import org.monarchinitiative.hpoworkbench.model.DiseaseDatabase;
-import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -41,14 +39,15 @@ import org.w3c.dom.events.EventTarget;
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import static org.monarchinitiative.hpoworkbench.controller.MainController.mode.*;
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
 
 /**
  * Controller for the {@link Tab} that displays HPO. The {@link Tab} is a part of the {@link MainController}
  *
  * @author <a href="mailto:daniel.danis@jax.org">Daniel Danis</a>
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.1.12
  * @since 0.1
  */
@@ -127,8 +126,6 @@ public final class HpoTabController {
      * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
      */
     private final Map<String, TermId> labelsAndHpoIds = new HashMap<>();
-
-    private final Model model;
     /**
      * The term that is currently selected in the Browser window.
      */
@@ -143,9 +140,8 @@ public final class HpoTabController {
     private String githubPassword;
 
     @Autowired
-    public HpoTabController(OptionalResources optionalResources, Model model) {
+    public HpoTabController(OptionalResources optionalResources) {
         this.optionalResources = optionalResources;
-        this.model = model;
     }
 
     BooleanProperty notInitializedYet = new SimpleBooleanProperty("not initialzied Yet", "false");
@@ -203,12 +199,14 @@ public final class HpoTabController {
 
     @FXML
     private void goDiseaseAutocomplete() {
-        HpoDisease dmod = model.getDiseases().get(diseaseAutocompleteTextfield.getText());
+        String diseaseAC = diseaseAutocompleteTextfield.getText();
+        HpoDisease dmod = optionalResources.getDisease2AnnotationMap().get(diseaseAC);
+        //HpoDisease dmod = model.getDiseases().get(diseaseAC);
         if (dmod == null) {
             LOGGER.warn("disease page could not be shown because disease model was null");
             return;
         } else {
-            LOGGER.error("got disease "+dmod.getName());
+            LOGGER.info("got disease "+dmod.getName());
         }
         updateDescriptionToDiseaseModel(dmod);
         selectedDisease = dmod;
@@ -292,8 +290,6 @@ public final class HpoTabController {
         }
         selectedTerm = getSelectedTerm().getValue().term;
         GitHubPopup popup = new GitHubPopup(selectedTerm);
-        initializeGitHubLabelsIfNecessary();
-        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(null);
         String githubissue = popup.retrieveGitHubIssue();
@@ -319,8 +315,6 @@ public final class HpoTabController {
             selectedTerm = getSelectedTerm().getValue().term;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm, true);
-        initializeGitHubLabelsIfNecessary();
-        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(null);
         String githubissue = popup.retrieveGitHubIssue();
@@ -349,8 +343,6 @@ public final class HpoTabController {
             return;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm, selectedDisease);
-        initializeGitHubLabelsIfNecessary();
-        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(null);
         String githubissue = popup.retrieveGitHubIssue();
@@ -384,8 +376,6 @@ public final class HpoTabController {
             return;
         }
         GitHubPopup popup = new GitHubPopup(selectedTerm, selectedDisease, true);
-        initializeGitHubLabelsIfNecessary();
-        popup.setLabels(model.getGithublabels());
         popup.setupGithubUsernamePassword(githubUsername, githubPassword);
         popup.displayWindow(null);
         String githubissue = popup.retrieveGitHubIssue();
@@ -404,7 +394,8 @@ public final class HpoTabController {
         Platform.runLater(()->{
             initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
             WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
-            WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, model.getDiseases().keySet());
+            WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield,
+                    optionalResources.getDisease2AnnotationMap().keySet());
         });
     }
 
@@ -526,13 +517,12 @@ public final class HpoTabController {
         }
         if (treeItem == null)
             return;
-
         Term term = treeItem.getValue().term;
-        String termID = term.getId().getValue();
-        List<HpoDisease> annotatedDiseases = model.getDiseaseAnnotations(termID, selectedDatabase);
-        if (annotatedDiseases == null) {
-            LOGGER.error("could not retrieve diseases for " + termID);
-        }
+        List<HpoDisease> annotatedDiseases = optionalResources.getIndirectAnnotMap().get(term.getId())
+                .stream()
+                .filter(d -> d.getDatabase().equals(selectedDatabase.toString()))
+                .collect(Collectors.toList());
+
         int n_descendents = 42;//getDescendents(model.getHpoOntology(),term.getId()).size();
         //todo--add number of descendents to HTML
         String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
@@ -557,15 +547,17 @@ public final class HpoTabController {
                                         // The following line is necessary because sometimes multiple events are triggered
                                         // and we get a "stray" HPO-related link that does not belong here.
                                         if (href.startsWith("HP:")) return;
-                                        HpoDisease dmod = model.getDiseases().get(href);
-                                        if (dmod == null) {
-                                            LOGGER.error("Link to disease model for " + href + " was null");
-                                            return;
-                                        }
-                                        updateDescriptionToDiseaseModel(dmod);
-                                        selectedDisease = dmod;
-                                        hpoAutocompleteTextfield.clear();
-                                        currentMode = BROWSE_DISEASE;
+//                                        Collection<HpoDisease> directAnnotMap =
+//                                                optionalResources.getDisease2AnnotationMap().values();
+//                                        HpoDisease dmod = model.getDiseases().get(href);
+//                                        if (dmod == null) {
+//                                            LOGGER.error("Link to disease model for " + href + " was null");
+//                                            return;
+//                                        }
+//                                        updateDescriptionToDiseaseModel(dmod);
+//                                        selectedDisease = dmod;
+//                                        hpoAutocompleteTextfield.clear();
+//                                        currentMode = BROWSE_DISEASE;
                                     }
                                 };
 
@@ -652,27 +644,6 @@ public final class HpoTabController {
 
     }
 
-
-    /**
-     * For the GitHub new issues, we want to allow the user to choose a pre-existing label for the issue.
-     * For this, we first go to GitHub and retrieve the labelsAndHpoIds with
-     * {@link org.monarchinitiative.hpoworkbench.github.GitHubLabelRetriever}. We only do this
-     * once per session though.
-     */
-    private void initializeGitHubLabelsIfNecessary() {
-        if (model.hasLabels()) {
-            return; // we only need to retrieve the labelsAndHpoIds from the server once per session!
-        }
-        GitHubLabelRetriever retriever = new GitHubLabelRetriever();
-        List<String> labels = retriever.getLabels();
-        if (labels == null) {
-            labels = new ArrayList<>();
-        }
-        if (labels.size() == 0) {
-            labels.add("new term request");
-        }
-        model.setGithublabels(labels);
-    }
 
     private void postGitHubIssue(String message, String title, String uname, String pword) {
         GitHubPoster poster = new GitHubPoster(uname, pword, title, message);
