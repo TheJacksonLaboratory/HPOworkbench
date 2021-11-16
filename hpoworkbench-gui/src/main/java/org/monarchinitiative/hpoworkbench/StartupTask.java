@@ -1,9 +1,7 @@
 package org.monarchinitiative.hpoworkbench;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.monarchinitiative.hpoworkbench.controller.MainController;
-import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -24,7 +22,8 @@ import java.util.Properties;
  * Changes made by user are stored for the next run in
  *
  * @author <a href="mailto:daniel.danis@jax.org">Daniel Danis</a>
- * @version 0.0.2
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ * @version 2.0.0
  * @since 0.0
  */
 public final class StartupTask extends Task<Void> {
@@ -34,9 +33,6 @@ public final class StartupTask extends Task<Void> {
     private final OptionalResources optionalResources;
 
     private final Properties pgProperties;
-
-    @Autowired
-    private MainController mainController;
 
     public StartupTask(OptionalResources optionalResources, Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -114,12 +110,8 @@ public final class StartupTask extends Task<Void> {
                 return null;
             }
             if (hpoAnnotFile.isFile()) {
-                DirectIndirectHpoAnnotationParser parser =
-                        new DirectIndirectHpoAnnotationParser(hpoAnnotPath, optionalResources.getHpoOntology());
-                updateProgress(0.88, 1);
-                optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
-                updateProgress(0.91, 1);
-                optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
+                updateProgress(0.78, 1);
+                optionalResources.setAnnotationResources(hpoAnnotPath);
                 updateProgress(0.95, 1);
                 LOGGER.info("Loaded annotation maps");
             } else {
