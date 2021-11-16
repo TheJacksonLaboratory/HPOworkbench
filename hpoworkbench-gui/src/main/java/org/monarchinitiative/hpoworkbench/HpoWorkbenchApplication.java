@@ -34,19 +34,19 @@ public class HpoWorkbenchApplication extends Application {
 
     @Override
     public void start(Stage stage) throws InterruptedException {
-        loadSplashScreen();
+        //loadSplashScreen();
         // notifyPreloader(new HpoWbPreloader.StateChangeNotification(HpoWbPreloader.StateChangeNotification.Type.BEFORE_START));
         // Perform some heavy lifting (i.e. database start, check for application updates, etc. )
-        for (int i = 1; i <= 10; i++) {
-            double progress =(double) i/10;
-            System.out.println("progress: " +  progress);
-            LauncherImpl.notifyPreloader(this, new HpoWbPreloader.ProgressNotification(progress));
-//            try {
-//                Thread.sleep(1000);
-//            }catch (Exception e) {
-//                e.printStackTrace();
-//            }
-        }
+//        for (int i = 1; i <= 10; i++) {
+//            double progress =(double) i/10;
+//            System.out.println("progress: " +  progress);
+//            LauncherImpl.notifyPreloader(this, new HpoWbPreloader.ProgressNotification(progress));
+////            try {
+////                Thread.sleep(1000);
+////            }catch (Exception e) {
+////                e.printStackTrace();
+////            }
+//        }
 
         applicationContext.publishEvent(new StageReadyEvent(stage));
     }

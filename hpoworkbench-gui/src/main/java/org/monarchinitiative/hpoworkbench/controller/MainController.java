@@ -86,10 +86,15 @@ public class MainController {
     @FXML
     public void initialize() {
         logger.info("Initializing main controller");
-//        StartupTask task = new StartupTask(optionalResources, pgProperties);
-//        task.setOnSucceeded(e -> publishMessage("Successfully loaded files"));
-//        task.setOnFailed(e -> publishMessage("Unable to load ontologies/annotations", MessageType.ERROR));
-//        this.executor.submit(task);
+       StartupTask task = new StartupTask(optionalResources, pgProperties);
+       task.setOnSucceeded(e -> {
+           publishMessage("Successfully loaded files");
+           hpoTabController.activate();
+           mondoTabController.initialize();
+           analysisTabController.initialize();
+       });
+       task.setOnFailed(e -> publishMessage("Unable to load ontologies/annotations", MessageType.ERROR));
+       this.executor.submit(task);
         String ver = MainController.getVersion();
         copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2021");
 

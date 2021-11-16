@@ -1,5 +1,6 @@
 package org.monarchinitiative.hpoworkbench;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.monarchinitiative.hpoworkbench.controller.MainController;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
