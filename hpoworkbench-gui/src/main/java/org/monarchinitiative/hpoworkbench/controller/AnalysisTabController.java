@@ -73,7 +73,7 @@ public final class AnalysisTabController {
 
     @FXML
     public void initialize() {
-        logger.info("Initialize");
+        logger.info("Initialize analysis tab");
     }
 
 

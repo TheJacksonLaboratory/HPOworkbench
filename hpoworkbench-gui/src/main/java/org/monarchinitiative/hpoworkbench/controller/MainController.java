@@ -86,10 +86,10 @@ public class MainController {
     @FXML
     public void initialize() {
         logger.info("Initializing main controller");
-        StartupTask task = new StartupTask(optionalResources, pgProperties);
-        task.setOnSucceeded(e -> publishMessage("Successfully loaded files"));
-        task.setOnFailed(e -> publishMessage("Unable to load ontologies/annotations", MessageType.ERROR));
-        this.executor.submit(task);
+//        StartupTask task = new StartupTask(optionalResources, pgProperties);
+//        task.setOnSucceeded(e -> publishMessage("Successfully loaded files"));
+//        task.setOnFailed(e -> publishMessage("Unable to load ontologies/annotations", MessageType.ERROR));
+//        this.executor.submit(task);
         String ver = MainController.getVersion();
         copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2021");
 
@@ -101,6 +101,11 @@ public class MainController {
         optionalResources.mondoOntologyProperty().addListener(listener);
         logger.info("Done initialization");
         checkAll();
+        this.analysisTabController.initialize();
+        this.mondoTabController.initialize();
+        this.hpoTabController.initialize();
+        this.hpoTabController.activate();
+        logger.info("done activate");
     }
 
     /**
@@ -113,8 +118,8 @@ public class MainController {
             publishMessage("phenotype.hpoa file is missing", MessageType.ERROR);
         } else if (optionalResources.getMondoOntology() == null) {
             publishMessage("Mondo file missing", MessageType.ERROR);
-        } else { // since we check only 2 resources, we should be
-            // fine here
+        } else {
+            logger.info("All three resources loaded");
             publishMessage("Ready to go", MessageType.INFO);
         }
     }

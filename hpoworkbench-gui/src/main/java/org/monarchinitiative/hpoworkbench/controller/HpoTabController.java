@@ -1,6 +1,7 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -155,7 +156,8 @@ public final class HpoTabController {
         initRadioButtons();
 
 //        // this binding evaluates to true, if ontology or annotations files are missing (null)
-//        BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
+
+        BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
 //        notInitializedYet.bind(hpoResourceMissing);
 //        goButton.disableProperty().bindBidirectional(notInitializedYet);
 //        goAutocomplete.disableProperty().bindBidirectional(notInitializedYet);
@@ -174,13 +176,12 @@ public final class HpoTabController {
 //        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
 
 
-//        hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
-//            if (!newValue) { // nothing is missing anymore
-//                activate();
-//            } else { // invalidate model and anything in the background. Controls should be disabled automatically
-//                deactivate();
-//            }
-//        }));
+        hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
+            if (!newValue) { // nothing is missing anymore
+                activate();
+            } else { // invalidate model and anything in the background. Controls should be disabled automatically
+                deactivate();
+           }}));
         Platform.runLater(this::activate);
 
     }
@@ -399,7 +400,7 @@ public final class HpoTabController {
 
 
     /** Function is called once all of the resources are found (hp obo, disease annotations, mondo). */
-    private void activate() {
+    public void activate() {
         Platform.runLater(()->{
             initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
             WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
