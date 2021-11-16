@@ -175,12 +175,14 @@ public class PopUps {
         buttons.add(new ButtonType("Cancel", ButtonData.CANCEL_CLOSE));
 
         al.getButtonTypes().setAll(buttons);
-
-        Optional<ButtonType> result = al.showAndWait();
-        if (result.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+        Optional<ButtonType> opt = al.showAndWait();
+        if (opt.isEmpty()) {
             return null;
-
-        return result.get().getText();
+        }
+        ButtonType result = opt.get();
+        if ( result.getButtonData() == ButtonData.CANCEL_CLOSE)
+            return null;
+        return result.getText();
     }
 
 

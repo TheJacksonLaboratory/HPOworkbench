@@ -1,40 +1,33 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.StartupTask;
-import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
-import org.monarchinitiative.hpoworkbench.exception.HpoWorkbenchRuntimeException;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
-import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
+import org.monarchinitiative.hpoworkbench.gui.webpopup.SettingsPopup;
 import org.monarchinitiative.hpoworkbench.io.*;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
-import org.monarchinitiative.phenol.io.OntologyLoader;
-import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -67,8 +60,17 @@ public class MainController {
      * Place at the bottom of the window controlled by {@link StatusController} for showing messages to user
      */
     @FXML
-    public StackPane statusStackPane;
+    private Label copyrightLabel;
 
+    @FXML
+    public HBox statusHBox;
+
+    @FXML private HpoTabController hpoTabController;
+    @FXML private MondoTabController mondoTabController;
+    @FXML private AnalysisTabController analysisTabController;
+    @FXML private SplitPane hpoTab;
+    @FXML private SplitPane mondoTab;
+    @FXML private SplitPane analysisTab;
 
     @Autowired
     public MainController(OptionalResources optionalResources,
@@ -83,18 +85,106 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        // NO-OP
         logger.info("Initializing main controller");
-        StartupTask task = new StartupTask(optionalResources, pgProperties);
-//        this.optionalResources.
-//        this.hpoReadyLabel.textProperty().bind(task.messageProperty());
-//        task.setOnSucceeded(e -> this.hpoReadyLabel.textProperty().unbind());
-        this.executor.submit(task);
-        // only enable analyze if Ontology downloaded (enabled property watches
-//        this.setupButton.disableProperty().bind(optionalResources.ontologyProperty().isNull());
-//        this.parseButton.setDisable(true);
-//        this.previwButton.setDisable(true);
-//        this.outputButton.setDisable(true);
+       StartupTask task = new StartupTask(optionalResources, pgProperties);
+       task.setOnSucceeded(e -> {
+           publishMessage("Successfully loaded files");
+           hpoTabController.activate();
+           mondoTabController.initialize();
+           analysisTabController.initialize();
+       });
+       task.setOnFailed(e -> publishMessage("Unable to load ontologies/annotations", MessageType.ERROR));
+       this.executor.submit(task);
+        String ver = MainController.getVersion();
+        copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2021");
+
+        ChangeListener<? super Object> listener = (obs, oldval, newval) -> checkAll();
+
+        optionalResources.hpoOntologyProperty().addListener(listener);
+        optionalResources.indirectAnnotMapProperty().addListener(listener);
+        optionalResources.directAnnotMapProperty().addListener(listener);
+        optionalResources.mondoOntologyProperty().addListener(listener);
+        logger.info("Done initialization");
+        checkAll();
+        this.analysisTabController.initialize();
+        this.mondoTabController.initialize();
+        this.hpoTabController.initialize();
+        this.hpoTabController.activate();
+        logger.info("done activate");
+    }
+
+    /**
+     * Check availability of tracked resources and publish an appropriate message.
+     */
+    private void checkAll() {
+        if (optionalResources.getHpoOntology() == null) { // hpo obo file is missing
+            publishMessage("hpo json file is missing", MessageType.ERROR);
+        } else if (optionalResources.getAnnotationPath() == null ) {
+            publishMessage("phenotype.hpoa file is missing", MessageType.ERROR);
+        } else if (optionalResources.getMondoOntology() == null) {
+            publishMessage("Mondo file missing", MessageType.ERROR);
+        } else {
+            logger.info("All three resources loaded");
+            publishMessage("Ready to go", MessageType.INFO);
+        }
+    }
+
+
+    /**
+     * Post information message to the status bar.
+     *
+     * @param msg String with message to be displayed
+     */
+    void publishMessage(String msg) {
+        publishMessage(msg, MessageType.INFO);
+    }
+
+    /**
+     * Post the message to the status bar. Color of the text is determined by the message <code>type</code>.
+     *
+     * @param msg  String with message to be displayed
+     * @param type message type
+     */
+    private void publishMessage(String msg, MessageType type) {
+        int MAX_MESSAGES = 1;
+        Platform.runLater(()->{
+            if (statusHBox.getChildren().size() == MAX_MESSAGES) {
+                statusHBox.getChildren().remove(MAX_MESSAGES - 1);
+            }
+            Label label = prepareContainer(type);
+            label.setText(msg);
+            statusHBox.getChildren().add(0, label);
+        });
+    }
+
+    /**
+     * Make label for displaying message in the {@link #statusHBox}. The style of the text depends on given
+     * <code>type</code>
+     *
+     * @param type of the message to be displayed
+     *
+     * @return {@link Label} styled according to the message type
+     */
+    private Label prepareContainer(MessageType type) {
+        Label label = new Label();
+        label.setPrefHeight(30);
+        HBox.setHgrow(label, Priority.ALWAYS);
+        label.setPadding(new Insets(5));
+        switch (type) {
+            case WARNING:
+                label.setStyle("-fx-text-fill: orange; -fx-font-weight: bolder");
+                break;
+            case ERROR:
+                label.setStyle("-fx-text-fill: red; -fx-font-weight: bolder");
+                break;
+            case INFO:
+            default:
+                label.setStyle("-fx-text-fill: black; -fx-font-weight: bolder");
+                break;
+        }
+
+
+        return label;
     }
 
     public static String getVersion() {
@@ -160,7 +250,12 @@ public class MainController {
         e.consume();
     }
 
-
+    @FXML
+    private void showSettings(ActionEvent e) {
+        Stage stage = (Stage) this.statusHBox.getScene().getWindow();
+        SettingsPopup popup = new SettingsPopup(pgProperties, optionalResources, stage);
+        popup.popup();
+    }
 
     /**
      * Show the help dialog

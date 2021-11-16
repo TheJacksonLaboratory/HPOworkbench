@@ -77,12 +77,9 @@ public class DirectIndirectHpoAnnotationParser {
         directAnnotationMap=new HashMap<>();
         totalAnnotationMap=new HashMap<>();
         Map<TermId, Set<HpoDisease>> tempmap = new HashMap<>();
-
         if (diseaseMap==null) {
             throw new HPOWorkbenchException("disease map was null after parse of "+pathToPhenotypeAnnotationTab);
         }
-
-
         for (TermId diseaseId : diseaseMap.keySet()) {
             HpoDisease disease = diseaseMap.get(diseaseId);
             for (HpoAnnotation annot : disease.getPhenotypicAbnormalities()) {

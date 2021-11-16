@@ -2,6 +2,8 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,8 +53,8 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
  * @since 0.1
  */
 @Component
-public final class HpoController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HpoController.class);
+public final class HpoTabController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HpoTabController.class);
 
     private static final String EVENT_TYPE_CLICK = "click";
     private static final String EVENT_TYPE_MOUSEOVER = "mouseover";
@@ -62,6 +64,10 @@ public final class HpoController {
      * Object that stores the ontology data etc. if available.
      */
     private final OptionalResources optionalResources;
+    @FXML
+    public Button goAutocomplete;
+    @FXML
+    public Button clearDiseaseButton;
 
     /**
      * Current behavior of HPO Workbench. See {@link MainController.mode}.
@@ -122,7 +128,7 @@ public final class HpoController {
      */
     private final Map<String, TermId> labelsAndHpoIds = new HashMap<>();
 
-    private Model model;
+    private final Model model;
     /**
      * The term that is currently selected in the Browser window.
      */
@@ -137,32 +143,37 @@ public final class HpoController {
     private String githubPassword;
 
     @Autowired
-    public HpoController(OptionalResources optionalResources) {
+    public HpoTabController(OptionalResources optionalResources, Model model) {
         this.optionalResources = optionalResources;
+        this.model = model;
     }
+
+    BooleanProperty notInitializedYet = new SimpleBooleanProperty("not initialzied Yet", "false");
 
     @FXML
     public void initialize() {
         LOGGER.trace("initialize HpoController");
         initRadioButtons();
 
-        // this binding evaluates to true, if ontology or annotations files are missing (null)
+//        // this binding evaluates to true, if ontology or annotations files are missing (null)
+
         BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
+//        notInitializedYet.bind(hpoResourceMissing);
+//        goButton.disableProperty().bindBidirectional(notInitializedYet);
+//        goAutocomplete.disableProperty().bindBidirectional(notInitializedYet);
+//        clearDiseaseButton.disableProperty().bindBidirectional(notInitializedYet);
+//
+//        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
+//        goButton.disableProperty().bind(hpoResourceMissing);
+//        goAutocomplete.disableProperty().bind(hpoResourceMissing);
+//        ontologyTreeView.disableProperty().bind(hpoResourceMissing);
 
-//        hpoTermRadioButton.disableProperty().bind(hpoResourceMissing);
-//        diseaseRadioButton.disableProperty().bind(hpoResourceMissing);
-//        newAnnotationRadioButton.disableProperty().bind(hpoResourceMissing);
-
-        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
-        goButton.disableProperty().bind(hpoResourceMissing);
-        ontologyTreeView.disableProperty().bind(hpoResourceMissing);
-
-        exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
-        exportToExcelButton.disableProperty().bind(hpoResourceMissing);
-        suggestCorrectionToTermButton.disableProperty().bind(hpoResourceMissing);
-        suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
-        suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
-        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
+//        exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
+//        exportToExcelButton.disableProperty().bind(hpoResourceMissing);
+//        suggestCorrectionToTermButton.disableProperty().bind(hpoResourceMissing);
+//        suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
+//        suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
+//        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
 
 
         hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
@@ -170,17 +181,14 @@ public final class HpoController {
                 activate();
             } else { // invalidate model and anything in the background. Controls should be disabled automatically
                 deactivate();
-            }
-        }));
+           }}));
+        Platform.runLater(this::activate);
 
-
-        if (!hpoResourceMissing.get()) {
-            activate();
-        }
     }
 
     @FXML
     public void goButtonAction() {
+        activate();
             TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
             if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
             expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
@@ -242,7 +250,7 @@ public final class HpoController {
             return;
         }
         LOGGER.trace(String.format("Exporting hierarchical summary starting from term %s", selectedTerm.toString()));
-        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(model.getHpoOntology(), selectedTerm);
+        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(optionalResources.getHpoOntology(), selectedTerm);
         try {
             exporter.exportToExcel(f.getAbsolutePath());
         } catch (HPOException e) {
@@ -265,7 +273,7 @@ public final class HpoController {
         if (f != null) {
             String path = f.getAbsolutePath();
             LOGGER.trace(String.format("Setting path to export HPO as excel file at: %s", path));
-            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(model.getHpoOntology());
+            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(optionalResources.getHpoOntology());
             exporter.exportToExcelFile(path);
         } else {
             LOGGER.error("Unable to obtain path to Excel export file");
@@ -391,18 +399,17 @@ public final class HpoController {
 
 
 
-    /** FUnction is called once all of the resources are found (hp obo, disease annotations, mondo). */
-    private void activate() {
-        initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
-        this.model = new Model(optionalResources.getHpoOntology(), optionalResources.getIndirectAnnotMap(),
-                optionalResources.getDirectAnnotMap());
-        WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
-        WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, model.getDiseases().keySet());
+    /** Function is called once all of the resources are found (hp obo, disease annotations, mondo). */
+    public void activate() {
+        Platform.runLater(()->{
+            initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
+            WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
+            WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, model.getDiseases().keySet());
+        });
     }
 
     private void deactivate() {
         initTree(null, k -> System.out.println("Consumed " + k));
-        this.model = new Model(null, null, null);
     }
 
 
@@ -415,9 +422,6 @@ public final class HpoController {
      */
     private void updateDescriptionToDiseaseModel(HpoDisease dmodel) {
         LOGGER.trace("TOP OF updateDescriptionToDiseaseModel");
-//        String dbName = dmodel.getDiseaseDatabaseId().getIdWithPrefix();
-//        String diseaseName = dmodel.getName();
-//        List<Term> annotatingTerms = model.getAnnotationTermsForDisease(dmodel);
         String content = HpoHtmlPageGenerator.getDiseaseHTML(dmodel, optionalResources.getHpoOntology());
         infoWebEngine.loadContent(content);
         infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener<Worker.State>()

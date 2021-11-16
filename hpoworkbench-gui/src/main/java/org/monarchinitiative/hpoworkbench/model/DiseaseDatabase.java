@@ -7,9 +7,6 @@ public enum DiseaseDatabase {
 
     private final String dbasename;
 
-
-
-
     DiseaseDatabase(String databas) {
         this.dbasename=databas;
     }

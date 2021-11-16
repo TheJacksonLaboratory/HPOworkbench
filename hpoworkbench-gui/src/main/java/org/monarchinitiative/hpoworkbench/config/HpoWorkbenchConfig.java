@@ -1,16 +1,14 @@
 package org.monarchinitiative.hpoworkbench.config;
 
+import org.monarchinitiative.hpoworkbench.model.Model;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +26,10 @@ public class HpoWorkbenchConfig {
     public static final String CONFIG_FILE_BASENAME = "hpowb.properties";
 
 
-
+    @Bean
+    public Model model(OptionalResources optionalResources) {
+        return new Model(optionalResources);
+    }
 
     @Bean
     public OptionalResources optionalResources() {

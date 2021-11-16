@@ -35,8 +35,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -53,8 +51,8 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 @Component
-public final class MondoController {
-    private static final Logger logger = LoggerFactory.getLogger(MondoController.class);
+public final class MondoTabController {
+    private static final Logger logger = LoggerFactory.getLogger(MondoTabController.class);
 
     private final OptionalResources optionalResources;
 
@@ -150,9 +148,9 @@ public final class MondoController {
 
 
     @Autowired
-    public MondoController(OptionalResources optionalResources,
-                           Properties properties,
-                           @Qualifier("appHomeDir") File hpoWorkbenchDir) {
+    public MondoTabController(OptionalResources optionalResources,
+                              Properties properties,
+                              @Qualifier("appHomeDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
         this.properties = properties;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
@@ -220,7 +218,7 @@ public final class MondoController {
             return;
         }
         logger.trace("Initializing Mondo tree with RootTerm {}", rootTerm);
-        TreeItem<GenericTermWrapper> root = new MondoController.GenericTermTreeItem(new GenericTermWrapper(rootTerm));
+        TreeItem<GenericTermWrapper> root = new MondoTabController.GenericTermTreeItem(new GenericTermWrapper(rootTerm));
         root.setExpanded(true);
         mondoOntologyTreeView.setShowRoot(false);
         mondoOntologyTreeView.setRoot(root);
@@ -231,7 +229,7 @@ public final class MondoController {
                         return;
                     }
                     GenericTermWrapper w = newValue.getValue();
-                    TreeItem<GenericTermWrapper> item = new MondoController.GenericTermTreeItem(w);
+                    TreeItem<GenericTermWrapper> item = new MondoTabController.GenericTermTreeItem(w);
                     updateMondoDescription(item);
                 });
         // create Map for lookup of the terms in the ontology based on their Name
@@ -462,7 +460,7 @@ public final class MondoController {
     /**
      * Get currently selected Term. Used in tests.
      *
-     * @return {@link HpoController.HpoTermTreeItem} that is currently selected
+     * @return {@link HpoTabController.HpoTermTreeItem} that is currently selected
      */
     private GenericTermTreeItem getSelectedTerm() {
         return (mondoOntologyTreeView.getSelectionModel().getSelectedItem() == null) ? null
@@ -589,7 +587,7 @@ public final class MondoController {
                 Set<Term> children = getTermChildren(getValue().term);
                 children.stream()
                         .sorted(Comparator.comparing(Term::getName))
-                        .map(term -> new MondoController.GenericTermTreeItem(new GenericTermWrapper(term)))
+                        .map(term -> new MondoTabController.GenericTermTreeItem(new GenericTermWrapper(term)))
                         .forEach(childrenList::add);
                 super.getChildren().setAll(childrenList);
             }

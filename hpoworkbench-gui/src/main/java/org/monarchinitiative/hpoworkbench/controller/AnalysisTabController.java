@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.DatePicker;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.monarchinitiative.hpoworkbench.analysis.AnnotationTlc;
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
@@ -35,8 +34,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public final class AnalysisController {
-    private static final Logger logger = LoggerFactory.getLogger(AnalysisController.class);
+public final class AnalysisTabController {
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisTabController.class);
 
     private final OptionalResources optionalResources;
 
@@ -65,14 +64,17 @@ public final class AnalysisController {
 
 
     @Autowired
-    public AnalysisController(OptionalResources optionalResources,
-                              @Qualifier("appHomeDir") File hpoWorkbenchDir) {
+    public AnalysisTabController(OptionalResources optionalResources,
+                                 @Qualifier("appHomeDir") File hpoWorkbenchDir) {
         this.optionalResources = optionalResources;
          File hpoWorkbenchDir1 = hpoWorkbenchDir;
     }
 
 
-
+    @FXML
+    public void initialize() {
+        logger.info("Initialize analysis tab");
+    }
 
 
     @FXML
