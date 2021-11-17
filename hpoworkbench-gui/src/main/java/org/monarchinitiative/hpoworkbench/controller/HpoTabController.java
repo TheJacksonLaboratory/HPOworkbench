@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -22,7 +21,7 @@ import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
 import org.monarchinitiative.hpoworkbench.model.DiseaseDatabase;
-import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
@@ -62,7 +61,7 @@ public final class HpoTabController {
     /**
      * Object that stores the ontology data etc. if available.
      */
-    private final OptionalResources optionalResources;
+    private final HpoWbModel hpoWbModel;
     @FXML
     public Button goAutocomplete;
     @FXML
@@ -140,8 +139,8 @@ public final class HpoTabController {
     private String githubPassword;
 
     @Autowired
-    public HpoTabController(OptionalResources optionalResources) {
-        this.optionalResources = optionalResources;
+    public HpoTabController(HpoWbModel hpoWbModel) {
+        this.hpoWbModel = hpoWbModel;
     }
 
     BooleanProperty notInitializedYet = new SimpleBooleanProperty("not initialzied Yet", "false");
@@ -150,34 +149,6 @@ public final class HpoTabController {
     public void initialize() {
         LOGGER.trace("initialize HpoController");
         initRadioButtons();
-
-//        // this binding evaluates to true, if ontology or annotations files are missing (null)
-
-        BooleanBinding hpoResourceMissing = optionalResources.hpoResourceMissing();
-//        notInitializedYet.bind(hpoResourceMissing);
-//        goButton.disableProperty().bindBidirectional(notInitializedYet);
-//        goAutocomplete.disableProperty().bindBidirectional(notInitializedYet);
-//        clearDiseaseButton.disableProperty().bindBidirectional(notInitializedYet);
-//
-//        hpoAutocompleteTextfield.disableProperty().bind(hpoResourceMissing);
-//        goButton.disableProperty().bind(hpoResourceMissing);
-//        goAutocomplete.disableProperty().bind(hpoResourceMissing);
-//        ontologyTreeView.disableProperty().bind(hpoResourceMissing);
-
-//        exportHierarchicalSummaryButton.disableProperty().bind(hpoResourceMissing);
-//        exportToExcelButton.disableProperty().bind(hpoResourceMissing);
-//        suggestCorrectionToTermButton.disableProperty().bind(hpoResourceMissing);
-//        suggestNewChildTermButton.disableProperty().bind(hpoResourceMissing);
-//        suggestNewAnnotationButton.disableProperty().bind(hpoResourceMissing);
-//        reportMistakenAnnotationButton.disableProperty().bind(hpoResourceMissing);
-
-
-        hpoResourceMissing.addListener(((observable, oldValue, newValue) -> {
-            if (!newValue) { // nothing is missing anymore
-                activate();
-            } else { // invalidate model and anything in the background. Controls should be disabled automatically
-                deactivate();
-           }}));
         Platform.runLater(this::activate);
 
     }
@@ -185,10 +156,16 @@ public final class HpoTabController {
     @FXML
     public void goButtonAction() {
         activate();
-            TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
-            if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
-            expandUntilTerm(optionalResources.getHpoOntology().getTermMap().get(id));
-            hpoAutocompleteTextfield.clear();
+        TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
+        if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
+        Optional<Term> opt = hpoWbModel.getTermFromHpoId(id);
+        if (opt.isEmpty()) {
+            LOGGER.error("Could not retrieve HPO term from {}", id.getValue());
+            return;
+        }
+        Term term = opt.get();
+        expandUntilTerm(term);
+        hpoAutocompleteTextfield.clear();
        /* } else if (currentMode == MainController.mode.NEW_ANNOTATION) {
             TermId id = labelsAndHpoIds.get(hpoAutocompleteTextfield.getText());
             if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
@@ -198,16 +175,15 @@ public final class HpoTabController {
     }
 
     @FXML
-    private void goDiseaseAutocomplete() {
+    private void goHpoDiseaseAutocomplete() {
         String diseaseAC = diseaseAutocompleteTextfield.getText();
-        HpoDisease dmod = optionalResources.getDisease2AnnotationMap().get(diseaseAC);
-        //HpoDisease dmod = model.getDiseases().get(diseaseAC);
-        if (dmod == null) {
+        Optional<HpoDisease> opt = hpoWbModel.getDisease(diseaseAC);
+        if (opt.isEmpty()) {
             LOGGER.warn("disease page could not be shown because disease model was null");
             return;
-        } else {
-            LOGGER.info("got disease "+dmod.getName());
         }
+        HpoDisease dmod = opt.get();
+        LOGGER.info("got disease "+dmod.getName());
         updateDescriptionToDiseaseModel(dmod);
         selectedDisease = dmod;
         this.currentDiseaseLabel.setText(dmod.getName());
@@ -248,7 +224,13 @@ public final class HpoTabController {
             return;
         }
         LOGGER.trace(String.format("Exporting hierarchical summary starting from term %s", selectedTerm.toString()));
-        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(optionalResources.getHpoOntology(), selectedTerm);
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            LOGGER.error("HPO was null (not initialized)");
+            return;
+        }
+        Ontology hpo = opt.get();
+        HierarchicalExcelExporter exporter = new HierarchicalExcelExporter(hpo, selectedTerm);
         try {
             exporter.exportToExcel(f.getAbsolutePath());
         } catch (HPOException e) {
@@ -269,9 +251,15 @@ public final class HpoTabController {
         chooser.setInitialFileName("hpo.xlsx");
         File f = chooser.showSaveDialog(null);
         if (f != null) {
+            Optional<Ontology> opt = hpoWbModel.getHpo();
+            if (opt.isEmpty()) {
+                LOGGER.error("HPO ontology not initialized");
+                return;
+            }
+            Ontology hpo = opt.get();
             String path = f.getAbsolutePath();
             LOGGER.trace(String.format("Setting path to export HPO as excel file at: %s", path));
-            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(optionalResources.getHpoOntology());
+            Hpo2ExcelExporter exporter = new Hpo2ExcelExporter(hpo);
             exporter.exportToExcelFile(path);
         } else {
             LOGGER.error("Unable to obtain path to Excel export file");
@@ -391,11 +379,16 @@ public final class HpoTabController {
 
     /** Function is called once all of the resources are found (hp obo, disease annotations, mondo). */
     public void activate() {
+        Optional<Ontology> hpoOpt = hpoWbModel.getHpo();
+        if (hpoOpt.isEmpty()) {
+            LOGGER.error("Could not find HPO");
+            return;
+        }
+        Ontology hpo = hpoOpt.get();
         Platform.runLater(()->{
-            initTree(optionalResources.getHpoOntology(), k -> System.out.println("Consumed " + k));
+            initTree(hpo, k -> System.out.println("Consumed " + k));
             WidthAwareTextFields.bindWidthAwareAutoCompletion(hpoAutocompleteTextfield, labelsAndHpoIds.keySet());
-            WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield,
-                    optionalResources.getDisease2AnnotationMap().keySet());
+            WidthAwareTextFields.bindWidthAwareAutoCompletion(diseaseAutocompleteTextfield, hpoWbModel.hpoDiseaseNames());
         });
     }
 
@@ -413,7 +406,13 @@ public final class HpoTabController {
      */
     private void updateDescriptionToDiseaseModel(HpoDisease dmodel) {
         LOGGER.trace("TOP OF updateDescriptionToDiseaseModel");
-        String content = HpoHtmlPageGenerator.getDiseaseHTML(dmodel, optionalResources.getHpoOntology());
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            LOGGER.error("HPO null");
+            return;
+        }
+        Ontology hpo = opt.get();
+        String content = HpoHtmlPageGenerator.getDiseaseHTML(dmodel, hpo);
         infoWebEngine.loadContent(content);
         infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener<Worker.State>()
                 (ov, oldState, newState) -> {
@@ -435,7 +434,7 @@ public final class HpoTabController {
                                             return;
                                         }
                                         TermId tid = TermId.of(href);
-                                        Term term = optionalResources.getHpoOntology().getTermMap().get(tid);
+                                        Term term = hpo.getTermMap().get(tid);
                                         if (term == null) {
                                             LOGGER.error(String.format("Could not construct term  from termid \"%s\"", tid.getValue()));
                                             return;
@@ -468,6 +467,13 @@ public final class HpoTabController {
      */
     private void expandUntilTerm(Term term) {
         // logger.trace("expand until term " + term.toString());
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            LOGGER.error("HPO null");
+            return;
+        }
+        Ontology hpo = opt.get();
+
         if (existsPathFromRoot(term)) {
             // find root -> term path through the tree
             Stack<Term> termStack = new Stack<>();
@@ -497,8 +503,8 @@ public final class HpoTabController {
             ontologyTreeView.getSelectionModel().select(target);
             ontologyTreeView.scrollTo(ontologyTreeView.getSelectionModel().getSelectedIndex());
         } else {
-            TermId rootId = optionalResources.getHpoOntology().getRootTermId();
-            Term rootTerm = optionalResources.getHpoOntology().getTermMap().get(rootId);
+            TermId rootId = hpo.getRootTermId();
+            Term rootTerm = hpo.getTermMap().get(rootId);
             LOGGER.warn(String.format("Unable to find the path from %s to %s", rootTerm.toString(), term.getName()));
         }
         selectedTerm = term;
@@ -518,8 +524,8 @@ public final class HpoTabController {
         if (treeItem == null)
             return;
         Term term = treeItem.getValue().term;
-        List<HpoDisease> annotatedDiseases = optionalResources.getIndirectAnnotMap().get(term.getId())
-                .stream()
+        List<HpoDisease> annotatedDiseases = hpoWbModel.getDiseasesByHpoTermId(term.getId());
+        annotatedDiseases = annotatedDiseases.stream()
                 .filter(d -> d.getDatabase().equals(selectedDatabase.toString()))
                 .collect(Collectors.toList());
 
@@ -700,11 +706,13 @@ public final class HpoTabController {
      * @return children of term (not including term itself).
      */
     private Set<Term> getTermChildren(Term term) {
-        Ontology ontology = optionalResources.getHpoOntology();
-        if (ontology == null) {
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            LOGGER.error("HPO null");
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
-            return new HashSet<>();
+            return Set.of();
         }
+        Ontology ontology = opt.get();
         TermId parentTermId = term.getId();
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
         Set<Term> kids = new HashSet<>();
@@ -722,11 +730,13 @@ public final class HpoTabController {
      * @return parents of term (not including term itself).
      */
     private Set<Term> getTermParents(Term term) {
-        Ontology ontology = optionalResources.getHpoOntology();
-        if (ontology == null) {
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            LOGGER.error("HPO null");
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
-            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
+            return Set.of();
         }
+        Ontology ontology = opt.get();
         Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
         Set<Term> eltern = new HashSet<>();
         parentIds.forEach(tid -> {
@@ -737,11 +747,13 @@ public final class HpoTabController {
     }
 
     private boolean existsPathFromRoot(Term term) {
-        Ontology ontology = optionalResources.getHpoOntology();
-        if (ontology == null) {
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            LOGGER.error("HPO null");
             PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
             return false;
         }
+        Ontology ontology = opt.get();
         TermId rootId = ontology.getRootTermId();
         TermId tid = term.getId();
         return existsPath(ontology, tid, rootId);

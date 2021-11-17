@@ -78,10 +78,10 @@ public class HpoStats {
 
     private Map<String,String> metadata;
 
-
-    public HpoStats(String hpopath, String annotationpath) throws HPOException{
-        this(hpopath,annotationpath,rootHpoTerm);
-    }
+//
+//    public HpoStats(String hpopath, String annotationpath) throws HPOException{
+//        this(hpopath,annotationpath,rootHpoTerm);
+//    }
 
 
     public String getHpoTerm() {

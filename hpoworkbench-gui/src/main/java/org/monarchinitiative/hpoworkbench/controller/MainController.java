@@ -2,7 +2,6 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -17,10 +16,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.StartupTask;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
-import org.monarchinitiative.hpoworkbench.gui.PlatformUtil;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.webpopup.SettingsPopup;
 import org.monarchinitiative.hpoworkbench.io.*;
+import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,15 +80,19 @@ public class MainController {
     @FXML
     private SplitPane analysisTab;
 
+    private final HpoWbModel hpoWbModel;
+
     @Autowired
     public MainController(OptionalResources optionalResources,
                           @Qualifier("configProperties") Properties properties,
                           @Qualifier("appHomeDir") File hpoWorkbenchDir,
-                          ExecutorService executorService) {
+                          ExecutorService executorService,
+                          HpoWbModel hpoWbModel) {
         this.optionalResources = optionalResources;
         this.pgProperties = properties;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
         this.executor = executorService;
+        this.hpoWbModel = hpoWbModel;
     }
 
     @FXML
@@ -106,9 +109,10 @@ public class MainController {
         task.setOnSucceeded(e -> {
             publishMessage("Successfully loaded files");
             hpoTabController.activate();
-            mondoTabController.initialize();
+            mondoTabController.activate();
             analysisTabController.initialize();
             window.close();
+            initModel();
         });
         task.setOnFailed(e -> {
             publishMessage("Unable to load ontologies/annotations", MessageType.ERROR);
@@ -131,6 +135,10 @@ public class MainController {
         this.hpoTabController.initialize();
         this.hpoTabController.activate();
         logger.info("done activate");
+    }
+
+    private void initModel() {
+        this.hpoWbModel.fromOptionalResources(optionalResources);
     }
 
     /**
