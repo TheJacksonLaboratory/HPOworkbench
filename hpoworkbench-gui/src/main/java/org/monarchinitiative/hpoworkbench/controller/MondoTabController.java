@@ -157,12 +157,12 @@ public final class MondoTabController {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize() {
 
     }
     /** Called by main controller once resources loaded. */
     public void activate() {
-        logger.trace("Initializing MondoController");
+        logger.trace("Activating MondoController");
         Optional<Ontology> opt = hpoWbModel.getMondo();
         if (opt.isEmpty()) {
             logger.error("Attempt to activate MondoTabController with null Mondo ontology");

@@ -75,8 +75,12 @@ public final class AnalysisTabController {
 
 
     @FXML
-    public void initialize() {
-        logger.info("Initialize analysis tab");
+    private void initialize() {
+        logger.info("Initialize analysis tab (no-op)");
+    }
+
+    public void activate() {
+        logger.info("Activating analysis tab (no-op)");
     }
 
 

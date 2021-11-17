@@ -96,7 +96,7 @@ public class MainController {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize() {
         logger.info("Initializing main controller");
         StartupTask task = new StartupTask(optionalResources, pgProperties);
         ProgressIndicator pb = new ProgressIndicator();
@@ -110,7 +110,7 @@ public class MainController {
             publishMessage("Successfully loaded files");
             hpoTabController.activate();
             mondoTabController.activate();
-            analysisTabController.initialize();
+            analysisTabController.activate();
             window.close();
             initModel();
         });
@@ -130,10 +130,6 @@ public class MainController {
         optionalResources.mondoOntologyProperty().addListener(listener);
         logger.info("Done initialization");
         checkAll();
-        this.analysisTabController.initialize();
-        this.mondoTabController.initialize();
-        this.hpoTabController.initialize();
-        this.hpoTabController.activate();
         logger.info("done activate");
     }
 

@@ -72,16 +72,7 @@ public class HpoStats {
     private int n_modeOfInheritance;
     private int n_phenotypicAbnormality;
 
-
-
-
-
     private Map<String,String> metadata;
-
-//
-//    public HpoStats(String hpopath, String annotationpath) throws HPOException{
-//        this(hpopath,annotationpath,rootHpoTerm);
-//    }
 
 
     public String getHpoTerm() {

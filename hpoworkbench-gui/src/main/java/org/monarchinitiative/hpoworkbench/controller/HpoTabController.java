@@ -176,10 +176,10 @@ public final class HpoTabController {
 
     @FXML
     private void goHpoDiseaseAutocomplete() {
-        String diseaseAC = diseaseAutocompleteTextfield.getText();
-        Optional<HpoDisease> opt = hpoWbModel.getDisease(diseaseAC);
+        String diseaseName = diseaseAutocompleteTextfield.getText();
+        Optional<HpoDisease> opt = hpoWbModel.getDisease(diseaseName);
         if (opt.isEmpty()) {
-            LOGGER.warn("disease page could not be shown because disease model was null");
+            LOGGER.warn("disease page could not be shown because disease model was null for {}", diseaseName);
             return;
         }
         HpoDisease dmod = opt.get();

@@ -80,18 +80,10 @@ public final class OptionalResources {
 
 
     public OptionalResources() {
-        hpoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(hpoOntologyProperty(),
-                indirectAnnotMapProperty(),
-                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
-                hpoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
-
-        mondoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(mondoOntologyProperty(),
-                indirectAnnotMapProperty(),
-                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
-                mondoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
-
-        hpoaResourceIsMissing =Bindings.createBooleanBinding(() -> Stream.of(directAnnotMapProperty())
-                .anyMatch(op -> op.get() == null));
+        hpoResourceIsMissing = Bindings.createBooleanBinding(() -> hpoOntologyProperty().get()==null);
+        mondoResourceIsMissing = Bindings.createBooleanBinding(() -> mondoOntologyProperty().get()==null);
+        hpoaResourceIsMissing =Bindings.createBooleanBinding(() -> Stream.of( indirectAnnotMapProperty(),
+                directAnnotMapProperty()).anyMatch(op -> op.get() == null));
     }
 
     /**
