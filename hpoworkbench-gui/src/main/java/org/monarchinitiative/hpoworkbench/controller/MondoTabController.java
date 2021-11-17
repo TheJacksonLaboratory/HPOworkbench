@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;

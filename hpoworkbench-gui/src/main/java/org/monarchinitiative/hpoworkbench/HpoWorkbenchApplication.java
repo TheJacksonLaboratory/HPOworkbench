@@ -1,17 +1,14 @@
 package org.monarchinitiative.hpoworkbench;
 
-import com.sun.javafx.application.LauncherImpl;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.application.Preloader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import org.monarchinitiative.hpoworkbench.gui.splash.HpoWbPreloader;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -33,7 +30,7 @@ public class HpoWorkbenchApplication extends Application {
 
 
     @Override
-    public void start(Stage stage) throws InterruptedException {
+    public void start(Stage stage) {
             applicationContext.publishEvent(new StageReadyEvent(stage));
     }
 

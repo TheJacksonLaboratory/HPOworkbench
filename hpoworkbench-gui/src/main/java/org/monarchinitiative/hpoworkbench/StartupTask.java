@@ -1,13 +1,11 @@
 package org.monarchinitiative.hpoworkbench;
 
 import javafx.concurrent.Task;
-import org.monarchinitiative.hpoworkbench.controller.MainController;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.Properties;

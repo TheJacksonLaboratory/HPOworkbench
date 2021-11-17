@@ -16,7 +16,7 @@
 <BorderPane minHeight="1000.0" minWidth="1200.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
         <HBox prefHeight="30.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
-            <MenuBar minHeight="30.0" minWidth="200.0" prefWidth="200.0" styleClass="mymenu" stylesheets="@../css/style.css">
+            <MenuBar minHeight="30.0" minWidth="300.0" prefWidth="300.0" styleClass="mymenu" stylesheets="@../css/style.css">
                 <Menu mnemonicParsing="false" text="File">
                     <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
                 </Menu>
@@ -26,6 +26,14 @@
                     <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo" />
                     <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
                 </Menu>
+            <Menu mnemonicParsing="false" text="Analysis">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#showHpoStatistics" text="Show HPO Statistics" />
+                  <MenuItem mnemonicParsing="false" onAction="#showMondoStats" text="Show Mondo Statistics" />
+                  <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreSpecificAnnotation" text="Entries with inspecific annotations" />
+                  <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreAnnotations" text="Entries with few Annotations" />
+              </items>
+            </Menu>
                 <Menu mnemonicParsing="false" text="Settings">
                     <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Show settings" />
                 </Menu>
@@ -47,9 +55,6 @@
             <Tab text="Mondo Browser">
                 <fx:include fx:id="mondoTab" source="MondoTab.fxml" />
             </Tab>
-         <Tab text="Analysis">
-           <fx:include fx:id="analysisTab" source="AnalysisTab.fxml" />
-         </Tab>
         </TabPane>
     </center>
     <bottom>

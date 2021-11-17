@@ -15,12 +15,22 @@ import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.StartupTask;
+import org.monarchinitiative.hpoworkbench.analysis.AnnotationTlc;
+import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
+import org.monarchinitiative.hpoworkbench.analysis.MondoStats;
+import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.webpopup.SettingsPopup;
+import org.monarchinitiative.hpoworkbench.gui.webviewerutil.WebViewerFactory;
+import org.monarchinitiative.hpoworkbench.gui.webviewerutil.WebViewerPopup;
+import org.monarchinitiative.hpoworkbench.html.AnnotationTlcHtmlGenerator;
+import org.monarchinitiative.hpoworkbench.html.HpoStatsHtmlGenerator;
+import org.monarchinitiative.hpoworkbench.html.MondoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.io.*;
 import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +38,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
@@ -71,8 +82,7 @@ public class MainController {
     private HpoTabController hpoTabController;
     @FXML
     private MondoTabController mondoTabController;
-    @FXML
-    private AnalysisTabController analysisTabController;
+
     @FXML
     private SplitPane hpoTab;
     @FXML
@@ -110,7 +120,6 @@ public class MainController {
             publishMessage("Successfully loaded files");
             hpoTabController.activate();
             mondoTabController.activate();
-            analysisTabController.activate();
             window.close();
             initModel();
         });
@@ -309,6 +318,77 @@ public class MainController {
      */
     enum mode {
         BROWSE_HPO, BROWSE_DISEASE, NEW_ANNOTATION
+    }
+
+    /// for the analysis menu
+    @FXML
+    private void showHpoStatistics(ActionEvent e) {
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            logger.error("Attempt to show HPO stats before initializing HPO ontology object");
+            return;
+        }
+        Ontology hpo = opt.get();
+        try {
+            HpoStats stats = new HpoStats(hpo, hpoWbModel.getId2diseaseMap());
+            Stage stage = (Stage) this.copyrightLabel.getScene().getWindow();
+            String html = HpoStatsHtmlGenerator.getHTML(stats);
+            WebViewerPopup popup = WebViewerFactory.hpoStats(html, stage);
+            popup.popup();
+
+        } catch (HPOException ex) {
+            PopUps.showException("Error","Could not retrieve HPO Stats",ex);
+        }
+        e.consume();
+    }
+
+    @FXML
+    private void showMondoStats(ActionEvent e) {
+        e.consume();
+        Optional<Ontology> opt = hpoWbModel.getMondo();
+        if (opt.isEmpty()) {
+            logger.error("Attempt to show Mondo stats with null Mondo object");
+        }
+        MondoStats stats = new MondoStats(opt.get());
+        Stage stage = (Stage) this.copyrightLabel.getScene().getWindow();
+        String html = MondoStatsHtmlGenerator.getHTML(stats);
+        WebViewerPopup popup = WebViewerFactory.mondoStats(html, stage);
+        popup.popup();
+    }
+
+    @FXML
+    private void showEntriesNeedingMoreAnnotations(ActionEvent e) {
+        e.consume();
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            logger.error("null HPO object");
+            return;
+        }
+        Ontology hpo = opt.get();
+        AnnotationTlc tlc = new AnnotationTlc(hpo, hpoWbModel.getId2diseaseMap());
+        String html = AnnotationTlcHtmlGenerator.getHTML(tlc);
+        Stage stage = (Stage) this.copyrightLabel.getScene().getWindow();
+        WebViewerPopup popup = WebViewerFactory.entriesNeedingMoreAnnotations(html, stage);
+        popup.popup();
+    }
+
+
+
+    @FXML
+    private void showEntriesNeedingMoreSpecificAnnotation(ActionEvent e) {
+        e.consume();
+        Optional<Ontology> opt = hpoWbModel.getHpo();
+        if (opt.isEmpty()) {
+            logger.error("null HPO object");
+            return;
+        }
+        Ontology hpo = opt.get();
+        AnnotationTlc tlc = new AnnotationTlc(hpo, hpoWbModel.getId2diseaseMap());
+        String html = AnnotationTlcHtmlGenerator.getHTMLSpecificTerms(tlc);
+        Stage stage = (Stage) this.copyrightLabel.getScene().getWindow();
+        WebViewerPopup popup = WebViewerFactory.entriesNeedingSpecificAnnotations(html, stage);
+        popup.popup();
+
     }
 
 }

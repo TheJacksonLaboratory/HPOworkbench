@@ -5,8 +5,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import org.monarchinitiative.hpoworkbench.StartupTask;
-import org.monarchinitiative.hpoworkbench.controller.MainController;
-import org.monarchinitiative.hpoworkbench.controller.MessageType;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Properties;
 import java.util.ResourceBundle;
