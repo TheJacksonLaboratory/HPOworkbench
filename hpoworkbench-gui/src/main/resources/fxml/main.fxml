@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
 
 <BorderPane minHeight="1000.0" minWidth="1200.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.monarchinitiative.hpoworkbench.controller.MainController">
     <top>
@@ -26,14 +35,12 @@
                     <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo" />
                     <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
                 </Menu>
-            <Menu mnemonicParsing="false" text="Analysis">
-              <items>
-                <MenuItem mnemonicParsing="false" onAction="#showHpoStatistics" text="Show HPO Statistics" />
-                  <MenuItem mnemonicParsing="false" onAction="#showMondoStats" text="Show Mondo Statistics" />
-                  <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreSpecificAnnotation" text="Entries with inspecific annotations" />
-                  <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreAnnotations" text="Entries with few Annotations" />
-              </items>
-            </Menu>
+                <Menu mnemonicParsing="false" text="Analysis">
+                    <MenuItem mnemonicParsing="false" onAction="#showHpoStatistics" text="Show HPO Statistics" />
+                    <MenuItem mnemonicParsing="false" onAction="#showMondoStats" text="Show Mondo Statistics" />
+                    <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreSpecificAnnotation" text="Entries with inspecific annotations" />
+                    <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreAnnotations" text="Entries with few Annotations" />
+                </Menu>
                 <Menu mnemonicParsing="false" text="Settings">
                     <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Show settings" />
                 </Menu>
@@ -48,14 +55,104 @@
         </HBox>
     </top>
     <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE">
-            <Tab text="HPO Browser">
-                <fx:include fx:id="hpoTab" source="HpoTab.fxml" />
-            </Tab>
-            <Tab text="Mondo Browser">
-                <fx:include fx:id="mondoTab" source="MondoTab.fxml" />
-            </Tab>
-        </TabPane>
+        <SplitPane dividerPositions="0.5" focusTraversable="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+            <VBox BorderPane.alignment="CENTER">
+                <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse HPO Terms or Diseases">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="15.0" top="5.0" />
+                    </VBox.margin>
+                </Label>
+                <HBox prefHeight="37.0" prefWidth="561.0">
+               <RadioButton fx:id="hpoRadioButton" mnemonicParsing="false" text="HPO">
+                  <HBox.margin>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </HBox.margin>
+               </RadioButton>
+               <RadioButton fx:id="mondoRadioButton" mnemonicParsing="false" text="Mondo">
+                  <HBox.margin>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </HBox.margin>
+               </RadioButton>
+                </HBox>
+                <HBox maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="ALWAYS">
+                    <TextField fx:id="autocompleteTextfield" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" promptText="autocomplete HPO/Mondo term...">
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </HBox.margin>
+                    </TextField>
+                    <Button fx:id="goButton" minHeight="30.0" minWidth="-Infinity" mnemonicParsing="false" onAction="#goButtonAction" styleClass="Button" stylesheets="@../css/style.css" text="Go" textOverrun="CLIP">
+                        <tooltip>
+                            <Tooltip text="tell me what to do" />
+                        </tooltip>
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+                        </HBox.margin>
+                    </Button>
+                </HBox>
+                <HBox>
+                    <Label fx:id="currentDiseaseLabel" minWidth="300.0" styleClass="smallfontlabel" stylesheets="@../css/style.css">
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <TreeView fx:id="ontologyTreeView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets left="5.0" right="5.0" top="5.0" />
+                    </VBox.margin>
+                </TreeView>
+            </VBox>
+
+            <AnchorPane>
+                <WebView fx:id="infoWebView" maxHeight="-1.0" maxWidth="1.7976931348623157E308" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="130.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                <HBox prefHeight="130.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                    <GridPane>
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                        </rowConstraints>
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                        </HBox.margin>
+                        <Button fx:id="exportHierarchicalSummaryButton" minWidth="210.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary">
+                            <GridPane.margin>
+                                <Insets right="5.0" />
+                            </GridPane.margin>
+                        </Button>
+                        <Button fx:id="exportToExcelButton" minWidth="210.0" mnemonicParsing="false" onAction="#exportToExcel" styleClass="Button" stylesheets="@../css/style.css" text="Export hpoOntology as Excel file" GridPane.rowIndex="1">
+                            <GridPane.margin>
+                                <Insets right="5.0" />
+                            </GridPane.margin>
+                        </Button>
+                        <Button fx:id="suggestCorrectionToTermButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest correction " GridPane.columnIndex="1">
+                            <GridPane.margin>
+                                <Insets left="5.0" right="5.0" />
+                            </GridPane.margin>
+                        </Button>
+                        <Button fx:id="suggestNewChildTermButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <GridPane.margin>
+                                <Insets left="5.0" right="5.0" />
+                            </GridPane.margin>
+                        </Button>
+                        <Button fx:id="suggestNewAnnotationButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new annotation" GridPane.rowIndex="2">
+                            <GridPane.margin>
+                                <Insets right="5.0" />
+                            </GridPane.margin>
+                        </Button>
+                        <Button fx:id="reportMistakenAnnotationButton" minWidth="210.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <GridPane.margin>
+                                <Insets left="5.0" right="5.0" />
+                            </GridPane.margin>
+                        </Button>
+                    </GridPane>
+                </HBox>
+            </AnchorPane>
+        </SplitPane>
     </center>
     <bottom>
         <StackPane BorderPane.alignment="CENTER_LEFT">

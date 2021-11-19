@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import org.monarchinitiative.hpoworkbench.StartupTask;
+import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
+import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
+import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +28,11 @@ public class SplashScreenController implements Initializable {
 
     public static Label label;
 
-    private final OptionalResources optionalResources;
+    private final OptionalHpoResource optionalHpoResource;
+
+    private final OptionalMondoResource optionalMondoResource;
+
+    private final OptionalHpoaResource optionalHpoaResource;
     private final ExecutorService executor;
     /**
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
@@ -36,10 +43,14 @@ public class SplashScreenController implements Initializable {
     private boolean success;
 
     @Autowired
-    public SplashScreenController(OptionalResources optionalResources,
+    public SplashScreenController(OptionalHpoResource optionalHpoResource,
+                                  OptionalMondoResource optionalMondoResource,
+                                  OptionalHpoaResource optionalHpoaResource,
                                   @Qualifier("configProperties") Properties properties,
                                   ExecutorService executorService) {
-        this.optionalResources = optionalResources;
+        this.optionalHpoResource = optionalHpoResource;
+        this.optionalMondoResource = optionalMondoResource;
+        this.optionalHpoaResource = optionalHpoaResource;
         this.pgProperties = properties;
         this.executor = executorService;
     }
@@ -48,7 +59,7 @@ public class SplashScreenController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         label = progress;
         LOGGER.info("Initializing splash screen");
-        StartupTask task = new StartupTask(optionalResources, pgProperties);
+        StartupTask task = new StartupTask(optionalHpoResource, optionalMondoResource, optionalHpoaResource, pgProperties);
         task.setOnSucceeded(e -> publishMessage(true));
         task.setOnFailed(e -> publishMessage(false));
         this.executor.submit(task);

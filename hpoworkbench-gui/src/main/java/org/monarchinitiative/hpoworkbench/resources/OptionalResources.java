@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tab;
-import org.monarchinitiative.hpoworkbench.controller.HpoTabController;
 import org.monarchinitiative.hpoworkbench.controller.MondoTabController;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
