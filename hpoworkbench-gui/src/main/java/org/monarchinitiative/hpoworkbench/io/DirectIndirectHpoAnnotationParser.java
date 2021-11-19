@@ -41,6 +41,11 @@ public class DirectIndirectHpoAnnotationParser {
     public DirectIndirectHpoAnnotationParser(String path, Ontology onto) {
         this.pathToPhenotypeAnnotationTab = path;
         this.ontology = onto;
+        try {
+            doParse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

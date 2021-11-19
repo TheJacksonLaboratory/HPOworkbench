@@ -129,26 +129,6 @@
                                 <Insets right="5.0" />
                             </GridPane.margin>
                         </Button>
-                        <Button fx:id="suggestCorrectionToTermButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestCorrectionToTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest correction " GridPane.columnIndex="1">
-                            <GridPane.margin>
-                                <Insets left="5.0" right="5.0" />
-                            </GridPane.margin>
-                        </Button>
-                        <Button fx:id="suggestNewChildTermButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewChildTerm" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new child term" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <GridPane.margin>
-                                <Insets left="5.0" right="5.0" />
-                            </GridPane.margin>
-                        </Button>
-                        <Button fx:id="suggestNewAnnotationButton" minWidth="210.0" mnemonicParsing="false" onAction="#suggestNewAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Suggest new annotation" GridPane.rowIndex="2">
-                            <GridPane.margin>
-                                <Insets right="5.0" />
-                            </GridPane.margin>
-                        </Button>
-                        <Button fx:id="reportMistakenAnnotationButton" minWidth="210.0" mnemonicParsing="false" onAction="#reportMistakenAnnotation" styleClass="Button" stylesheets="@../css/style.css" text="Report mistaken annotation" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                            <GridPane.margin>
-                                <Insets left="5.0" right="5.0" />
-                            </GridPane.margin>
-                        </Button>
                     </GridPane>
                 </HBox>
             </AnchorPane>

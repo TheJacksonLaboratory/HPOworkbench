@@ -121,9 +121,10 @@ public final class StartupTask extends Task<Void> {
             }
             if (hpoAnnotFile.isFile()) {
                 updateProgress(0.78, 1);
-                optionalHpoaResource.setAnnotationResources(hpoAnnotPath, optionalHpoResource.getOntology());
+                this.optionalHpoaResource.setAnnotationResources(hpoAnnotPath, optionalHpoResource.getOntology());
                 updateProgress(0.95, 1);
-                LOGGER.info("Loaded annotation maps");
+                System.err.println("Loaded annotation maps");
+                System.err.println(this.optionalHpoaResource.toString());
             } else {
                 optionalHpoaResource.initializeWithEmptyMaps();
                 LOGGER.error("Cannot load phenotype.hpoa File was null");
