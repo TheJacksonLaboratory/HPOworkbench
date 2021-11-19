@@ -81,14 +81,9 @@ public class DownloaderFactory {
             String hpoAnnotationsFileName = hpoWebConfigurationDirectory + File.separator + PlatformUtil.HPO_ANNOTATIONS_FILENAME;
             DirectIndirectHpoAnnotationParser parser = new DirectIndirectHpoAnnotationParser(hpoAnnotationsFileName, optionalResources
                     .getHpoOntology());
-            try {
-                parser.doParse();
-                optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
-                optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
-                pgProperties.setProperty(OptionalResources.HPOA_PATH_PROPERTY, hpoAnnotationsFileName);
-            } catch (HPOWorkbenchException exc) {
-                PopUps.showException("Exception", "Error encountered while trying to download hpoa", exc);
-            }
+            optionalResources.setDirectAnnotMap(parser.getDirectAnnotMap());
+            optionalResources.setIndirectAnnotMap(parser.getTotalAnnotationMap());
+            pgProperties.setProperty(OptionalResources.HPOA_PATH_PROPERTY, hpoAnnotationsFileName);
         });
         hpodownload.setOnFailed(event -> {
             window.close();

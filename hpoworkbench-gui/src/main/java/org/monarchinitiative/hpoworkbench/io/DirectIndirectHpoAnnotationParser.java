@@ -72,7 +72,7 @@ public class DirectIndirectHpoAnnotationParser {
     /**
      * Parse annotations file and populate maps containing direct and indirect annotations.
      */
-    public void doParse()  throws HPOWorkbenchException {
+    private void doParse()  throws HPOWorkbenchException {
         if (ontology == null) {
             logger.warn("Ontology unset, cannot parse annotations file");
             return;
