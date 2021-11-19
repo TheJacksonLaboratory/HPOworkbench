@@ -22,11 +22,13 @@ package org.monarchinitiative.hpoworkbench.gui;
 
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -72,7 +74,7 @@ public class PopUps {
         al.setTitle(windowTitle);
         al.setHeaderText(null);
         al.setContentText(text);
-        al.showAndWait();
+        al.show();
     }
 
     /**
@@ -259,6 +261,20 @@ public class PopUps {
         childStage.setX(bounds.getWidth() * 0.35);
         childStage.setY(bounds.getHeight() * 0.25);
         return childStage;
+    }
+
+    public static Stage setupProgressDialog(String title, String labl, ProgressIndicator pb) {
+
+        javafx.scene.control.Label label = new javafx.scene.control.Label(labl);
+        FlowPane root = new FlowPane();
+        root.setPadding(new Insets(10));
+        root.setHgap(10);
+        root.getChildren().addAll(label, pb);
+        Scene scene = new Scene(root, 400, 100);
+        Stage window = new Stage();
+        window.setTitle(title);
+        window.setScene(scene);
+        return window;
     }
 
 

@@ -1,6 +1,9 @@
 package org.monarchinitiative.hpoworkbench.gui.webpopup;
 
 import javafx.stage.Stage;
+import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
+import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
+import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 
 import java.util.*;
@@ -12,12 +15,22 @@ public class SettingsPopup extends WebViewerPopup {
     private final String html;
 
     private final Properties properties;
-    private final OptionalResources optionalResources;
+    private final OptionalHpoResource optionalHpoResource;
 
-    public SettingsPopup(Properties pgProps , OptionalResources optRes, Stage stage) {
+    private final OptionalMondoResource optionalMondoResource;
+
+    private final OptionalHpoaResource optionalHpoaResource;
+
+    public SettingsPopup(Properties pgProps ,
+                         OptionalHpoResource optionalHpoResource,
+                         OptionalMondoResource optionalMondoResource,
+                         OptionalHpoaResource optionalHpoaResource,
+                         Stage stage) {
         super(stage);
         this.properties = pgProps;
-        this.optionalResources = optRes;
+        this.optionalHpoResource = optionalHpoResource;
+        this.optionalMondoResource = optionalMondoResource;
+        this.optionalHpoaResource = optionalHpoaResource;
         this.html = getHTML();
     }
 
@@ -39,27 +52,27 @@ public class SettingsPopup extends WebViewerPopup {
             items.put("phenotype.hpoa path",NOT_INITIALIZED);
         }
         // check the loaded ontologies etc.
-        if (optionalResources.getHpoOntology() != null) {
+        if (optionalHpoResource.getOntology() != null) {
             items.put("HPO", "initialized");
         } else {
             items.put("HPO", NOT_INITIALIZED);
         }
-        if (optionalResources.getMondoOntology() != null) {
+        if (optionalMondoResource.getOntology() != null) {
             items.put("Mondo", "initialized");
         } else {
             items.put("Mondo", NOT_INITIALIZED);
         }
-        if (optionalResources.getDisease2AnnotationMap() != null) {
-            items.put("Disease to annotation map", "initialized");
+        if (optionalHpoaResource.getId2diseaseModelMap() != null) {
+            items.put("id2disease map", "initialized");
         } else {
-            items.put("Disease to annotation map", NOT_INITIALIZED);
+            items.put("id2disease map", NOT_INITIALIZED);
         }
-        if (optionalResources.getDirectAnnotMap() != null) {
+        if (optionalHpoaResource.getDirectAnnotMap() != null) {
             items.put("Direct annotation map", "initialized");
         } else {
             items.put("Direct annotation map", NOT_INITIALIZED);
         }
-        if (optionalResources.getIndirectAnnotMap() != null) {
+        if (optionalHpoaResource.getIndirectAnnotMap() != null) {
             items.put("Indirect annotation map", "initialized");
         } else {
             items.put("Indirect annotation map", NOT_INITIALIZED);

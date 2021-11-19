@@ -1,7 +1,6 @@
 package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
@@ -21,7 +20,7 @@ import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
 import org.monarchinitiative.hpoworkbench.gui.GitHubPopup;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
-import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
+import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.*;
@@ -53,8 +52,6 @@ import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.*;
 @Component
 public final class MondoTabController {
     private static final Logger logger = LoggerFactory.getLogger(MondoTabController.class);
-
-    private final OptionalResources optionalResources;
 
     private final TermId MONDO_ROOT_ID = TermId.of("MONDO:0000001");
 
@@ -146,52 +143,31 @@ public final class MondoTabController {
      */
     private WebEngine infoWebEngine;
 
+    private HpoWbModel hpoWbModel;
+
 
     @Autowired
-    public MondoTabController(OptionalResources optionalResources,
+    public MondoTabController(HpoWbModel hpoWbModel,
                               Properties properties,
                               @Qualifier("appHomeDir") File hpoWorkbenchDir) {
-        this.optionalResources = optionalResources;
         this.properties = properties;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
+        this.hpoWbModel = hpoWbModel;
     }
 
     @FXML
-    public void initialize() {
-        // this binding evaluates to true, if ontology or annotations files are missing (null)
-        BooleanBinding mondoResourceIsMissing = optionalResources.mondoResourceMissing();
-        logger.trace("Initializing MondoController, missing = " + mondoResourceIsMissing.get());
-        hpoTermRadioButton.disableProperty().setValue(false);
-        diseaseRadioButton.disableProperty().setValue(false);
-        newAnnotationRadioButton.disableProperty().setValue(false);
-        goButton.disableProperty().bind(mondoResourceIsMissing);
-        copyToClipboardButton.disableProperty().setValue(false);
-        exportToExcelButton.disableProperty().setValue(false);
-        suggestCorrectionToTermButton.disableProperty().bind(mondoResourceIsMissing);
-        suggestNewChildTermButton.disableProperty().setValue(false);
-        suggestNewAnnotationButton.disableProperty().setValue(false);
-        reportMistakenAnnotationButton.disableProperty().setValue(false);
-        allDatabaseButton.disableProperty().setValue(false);
-        orphanetButton.disableProperty().setValue(false);
-        omimButton.disableProperty().setValue(false);
-        decipherButton.disableProperty().setValue(false);
+    private void initialize() {
 
-        mondoResourceIsMissing.addListener((observable, oldValue, newValue) -> {
-            if (!newValue) { // nothing is missing anymore
-                activate();
-            } else { // invalidate model and anything in the background. Controls should be disabled automatically
-                deactivate();
-            }
-        });
-
-        if (!mondoResourceIsMissing.get()) {
-            activate();
-        }
     }
-
-    private void activate() {
-        initTree(optionalResources.getMondoOntology());
-
+    /** Called by main controller once resources loaded. */
+    public void activate() {
+        logger.trace("Activating MondoController");
+        Optional<Ontology> opt = hpoWbModel.getMondo();
+        if (opt.isEmpty()) {
+            logger.error("Attempt to activate MondoTabController with null Mondo ontology");
+            return;
+        }
+        initTree(opt.get());
     }
 
     private void deactivate() {
@@ -286,26 +262,26 @@ public final class MondoTabController {
         Term mondoTerm = treeItem.getValue().term;
         TermId omimTermId = getOMIMid(mondoTerm);
         TermId orphaTermId = getOrphanetid(mondoTerm);
-
-        Map<TermId, HpoDisease> disease2AnnotationMap = optionalResources.getDisease2AnnotationMap();
-        if (disease2AnnotationMap == null) {
-            PopUps.showInfoMessage("Error: disease annotation map could not be initialized. Consider restarting the app.", "Error");
+        Optional<Ontology> hpoOpt = hpoWbModel.getHpo();
+        if (hpoOpt.isEmpty()) {
+            logger.warn("Could not init HPO");
             return;
         }
-        HpoDisease omimDisease = disease2AnnotationMap.get(omimTermId);
-        HpoDisease orphaDisease = disease2AnnotationMap.get(orphaTermId);
+        Ontology hpo = hpoOpt.get();
+        Optional<HpoDisease> omimDiseaseOpt = hpoWbModel.getDiseaseById(omimTermId);
+        Optional<HpoDisease> orphaDiseaseOpt = hpoWbModel.getDiseaseById(orphaTermId);
         //debugDisease(omimDisease);
         //debugDisease(orphaDisease);
 
-        if (omimDisease == null || orphaDisease == null) {
+        if (omimDiseaseOpt.isEmpty() || orphaDiseaseOpt.isEmpty()) {
             logger.warn("Could not init diseases");
-        } else {
-            logger.trace("Got mim " + omimDisease);
-            logger.trace("Got orph " + orphaDisease);
+            return;
         }
-
-
-        this.htmlContent = MondoHtmlPageGenerator.getHTML(mondoTerm, omimDisease, orphaDisease, optionalResources.getHpoOntology());
+        HpoDisease omimDisease = omimDiseaseOpt.get();
+        HpoDisease orphaDisease = orphaDiseaseOpt.get();
+        logger.trace("Got mim " + omimDisease);
+        logger.trace("Got orph " + orphaDisease);
+        this.htmlContent = MondoHtmlPageGenerator.getHTML(mondoTerm, omimDisease, orphaDisease, hpo);
         infoWebEngine.loadContent(this.htmlContent);
         infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener
                 (ov, oldState, newState) -> {
@@ -358,15 +334,16 @@ public final class MondoTabController {
     /**
      * Get the parents of "term"
      *
-     * @param term HPO Term of interest
+     * @param term Mondo Term of interest
      * @return parents of term (not including term itself).
      */
-    private Set<Term> getTermParents(Term term) {
-        Ontology ontology = optionalResources.getMondoOntology();
-        if (ontology == null) {
-            PopUps.showInfoMessage("Error: Could not initialize HPO Ontology", "ERROR");
-            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
+    private Set<Term> getMondoTermParents(Term term) {
+        Optional<Ontology> opt = hpoWbModel.getMondo();
+        if (opt.isEmpty()) {
+            PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
+            return new HashSet<>();
         }
+        Ontology ontology = opt.get();
         Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
         Set<Term> eltern = new HashSet<>();
         parentIds.forEach(tid -> {
@@ -376,12 +353,13 @@ public final class MondoTabController {
         return eltern;
     }
 
-    private boolean existsPathFromRoot(Term term) {
-        Ontology ontology = optionalResources.getMondoOntology();
-        if (ontology == null) {
+    private boolean existsPathFromMondoRoot(Term term) {
+        Optional<Ontology> opt = hpoWbModel.getMondo();
+        if (opt.isEmpty()) {
             PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
             return false;
         }
+        Ontology ontology = opt.get();
         TermId tid = term.getId();
         return existsPath(ontology, tid, MONDO_ROOT_ID);
     }
@@ -394,17 +372,23 @@ public final class MondoTabController {
      * @param term {@link Term} to be displayed
      */
     private void expandUntilTerm(Term term) {
+        Optional<Ontology> opt = hpoWbModel.getMondo();
+        if (opt.isEmpty()) {
+            PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
+            return;
+        }
+        Ontology mondo = opt.get();
         // logger.trace("expand until term " + term.toString());
         // switchToMode(BROWSE_HPO);
-        if (existsPathFromRoot(term)) {
+        if (existsPathFromMondoRoot(term)) {
             // find root -> term path through the tree
             Stack<Term> termStack = new Stack<>();
             termStack.add(term);
-            Set<Term> parents = getTermParents(term);
+            Set<Term> parents = getMondoTermParents(term);
             while (parents.size() != 0) {
                 Term parent = parents.iterator().next();
                 termStack.add(parent);
-                parents = getTermParents(parent);
+                parents = getMondoTermParents(parent);
             }
 
             // expand tree nodes in top -> down direction
@@ -425,8 +409,8 @@ public final class MondoTabController {
             mondoOntologyTreeView.getSelectionModel().select(target);
             mondoOntologyTreeView.scrollTo(mondoOntologyTreeView.getSelectionModel().getSelectedIndex());
         } else {
-            TermId rootId = optionalResources.getMondoOntology().getRootTermId();
-            Term rootTerm = optionalResources.getMondoOntology().getTermMap().get(rootId);
+            TermId rootId = mondo.getRootTermId();
+            Term rootTerm = mondo.getTermMap().get(rootId);
             logger.warn(String.format("Unable to find the path from %s to %s", rootTerm.toString(), term.getName()));
         }
         selectedTerm = term;
@@ -434,8 +418,14 @@ public final class MondoTabController {
 
     @FXML
     public void goButtonAction() {
+        Optional<Ontology> opt = hpoWbModel.getMondo();
+        if (opt.isEmpty()) {
+            PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
+            return;
+        }
+        Ontology mondo = opt.get();
         TermId tid = labelsAndMondoIds.get(searchTextField.getText());
-        Term term = optionalResources.getMondoOntology().getTermMap().get(tid);
+        Term term = mondo.getTermMap().get(tid);
         if (term == null) {
             String msg = String.format("Could not find ontology term for search result: %s", searchTextField.getText());
             PopUps.showInfoMessage(msg, "Warning");
@@ -524,20 +514,21 @@ public final class MondoTabController {
      * @return children of term (not including term itself).
      */
     private Set<Term> getTermChildren(Term term) {
-        Ontology ontology = optionalResources.getMondoOntology();
-        if (ontology == null) {
+        Optional<Ontology> opt = hpoWbModel.getMondo();
+        if (opt.isEmpty()) {
             PopUps.showInfoMessage("Error: Could not initialize Mondo Ontology", "ERROR");
-            return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
+            return Set.of();
         }
+        Ontology mondo = opt.get();
         if (term == null) {
             PopUps.showInfoMessage("Error: term==null in getTermChildren", "ERROR");
             return new HashSet<>(); // return hasTermsUniqueToOnlyOneDisease set
         }
         TermId parentTermId = term.getId();
-        Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
+        Set<TermId> childrenIds = getChildTerms(mondo, parentTermId, false);
         Set<Term> kids = new HashSet<>();
         childrenIds.forEach(tid -> {
-            Term gt = ontology.getTermMap().get(tid);
+            Term gt = mondo.getTermMap().get(tid);
             kids.add(gt);
         });
         return kids;

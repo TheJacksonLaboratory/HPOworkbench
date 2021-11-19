@@ -8,8 +8,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tab;
-import org.monarchinitiative.hpoworkbench.controller.HpoTabController;
 import org.monarchinitiative.hpoworkbench.controller.MondoTabController;
+import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -35,12 +35,17 @@ import java.util.stream.Stream;
  * @since 0.1
  */
 
+/**
+ * This class is responsible for ingesting the three files that HPOworkbench uses. It is populated
+ * by {@link org.monarchinitiative.hpoworkbench.StartupTask}. These resources need to be downloaded
+ * by the user upon the first usage of this app, and so they may be null.
+ * @author Peter Robinson
+ */
 public final class OptionalResources {
     private static final Logger LOGGER = LoggerFactory.getLogger(OptionalResources.class);
     public static final String HP_JSON_PATH_PROPERTY = "hp.json.path";
     public static final String MONDO_PATH_PROPERTY = "mondo.json.path";
     public static final String HPOA_PATH_PROPERTY = "hpoa.path";
-    static public final String HPOA_URL_KEY = "hpo.phenotype.annotations.url";
     /**
      * This binding evaluates as true when a resource required for a {@link Tab} controlled by
      * {@link MondoTabController} is missing.
@@ -60,9 +65,6 @@ public final class OptionalResources {
     private final ObjectProperty<Ontology> mondoOntology
             = new SimpleObjectProperty<>(this, "mondoOntology", null);
 
-    private final StringProperty statusLabelProperty =
-            new SimpleStringProperty(this, "status", "");
-
     private final ObjectProperty<Map<TermId, List<HpoDisease>>> indirectAnnotMap =
             new SimpleObjectProperty<>(this, "indirectAnnotMap", null);
 
@@ -77,18 +79,10 @@ public final class OptionalResources {
 
 
     public OptionalResources() {
-        hpoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(hpoOntologyProperty(),
-                indirectAnnotMapProperty(),
-                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
-                hpoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
-
-        mondoResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of(mondoOntologyProperty(),
-                indirectAnnotMapProperty(),
-                directAnnotMapProperty()).anyMatch(op -> op.get() == null),
-                mondoOntologyProperty(), indirectAnnotMapProperty(), directAnnotMapProperty());
-
-        hpoaResourceIsMissing =Bindings.createBooleanBinding(() -> Stream.of(directAnnotMapProperty())
-                .anyMatch(op -> op.get() == null));
+        hpoResourceIsMissing = Bindings.createBooleanBinding(() -> hpoOntologyProperty().get()==null);
+        mondoResourceIsMissing = Bindings.createBooleanBinding(() -> mondoOntologyProperty().get()==null);
+        hpoaResourceIsMissing =Bindings.createBooleanBinding(() -> Stream.of( indirectAnnotMapProperty(),
+                directAnnotMapProperty()).anyMatch(op -> op.get() == null));
     }
 
     /**
@@ -134,6 +128,18 @@ public final class OptionalResources {
 
     public Map<TermId, List<HpoDisease>> getDirectAnnotMap() {
         return directAnnotMap.get();
+    }
+
+    public void setAnnotationResources(String phenotypeDotHpoaPath){
+        if (hpoResourceIsMissing.get()) {
+            LOGGER.error("Attempt to ingest hpoa.phenotype file without initializing hp.json");
+            return;
+        }
+        Ontology hpo = getHpoOntology();
+        DirectIndirectHpoAnnotationParser parser =
+                new DirectIndirectHpoAnnotationParser(phenotypeDotHpoaPath, hpo);
+        setDirectAnnotMap(parser.getDirectAnnotMap());
+        setIndirectAnnotMap(parser.getTotalAnnotationMap());
     }
 
     public void setDirectAnnotMap(Map<TermId, List<HpoDisease>> directAnnotMap) {

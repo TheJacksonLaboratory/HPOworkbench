@@ -45,9 +45,9 @@ public class StageInitializer implements ApplicationListener<HpoWorkbenchApplica
             fxmlLoader.setControllerFactory(applicationContext::getBean);
             Parent parent = fxmlLoader.load();
             Stage stage = event.getStage();
-            stage.setScene(new Scene(parent, 800, 600));
+            stage.setScene(new Scene(parent, 1200, 900));
+            stage.setResizable(true);
             stage.setTitle(applicationTitle);
-            stage.setResizable(false);
             readAppIcon().ifPresent(stage.getIcons()::add);
             stage.show();
         } catch (IOException e) {

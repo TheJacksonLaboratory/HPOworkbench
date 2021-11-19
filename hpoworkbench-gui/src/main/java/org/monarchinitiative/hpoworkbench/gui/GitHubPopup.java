@@ -16,6 +16,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.controlsfx.control.CheckComboBox;
+import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
@@ -180,7 +181,7 @@ public class GitHubPopup {
     }
 
     /** This is used if the user has alreay entered their GitHub name and password (they are stored in the
-     * {@link org.monarchinitiative.hpoworkbench.model.Model} object.
+     * {@link HpoWbModel} object.
      * @param ghuname  GitHub user name
      * @param ghpword corresponding GitHub password
      */

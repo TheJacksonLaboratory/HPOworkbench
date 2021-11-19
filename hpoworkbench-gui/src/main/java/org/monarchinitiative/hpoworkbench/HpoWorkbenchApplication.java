@@ -1,17 +1,14 @@
 package org.monarchinitiative.hpoworkbench;
 
-import com.sun.javafx.application.LauncherImpl;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.application.Preloader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import org.monarchinitiative.hpoworkbench.gui.splash.HpoWbPreloader;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -33,22 +30,8 @@ public class HpoWorkbenchApplication extends Application {
 
 
     @Override
-    public void start(Stage stage) throws InterruptedException {
-        //loadSplashScreen();
-        // notifyPreloader(new HpoWbPreloader.StateChangeNotification(HpoWbPreloader.StateChangeNotification.Type.BEFORE_START));
-        // Perform some heavy lifting (i.e. database start, check for application updates, etc. )
-//        for (int i = 1; i <= 10; i++) {
-//            double progress =(double) i/10;
-//            System.out.println("progress: " +  progress);
-//            LauncherImpl.notifyPreloader(this, new HpoWbPreloader.ProgressNotification(progress));
-////            try {
-////                Thread.sleep(1000);
-////            }catch (Exception e) {
-////                e.printStackTrace();
-////            }
-//        }
-
-        applicationContext.publishEvent(new StageReadyEvent(stage));
+    public void start(Stage stage) {
+            applicationContext.publishEvent(new StageReadyEvent(stage));
     }
 
     @Override

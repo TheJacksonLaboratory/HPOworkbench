@@ -1,14 +1,14 @@
 package org.monarchinitiative.hpoworkbench.config;
 
-import org.monarchinitiative.hpoworkbench.model.Model;
+import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
+import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
+import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
+import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,22 +19,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Configuration
-@PropertySource("classpath:application.properties")
 public class HpoWorkbenchConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(HpoWorkbenchConfig.class);
 
     public static final String CONFIG_FILE_BASENAME = "hpowb.properties";
 
-
-    @Bean
-    public Model model(OptionalResources optionalResources) {
-        return new Model(optionalResources);
-    }
-
     @Bean
     public OptionalResources optionalResources() {
         return new OptionalResources();
     }
+
+    @Bean
+    public OptionalHpoResource optionalHpoResource() { return new OptionalHpoResource(); }
+
+    @Bean
+    public OptionalMondoResource optionalMondoResource() { return new OptionalMondoResource(); }
+
+    @Bean
+    public OptionalHpoaResource optionalHpoaResource() { return new OptionalHpoaResource(); }
 
     @Bean
     public ExecutorService executorService() {
@@ -65,7 +67,7 @@ public class HpoWorkbenchConfig {
     public File configFilePath(@Qualifier("appHomeDir") File appHomeDir) {
         return new File(appHomeDir, CONFIG_FILE_BASENAME);
     }
-//
+
 
     @Bean("appHomeDir")
     public File appHomeDir() throws IOException {
@@ -100,7 +102,10 @@ public class HpoWorkbenchConfig {
         return appHomeDir;
     }
 
-
+    @Bean("hpoWbModel")
+    public HpoWbModel hpoWbModel() {
+        return new HpoWbModel();
+    }
 
 
 //    @Bean("appNameVersion")
