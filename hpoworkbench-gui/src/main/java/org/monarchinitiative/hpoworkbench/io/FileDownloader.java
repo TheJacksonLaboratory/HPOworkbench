@@ -230,9 +230,8 @@ public class FileDownloader {
 
     protected static URLConnection connect(URLConnection conn, int connectionTimeout, String acceptHeaders, Set<String> visited)
             throws IOException {
-        if (conn instanceof HttpURLConnection) {
+        if (conn instanceof HttpURLConnection con) {
             // follow redirects to HTTPS
-            HttpURLConnection con = (HttpURLConnection) conn;
             con.connect();
             int responseCode = con.getResponseCode();
             // redirect

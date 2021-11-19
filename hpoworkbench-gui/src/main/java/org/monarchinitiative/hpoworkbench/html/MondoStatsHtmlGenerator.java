@@ -5,13 +5,11 @@ import org.monarchinitiative.hpoworkbench.analysis.MondoStats;
 
 public class MondoStatsHtmlGenerator {
 
-    private static final String HTML_TEMPLATE = "<!DOCTYPE html>" +
-            "<html lang=\"en\"><head>" +
-            "<style>%s</style>\n" +
-            "<meta charset=\"UTF-8\"><title>Mondo: descriptive statistics</title></head>" +
-            "<body>" +
-            "%s \n" + // the Mondo , summary, and the annotation HTML code go here
-            "</body></html>";
+    // the Mondo , summary, and the annotation HTML code go here
+    private static final String HTML_TEMPLATE = """
+            <!DOCTYPE html><html lang="en"><head><style>%s</style>
+            <meta charset="UTF-8"><title>Mondo: descriptive statistics</title></head><body>%s\s
+            </body></html>""";
 
     public static String getHTML(MondoStats stats) {
 

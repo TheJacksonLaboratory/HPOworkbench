@@ -50,26 +50,28 @@ class HpoHtmlPageGenerator {
         if (diseases == null) {
             return "<p>No disease annotations found.</p>";
         }
-        String header = String.format("\n" +
-                "  <table class=\"zebra\">\n" +
-                "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">Diseases annotated to %s (n=%d)</caption>\n" +
-                "    <thead>\n" +
-                "      <tr>\n" +
-                "        <th>Id</th>\n" +
-                "        <th>Disease</th>\n" +
-                "      </tr>\n" +
-                "    </thead>\n" +
-                "    <tfoot>\n" +
-                "      <tr>\n" +
-                "        <td colspan=\"2\">More information: <a href=\"http://www.human-phenotype-ontology.org\">HPO Website</a></td>\n" +
-                "      </tr>\n" +
-                "    </tfoot>", Id, diseases.size());
+        String header = String.format("""
+
+                <table class="zebra">
+                  <caption  style="color:#222;text-shadow:0px 1px 2px #555;font-size:24px;">Diseases annotated to %s (n=%d)</caption>
+                  <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th>Disease</th>
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                      <td colspan="2">More information: <a href="http://www.human-phenotype-ontology.org">HPO Website</a></td>
+                    </tr>
+                  </tfoot>""".indent(2), Id, diseases.size());
         StringBuilder sb = new StringBuilder();
         for (HpoDisease s : diseases) {
-            String row = String.format("<tr>\n" +
-                    "        <td><a href=\"%s\">%s</a></td>\n" +
-                    "        <td>%s</td>\n" +
-                    "      </tr>", s.getName(), s.getDiseaseDatabaseId().getValue(), s.getName());
+            String row = String.format("""
+                    <tr>
+                            <td><a href="%s">%s</a></td>
+                            <td>%s</td>
+                          </tr>""", s.getName(), s.getDiseaseDatabaseId().getValue(), s.getName());
             sb.append(row);
         }
         return String.format("%s<tbody>%s</tbody></table></div>", header, sb);
@@ -133,12 +135,14 @@ class HpoHtmlPageGenerator {
             sb.append("</br>").append(onset);
         }
         sb.append("</br>Source: ").append(String.join("; ",annot.getCitations()));
-        return String.format("<tr>\n" +
-                        "        <td><a href=\"%s\">%s</a></td>\n" +
-                        "        <td>%s</td>\n" +
-                        "        <td>%s</td>\n" +
-                        "        <td>%s</td>\n" +
-                        "      </tr>\n",
+        return String.format("""
+                        <tr>
+                                <td><a href="%s">%s</a></td>
+                                <td>%s</td>
+                                <td>%s</td>
+                                <td>%s</td>
+                              </tr>
+                        """,
                 term.getId().getValue(),
                 term.getId().getValue(),
                 label,
@@ -182,13 +186,15 @@ class HpoHtmlPageGenerator {
         for (HpoCategory cat : hpocatlist) {
             String template=cat.getNumberOfAnnotations()>1?"%s (%d annotations)":"%s (%d annotation)";
             String title = String.format(template, cat.getLabel(), cat.getNumberOfAnnotations());
-            sb.append(String.format("  <table class=\"zebra\">\n" +
-                    "    <caption  style=\"color:#222;text-shadow:0px 1px 2px #555;font-size:24px;\">%s</caption>\n" +
-                    "    <thead>\n" +
-                    "      <tr>\n" +
-                    "        <th>Id</th><th>Label</th><th>Definition</th><th>Other information</th>\n" +
-                    "      </tr>\n" +
-                    "    </thead>\n", title));
+            sb.append(String.format("""
+                      <table class="zebra">
+                        <caption  style="color:#222;text-shadow:0px 1px 2px #555;font-size:24px;">%s</caption>
+                        <thead>
+                          <tr>
+                            <th>Id</th><th>Label</th><th>Definition</th><th>Other information</th>
+                          </tr>
+                        </thead>
+                    """, title));
             List<TermId> termIdList = cat.getAnnotatingTermIds();
             for (TermId tid : termIdList) {
                 HpoAnnotation annot = id2annotationmap.get(tid);
@@ -224,21 +230,22 @@ class HpoHtmlPageGenerator {
             "</body></html>";
 
 
-    private static final String CSS = "body {\n" +
-            "  font: normal medium/1.4 sans-serif;\n" +
-            "}\n" +
-            "table {\n" +
-            "  border-collapse: collapse;\n" +
-            "  width: 100%;\n" +
-            "}\n" +
-            "th, td {\n" +
-            "  padding: 0.25rem;\n" +
-            "  text-align: left;\n" +
-            "  border: 1px solid #ccc;\n" +
-            "}\n" +
-            "tbody tr:nth-child(odd) {\n" +
-            "  background: #eee;\n" +
-            "}";
+    private static final String CSS = """
+            body {
+              font: normal medium/1.4 sans-serif;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            th, td {
+              padding: 0.25rem;
+              text-align: left;
+              border: 1px solid #ccc;
+            }
+            tbody tr:nth-child(odd) {
+              background: #eee;
+            }""";
 
 
 }
