@@ -7,12 +7,12 @@ import org.monarchinitiative.phenol.ontology.data.Term;
  * toString method of the objects to create the label, and the HpoTerm's toString object unfortunately
  * provides a very long string, whereas we would like  to show just the label.
  */
-class HpoTermWrapper {
+class OntologyTermWrapper {
 
     final Term term;
 
 
-    HpoTermWrapper(Term trm) {
+    OntologyTermWrapper(Term trm) {
         this.term=trm;
     }
     @Override

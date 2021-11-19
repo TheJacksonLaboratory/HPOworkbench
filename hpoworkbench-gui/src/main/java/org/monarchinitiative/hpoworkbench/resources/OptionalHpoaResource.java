@@ -12,10 +12,7 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,7 +32,6 @@ public class OptionalHpoaResource {
 
 
     public OptionalHpoaResource(){
-        System.err.println("COTR");
         hpoaResourceIsMissing = Bindings.createBooleanBinding(() -> Stream.of( indirectAnnotMapProperty(),
                 directAnnotMapProperty()).anyMatch(op -> op.get() == null));
     }
@@ -49,26 +45,30 @@ public class OptionalHpoaResource {
     }
 
     public void setAnnotationResources(String phenotypeDotHpoaPath, Ontology hpo){
-        System.err.println("OptionalHpoaResources TOP" + this.toString());
         DirectIndirectHpoAnnotationParser parser =
                 new DirectIndirectHpoAnnotationParser(phenotypeDotHpoaPath, hpo);
         Map<TermId, List<HpoDisease>> directMap = parser.getDirectAnnotMap();
-        LOGGER.info("Setting direct annottion map with size {}", directMap.size());
+        LOGGER.info("Setting direct annotation map with size {}", directMap.size());
         this.directAnnotMap.set(directMap);
-        System.err.println("OptionalHpoaResources 2" + this.toString());
         this.indirectAnnotMap.set(parser.getTotalAnnotationMap());
-        System.err.println("OptionalHpoaResources 3" + this.toString());
         if (getDirectAnnotMap() != null) {
-
             Set<HpoDisease> diseaseSet = directAnnotMap.get().values().stream()
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
-            name2diseaseIdMap = diseaseSet.stream()
-                    .collect(Collectors.toMap(HpoDisease::getName, HpoDisease::getDiseaseDatabaseId));
+            LOGGER.info("Found {} diseases (diseaseSet)", diseaseSet.size());
+            // for some reason the stream implementation is choking
+            name2diseaseIdMap = new HashMap<>();
+            for (var disease : diseaseSet) {
+                name2diseaseIdMap.put(disease.getName(), disease.getDiseaseDatabaseId());
+            }
+            LOGGER.info("name2diseaseIdMap initialized with {} entries", name2diseaseIdMap.size());
             id2diseaseModelMap = diseaseSet.stream()
                     .collect(Collectors.toMap(HpoDisease::getDiseaseDatabaseId, Function.identity()));
+            LOGGER.info("id2diseaseModelMap initialized with {} entries", id2diseaseModelMap.size());
+        } else {
+            // should never happen
+            LOGGER.error("getDirectAnnotMap() was null after initialization");
         }
-        System.err.println("OptionalHpoaResources " + this.toString());
     }
 
     public Map<TermId, List<HpoDisease>> getDirectAnnotMap() {

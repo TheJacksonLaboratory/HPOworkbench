@@ -24,8 +24,6 @@ import org.monarchinitiative.hpoworkbench.analysis.MondoStats;
 import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
-import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
-import org.monarchinitiative.hpoworkbench.github.GitHubPoster;
 import org.monarchinitiative.hpoworkbench.gui.HelpViewFactory;
 import org.monarchinitiative.hpoworkbench.gui.PopUps;
 import org.monarchinitiative.hpoworkbench.gui.WidthAwareTextFields;
@@ -36,7 +34,6 @@ import org.monarchinitiative.hpoworkbench.html.AnnotationTlcHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.HpoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.MondoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.io.*;
-import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
@@ -118,7 +115,7 @@ public class MainController {
      * The tree view that shows the HPO Ontology hierarchy
      */
     @FXML
-    private TreeView<HpoTermWrapper> ontologyTreeView;
+    private TreeView<OntologyTermWrapper> ontologyTreeView;
     /**
      * WebView for displaying details of the Term that is selected in the {@link #ontologyTreeView}.
      */
@@ -154,7 +151,7 @@ public class MainController {
     /**
      * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
      */
-    private final Map<String, TermId> labelsAndHpoIds = new HashMap<>();
+    private final Map<String, TermId> ontologyLabelsAndTermIdMap = new HashMap<>();
     /**
      * The term that is currently selected in the Browser window.
      */
@@ -460,6 +457,10 @@ public class MainController {
             logger.error("Attempt to show HPO stats before initializing HPO ontology object");
             return;
         }
+        if (optionalHpoaResource.getId2diseaseModelMap() == null) {
+            logger.error("Attempt to show HPO stats but id2diseaseModel map was empty");
+            return;
+        }
         AnnotationTlc tlc = new AnnotationTlc(hpo, optionalHpoaResource.getId2diseaseModelMap());
         String html = AnnotationTlcHtmlGenerator.getHTMLSpecificTerms(tlc);
         Stage stage = (Stage) this.copyrightLabel.getScene().getWindow();
@@ -473,7 +474,7 @@ public class MainController {
     @FXML
     public void goButtonAction() {
         activateOntologyTree();
-        TermId id = labelsAndHpoIds.get(autocompleteTextfield.getText());
+        TermId id = ontologyLabelsAndTermIdMap.get(autocompleteTextfield.getText());
         if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
         Ontology hpo = optionalHpoResource.getOntology();
         if (hpo == null) {
@@ -568,7 +569,7 @@ public class MainController {
                 final Ontology hpo = optionalHpoResource.getOntology();
                 Platform.runLater(()->{
                     initTree(hpo, k -> System.out.println("Consumed " + k));
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, labelsAndHpoIds.keySet());
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
                 });
             }
         } else if (currentMode.equals(mode.BROWSE_MONDO)) {
@@ -580,7 +581,7 @@ public class MainController {
                 Platform.runLater(()->{
                     initTree(mondo, k -> System.out.println("Consumed " + k));
                     // TODO get reference to Mondo disease labels
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, labelsAndHpoIds.keySet());
+                    WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
                 });
             }
         }
@@ -633,7 +634,7 @@ public class MainController {
                                         expandUntilTerm(term);
                                         // update the Webview browser
                                         logger.trace("ABOUT TO UPDATE DESCRIPTION FOR " + term.getName());
-                                        updateDescription(new HpoTermTreeItem(new HpoTermWrapper(term)));
+                                        updateDescription(new OntologyTermTreeItem(new OntologyTermWrapper(term)));
                                         autocompleteTextfield.clear();
                                         currentMode = MainController.mode.BROWSE_HPO;
                                         //hpoTermRadioButton.setSelected(true);
@@ -679,12 +680,12 @@ public class MainController {
             }
 
             // expand tree nodes in top -> down direction
-            List<TreeItem<HpoTermWrapper>> children = ontologyTreeView.getRoot().getChildren();
+            List<TreeItem<OntologyTermWrapper>> children = ontologyTreeView.getRoot().getChildren();
             termStack.pop(); // get rid of 'All' node which is hidden
-            TreeItem<HpoTermWrapper> target = ontologyTreeView.getRoot();
+            TreeItem<OntologyTermWrapper> target = ontologyTreeView.getRoot();
             while (!termStack.empty()) {
                 Term current = termStack.pop();
-                for (TreeItem<HpoTermWrapper> child : children) {
+                for (TreeItem<OntologyTermWrapper> child : children) {
                     if (child.getValue().term.equals(current)) {
                         child.setExpanded(true);
                         target = child;
@@ -709,7 +710,7 @@ public class MainController {
      *
      * @param treeItem currently selected {@link TreeItem} containing {@link Term}
      */
-    private void updateDescription(TreeItem<HpoTermWrapper> treeItem) {
+    private void updateDescription(TreeItem<OntologyTermWrapper> treeItem) {
         logger.trace("TOP OF UPDATE DESCRIPTION");
         if (treeItem == null)
             return;
@@ -719,7 +720,6 @@ public class MainController {
             return;
         }
         List<HpoDisease> annotatedDiseases =  optionalHpoaResource.getIndirectAnnotMap().getOrDefault(term.getId(), List.of());
-        System.out.println(optionalHpoaResource);
         int n_descendents = 42;//getDescendents(model.getHpoOntology(),term.getId()).size();
         //todo--add number of descendents to HTML
         String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
@@ -782,26 +782,28 @@ public class MainController {
         }
         TermId rootId = ontology.getRootTermId();
         Term rootTerm = ontology.getTermMap().get(rootId);
-        TreeItem<HpoTermWrapper> root = new HpoTermTreeItem(new HpoTermWrapper(rootTerm));
+        TreeItem<OntologyTermWrapper> root = new OntologyTermTreeItem(new OntologyTermWrapper(rootTerm));
         root.setExpanded(true);
         ontologyTreeView.setShowRoot(false);
         ontologyTreeView.setRoot(root);
         ontologyTreeView.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
+                    OntologyTermWrapper w;
                     if (newValue == null) {
-                        logger.error("New value is null");
-                        return;
+                        // nothing selected so start are the root.
+                        w = new OntologyTermWrapper(rootTerm);
+                    } else {
+                        w = newValue.getValue();
                     }
-                    HpoTermWrapper w = newValue.getValue();
-                    TreeItem<HpoTermWrapper> item = new HpoTermTreeItem(w);
+                    TreeItem<OntologyTermWrapper> item = new OntologyTermTreeItem(w);
                     updateDescription(item);
                 });
         // create Map for lookup of the terms in the ontology based on their Name
         ontology.getTermMap().values().forEach(term -> {
-            labelsAndHpoIds.put(term.getName(), term.getId());
-            labelsAndHpoIds.put(term.getId().getValue(), term.getId());
+            ontologyLabelsAndTermIdMap.put(term.getName(), term.getId());
+            ontologyLabelsAndTermIdMap.put(term.getId().getValue(), term.getId());
         });
-        WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, labelsAndHpoIds.keySet());
+        WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
 
         // show intro message in the infoWebView
         Platform.runLater(() -> {
@@ -818,8 +820,10 @@ public class MainController {
         ToggleGroup group = new ToggleGroup();
         hpoRadioButton.setSelected(true);
         hpoRadioButton.setToggleGroup(group);
+        hpoRadioButton.setUserData("HPO");
         mondoRadioButton.setSelected(false);
         mondoRadioButton.setToggleGroup(group);
+        hpoRadioButton.setUserData("Mondo");
         group.selectedToggleProperty().addListener(
                 (ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) -> {
                     if (group.getSelectedToggle() != null) {
@@ -834,56 +838,18 @@ public class MainController {
                             }
                         }
                     }
+                    activateOntologyTree();
                 });
     }
-
-
-    private void postGitHubIssue(String message, String title, String uname, String pword) {
-        GitHubPoster poster = new GitHubPoster(uname, pword, title, message);
-        this.githubUsername = uname;
-        this.githubPassword = pword;
-        try {
-            poster.postHpoIssue();
-        } catch (HPOWorkbenchException he) {
-            PopUps.showException("GitHub error", "Bad Request (400): Could not post issue", he);
-        } catch (Exception ex) {
-            PopUps.showException("GitHub error", "GitHub error: Could not post issue", ex);
-            return;
-        }
-        String response = poster.getHttpResponse();
-        PopUps.showInfoMessage(
-                String.format("Created issue for %s\nServer response: %s", selectedTerm.getName(), response), "Created new issue");
-    }
-
-    private void postGitHubIssue(String message, String title, String uname, String pword, List<String> labels) {
-        GitHubPoster poster = new GitHubPoster(uname, pword, title, message);
-        this.githubUsername = uname;
-        this.githubPassword = pword;
-        if (labels != null && !labels.isEmpty()) {
-            poster.setLabel(labels);
-        }
-        try {
-            poster.postHpoIssue();
-        } catch (HPOWorkbenchException he) {
-            PopUps.showException("GitHub error", "Bad Request (400): Could not post issue", he);
-        } catch (Exception ex) {
-            PopUps.showException("GitHub error", "GitHub error: Could not post issue", ex);
-            return;
-        }
-        String response = poster.getHttpResponse();
-        PopUps.showInfoMessage(
-                String.format("Created issue for %s\nServer response: %s", selectedTerm.getName(), response), "Created new issue");
-    }
-
 
     /**
      * Get currently selected Term. Used in tests.
      *
-     * @return {@link HpoTermTreeItem} that is currently selected
+     * @return {@link OntologyTermTreeItem} that is currently selected
      */
-    private HpoTermTreeItem getSelectedTerm() {
+    private OntologyTermTreeItem getSelectedTerm() {
         return (ontologyTreeView.getSelectionModel().getSelectedItem() == null) ? null
-                : (HpoTermTreeItem) ontologyTreeView.getSelectionModel().getSelectedItem();
+                : (OntologyTermTreeItem) ontologyTreeView.getSelectionModel().getSelectedItem();
     }
 
     /**
@@ -963,19 +929,17 @@ public class MainController {
      * Inner class that defines a bridge between hierarchy of {@link Term}s and {@link TreeItem}s of the
      * {@link TreeView}.
      */
-    class HpoTermTreeItem extends TreeItem<HpoTermWrapper> {
+    class OntologyTermTreeItem extends TreeItem<OntologyTermWrapper> {
         /** List used for caching of the children of this term */
-        private ObservableList<TreeItem<HpoTermWrapper>> childrenList;
-
+        private ObservableList<TreeItem<OntologyTermWrapper>> childrenList;
         /**
          * Default & only constructor for the TreeItem.
          *
          * @param term {@link Term} that is represented by this TreeItem
          */
-        HpoTermTreeItem(HpoTermWrapper term) {
+        OntologyTermTreeItem(OntologyTermWrapper term) {
             super(term);
         }
-
         /**
          * Check that the {@link Term} that is represented by this TreeItem is a leaf term as described below.
          * <p>
@@ -992,14 +956,14 @@ public class MainController {
          * {@inheritDoc}
          */
         @Override
-        public ObservableList<TreeItem<HpoTermWrapper>> getChildren() {
+        public ObservableList<TreeItem<OntologyTermWrapper>> getChildren() {
             if (childrenList == null) {
                 // logger.debug(String.format("Getting children for term %s", getValue().term.getName()));
                 childrenList = FXCollections.observableArrayList();
                 Set<Term> children = getTermChildren(getValue().term);
                 children.stream()
                         .sorted(Comparator.comparing(Term::getName))
-                        .map(term -> new HpoTermTreeItem(new HpoTermWrapper(term)))
+                        .map(term -> new OntologyTermTreeItem(new OntologyTermWrapper(term)))
                         .forEach(childrenList::add);
                 super.getChildren().setAll(childrenList);
             }

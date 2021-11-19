@@ -123,8 +123,7 @@ public final class StartupTask extends Task<Void> {
                 updateProgress(0.78, 1);
                 this.optionalHpoaResource.setAnnotationResources(hpoAnnotPath, optionalHpoResource.getOntology());
                 updateProgress(0.95, 1);
-                System.err.println("Loaded annotation maps");
-                System.err.println(this.optionalHpoaResource.toString());
+                LOGGER.info("Loaded annotation maps");
             } else {
                 optionalHpoaResource.initializeWithEmptyMaps();
                 LOGGER.error("Cannot load phenotype.hpoa File was null");
