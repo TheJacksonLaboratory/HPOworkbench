@@ -8,7 +8,7 @@ how to setup the program (the HPO data files need to be downloaded upon initial 
 Mac OSX
 ~~~~~~~
 Download the latest version of ``HPOWorkbench.jar`` from https://github.com/TheJacksonLaboratory/HPOworkbench/releases/.
-You can run the program by double-clicking on this file (Prerequisite: Java version 8 or better must be installed
+You can run the program by double-clicking on this file (Prerequisite: Java version 16 or higher must be installed
 on your Mac). You can also start the app from the command line as follows. ::
 
     $ java -jar HPOWorkbench.jar
@@ -17,7 +17,7 @@ on your Mac). You can also start the app from the command line as follows. ::
 Windows
 ~~~~~~~
 Download the latest version of ``HPOWorkbench.exe`` from https://github.com/TheJacksonLaboratory/HPOworkbench/releases/.
-You can run the program by double-clicking on this file (Prerequisite: Java version 8 or better must be installed
+You can run the program by double-clicking on this file (Prerequisite: Java version 16 or higher must be installed
 on your machine).
 
 
