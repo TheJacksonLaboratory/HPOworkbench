@@ -3,8 +3,6 @@ package org.monarchinitiative.hpoworkbench;
 import javafx.concurrent.Task;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
-import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
-import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
@@ -33,24 +31,20 @@ public final class StartupTask extends Task<Void> {
 
     private final OptionalHpoResource optionalHpoResource;
 
-    private final OptionalMondoResource optionalMondoResource;
-
-
     private final OptionalHpoaResource optionalHpoaResource;
 
 
     private final Properties pgProperties;
 
-    public StartupTask(OptionalHpoResource hpoResource, OptionalMondoResource mondoResource,
+    public StartupTask(OptionalHpoResource hpoResource,
                        OptionalHpoaResource hpoaResource, Properties pgProperties) {
         this.pgProperties = pgProperties;
         this.optionalHpoResource = hpoResource;
-        this.optionalMondoResource = mondoResource;
         this.optionalHpoaResource = hpoaResource;
     }
 
     /**
-     * Read {@link Properties} and initialize app resources in the {@link OptionalResources}:
+     * Read {@link Properties} and initialize app resources in the :
      *
      * <ul>
      * <li>HPO ontology</li>
@@ -66,9 +60,8 @@ public final class StartupTask extends Task<Void> {
         This way we ensure that GUI elements dependent on ontology presence (labels, buttons) stay disabled
         and that the user will be notified about the fact that the ontology is missing.
          */
-        String hpoJsonPath = pgProperties.getProperty(OptionalResources.HP_JSON_PATH_PROPERTY);
-        String hpoAnnotPath = pgProperties.getProperty(OptionalResources.HPOA_PATH_PROPERTY);
-        String mondoJsonPath = pgProperties.getProperty(OptionalResources.MONDO_PATH_PROPERTY);
+        String hpoJsonPath = pgProperties.getProperty(OptionalHpoResource.HP_JSON_PATH_PROPERTY);
+        String hpoAnnotPath = pgProperties.getProperty(OptionalHpoaResource.HPOA_PATH_PROPERTY);
         updateProgress(0.02, 1);
         if (hpoJsonPath != null) {
             final File hpJsonFile = new File(hpoJsonPath);
@@ -92,23 +85,6 @@ public final class StartupTask extends Task<Void> {
             LOGGER.info(msg);
             optionalHpoResource.setOntology(null);
         }
-        if (mondoJsonPath != null) {
-            final File mondoJsonFile = new File(mondoJsonPath);
-            updateProgress(0.33, 1);
-            if (mondoJsonFile.isFile()) {
-                String msg = String.format("Loading Mondo from file '%s'", mondoJsonFile.getAbsoluteFile());
-                updateMessage(msg);
-                LOGGER.info(msg);
-                final Ontology mondo = OntologyLoader.loadOntology(mondoJsonFile);
-                updateProgress(0.62, 1);
-                optionalMondoResource.setOntology(mondo);
-                updateProgress(0.68, 1);
-                updateMessage("Mondo loaded");
-                LOGGER.info("Loaded Mondo ontology");
-            } else {
-                optionalMondoResource.setOntology(null);
-            }
-        }
         if (hpoAnnotPath != null) {
             String msg = String.format("Loading phenotype.hpoa from file '%s'", hpoAnnotPath);
             updateMessage(msg);
@@ -123,8 +99,7 @@ public final class StartupTask extends Task<Void> {
                 updateProgress(0.78, 1);
                 this.optionalHpoaResource.setAnnotationResources(hpoAnnotPath, optionalHpoResource.getOntology());
                 updateProgress(0.95, 1);
-                System.err.println("Loaded annotation maps");
-                System.err.println(this.optionalHpoaResource.toString());
+                LOGGER.info("Loaded annotation maps");
             } else {
                 optionalHpoaResource.initializeWithEmptyMaps();
                 LOGGER.error("Cannot load phenotype.hpoa File was null");

@@ -3,10 +3,11 @@ package org.monarchinitiative.hpoworkbench.gui.webpopup;
 import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
-import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
-import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 
 import java.util.*;
+
+import static org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource.HP_JSON_PATH_PROPERTY;
+import static org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource.HPOA_PATH_PROPERTY;
 
 public class SettingsPopup extends WebViewerPopup {
 
@@ -17,37 +18,28 @@ public class SettingsPopup extends WebViewerPopup {
     private final Properties properties;
     private final OptionalHpoResource optionalHpoResource;
 
-    private final OptionalMondoResource optionalMondoResource;
-
     private final OptionalHpoaResource optionalHpoaResource;
 
     public SettingsPopup(Properties pgProps ,
                          OptionalHpoResource optionalHpoResource,
-                         OptionalMondoResource optionalMondoResource,
                          OptionalHpoaResource optionalHpoaResource,
                          Stage stage) {
         super(stage);
         this.properties = pgProps;
         this.optionalHpoResource = optionalHpoResource;
-        this.optionalMondoResource = optionalMondoResource;
         this.optionalHpoaResource = optionalHpoaResource;
         this.html = getHTML();
     }
 
     private Map<String, String> getSettingsItems() {
         Map<String, String> items = new HashMap<>();
-        if (properties.contains(OptionalResources.HP_JSON_PATH_PROPERTY)) {
-            items.put("hp.json path", properties.getProperty(OptionalResources.HP_JSON_PATH_PROPERTY));
+        if (properties.contains(HP_JSON_PATH_PROPERTY)) {
+            items.put("hp.json path", properties.getProperty(HP_JSON_PATH_PROPERTY));
         } else {
             items.put("hp.json path",NOT_INITIALIZED);
         }
-        if (properties.contains(OptionalResources.MONDO_PATH_PROPERTY)) {
-            items.put("mondo.json path", properties.getProperty(OptionalResources.MONDO_PATH_PROPERTY));
-        } else {
-            items.put("mondo.json path",NOT_INITIALIZED);
-        }
-        if (properties.contains(OptionalResources.HPOA_PATH_PROPERTY)) {
-            items.put("phenotype.hpoa path", properties.getProperty(OptionalResources.HPOA_PATH_PROPERTY));
+        if (properties.contains(HPOA_PATH_PROPERTY)) {
+            items.put("phenotype.hpoa path", properties.getProperty(HPOA_PATH_PROPERTY));
         } else {
             items.put("phenotype.hpoa path",NOT_INITIALIZED);
         }
@@ -56,11 +48,6 @@ public class SettingsPopup extends WebViewerPopup {
             items.put("HPO", "initialized");
         } else {
             items.put("HPO", NOT_INITIALIZED);
-        }
-        if (optionalMondoResource.getOntology() != null) {
-            items.put("Mondo", "initialized");
-        } else {
-            items.put("Mondo", NOT_INITIALIZED);
         }
         if (optionalHpoaResource.getId2diseaseModelMap() != null) {
             items.put("id2disease map", "initialized");

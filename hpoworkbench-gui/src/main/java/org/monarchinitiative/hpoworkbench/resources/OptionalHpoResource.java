@@ -12,6 +12,7 @@ public class OptionalHpoResource implements OptionalOntologyResource {
 
     private final ObjectProperty<Ontology> hpoOntology = new SimpleObjectProperty<>(this, "hpoOntology", null);
 
+    public final static String HP_JSON_PATH_PROPERTY = "hp.json.path";
 
     public OptionalHpoResource() {
         hpoResourceIsMissing = Bindings.createBooleanBinding(() -> ontologyProperty().get()==null);

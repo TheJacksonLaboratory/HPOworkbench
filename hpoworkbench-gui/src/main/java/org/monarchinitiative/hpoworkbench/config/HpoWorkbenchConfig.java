@@ -1,10 +1,7 @@
 package org.monarchinitiative.hpoworkbench.config;
 
-import org.monarchinitiative.hpoworkbench.model.HpoWbModel;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
-import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
-import org.monarchinitiative.hpoworkbench.resources.OptionalResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,15 +22,7 @@ public class HpoWorkbenchConfig {
     public static final String CONFIG_FILE_BASENAME = "hpowb.properties";
 
     @Bean
-    public OptionalResources optionalResources() {
-        return new OptionalResources();
-    }
-
-    @Bean
     public OptionalHpoResource optionalHpoResource() { return new OptionalHpoResource(); }
-
-    @Bean
-    public OptionalMondoResource optionalMondoResource() { return new OptionalMondoResource(); }
 
     @Bean
     public OptionalHpoaResource optionalHpoaResource() { return new OptionalHpoaResource(); }
@@ -101,12 +90,6 @@ public class HpoWorkbenchConfig {
         }
         return appHomeDir;
     }
-
-    @Bean("hpoWbModel")
-    public HpoWbModel hpoWbModel() {
-        return new HpoWbModel();
-    }
-
 
 //    @Bean("appNameVersion")
 //    String appNameVersion(String appVersion, String appName) {

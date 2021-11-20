@@ -6,7 +6,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
@@ -32,14 +31,13 @@
                 <Menu mnemonicParsing="false" text="Edit">
                     <MenuItem mnemonicParsing="false" onAction="#downloadHPO" text="Download HPO" />
                     <MenuItem mnemonicParsing="false" onAction="#downloadHPOAnnotations" text="Download HPO annotations" />
-                    <MenuItem mnemonicParsing="false" onAction="#downloadMondo" text="Download Mondo" />
                     <MenuItem mnemonicParsing="false" onAction="#importLocalHpObo" text="Import local copy of hp.obo" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Analysis">
                     <MenuItem mnemonicParsing="false" onAction="#showHpoStatistics" text="Show HPO Statistics" />
-                    <MenuItem mnemonicParsing="false" onAction="#showMondoStats" text="Show Mondo Statistics" />
                     <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreSpecificAnnotation" text="Entries with inspecific annotations" />
                     <MenuItem mnemonicParsing="false" onAction="#showEntriesNeedingMoreAnnotations" text="Entries with few Annotations" />
+                    <MenuItem mnemonicParsing="false" onAction="#exportToExcel" text="Export HPO as Excel file" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Settings">
                     <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Show settings" />
@@ -57,30 +55,18 @@
     <center>
         <SplitPane dividerPositions="0.5" focusTraversable="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
             <VBox BorderPane.alignment="CENTER">
-                <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse HPO Terms or Diseases">
+                <Label styleClass="bluelabel" stylesheets="@../css/style.css" text="Browse HPO Terms">
                     <VBox.margin>
                         <Insets bottom="5.0" left="15.0" top="5.0" />
                     </VBox.margin>
                 </Label>
-                <HBox prefHeight="37.0" prefWidth="561.0">
-               <RadioButton fx:id="hpoRadioButton" mnemonicParsing="false" text="HPO">
-                  <HBox.margin>
-                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                  </HBox.margin>
-               </RadioButton>
-               <RadioButton fx:id="mondoRadioButton" mnemonicParsing="false" text="Mondo">
-                  <HBox.margin>
-                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                  </HBox.margin>
-               </RadioButton>
-                </HBox>
                 <HBox maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="ALWAYS">
-                    <TextField fx:id="autocompleteTextfield" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" promptText="autocomplete HPO/Mondo term...">
+                    <TextField fx:id="autocompleteTextfield" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" promptText="autocomplete HPO term...">
                         <HBox.margin>
                             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                         </HBox.margin>
                     </TextField>
-                    <Button fx:id="goButton" minHeight="30.0" minWidth="-Infinity" mnemonicParsing="false" onAction="#goButtonAction" styleClass="Button" stylesheets="@../css/style.css" text="Go" textOverrun="CLIP">
+                    <Button minHeight="30.0" minWidth="-Infinity" mnemonicParsing="false" onAction="#goButtonAction" styleClass="Button" stylesheets="@../css/style.css" text="Go" textOverrun="CLIP">
                         <tooltip>
                             <Tooltip text="tell me what to do" />
                         </tooltip>
@@ -90,7 +76,7 @@
                     </Button>
                 </HBox>
                 <HBox>
-                    <Label fx:id="currentDiseaseLabel" minWidth="300.0" styleClass="smallfontlabel" stylesheets="@../css/style.css">
+                    <Label minWidth="300.0" styleClass="smallfontlabel" stylesheets="@../css/style.css">
                         <HBox.margin>
                             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                         </HBox.margin>
@@ -104,7 +90,7 @@
             </VBox>
 
             <AnchorPane>
-                <WebView fx:id="infoWebView" maxHeight="-1.0" maxWidth="1.7976931348623157E308" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="130.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                <WebView fx:id="infoWebView" maxHeight="-1.0" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="130.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
                 <HBox prefHeight="130.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                     <GridPane>
                         <columnConstraints>
@@ -119,12 +105,7 @@
                         <HBox.margin>
                             <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
                         </HBox.margin>
-                        <Button fx:id="exportHierarchicalSummaryButton" minWidth="210.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary">
-                            <GridPane.margin>
-                                <Insets right="5.0" />
-                            </GridPane.margin>
-                        </Button>
-                        <Button fx:id="exportToExcelButton" minWidth="210.0" mnemonicParsing="false" onAction="#exportToExcel" styleClass="Button" stylesheets="@../css/style.css" text="Export hpoOntology as Excel file" GridPane.rowIndex="1">
+                        <Button minWidth="210.0" mnemonicParsing="false" onAction="#exportHierarchicalSummary" styleClass="Button" stylesheets="@../css/style.css" text="Export hierarchical Summary as Excel file">
                             <GridPane.margin>
                                 <Insets right="5.0" />
                             </GridPane.margin>
