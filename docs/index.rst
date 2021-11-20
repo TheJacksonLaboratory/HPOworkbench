@@ -11,7 +11,6 @@ HPO Workbench
 
    installation
    Browsing HPO Terms and Annotated Diseases <browsing>
-   Suggest additions and corrections as GitHub issues <github>
    Exporting HPO data as an Excel file <excel>
    Using the very latest HPO version <latest>
    HPO Workbench from the command line <command>
@@ -36,7 +35,17 @@ will be registered under your id (so that you will get feedback via Email about 
 HPO Workbench can also be used to export Excel files that represent the HPO hierarchy by means of indentation of
 columns. These excel files are meant to be used to record suggestions.
 
-Instructions for these three main use cases of HPO Workbench can be found on the following pages.
+Browsing the HPO using HPO Workbench
+====================================
+Navigate through the hierarchy of the using the tree browser or
+use the autocomplete text field to find the HPO term of your choice.
+HPO Workbench will display the ID, definition, comment, and synyonyms
+for the term. If any diseases in the HPO corpus are annotated to
+the term, a list of the diseases will be displayed.
+
+.. figure:: img/HPOworkbench.png
+  :scale: 100 %
+  :alt: HPO Workbench - browsing
 
 
 GitHub repository
