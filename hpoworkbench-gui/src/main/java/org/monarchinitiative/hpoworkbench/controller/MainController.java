@@ -2,7 +2,6 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
@@ -20,7 +19,6 @@ import javafx.stage.Stage;
 import org.monarchinitiative.hpoworkbench.StartupTask;
 import org.monarchinitiative.hpoworkbench.analysis.AnnotationTlc;
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
-import org.monarchinitiative.hpoworkbench.analysis.MondoStats;
 import org.monarchinitiative.hpoworkbench.excel.HierarchicalExcelExporter;
 import org.monarchinitiative.hpoworkbench.excel.Hpo2ExcelExporter;
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
@@ -32,11 +30,9 @@ import org.monarchinitiative.hpoworkbench.gui.webviewerutil.WebViewerFactory;
 import org.monarchinitiative.hpoworkbench.gui.webviewerutil.WebViewerPopup;
 import org.monarchinitiative.hpoworkbench.html.AnnotationTlcHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.HpoStatsHtmlGenerator;
-import org.monarchinitiative.hpoworkbench.html.MondoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.io.*;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
-import org.monarchinitiative.hpoworkbench.resources.OptionalMondoResource;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
@@ -71,8 +67,6 @@ public class MainController {
 
     private final OptionalHpoResource optionalHpoResource;
 
-    private final OptionalMondoResource optionalMondoResource;
-
     private final OptionalHpoaResource optionalHpoaResource;
 
     /**
@@ -91,22 +85,13 @@ public class MainController {
     @Autowired
     DownloaderFactory factory;
     /**
-     * Place at the bottom of the window controlled by {@link StatusController} for showing messages to user
+     * Place at the bottom of the window for showing messages to user
      */
     @FXML
     private Label copyrightLabel;
 
     @FXML
     public HBox statusHBox;
-
-    /**
-     * Determines the behavior of the app. Are we browsing HPO terms, diseases, or suggesting new annotations?
-     */
-    enum mode {BROWSE_HPO, BROWSE_MONDO }
-    /**
-     * Current behavior of HPO Workbench (Browse HPO or Browse Mondo. See {@link MainController.mode}.
-     */
-    private MainController.mode currentMode = MainController.mode.BROWSE_HPO;
 
     @FXML
     private TextField autocompleteTextfield;
@@ -126,27 +111,9 @@ public class MainController {
      */
     private WebEngine infoWebEngine;
     @FXML
-    private Button exportHierarchicalSummaryButton;
-    @FXML
-    private Button exportToExcelButton;
-    @FXML
-    private Button suggestCorrectionToTermButton;
-    @FXML
-    private Button suggestNewChildTermButton;
-    @FXML
-    private Button suggestNewAnnotationButton;
-    @FXML
-    private Button reportMistakenAnnotationButton;
-    @FXML
     private RadioButton hpoRadioButton;
     @FXML
     private RadioButton mondoRadioButton;
-    /** Can be a reference to the HPO or MONDO ontologies according to the selected radio button. */
-    private Ontology selectedOntology = null;
-    /**
-     * Current disease shown in the browser. Any suggested changes will refer to this disease.
-     */
-    private HpoDisease selectedDisease = null;
 
     /**
      * Key: a term name such as "Myocardial infarction"; value: the corresponding HPO id as a {@link TermId}.
@@ -157,10 +124,6 @@ public class MainController {
      */
     private Term selectedTerm = null;
     /**
-     * Users can create a github issue. Username and password will be stored for the current session only.
-     */
-    private String githubUsername = null;
-    /**
      * Github password. Username and password will be stored for the current session only.
      */
     private String githubPassword;
@@ -168,13 +131,11 @@ public class MainController {
 
     @Autowired
     public MainController(OptionalHpoResource optionalHpoResource,
-                          OptionalMondoResource optionalMondoResource,
                           OptionalHpoaResource optionalHpoaResource,
                           @Qualifier("configProperties") Properties properties,
                           @Qualifier("appHomeDir") File hpoWorkbenchDir,
                           ExecutorService executorService) {
         this.optionalHpoResource = optionalHpoResource;
-        this.optionalMondoResource = optionalMondoResource;
         this.optionalHpoaResource = optionalHpoaResource;
         this.pgProperties = properties;
         this.hpoWorkbenchDir = hpoWorkbenchDir;
@@ -184,8 +145,7 @@ public class MainController {
     @FXML
     private void initialize() {
         logger.info("Initializing main controller");
-        initRadioButtons();
-        StartupTask task = new StartupTask(optionalHpoResource, optionalMondoResource, optionalHpoaResource, pgProperties);
+        StartupTask task = new StartupTask(optionalHpoResource, optionalHpoaResource, pgProperties);
         publishMessage("Loading resources");
         ProgressIndicator pb = new ProgressIndicator();
         pb.setProgress(0);
@@ -208,7 +168,6 @@ public class MainController {
 
         ChangeListener<? super Object> listener = (obs, oldval, newval) -> activateIfResourcesAvailable();
         optionalHpoResource.ontologyProperty().addListener(listener);
-        optionalMondoResource.ontologyProperty().addListener(listener);
         optionalHpoaResource.directAnnotMapProperty().addListener(listener);
         optionalHpoaResource.indirectAnnotMapProperty().addListener(listener);
         logger.info("Done initialization");
@@ -217,9 +176,7 @@ public class MainController {
     }
 
     private void activateIfResourcesAvailable() {
-        if (optionalHpoResource.getOntology() != null && currentMode.equals(mode.BROWSE_HPO)) { // hpo obo file is missing
-            activateOntologyTree();
-        } else if (optionalMondoResource.getOntology() != null && currentMode.equals(mode.BROWSE_MONDO)) {
+        if (optionalHpoResource.getOntology() != null) { // hpo obo file is missing
             activateOntologyTree();
         } else {
             logger.error("Could not activate resource");
@@ -235,8 +192,6 @@ public class MainController {
             publishMessage("hpo json file is missing", MessageType.ERROR);
         } else if (optionalHpoaResource.getDirectAnnotMap() == null) {
             publishMessage("phenotype.hpoa file is missing", MessageType.ERROR);
-        } else if (optionalMondoResource.getOntology() == null) {
-            publishMessage("Mondo file missing", MessageType.ERROR);
         } else {
             logger.info("All three resources loaded");
             publishMessage("Ready to go", MessageType.INFO);
@@ -352,12 +307,6 @@ public class MainController {
     }
 
     @FXML
-    private void downloadMondo(ActionEvent e) {
-        factory.downloadMondo();
-        e.consume();
-    }
-
-    @FXML
     private void downloadHPOAnnotations(ActionEvent e) {
         factory.downloadHPOAnnotations();
         e.consume();
@@ -366,7 +315,7 @@ public class MainController {
     @FXML
     private void showSettings(ActionEvent e) {
         Stage stage = (Stage) this.statusHBox.getScene().getWindow();
-        SettingsPopup popup = new SettingsPopup(pgProperties, optionalHpoResource, optionalMondoResource, optionalHpoaResource, stage);
+        SettingsPopup popup = new SettingsPopup(pgProperties, optionalHpoResource, optionalHpoaResource, stage);
         popup.popup();
     }
 
@@ -417,20 +366,6 @@ public class MainController {
         e.consume();
     }
 
-    @FXML
-    private void showMondoStats(ActionEvent e) {
-        e.consume();
-        Ontology mondo = optionalMondoResource.getOntology();
-        if (mondo == null) {
-            logger.error("Attempt to show Mondo stats with null Mondo object");
-            return;
-        }
-        MondoStats stats = new MondoStats(mondo);
-        Stage stage = (Stage) this.copyrightLabel.getScene().getWindow();
-        String html = MondoStatsHtmlGenerator.getHTML(stats);
-        WebViewerPopup popup = WebViewerFactory.mondoStats(html, stage);
-        popup.popup();
-    }
 
     @FXML
     private void showEntriesNeedingMoreAnnotations(ActionEvent e) {
@@ -473,7 +408,6 @@ public class MainController {
 
     @FXML
     public void goButtonAction() {
-        activateOntologyTree();
         TermId id = ontologyLabelsAndTermIdMap.get(autocompleteTextfield.getText());
         if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
         Ontology hpo = optionalHpoResource.getOntology();
@@ -561,10 +495,8 @@ public class MainController {
 
     /** Function is called once all of the resources are found (hp obo, disease annotations, mondo). */
     public void activateOntologyTree() {
-        if (currentMode.equals(mode.BROWSE_HPO)) {
             if (optionalHpoResource.getOntology() == null) {
                 logger.error("activateOntologyTree: HPO null");
-                return;
             } else {
                 final Ontology hpo = optionalHpoResource.getOntology();
                 Platform.runLater(()->{
@@ -572,82 +504,6 @@ public class MainController {
                     WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
                 });
             }
-        } else if (currentMode.equals(mode.BROWSE_MONDO)) {
-            if (optionalMondoResource.getOntology() == null) {
-                logger.error("activateOntologyTree: Mondo null");
-                return;
-            } else {
-                final Ontology mondo = optionalMondoResource.getOntology();
-                Platform.runLater(()->{
-                    initTree(mondo, k -> System.out.println("Consumed " + k));
-                    // TODO get reference to Mondo disease labels
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
-                });
-            }
-        }
-    }
-
-
-
-    /**
-     * Update content of the {@link #infoWebView} with currently selected {@link Term}.
-     * The function is called when the user is on an HPO Term page and selects a link to
-     * a disease.
-     *
-     * @param dmodel currently selected {@link TreeItem} containing {@link Term}
-     */
-    private void updateDescriptionToDiseaseModel(HpoDisease dmodel) {
-        logger.trace("TOP OF updateDescriptionToDiseaseModel");
-        Ontology hpo = optionalHpoResource.getOntology();
-        if (hpo == null) {
-            logger.error("HPO null");
-            return;
-        }
-        String content = HpoHtmlPageGenerator.getDiseaseHTML(dmodel, hpo);
-        infoWebEngine.loadContent(content);
-        infoWebEngine.getLoadWorker().stateProperty().addListener( // ChangeListener<Worker.State>()
-                (ov, oldState, newState) -> {
-                    logger.trace("TOP OF CHANGED updateDescriptionToDiseaseModel");
-                    if (newState == Worker.State.SUCCEEDED) {
-                        org.w3c.dom.events.EventListener listener = // EventListener
-                                (ev) -> {
-                                    String domEventType = ev.getType();
-                                    //System.err.println("EventType from updateToDisease: " + domEventType);
-                                    if (domEventType.equals(EVENT_TYPE_CLICK)) {
-                                        String href = ((Element) ev.getTarget()).getAttribute("href");
-                                        if (href.equals("http://www.human-phenotype-ontology.org")) {
-                                            return; // the external link is taken care of by the Webengine
-                                            // therefore, we do not need to do anything special here
-                                        }
-                                        // The following line is needed because sometimes we get multiple click events
-                                        // if the user clicks once and some appear to be for the "wrong" link type.
-                                        if (!href.startsWith("HP:")) {
-                                            return;
-                                        }
-                                        TermId tid = TermId.of(href);
-                                        Term term = hpo.getTermMap().get(tid);
-                                        if (term == null) {
-                                            logger.error(String.format("Could not construct term  from termid \"%s\"", tid.getValue()));
-                                            return;
-                                        }
-                                        // set the tree on the left to our new term
-                                        expandUntilTerm(term);
-                                        // update the Webview browser
-                                        logger.trace("ABOUT TO UPDATE DESCRIPTION FOR " + term.getName());
-                                        updateDescription(new OntologyTermTreeItem(new OntologyTermWrapper(term)));
-                                        autocompleteTextfield.clear();
-                                        currentMode = MainController.mode.BROWSE_HPO;
-                                        //hpoTermRadioButton.setSelected(true);
-                                    }
-                                };
-
-                        Document doc = infoWebView.getEngine().getDocument();
-                        NodeList nodeList = doc.getElementsByTagName("a");
-                        for (int i = 0; i < nodeList.getLength(); i++) {
-                            ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
-                        }
-                    }
-                });
     }
 
     /**
@@ -658,12 +514,7 @@ public class MainController {
      */
     private void expandUntilTerm(Term term) {
         // logger.trace("expand until term " + term.toString());
-        Ontology ontology;
-        if (currentMode.equals(mode.BROWSE_HPO)) {
-            ontology = optionalHpoResource.getOntology();
-        } else {
-            ontology = optionalMondoResource.getOntology();
-        }
+        Ontology ontology = optionalHpoResource.getOntology();
         if (ontology == null) {
             logger.error("expandUntilTerm not possible because ontology was null");
             return;
@@ -711,7 +562,6 @@ public class MainController {
      * @param treeItem currently selected {@link TreeItem} containing {@link Term}
      */
     private void updateDescription(TreeItem<OntologyTermWrapper> treeItem) {
-        logger.trace("TOP OF UPDATE DESCRIPTION");
         if (treeItem == null)
             return;
         Term term = treeItem.getValue().term;
@@ -741,20 +591,6 @@ public class MainController {
                                             return; // the external link is taken care of by the Webengine
                                             // therefore, we do not need to do anything special here
                                         }
-                                        // The following line is necessary because sometimes multiple events are triggered
-                                        // and we get a "stray" HPO-related link that does not belong here.
-                                        if (href.startsWith("HP:")) return;
-//                                        Collection<HpoDisease> directAnnotMap =
-//                                                optionalResources.getDisease2AnnotationMap().values();
-//                                        HpoDisease dmod = model.getDiseases().get(href);
-//                                        if (dmod == null) {
-//                                            LOGGER.error("Link to disease model for " + href + " was null");
-//                                            return;
-//                                        }
-//                                        updateDescriptionToDiseaseModel(dmod);
-//                                        selectedDisease = dmod;
-//                                        hpoAutocompleteTextfield.clear();
-//                                        currentMode = BROWSE_DISEASE;
                                     }
                                 };
 
@@ -786,6 +622,7 @@ public class MainController {
         root.setExpanded(true);
         ontologyTreeView.setShowRoot(false);
         ontologyTreeView.setRoot(root);
+
         ontologyTreeView.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     OntologyTermWrapper w;
@@ -814,35 +651,6 @@ public class MainController {
     }
 
     /**
-     * Initialize the RadioButtons for the HPO/Mondo choice
-     */
-    private void initRadioButtons() {
-        ToggleGroup group = new ToggleGroup();
-        hpoRadioButton.setSelected(true);
-        hpoRadioButton.setToggleGroup(group);
-        hpoRadioButton.setUserData("HPO");
-        mondoRadioButton.setSelected(false);
-        mondoRadioButton.setToggleGroup(group);
-        hpoRadioButton.setUserData("Mondo");
-        group.selectedToggleProperty().addListener(
-                (ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) -> {
-                    if (group.getSelectedToggle() != null) {
-                        String userdata = (String) group.getSelectedToggle().getUserData();
-                        if (userdata == null) {
-                            logger.warn("Could not retrieve user data for HPO/MONDO radio buttons");
-                            currentMode = mode.BROWSE_HPO;
-                        } else {
-                            switch (userdata) {
-                                case "HPO" -> currentMode = mode.BROWSE_HPO;
-                                case "Mondo" -> currentMode = mode.BROWSE_MONDO;
-                            }
-                        }
-                    }
-                    activateOntologyTree();
-                });
-    }
-
-    /**
      * Get currently selected Term. Used in tests.
      *
      * @return {@link OntologyTermTreeItem} that is currently selected
@@ -859,12 +667,7 @@ public class MainController {
      * @return children of term (not including term itself).
      */
     private Set<Term> getTermChildren(Term term) {
-        Ontology ontology;
-        if (currentMode.equals(mode.BROWSE_HPO)) {
-            ontology = optionalHpoResource.getOntology();
-        } else {
-            ontology = optionalMondoResource.getOntology();
-        }
+        Ontology  ontology = optionalHpoResource.getOntology();
         if (ontology == null) {
             logger.error("Ontology null");
             PopUps.showInfoMessage("Error: Could not initialize Ontology", "ERROR");
@@ -887,12 +690,7 @@ public class MainController {
      * @return parents of term (not including term itself).
      */
     private Set<Term> getTermParents(Term term) {
-        Ontology ontology;
-        if (currentMode.equals(mode.BROWSE_HPO)) {
-            ontology = optionalHpoResource.getOntology();
-        } else {
-            ontology = optionalMondoResource.getOntology();
-        }
+        Ontology ontology = optionalHpoResource.getOntology();
         if (ontology == null) {
             logger.error("Ontology null");
             PopUps.showInfoMessage("Error: Could not initialize Ontology", "ERROR");
@@ -908,12 +706,7 @@ public class MainController {
     }
 
     private boolean existsPathFromRoot(Term term) {
-        Ontology ontology;
-        if (currentMode.equals(mode.BROWSE_HPO)) {
-            ontology = optionalHpoResource.getOntology();
-        } else {
-            ontology = optionalMondoResource.getOntology();
-        }
+        Ontology ontology = optionalHpoResource.getOntology();
         if (ontology == null) {
             logger.error("Ontology null");
             PopUps.showInfoMessage("Error: Could not initialize Ontology", "ERROR");

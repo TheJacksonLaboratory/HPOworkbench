@@ -4,7 +4,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import org.monarchinitiative.hpoworkbench.StartupTask;
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -20,7 +19,7 @@ import java.util.stream.Stream;
 public class OptionalHpoaResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OptionalHpoaResource.class);
     private final BooleanBinding hpoaResourceIsMissing;
-
+    public final static String HPOA_PATH_PROPERTY = "hpoa/path";
     private final ObjectProperty<Map<TermId, List<HpoDisease>>> indirectAnnotMap =
             new SimpleObjectProperty<>(this, "indirectAnnotMap", null);
 
