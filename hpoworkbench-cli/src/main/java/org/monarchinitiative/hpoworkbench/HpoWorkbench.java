@@ -36,6 +36,7 @@ public class HpoWorkbench implements Callable<Integer> {
                 .addSubcommand("csv", new HPO2CSVCommand())
                 .addSubcommand("matchterms", new MatchTermsCommand())
                 .addSubcommand("count", new CountGenes())
+                .addSubcommand("encoding", new EncodingCheckCommand())
                 .addSubcommand("ranges", new CountHpoIdRanges());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);

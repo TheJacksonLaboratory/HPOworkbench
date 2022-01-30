@@ -10,7 +10,7 @@ Please see the [full documentation](http://hpo-workbench.readthedocs.io/en/lates
 
 ## Version 2
 
-We are working on a version 2 using Java 16 and Spring Boot. To run HPO Workbench, you will need
+We are working on a version 2 using Java 17 and Spring Boot. To run HPO Workbench, you will need
 to have Java 16 and maven installed and to buld the application with the standard ``mvn package``
 command. The app can then be started with
 ```bazaar
