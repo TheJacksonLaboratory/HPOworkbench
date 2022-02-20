@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.monarchinitiative.hpoworkbench</groupId>
     <artifactId>hpoworkbench</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <packaging>pom</packaging> <!-- packaging pom for multimodule project -->
     <name>HPOworkbench</name>
 
@@ -76,6 +76,7 @@
                 <artifactId>picocli</artifactId>
                 <version>4.5.2</version>
             </dependency>
+
 
             <dependency>
                 <groupId>org.openjfx</groupId>
