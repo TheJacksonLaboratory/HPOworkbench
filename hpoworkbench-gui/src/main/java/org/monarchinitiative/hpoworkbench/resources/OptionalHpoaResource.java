@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+
 import org.monarchinitiative.hpoworkbench.io.DirectIndirectHpoAnnotationParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -57,8 +58,8 @@ public class OptionalHpoaResource {
             LOGGER.info("Found {} diseases (diseaseSet)", diseaseSet.size());
             // for some reason the stream implementation is choking
             name2diseaseIdMap = new HashMap<>();
-            for (var disease : diseaseSet) {
-                name2diseaseIdMap.put(disease.getName(), disease.getDiseaseDatabaseId());
+            for (HpoDisease disease : diseaseSet) {
+                name2diseaseIdMap.put(disease.getDiseaseName(), disease.getDiseaseDatabaseId());
             }
             LOGGER.info("name2diseaseIdMap initialized with {} entries", name2diseaseIdMap.size());
             id2diseaseModelMap = diseaseSet.stream()

@@ -2,7 +2,7 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -111,7 +112,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
                        }
                    }
                    for (String h : hits) {
-                       System.out.println(disease.getName() +": " + h);
+                       System.out.println(disease.getDiseaseName() +": " + h);
                    }
                 }
             } else {
@@ -206,7 +207,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
         LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
-        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath,hpoOntology);
+        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(annotpath),hpoOntology);
         LOGGER.trace("Diseases imported: " + diseaseMap.size());
     }
 

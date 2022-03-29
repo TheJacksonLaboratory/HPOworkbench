@@ -6,13 +6,14 @@ import com.google.common.collect.ImmutableMap;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -78,7 +79,7 @@ public class DirectIndirectHpoAnnotationParser {
             return;
         }
         logger.trace("doParse in DirectIndirectParser");
-        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(this.pathToPhenotypeAnnotationTab,this.ontology);
+        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(this.pathToPhenotypeAnnotationTab),this.ontology);
         directAnnotationMap=new HashMap<>();
         totalAnnotationMap=new HashMap<>();
         Map<TermId, Set<HpoDisease>> tempmap = new HashMap<>();
@@ -88,7 +89,7 @@ public class DirectIndirectHpoAnnotationParser {
         for (TermId diseaseId : diseaseMap.keySet()) {
             HpoDisease disease = diseaseMap.get(diseaseId);
             for (HpoAnnotation annot : disease.getPhenotypicAbnormalities()) {
-                TermId hpoId = annot.getTermId();
+                TermId hpoId = annot.id();
                 directAnnotationMap.putIfAbsent(hpoId,new ArrayList<>());
                 directAnnotationMap.get(hpoId).add(disease);
                 Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, hpoId, true);

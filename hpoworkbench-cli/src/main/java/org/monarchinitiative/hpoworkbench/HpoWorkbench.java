@@ -34,8 +34,11 @@ public class HpoWorkbench implements Callable<Integer> {
                 .addSubcommand("descendents", new HpoListDescendentsCommand())
                 .addSubcommand("hpo2hpo", new Hpo2HpoCommand())
                 .addSubcommand("csv", new HPO2CSVCommand())
+                .addSubcommand("convert", new PhenopacketConvertCommand())
+                .addSubcommand("compare", new PhenopacketCompareCommand())
                 .addSubcommand("matchterms", new MatchTermsCommand())
                 .addSubcommand("count", new CountGenes())
+                .addSubcommand("encoding", new EncodingCheckCommand())
                 .addSubcommand("ranges", new CountHpoIdRanges());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);

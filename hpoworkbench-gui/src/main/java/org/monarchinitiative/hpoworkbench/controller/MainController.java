@@ -569,7 +569,7 @@ public class MainController {
             logger.error("Attempt to get Indirect annotation map but it was null");
             return;
         }
-        List<HpoDisease> annotatedDiseases =  optionalHpoaResource.getIndirectAnnotMap().getOrDefault(term.getId(), List.of());
+        List<HpoDisease> annotatedDiseases =  optionalHpoaResource.getIndirectAnnotMap().getOrDefault(term.id(), List.of());
         int n_descendents = 42;//getDescendents(model.getHpoOntology(),term.getId()).size();
         //todo--add number of descendents to HTML
         String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
@@ -637,8 +637,8 @@ public class MainController {
                 });
         // create Map for lookup of the terms in the ontology based on their Name
         ontology.getTermMap().values().forEach(term -> {
-            ontologyLabelsAndTermIdMap.put(term.getName(), term.getId());
-            ontologyLabelsAndTermIdMap.put(term.getId().getValue(), term.getId());
+            ontologyLabelsAndTermIdMap.put(term.getName(), term.id());
+            ontologyLabelsAndTermIdMap.put(term.id().getValue(), term.id());
         });
         WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
 
@@ -673,7 +673,7 @@ public class MainController {
             PopUps.showInfoMessage("Error: Could not initialize Ontology", "ERROR");
             return Set.of();
         }
-        TermId parentTermId = term.getId();
+        TermId parentTermId = term.id();
         Set<TermId> childrenIds = getChildTerms(ontology, parentTermId, false);
         Set<Term> kids = new HashSet<>();
         childrenIds.forEach(tid -> {
@@ -696,7 +696,7 @@ public class MainController {
             PopUps.showInfoMessage("Error: Could not initialize Ontology", "ERROR");
             return Set.of();
         }
-        Set<TermId> parentIds = getParentTerms(ontology, term.getId(), false);
+        Set<TermId> parentIds = getParentTerms(ontology, term.id(), false);
         Set<Term> eltern = new HashSet<>();
         parentIds.forEach(tid -> {
             Term ht = ontology.getTermMap().get(tid);
@@ -712,9 +712,7 @@ public class MainController {
             PopUps.showInfoMessage("Error: Could not initialize Ontology", "ERROR");
             return false;
         }
-        TermId rootId = ontology.getRootTermId();
-        TermId tid = term.getId();
-        return existsPath(ontology, tid, rootId);
+        return existsPath(ontology, term.id(), ontology.getRootTermId());
     }
 
 

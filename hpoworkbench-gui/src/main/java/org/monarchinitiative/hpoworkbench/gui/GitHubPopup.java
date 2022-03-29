@@ -16,6 +16,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.controlsfx.control.CheckComboBox;
+
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermSynonym;
@@ -63,7 +64,7 @@ public class GitHubPopup {
      */
     public GitHubPopup(Term term) {
         termlabel = term.getName();
-        termid = term.getId().getValue();
+        termid = term.id().getValue();
         definition = term.getDefinition();
         comment = term.getComment();
         synlist = term.getSynonyms().size() == 0 ? "-" : term.getSynonyms().
@@ -180,7 +181,7 @@ public class GitHubPopup {
     }
 
     /** This is used if the user has alreay entered their GitHub name and password (they are stored in the
-     * {@link HpoWbModel} object.
+     *  object.
      * @param ghuname  GitHub user name
      * @param ghpword corresponding GitHub password
      */
@@ -213,7 +214,7 @@ public class GitHubPopup {
                             Reference (e.g., PubMed ID):
                             Your biocurator ID for nanoattribution (if desired):
                             Anything else (replacement?):""",
-                    dmodel.getName(),
+                    dmodel.getDiseaseName(),
                     dmodel.getDiseaseDatabaseId().getValue(),
                     termlabel, termid);
         } else if (newAnnotation) {
@@ -225,7 +226,7 @@ public class GitHubPopup {
                             Age of onset:
                             Your biocurator ID for nanoattribution (if desired):
                             Anything else:""",
-                    shortName(dmodel.getName()),
+                    shortName(dmodel.getDiseaseName()),
                     dmodel.getDiseaseDatabaseId().getValue(),
                     termlabel, termid);
         } else {
