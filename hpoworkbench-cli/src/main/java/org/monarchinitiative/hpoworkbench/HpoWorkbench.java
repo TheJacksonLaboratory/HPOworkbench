@@ -35,6 +35,7 @@ public class HpoWorkbench implements Callable<Integer> {
                 .addSubcommand("hpo2hpo", new Hpo2HpoCommand())
                 .addSubcommand("csv", new HPO2CSVCommand())
                 .addSubcommand("convert", new PhenopacketConvertCommand())
+                .addSubcommand("compare", new PhenopacketCompareCommand())
                 .addSubcommand("matchterms", new MatchTermsCommand())
                 .addSubcommand("count", new CountGenes())
                 .addSubcommand("encoding", new EncodingCheckCommand())

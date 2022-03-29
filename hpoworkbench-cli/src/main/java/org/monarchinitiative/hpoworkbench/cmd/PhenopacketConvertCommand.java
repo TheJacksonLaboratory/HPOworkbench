@@ -152,7 +152,7 @@ public class PhenopacketConvertCommand implements Callable<Integer> {
                     .setGenomeAssembly(assembly)
                     .build();
 
-            VariationDescriptorBuilder builder = VariationDescriptorBuilder.create();
+            VariationDescriptorBuilder builder = VariationDescriptorBuilder.create("id");
             builder.geneContext(this.geneDescriptor);
             builder.vcfVecord(vcfRecord);
             // this must be a sequence ontology class
@@ -161,7 +161,7 @@ public class PhenopacketConvertCommand implements Callable<Integer> {
                 case "homozygous" -> builder.homozygous();
                 case "heteroyzgous" -> builder.heterozygous();
                 case "hemizygous" -> builder.hemizygous();
-                default -> throw new PhenolRuntimeException("Unregonized zygosity " + zygosity.getLabel());
+                default -> throw new PhenolRuntimeException("Unrecognized zygosity " + zygosity.getLabel());
             }
             return builder.build();
         }

@@ -42,7 +42,7 @@ public class SingleDiseaseHTMLGenerator {
         }
         HpoCategoryMap hpocatmap = new HpoCategoryMap();
         for (HpoAnnotation annot : annotations) {
-            TermId tid = annot.getTermId();
+            TermId tid = annot.id();
             hpocatmap.addAnnotatedTerm(tid, ontology);
         }
         List<HpoCategory> hpocatlist = hpocatmap.getActiveCategoryList();
@@ -73,8 +73,8 @@ public class SingleDiseaseHTMLGenerator {
                                         <td>%s</td>
                                       </tr>
                                 """,
-                        term.getId().getValue(),
-                        term.getId().getValue(),
+                        term.id().getValue(),
+                        term.id().getValue(),
                         term.getName(),
                         term.getDefinition() != null ? term.getDefinition() : "");
                 sb.append(row);

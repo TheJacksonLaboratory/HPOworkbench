@@ -60,9 +60,9 @@ public class OmimOrphanetDiseaseHtmlGenerator {
                                     <td>%s</td>
                                   </tr>
                             """,
-                    term.getId().getValue(),
+                    term.id().getValue(),
                     term.getName(),
-                    term.getId().getValue(),
+                    term.id().getValue(),
                     term.getDefinition());
 
             sb.append(row);

@@ -9,6 +9,7 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategoryMap;
 import org.monarchinitiative.phenol.ontology.data.*;
 
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ class HpoHtmlPageGenerator {
     /**@return A String with the HTML for representing one HPO term and the diseases it is annotated to. */
     static String getHTML(Term term, List<HpoDisease> annotatedDiseases) {
 
-        String termID = term.getId().getValue();
+        String termID = term.id().getValue();
         String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
                 .collect(Collectors.joining("; "));
         String definition = (term.getDefinition() == null) ? "" : term.getDefinition();
@@ -71,7 +72,7 @@ class HpoHtmlPageGenerator {
                     <tr>
                             <td><a href="%s">%s</a></td>
                             <td>%s</td>
-                          </tr>""", s.getName(), s.getDiseaseDatabaseId().getValue(), s.getName());
+                          </tr>""", s.getDiseaseName(), s.getDiseaseDatabaseId().getValue(), s.getDiseaseName());
             sb.append(row);
         }
         return String.format("%s<tbody>%s</tbody></table></div>", header, sb);
@@ -93,7 +94,7 @@ class HpoHtmlPageGenerator {
     }
 
 
-    private static List<Term> getTerms(List<TermId> ids,Ontology ontology) {
+    private static List<Term> getTerms(List<TermId> ids, Ontology ontology) {
         ImmutableList.Builder<Term> builder = new ImmutableList.Builder<>();
         for (TermId tid : ids){
             Term term = ontology.getTermMap().get(tid);
@@ -117,12 +118,12 @@ class HpoHtmlPageGenerator {
 
     /** @return String representing an HTML table row for one disease annotation. */
     private static String getAnnotationTableRow(HpoAnnotation annot, Ontology ontology) {
-        TermId tid = annot.getTermId();
+        TermId tid = annot.id();
         Term term = ontology.getTermMap().get(tid);
         String label = term.getName();
         String definition = term.getDefinition() != null ? term.getDefinition() : "";
         // try to get whatever we have in terms of frequency or modifiers
-        String fr = String.format("Frequency=%s",annot.getFrequencyString());
+        String fr = String.format("Frequency=%.1f%%",annot.getFrequency());
         List<TermId> modifiers = annot.getModifiers();
         HpoOnset onset = annot.getOnset();
         StringBuilder sb = new StringBuilder();
@@ -143,8 +144,8 @@ class HpoHtmlPageGenerator {
                                 <td>%s</td>
                               </tr>
                         """,
-                term.getId().getValue(),
-                term.getId().getValue(),
+                term.id().getValue(),
+                term.id().getValue(),
                 label,
                 definition,
                 sb);
@@ -164,9 +165,9 @@ class HpoHtmlPageGenerator {
             return "<p>No HPO annotations found.</p>";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("<h1>").append(disease.getName()).append("</h1>\n");
+        sb.append("<h1>").append(disease.getDiseaseName()).append("</h1>\n");
         sb.append("<p><b>Disease ID:</b>").append(disease.getDiseaseDatabaseId()).append("<br/>");
-        sb.append("<b>Name:</b>").append(disease.getName()).append("<br/>");
+        sb.append("<b>Name:</b>").append(disease.getDiseaseName()).append("<br/>");
         // output inheritance
         String inheritanceString="No mode of inheritance information available";
         if (modesOfInheritance.size()>0) {
@@ -177,7 +178,7 @@ class HpoHtmlPageGenerator {
         HpoCategoryMap hpocatmap = new HpoCategoryMap();
         Map<TermId,HpoAnnotation> id2annotationmap=new HashMap<>();
         for (HpoAnnotation annot : annotations) {
-            TermId tid = annot.getTermId();
+            TermId tid = annot.id();
             hpocatmap.addAnnotatedTerm(tid, ontology);
             id2annotationmap.put(tid,annot);
         }
