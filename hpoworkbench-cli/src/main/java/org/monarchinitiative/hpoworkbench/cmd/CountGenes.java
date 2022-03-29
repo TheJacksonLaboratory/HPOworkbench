@@ -4,7 +4,6 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationParser;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -17,6 +16,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -74,8 +74,8 @@ public class CountGenes extends HPOCommand implements Callable<Integer> {
 
     private void parsePhenolFiles() {
         Ontology ontology = OntologyLoader.loadOntology(new File(hpopath));
-        HpoAssociationParser parser = new HpoAssociationParser(pathToGeneInfo, pathToMim2Gene, pathToOrpha, annotpath, ontology);
-        this.geneToDiseaseMapPhenol = parser.getGeneToDiseaseIdMap();
+        //HpoAssociationParser parser = new HpoAssociationParser(pathToGeneInfo, pathToMim2Gene, pathToOrpha, annotpath, ontology);
+        this.geneToDiseaseMapPhenol = null;//parser.getGeneToDiseaseIdMap();
     }
 
 

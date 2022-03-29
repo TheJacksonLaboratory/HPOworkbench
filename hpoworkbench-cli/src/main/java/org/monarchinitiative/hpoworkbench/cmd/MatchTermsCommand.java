@@ -98,7 +98,7 @@ public class MatchTermsCommand extends  HPOCommand implements Callable<Integer> 
         this.hpo = OntologyLoader.loadOntology(new File(this.hpopath));
         labelToTermIdMap = new HashMap<>();
         for (Term term : hpo.getTermMap().values()){
-            TermId tid = term.getId();
+            TermId tid = term.id();
             String label = term.getName();
             labelToTermIdMap.put(label,tid);
             for (TermSynonym tsyn :term.getSynonyms() ) {

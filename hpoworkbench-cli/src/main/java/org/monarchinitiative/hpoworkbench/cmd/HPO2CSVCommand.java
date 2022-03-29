@@ -92,10 +92,10 @@ public class HPO2CSVCommand extends HPOCommand implements Callable<Integer> {
            for (Term t :terms) {
                 //System.out.println(t);
                 String label = t.getName();
-                String id = t.getId().getValue();
+                String id = t.id().getValue();
                 String def=t.getDefinition();
                 String synString=t.getSynonyms().stream().map(TermSynonym::getValue).collect(Collectors.joining("; "));
-              Set<TermId> ancestors= ontology.getAncestorTermIds(t.getId());
+              Set<TermId> ancestors= ontology.getAncestorTermIds(t.id());
 
              /* for (TermId i:ancestors) {
                   Term = ontology.getterm(id);

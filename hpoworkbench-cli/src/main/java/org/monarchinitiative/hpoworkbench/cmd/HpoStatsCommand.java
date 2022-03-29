@@ -4,11 +4,10 @@ package org.monarchinitiative.hpoworkbench.cmd;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
-import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoOnsetTermIds;
-import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -18,6 +17,7 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -93,8 +93,8 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
             getDescendentsOfTermOfInterest();
             filterDiseasesAccordingToDatabase();
-            qcInheritanceModesForDiseases();
-            countDiseasesWithAndWithoutAssociatedGenes();
+          //  qcInheritanceModesForDiseases();
+            //countDiseasesWithAndWithoutAssociatedGenes();
         } else {
             System.err.println("[WARN] No HPO term passed for stats");
         }
@@ -102,7 +102,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
     }
 
 
-    private void countDiseasesWithAndWithoutAssociatedGenes() {
+   /* private void countDiseasesWithAndWithoutAssociatedGenes() {
         String geneInfoFile = this.downloadDirectory + File.separator + "Homo_sapiens_gene_info.gz";
         String mim2genemedgenFile = this.downloadDirectory + File.separator + "mim2gene_medgen";
         HpoAssociationParser assocParser = new HpoAssociationParser(geneInfoFile,
@@ -112,7 +112,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
                 hpoOntology);
         final Multimap<TermId,TermId> disease2geneIdMultiMap=assocParser.getDiseaseToGeneIdMap();
         final Map<TermId,String> geneId2SymbolMap = assocParser.getGeneIdToSymbolMap();
-        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath, hpoOntology);
+        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(annotpath), hpoOntology);
         int disease_without_gene = 0;
         int disease_with_gene = 0;
         final Set<TermId> geneset = new HashSet<>();
@@ -129,9 +129,9 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
         }
         System.out.printf("Diseases with associated gene: %d. Without associated gene: %d. Total %d Total genes: %d\n\n",
                 disease_with_gene, disease_without_gene, disease_with_gene+disease_without_gene, geneset.size());
-    }
+    }*/
 
-    private void qcInheritanceModesForDiseases() {
+   /* private void qcInheritanceModesForDiseases() {
         String geneInfoFile = this.downloadDirectory + File.separator + "Homo_sapiens_gene_info.gz";
         String mim2genemedgenFile = this.downloadDirectory + File.separator + "mim2gene_medgen";
 
@@ -163,7 +163,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
             }
         }
     }
-
+*/
 
 
 
@@ -273,8 +273,8 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
     private boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
         List<HpoAnnotation> tiwmlist= d.getPhenotypicAbnormalities();
-        for (HpoAnnotation id:tiwmlist) {
-          if (this.descendentsOfTheTermOfInterest.contains(id.getTermId()))
+        for (HpoAnnotation annot:tiwmlist) {
+          if (this.descendentsOfTheTermOfInterest.contains(annot.id()))
               return true;
         }
         return false;
@@ -295,7 +295,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
             }
             int n_annot=0;
             for (HpoAnnotation annot : d.getPhenotypicAbnormalities() ){
-                TermId hpoId=annot.getTermId();
+                TermId hpoId=annot.id();
                 if (existsPath(hpoOntology,hpoId,termOfInterest)) {
                     n_annot++;
                 }
@@ -323,8 +323,8 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
     private boolean hasAdultOnset(HpoDisease d) {
         List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
-        for (HpoAnnotation id:ids) {
-            if (this.adultOnset.contains(id.getTermId()))
+        for (HpoAnnotation annot:ids) {
+            if (this.adultOnset.contains(annot.id()))
                 return  true;
         }
         return false;
@@ -332,8 +332,8 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
     private boolean hasChildhoodOnset(HpoDisease d) {
         List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
-        for (HpoAnnotation id:ids) {
-            if (this.childhoodOnset.contains(id.getTermId()))
+        for (HpoAnnotation annot:ids) {
+            if (this.childhoodOnset.contains(annot.id()))
                 return  true;
         }
         return false;
