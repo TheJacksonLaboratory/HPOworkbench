@@ -52,14 +52,14 @@ public class AnnotationMerger {
             diseaseName1="";
             logger.trace("disease 1 == null");
         } else {
-            diseaseName1=disease1.getName();
+            diseaseName1=disease1.getDiseaseName();
             logger.trace("disease 1 ok, {}" , disease1);
         }
         if (disease2==null) {
             logger.trace("disease 2 == null");
             diseaseName2="";
         } else {
-            diseaseName2=disease2.getName();
+            diseaseName2=disease2.getDiseaseName();
             logger.trace("disease 2 ok, {}" , disease2);
         }
 
@@ -154,13 +154,13 @@ public class AnnotationMerger {
         if (disease1==null) {
             lst1= ImmutableList.of();
         } else {
-            lst1 = disease1.getPhenotypicAbnormalities().stream().map(HpoAnnotation::getTermId).collect(Collectors.toList());
+            lst1 = disease1.getPhenotypicAbnormalities().stream().map(HpoAnnotation::id).collect(Collectors.toList());
         }
         List<TermId> lst2;
         if (disease2==null) {
             lst2=ImmutableList.of();
         } else {
-            lst2 = disease2.getPhenotypicAbnormalities().stream().map(HpoAnnotation::getTermId).collect(Collectors.toList());
+            lst2 = disease2.getPhenotypicAbnormalities().stream().map(HpoAnnotation::id).collect(Collectors.toList());
         }
         HpoCategoryMap catmap1 =  new HpoCategoryMap();
         catmap1.addAnnotatedTerms(lst1,ontology);
@@ -242,9 +242,9 @@ public class AnnotationMerger {
 
 
     private void printDisease(HpoDisease d) {
-        System.out.println(d.getName());
+        System.out.println(d.getDiseaseName());
         for (HpoAnnotation ann : d.getPhenotypicAbnormalities()) {
-            TermId tid = ann.getTermId();
+            TermId tid = ann.id();
             String label = ontology.getTermMap().get(tid).getName();
             System.out.println("\t" + label + "[" + tid.getValue() +"]");
         }

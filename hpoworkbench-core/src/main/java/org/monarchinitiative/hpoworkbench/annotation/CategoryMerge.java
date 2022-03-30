@@ -156,7 +156,7 @@ public class CategoryMerge {
     private String diseaseName(HpoDisease d) {
         if (d==null) return "none";
 
-        return d.getName() +" (" + d.getDiseaseDatabaseId() +")";
+        return d.getDiseaseName() +" (" + d.getDiseaseDatabaseId() +")";
     }
 
     public String getCounts() {

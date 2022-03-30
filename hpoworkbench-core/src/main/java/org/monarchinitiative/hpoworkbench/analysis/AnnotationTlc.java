@@ -50,12 +50,12 @@ public class AnnotationTlc {
             String db = disease.getDatabase();
             if (! db.equals("OMIM")) continue;  // just look at OMIM entries
             List<HpoAnnotation> annotations = disease.getPhenotypicAbnormalities();
-            String label = String.format("%s [%s]",disease.getName(),disease.getDiseaseDatabaseId());
+            String label = String.format("%s [%s]",disease.getDiseaseName(),disease.getDiseaseDatabaseId());
             if (annotations.size()<3) {
                 underannotatedDiseases.put(label,annotations.size());
             } else {
                 for (HpoAnnotation ann : annotations) {
-                    TermId tid=ann.getTermId();
+                    TermId tid=ann.id();
                     String lab = hpoOntology.getTermMap().get(tid).getName();
                     if (lab.contains("Abnormality of")) {
                         String s = String.format("%s [%s]",lab,tid.getValue());
