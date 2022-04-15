@@ -2,12 +2,10 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoOnsetTermIds;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -17,7 +15,6 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 

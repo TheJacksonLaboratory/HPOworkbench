@@ -1,0 +1,2 @@
+Term    Id  Onset
+Syndactyly  HP:0001159  Congenital onset

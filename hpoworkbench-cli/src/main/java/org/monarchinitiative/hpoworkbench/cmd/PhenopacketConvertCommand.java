@@ -2,8 +2,6 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
-import org.apache.poi.ss.formula.ptg.GreaterThanPtg;
-import org.ga4gh.vrs.v1.Gene;
 import org.ga4gh.vrsatile.v1.GeneDescriptor;
 import org.ga4gh.vrsatile.v1.VariationDescriptor;
 import org.ga4gh.vrsatile.v1.VcfRecord;
@@ -27,7 +25,6 @@ import picocli.CommandLine;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 

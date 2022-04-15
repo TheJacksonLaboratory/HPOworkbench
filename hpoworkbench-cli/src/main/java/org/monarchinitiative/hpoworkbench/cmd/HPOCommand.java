@@ -19,8 +19,8 @@ public abstract class HPOCommand {
     protected String downloadDirectory="data";
     @CommandLine.Option(names={"-a", "--annot"},description = "path to phenol.hpoa")
     protected String annotpath="data/phenotype.hpoa";
-    @CommandLine.Option(names={"--hpo"}, description = "path to hp.obo")
-    protected String hpopath ="data/hp.obo";
+    @CommandLine.Option(names={"--hpo"}, description = "path to hp.json")
+    protected String hpopath ="data/hp.json";
 
     protected Map<String,String> defaults=new HashMap<>();
 

@@ -67,6 +67,11 @@
             <artifactId>phenotools-builder</artifactId>
             <version>0.0.2-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.monarchinitiative.biodownload</groupId>
+            <artifactId>biodownload</artifactId>
+            <version>1.0.1</version>
+        </dependency>
 
     </dependencies>
 
