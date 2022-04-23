@@ -2,7 +2,10 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -27,7 +30,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
     private static final Logger LOGGER = LoggerFactory.getLogger(Hpo2HpoCommand.class);
     private Ontology hpoOntology=null;
     /** All disease annotations for the entire ontology. */
-    private Map<TermId, HpoDisease> diseaseMap =null;
+    private final Map<TermId, HpoDisease> diseaseMap =null;
     @CommandLine.Option(names={"--target"},required = true,description = "file with target disease IDs")
     private String targetFile;
     @CommandLine.Option(names={"--source"},required = true,description = "file with source disease IDs")
@@ -48,7 +51,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
      * Function for the execution of the command.
      */
     @Override
-    public Integer call() {
+    public Integer call() throws IOException {
         inputHPOdata();
         inputTargets();
         inputSources();
@@ -94,11 +97,12 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
         for (TermId diseaseId : targets) {
             if (diseaseMap.containsKey(diseaseId)) {
                 HpoDisease disease = diseaseMap.get(diseaseId);
-                List<TermId> hpos = disease.getPhenotypicAbnormalityTermIdList();
-                for (TermId hpo : hpos) {
-                   List<String> hits = getTwoHopMatches(hpo);
+                while (disease.phenotypicAbnormalities().hasNext()) {
+                    HpoDiseaseAnnotation annotation = disease.phenotypicAbnormalities().next();
+                    TermId hpoId = annotation.id();
+                   List<String> hits = getTwoHopMatches(hpoId);
                    if (hits.isEmpty()) {
-                       Set<TermId> pars = getParentTerms(hpoOntology,hpo,false);
+                       Set<TermId> pars = getParentTerms(hpoOntology, hpoId,false);
                        for (TermId par : pars) {
                            List<String> newHits1 = getZeroHopMatches(par);
                            hits.addAll(newHits1);
@@ -112,7 +116,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
                        }
                    }
                    for (String h : hits) {
-                       System.out.println(disease.getDiseaseName() +": " + h);
+                       System.out.println(disease.diseaseName() +": " + h);
                    }
                 }
             } else {
@@ -128,11 +132,12 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
         for (TermId tid : sources) {
             if (diseaseMap.containsKey(tid)) {
                 HpoDisease disease = diseaseMap.get(tid);
-                List<TermId> hpos = disease.getPhenotypicAbnormalityTermIdList();
-                for (TermId hpo : hpos) {
-                    counts.putIfAbsent(hpo,0);
-                    int c = counts.get(hpo);
-                    counts.put(hpo,c+1);
+                while (disease.phenotypicAbnormalities().hasNext()) {
+                    HpoDiseaseAnnotation annotation = disease.phenotypicAbnormalities().next();
+                    TermId hpoId = annotation.id();
+                    counts.putIfAbsent(hpoId,0);
+                    int c = counts.get(hpoId);
+                    counts.put(hpoId,c+1);
                 }
             } else {
                 System.err.println("[ERROR] could not find disease for " + tid.getValue());
@@ -193,7 +198,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
 
 
 
-    private void inputHPOdata() {
+    private void inputHPOdata() throws IOException {
         File f = new File(hpopath);
         if (! f.exists()) {
             LOGGER.error(String.format("Could not find hpo ontology file at\"%s\". Terminating program...", hpopath ));
@@ -207,7 +212,10 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
         LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
-        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(annotpath),hpoOntology);
+        HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
+        HpoDiseaseLoader loader = HpoDiseaseLoader.of(hpoOntology, options);
+        HpoDiseases diseases = loader.load(Path.of(annotpath));
+        Map<TermId, HpoDisease> diseaseMap = diseases.diseaseById();
         LOGGER.trace("Diseases imported: " + diseaseMap.size());
     }
 

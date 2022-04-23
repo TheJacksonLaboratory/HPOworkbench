@@ -6,13 +6,17 @@ import com.google.common.collect.ImmutableMap;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -73,13 +77,16 @@ public class DirectIndirectHpoAnnotationParser {
     /**
      * Parse annotations file and populate maps containing direct and indirect annotations.
      */
-    private void doParse()  throws HPOWorkbenchException {
+    private void doParse() throws HPOWorkbenchException, IOException {
         if (ontology == null) {
             logger.warn("Ontology unset, cannot parse annotations file");
             return;
         }
         logger.trace("doParse in DirectIndirectParser");
-        Map<TermId, HpoDisease> diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(this.pathToPhenotypeAnnotationTab),this.ontology);
+        HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
+        HpoDiseaseLoader loader = HpoDiseaseLoader.of(ontology, options);
+        HpoDiseases diseases = loader.load(Path.of(this.pathToPhenotypeAnnotationTab));
+        Map<TermId, HpoDisease> diseaseMap = diseases.diseaseById();
         directAnnotationMap=new HashMap<>();
         totalAnnotationMap=new HashMap<>();
         Map<TermId, Set<HpoDisease>> tempmap = new HashMap<>();

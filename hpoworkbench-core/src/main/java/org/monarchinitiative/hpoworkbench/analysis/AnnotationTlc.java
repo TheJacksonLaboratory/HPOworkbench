@@ -1,10 +1,8 @@
 package org.monarchinitiative.hpoworkbench.analysis;
 
 
-
-
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -47,14 +45,14 @@ public class AnnotationTlc {
         diseasesWithTooGeneralAnnotations=new HashMap<>();
         for (Map.Entry<TermId,HpoDisease> entry : diseaseMap.entrySet()) {
             HpoDisease disease = entry.getValue();
-            String db = disease.getDatabase();
+            String db = disease.id().getPrefix();
             if (! db.equals("OMIM")) continue;  // just look at OMIM entries
-            List<HpoAnnotation> annotations = disease.getPhenotypicAbnormalities();
-            String label = String.format("%s [%s]",disease.getDiseaseName(),disease.getDiseaseDatabaseId());
-            if (annotations.size()<3) {
-                underannotatedDiseases.put(label,annotations.size());
+            String label = String.format("%s [%s]",disease.diseaseName(),disease.id().getValue());
+            if (disease.phenotypicAbnormalitiesCount()<3) {
+                underannotatedDiseases.put(label,disease.phenotypicAbnormalitiesCount());
             } else {
-                for (HpoAnnotation ann : annotations) {
+                while (disease.phenotypicAbnormalities().hasNext()) {
+                    HpoDiseaseAnnotation ann = disease.phenotypicAbnormalities().next();
                     TermId tid=ann.id();
                     String lab = hpoOntology.getTermMap().get(tid).getName();
                     if (lab.contains("Abnormality of")) {

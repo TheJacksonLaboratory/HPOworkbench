@@ -6,7 +6,6 @@ package org.monarchinitiative.hpoworkbench.resources;
  *
  * @author <a href="mailto:daniel.danis@jax.org">Daniel Danis</a>
  * @version 0.1.10
- * @see OptionalResources
  * @see ResourceValidators
  * @since 0.1
  */

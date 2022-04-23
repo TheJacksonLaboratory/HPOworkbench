@@ -8,7 +8,6 @@
  * <li>wrap the resources (e.g. ontology object) in the {@link javafx.beans.property.ObjectProperty}</li>
  * <li>create binding using multiple properties (e.g. a binding that evaluates as <code>true</code> only when
  * all the resources are available)</li>
- * <li>{@link org.monarchinitiative.hpoworkbench.resources.OptionalResources} to the controller</li>
  * <li>bind the disableProperty of the buttons, textfields, etc.. to the binding</li>
  * </ul>
  */

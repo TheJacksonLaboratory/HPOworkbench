@@ -142,7 +142,6 @@ public class PhenopacketCompareCommand implements Callable<Integer> {
                 String id = pf.getType().getId();
                 if (id.equals(idAsString)) {
                     annotated++;
-                    continue;
                 }
             }
         }
