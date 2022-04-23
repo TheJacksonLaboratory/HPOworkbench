@@ -1,11 +1,10 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
 import org.monarchinitiative.phenol.annotations.io.hpo.DiseaseDatabase;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationLoader;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -33,12 +32,16 @@ public class OnsetCommand extends  HPOCommand implements Callable<Integer> {
         if (hpopath==null) {
             hpopath = this.downloadDirectory + File.separator + "hp.json";
         }
-        Ontology hpo = OntologyLoader.loadOntology(new File(hpopath));
-        var diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(annotpath), hpo);
-        Set<DiseaseDatabase> diseaseDatabaseSet = Set.of(DiseaseDatabase.OMIM);
-        HpoDiseases hpoDiseases = HpoDiseaseAnnotationLoader.loadHpoDiseases(Path.of(annotpath), hpo, diseaseDatabaseSet);
+        String hpJsonPath = this.downloadDirectory + File.separator + this.hpopath;
+        String annotationPath = this.downloadDirectory + File.separator + annotpath;
+
+        Ontology ontology = OntologyLoader.loadOntology(new File(hpJsonPath));
+        HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
+        HpoDiseaseLoader loader = HpoDiseaseLoader.of(ontology, options);
+        HpoDiseases diseases = loader.load(Path.of(annotationPath));
+
         termIdTermIdMap = parseHpoTermToHpoOnsetMap();
-        hpoDiseases.hpoDiseases().forEach(this::processDisease);
+        diseases.hpoDiseases().forEach(this::processDisease);
 
 
         return 0;
@@ -46,11 +49,9 @@ public class OnsetCommand extends  HPOCommand implements Callable<Integer> {
 
 
     public void processDisease(HpoDisease disease) {
-       if (disease.getClinicalCourseList().isEmpty()) {
+        if (disease.globalOnset().isPresent())
+           System.out.println(disease.globalOnset().get());
 
-       } else {
-           System.out.println(disease.getClinicalCourseList());
-       }
     }
 
     private Map<TermId, TermId> parseHpoTermToHpoOnsetMap() {

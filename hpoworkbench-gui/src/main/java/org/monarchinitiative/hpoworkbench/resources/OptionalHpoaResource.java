@@ -59,11 +59,11 @@ public class OptionalHpoaResource {
             // for some reason the stream implementation is choking
             name2diseaseIdMap = new HashMap<>();
             for (HpoDisease disease : diseaseSet) {
-                name2diseaseIdMap.put(disease.getDiseaseName(), disease.getDiseaseDatabaseId());
+                name2diseaseIdMap.put(disease.diseaseName(), disease.id());
             }
             LOGGER.info("name2diseaseIdMap initialized with {} entries", name2diseaseIdMap.size());
             id2diseaseModelMap = diseaseSet.stream()
-                    .collect(Collectors.toMap(HpoDisease::getDiseaseDatabaseId, Function.identity()));
+                    .collect(Collectors.toMap(HpoDisease::id, Function.identity()));
             LOGGER.info("id2diseaseModelMap initialized with {} entries", id2diseaseModelMap.size());
         } else {
             // should never happen

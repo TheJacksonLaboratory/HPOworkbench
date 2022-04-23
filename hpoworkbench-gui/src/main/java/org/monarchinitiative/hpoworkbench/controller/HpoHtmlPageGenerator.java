@@ -2,17 +2,14 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 
 import com.google.common.collect.ImmutableList;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoOnset;
+import org.monarchinitiative.phenol.annotations.base.temporal.Age;
+import org.monarchinitiative.phenol.annotations.formats.hpo.*;
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategoryMap;
 import org.monarchinitiative.phenol.ontology.data.*;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -67,12 +64,15 @@ class HpoHtmlPageGenerator {
                     </tr>
                   </tfoot>""".indent(2), Id, diseases.size());
         StringBuilder sb = new StringBuilder();
-        for (HpoDisease s : diseases) {
+        for (HpoDisease disease : diseases) {
             String row = String.format("""
                     <tr>
-                            <td><a href="%s">%s</a></td>
-                            <td>%s</td>
-                          </tr>""", s.getDiseaseName(), s.getDiseaseDatabaseId().getValue(), s.getDiseaseName());
+                       <td><a href="%s">%s</a></td>
+                       <td>%s</td>
+                   </tr>""",
+                    disease.diseaseName(),
+                    disease.id().getValue(),
+                    disease.diseaseName());
             sb.append(row);
         }
         return String.format("%s<tbody>%s</tbody></table></div>", header, sb);
@@ -117,25 +117,29 @@ class HpoHtmlPageGenerator {
     }
 
     /** @return String representing an HTML table row for one disease annotation. */
-    private static String getAnnotationTableRow(HpoAnnotation annot, Ontology ontology) {
+    private static String getAnnotationTableRow(HpoDiseaseAnnotation annot, Ontology ontology) {
         TermId tid = annot.id();
         Term term = ontology.getTermMap().get(tid);
         String label = term.getName();
         String definition = term.getDefinition() != null ? term.getDefinition() : "";
         // try to get whatever we have in terms of frequency or modifiers
-        String fr = String.format("Frequency=%.1f%%",annot.getFrequency());
-        List<TermId> modifiers = annot.getModifiers();
-        HpoOnset onset = annot.getOnset();
+        String fr = String.format("Frequency=%.1f%%",annot.frequency().orElse(1f));
+        List<TermId> modifiers = annot.metadata()
+                .map(HpoDiseaseAnnotationMetadata::modifiers)
+                .flatMap(Collection::stream)
+                .toList();
+        Optional<Age> onset = annot.earliestOnset();
         StringBuilder sb = new StringBuilder();
         sb.append(fr);
         if (modifiers.size()>0) {
             List<String> names=getTermsNamesFromIds(modifiers,ontology);
             sb.append("</br>Modifiers: ").append(String.join("; ",names));
         }
-        if (onset.available()) {
+        if (onset.isPresent()) {
             sb.append("</br>").append(onset);
         }
-        sb.append("</br>Source: ").append(String.join("; ",annot.getCitations()));
+      //  sb.append("</br>Source: ").append(String.join("; ",annot.metadata().map(HpoDiseaseAnnotationMetadata::)));
+        sb.append("</br>Source: TODO");
         return String.format("""
                         <tr>
                                 <td><a href="%s">%s</a></td>
@@ -157,37 +161,38 @@ class HpoHtmlPageGenerator {
      * Create a table with the HPO Categories and annotations.
      */
     private static String getListOfTermsHTML(HpoDisease disease, Ontology ontology) {
-        List<Term> modesOfInheritance = getTerms(disease.getModesOfInheritance(),ontology);
-        List<Term> negativeTerms=getTerms(disease.getNegativeAnnotations(),ontology);
-        List<HpoAnnotation> annotations = disease.getPhenotypicAbnormalities();
-
-        if (annotations == null) {
+        List<Term> modesOfInheritance = getTerms(disease.modesOfInheritance(),ontology);
+        //List<Term> negativeTerms=getTerms(disease.getNegativeAnnotations(),ontology);
+        if (! disease.phenotypicAbnormalities().hasNext()) {
             return "<p>No HPO annotations found.</p>";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("<h1>").append(disease.getDiseaseName()).append("</h1>\n");
-        sb.append("<p><b>Disease ID:</b>").append(disease.getDiseaseDatabaseId()).append("<br/>");
-        sb.append("<b>Name:</b>").append(disease.getDiseaseName()).append("<br/>");
-        // output inheritance
-        String inheritanceString="No mode of inheritance information available";
-        if (modesOfInheritance.size()>0) {
-            inheritanceString=modesOfInheritance.stream().map(Term::getName).collect(Collectors.joining("; "));
-        }
-        sb.append("<b>Inheritance:</b>").append(inheritanceString).append("<br/>");
-        sb.append("<b>Number of annotations:</b>").append(annotations.size()).append("</p>\n");
-        HpoCategoryMap hpocatmap = new HpoCategoryMap();
-        Map<TermId,HpoAnnotation> id2annotationmap=new HashMap<>();
-        for (HpoAnnotation annot : annotations) {
-            TermId tid = annot.id();
-            hpocatmap.addAnnotatedTerm(tid, ontology);
-            id2annotationmap.put(tid,annot);
-        }
-        List<HpoCategory> hpocatlist = hpocatmap.getActiveCategoryList();
 
-        for (HpoCategory cat : hpocatlist) {
-            String template=cat.getNumberOfAnnotations()>1?"%s (%d annotations)":"%s (%d annotation)";
-            String title = String.format(template, cat.getLabel(), cat.getNumberOfAnnotations());
-            sb.append(String.format("""
+
+            sb.append("<h1>").append(disease.diseaseName()).append("</h1>\n");
+            sb.append("<p><b>Disease ID:</b>").append(disease.id().getValue()).append("<br/>");
+            sb.append("<b>Name:</b>").append(disease.diseaseName()).append("<br/>");
+            // output inheritance
+            String inheritanceString="No mode of inheritance information available";
+            if (modesOfInheritance.size()>0) {
+                inheritanceString=modesOfInheritance.stream().map(Term::getName).collect(Collectors.joining("; "));
+            }
+            sb.append("<b>Inheritance:</b>").append(inheritanceString).append("<br/>");
+            sb.append("<b>Number of annotations:</b>").append(disease.phenotypicAbnormalitiesCount()).append("</p>\n");
+            HpoCategoryMap hpocatmap = new HpoCategoryMap();
+        Map<TermId,HpoDiseaseAnnotation> id2annotationmap=new HashMap<>();
+        while (disease.phenotypicAbnormalities().hasNext()) {
+            HpoDiseaseAnnotation annotation = disease.phenotypicAbnormalities().next();
+                TermId tid = annotation.id();
+                hpocatmap.addAnnotatedTerm(tid, ontology);
+                id2annotationmap.put(tid,annotation);
+            }
+            List<HpoCategory> hpocatlist = hpocatmap.getActiveCategoryList();
+
+            for (HpoCategory cat : hpocatlist) {
+                String template=cat.getNumberOfAnnotations()>1?"%s (%d annotations)":"%s (%d annotation)";
+                String title = String.format(template, cat.getLabel(), cat.getNumberOfAnnotations());
+                sb.append(String.format("""
                       <table class="zebra">
                         <caption  style="color:#222;text-shadow:0px 1px 2px #555;font-size:24px;">%s</caption>
                         <thead>
@@ -196,20 +201,20 @@ class HpoHtmlPageGenerator {
                           </tr>
                         </thead>
                     """, title));
-            List<TermId> termIdList = cat.getAnnotatingTermIds();
-            for (TermId tid : termIdList) {
-                HpoAnnotation annot = id2annotationmap.get(tid);
-                sb.append(getAnnotationTableRow(annot,ontology));
+                List<TermId> termIdList = cat.getAnnotatingTermIds();
+                for (TermId tid : termIdList) {
+                    HpoDiseaseAnnotation annot = id2annotationmap.get(tid);
+                    sb.append(getAnnotationTableRow(annot,ontology));
+                }
+                sb.append("\n");
             }
-            sb.append("\n");
-        }
-        if (negativeTerms.size()>0) {
-            sb.append("<h2>Features that are not observed in this disease</h2><ol>");
-            for (Term term : negativeTerms) {
-                sb.append("<li>").append(term.getName()).append("</li>\n");
-            }
-            sb.append("</ol>");
-        }
+//            if (negativeTerms.size()>0) {
+//                sb.append("<h2>Features that are not observed in this disease</h2><ol>");
+//                for (Term term : negativeTerms) {
+//                    sb.append("<li>").append(term.getName()).append("</li>\n");
+//                }
+//                sb.append("</ol>");
+//            }
 
 
         return sb.toString();

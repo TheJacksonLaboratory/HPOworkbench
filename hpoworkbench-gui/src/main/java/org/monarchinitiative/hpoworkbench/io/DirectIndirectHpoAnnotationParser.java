@@ -4,8 +4,8 @@ package org.monarchinitiative.hpoworkbench.io;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -88,7 +88,8 @@ public class DirectIndirectHpoAnnotationParser {
         }
         for (TermId diseaseId : diseaseMap.keySet()) {
             HpoDisease disease = diseaseMap.get(diseaseId);
-            for (HpoAnnotation annot : disease.getPhenotypicAbnormalities()) {
+            while (disease.phenotypicAbnormalities().hasNext()) {
+                HpoDiseaseAnnotation annot = disease.phenotypicAbnormalities().next();
                 TermId hpoId = annot.id();
                 directAnnotationMap.putIfAbsent(hpoId,new ArrayList<>());
                 directAnnotationMap.get(hpoId).add(disease);
@@ -100,7 +101,7 @@ public class DirectIndirectHpoAnnotationParser {
                 }
             }
             // Also add the modes of inheritance to the annotations
-            for (TermId inheritanceId : disease.getModesOfInheritance()) {
+            for (TermId inheritanceId : disease.modesOfInheritance()) {
                 directAnnotationMap.putIfAbsent(inheritanceId,new ArrayList<>());
                 directAnnotationMap.get(inheritanceId).add(disease);
                 Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, inheritanceId, true);
