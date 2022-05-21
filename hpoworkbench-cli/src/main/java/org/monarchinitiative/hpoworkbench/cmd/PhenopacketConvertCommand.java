@@ -6,10 +6,7 @@ import org.ga4gh.vrsatile.v1.GeneDescriptor;
 import org.ga4gh.vrsatile.v1.VariationDescriptor;
 import org.ga4gh.vrsatile.v1.VcfRecord;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
-import org.phenopackets.phenotools.builder.builders.GenomicInterpretationBuilder;
-import org.phenopackets.phenotools.builder.builders.InterpretationBuilder;
-import org.phenopackets.phenotools.builder.builders.VariationDescriptorBuilder;
-import org.phenopackets.phenotools.converter.converters.PhenopacketConverter;
+
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,7 +28,8 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(name = "convert",
         mixinStandardHelpOptions = true,
         description = "Convert phenopackete from v1 to v2 with genotype info")
-public class PhenopacketConvertCommand implements Callable<Integer> {
+public class PhenopacketConvertCommand {//implements Callable<Integer> {
+    /*
     private final Logger logger = LoggerFactory.getLogger(PhenopacketConvertCommand.class);
     @CommandLine.Option(names={"--phenopacket"},
             required = true,
@@ -112,12 +110,6 @@ public class PhenopacketConvertCommand implements Callable<Integer> {
         }
 
 
-        /**
-         * For the purposes of this conversion, we assume variants are pathogenic and our interpretation is causative.
-         * @param id
-         * @param v1variant
-         * @return
-         */
         public GenomicInterpretation getGenomicInterpretation(String id, org.phenopackets.schema.v1.core.Variant v1variant) {
             VariationDescriptor variationDescriptor = getVariationDescriptor(v1variant);
             VariantInterpretation variantInterpretation = VariantInterpretation.newBuilder()
@@ -165,6 +157,6 @@ public class PhenopacketConvertCommand implements Callable<Integer> {
 
     }
 
-
+*/
 
 }
