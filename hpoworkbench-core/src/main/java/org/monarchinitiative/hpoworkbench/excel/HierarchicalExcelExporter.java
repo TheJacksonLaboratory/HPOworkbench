@@ -96,7 +96,7 @@ public class HierarchicalExcelExporter {
         Set<TermId> previouslyseen=new HashSet<>();
         Stack<Pair<TermId,Integer>> stack = new Stack<>();
 
-        TermId tid = subhierarchyRoot.getId();
+        TermId tid = subhierarchyRoot.id();
         stack.push(new Pair<>(tid,1));
 
         while (! stack.empty() ) {

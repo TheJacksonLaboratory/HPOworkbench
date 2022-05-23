@@ -3,6 +3,7 @@ package org.monarchinitiative.hpoworkbench.html;
 
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategoryMap;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -36,14 +37,15 @@ public class SingleDiseaseHTMLGenerator {
      * Create a table with the HPO Categories and annotations.
      */
     private static String getListOfTermsHTML(HpoDisease disease, Ontology ontology) {
-        List<HpoAnnotation> annotations = disease.getPhenotypicAbnormalities();
-        if (annotations == null) {
+        if (disease.phenotypicAbnormalitiesCount() == 0) {
             return "<p>No HPO annotations found.</p>";
         }
         HpoCategoryMap hpocatmap = new HpoCategoryMap();
-        for (HpoAnnotation annot : annotations) {
-            TermId tid = annot.id();
+        while (disease.phenotypicAbnormalities().hasNext()) {
+            HpoDiseaseAnnotation annotation = disease.phenotypicAbnormalities().next();
+            TermId tid = annotation.id();
             hpocatmap.addAnnotatedTerm(tid, ontology);
+
         }
         List<HpoCategory> hpocatlist = hpocatmap.getActiveCategoryList();
         StringBuilder sb = new StringBuilder();

@@ -1,0 +1,20 @@
+Term,Id,Onset
+Syndactyly,HP:0001159
+Ventricular septal defect,HP:0001629
+Atrioventricular canal defect,HP:0006695
+Atrial septal defect,HP:0001631
+Abnormal connection of the cardiac segments,HP:0011545
+Fetal anomaly,HP:0034057
+Neural tube defect,HP:0045005
+Coloboma,HP:0000589
+Microtia,HP:0008551
+Cryptotia,HP:0011252
+Cupped ear,HP:0000378
+Cleft helix,HP:0009902
+Low-set ears,HP:0000369
+Synotia,HP:0100663
+Holoprosencephaly,HP:0001360
+Exstrophy,HP:0100548
+Abdominal wall defect,HP:0010866
+Abnormal lung lobation,HP:0002101
+Unilateral primary pulmonary dysgenesis,HP:0006549

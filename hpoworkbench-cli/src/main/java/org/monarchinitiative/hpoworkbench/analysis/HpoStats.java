@@ -39,6 +39,7 @@ public class HpoStats {
         LOGGER.trace(String.format("inputting data with files %s and %s", hpoOboPath, annotpath));
         HPOParser parser = new HPOParser(hpoOboPath);
         this.hpoOntology = parser.getHPO();
+
         this.diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(annotpath), hpoOntology);
         LOGGER.trace("Diseases imported: " + diseaseMap.size());
     }

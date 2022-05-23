@@ -39,6 +39,8 @@ public class HpoWorkbench implements Callable<Integer> {
                 .addSubcommand("matchterms", new MatchTermsCommand())
                 .addSubcommand("count", new CountGenes())
                 .addSubcommand("encoding", new EncodingCheckCommand())
+                .addSubcommand("onset", new OnsetCommand())
+                .addSubcommand("ptools", new MapToPtools())
                 .addSubcommand("ranges", new CountHpoIdRanges());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);

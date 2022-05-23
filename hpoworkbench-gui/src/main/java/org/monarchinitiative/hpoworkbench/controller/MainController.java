@@ -239,16 +239,9 @@ public class MainController {
         HBox.setHgrow(label, Priority.ALWAYS);
         label.setPadding(new Insets(5));
         switch (type) {
-            case WARNING:
-                label.setStyle("-fx-text-fill: orange; -fx-font-weight: bolder");
-                break;
-            case ERROR:
-                label.setStyle("-fx-text-fill: red; -fx-font-weight: bolder");
-                break;
-            case INFO:
-            default:
-                label.setStyle("-fx-text-fill: black; -fx-font-weight: bolder");
-                break;
+            case WARNING -> label.setStyle("-fx-text-fill: orange; -fx-font-weight: bolder");
+            case ERROR -> label.setStyle("-fx-text-fill: red; -fx-font-weight: bolder");
+            case INFO, default -> label.setStyle("-fx-text-fill: black; -fx-font-weight: bolder");
         }
 
 

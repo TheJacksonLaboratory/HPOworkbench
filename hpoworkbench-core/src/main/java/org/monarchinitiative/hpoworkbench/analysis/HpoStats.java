@@ -3,9 +3,11 @@ package org.monarchinitiative.hpoworkbench.analysis;
 
 import org.monarchinitiative.hpoworkbench.exception.HPOException;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.annotations.obo.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
@@ -14,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getDescendents;
@@ -32,17 +36,14 @@ public class HpoStats {
     private Map<TermId, HpoDisease> diseaseMap =null;
     /** Set of all HPO terms that are descendents of {@link #termIdOfInterest}. */
     private Set<TermId> descendentsOfTheTermOfInterest =null;
-    private Set<TermId> adultOnset=null;
-    private Set<TermId> childhoodOnset=null;
 
-
-    private List<HpoDisease> omim;
-    private List<HpoDisease> orphanet;
-    private List<HpoDisease> decipher;
+    private final List<HpoDisease> omim;
+    private final List<HpoDisease> orphanet;
+    private final List<HpoDisease> decipher;
     /** Id for root (All) */
     private static final String rootHpoTerm="HP:0000001";
 
-    private TermId termIdOfInterest;
+    private final TermId termIdOfInterest;
     /** Total number of terms that descend from the term of interest */
     private int n_terms;
     /** Total number of terms that have a textual definition. */
@@ -203,7 +204,7 @@ public class HpoStats {
      * @param term a string such as "HP:0000123"
      * @throws HPOException if the HPO string is malformed
      */
-    public HpoStats(String hpo,String annotations,String term) throws HPOException {
+    public HpoStats(String hpo,String annotations,String term) throws HPOException, IOException {
         this.hpopath = hpo;
         this.annotpath = annotations;
         LOGGER.trace("HPO path: {}, annotation path: {}", hpopath, annotpath);
@@ -268,9 +269,10 @@ public class HpoStats {
 
     /** is the disease annotated to the term we are interested in? */
     private boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
-        List<HpoAnnotation> tiwmlist= d.getPhenotypicAbnormalities();
-        for (HpoAnnotation id:tiwmlist) {
-            if (this.descendentsOfTheTermOfInterest.contains(id.getTermId()))
+        while (d.phenotypicAbnormalities().hasNext()) {
+            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+            TermId hpoId = annotation.id();
+            if (this.descendentsOfTheTermOfInterest.contains(hpoId))
                 return true;
         }
         return false;
@@ -309,15 +311,12 @@ public class HpoStats {
             if (!diseaseAnnotatedToTermOfInterest(d)) {
                 continue;
             }
-            String database=d.getDatabase();
-            if (database.startsWith("OMIM")) {
-                omim.add(d);
-            } else if (database.startsWith("ORPHA")){
-                orphanet.add(d);
-            } else if (database.startsWith("DECIPHER")) {
-                decipher.add(d);
-            } else {
-                LOGGER.error("Did not recognize data base"+ database);
+            String databasePrefix =d.id().getPrefix();
+            switch (databasePrefix) {
+                case "OMIM" -> omim.add(d);
+                case "ORPHA" -> orphanet.add(d);
+                case "DECIPHER" -> decipher.add(d);
+                default -> LOGGER.error("Did not recognize database \"" + databasePrefix + "\"");
             }
         }
         String termname=hpoOntology.getTermMap().get(termIdOfInterest).getName();
@@ -333,10 +332,10 @@ public class HpoStats {
     private void countNegatedAnnotations() {
         if (diseaseMap == null) {
             LOGGER.error("diseaseMap was not initialized");
-            return;
         }
-        this.n_negated_annotations = diseaseMap.values().stream().
-                mapToInt(d -> d.getNegativeAnnotations().size()).sum();
+        // TODO NEGATIVE
+//        this.n_negated_annotations = diseaseMap.values().stream().
+//                mapToInt(d -> d.getNegativeAnnotations().size()).sum();
     }
 
     public int getN_omim_annotations() {
@@ -356,19 +355,19 @@ public class HpoStats {
         n_orphanet_annotations=0;
         n_decipher_annotations=0;
         for (HpoDisease d:omim) {
-            n_omim_annotations += (d.getPhenotypicAbnormalities().size()+d.getModesOfInheritance().size()+d.getNegativeAnnotations().size());
+            n_omim_annotations += (d.phenotypicAbnormalitiesCount());
         }
         for (HpoDisease d:orphanet) {
-            n_orphanet_annotations += (d.getPhenotypicAbnormalities().size()+d.getModesOfInheritance().size()+d.getNegativeAnnotations().size());
+            n_orphanet_annotations += (d.phenotypicAbnormalitiesCount());
         }
         for (HpoDisease d:decipher) {
-            n_decipher_annotations += (d.getPhenotypicAbnormalities().size()+d.getModesOfInheritance().size()+d.getNegativeAnnotations().size());
+            n_decipher_annotations += (d.phenotypicAbnormalitiesCount());
         }
 
     }
 
 
-    private void inputHPOdata() throws HPOException{
+    private void inputHPOdata() throws HPOException, IOException {
         File f = new File(hpopath);
         if (! f.exists()) {
             throw new HPOException(String.format("Could not find hpo ontology file at\"%s\". Terminating program...", hpopath ));
@@ -380,6 +379,10 @@ public class HpoStats {
         LOGGER.trace(String.format("inputting data with files %s and %s",hpopath,annotpath));
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
-        diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(annotpath, hpoOntology);
+        HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
+        HpoDiseaseLoader loader = HpoDiseaseLoader.of(hpoOntology, options);
+        HpoDiseases diseases = loader.load(Path.of(annotpath));
+        Map<TermId, HpoDisease> diseaseMap = diseases.diseaseById();
+
     }
 }

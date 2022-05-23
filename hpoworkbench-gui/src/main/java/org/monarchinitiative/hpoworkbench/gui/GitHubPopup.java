@@ -214,8 +214,8 @@ public class GitHubPopup {
                             Reference (e.g., PubMed ID):
                             Your biocurator ID for nanoattribution (if desired):
                             Anything else (replacement?):""",
-                    dmodel.getDiseaseName(),
-                    dmodel.getDiseaseDatabaseId().getValue(),
+                    dmodel.diseaseName(),
+                    dmodel.id().getValue(),
                     termlabel, termid);
         } else if (newAnnotation) {
             return String.format("""
@@ -226,8 +226,8 @@ public class GitHubPopup {
                             Age of onset:
                             Your biocurator ID for nanoattribution (if desired):
                             Anything else:""",
-                    shortName(dmodel.getDiseaseName()),
-                    dmodel.getDiseaseDatabaseId().getValue(),
+                    shortName(dmodel.diseaseName()),
+                    dmodel.id().getValue(),
                     termlabel, termid);
         } else {
             return String.format("""

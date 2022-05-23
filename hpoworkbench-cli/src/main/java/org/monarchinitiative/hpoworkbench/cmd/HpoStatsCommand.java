@@ -2,12 +2,8 @@ package org.monarchinitiative.hpoworkbench.cmd;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 import org.monarchinitiative.hpoworkbench.analysis.HpoStats;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoOnsetTermIds;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.formats.hpo.*;
 import org.monarchinitiative.phenol.graph.IdLabeledEdge;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -17,7 +13,6 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -41,8 +36,8 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
     private Set<TermId> descendentsOfTheTermOfInterest =null;
     /** We use this to count the number of subclass relations underneath {@link #termOfInterest}. */
     private Set<IdLabeledEdge> relationsUnderTermOfInterest;
-    private Set<TermId> adultOnset=null;
-    private Set<TermId> childhoodOnset=null;
+    private Set<HpoOnset> adultOnset=null;
+    private Set<HpoOnset> childhoodOnset=null;
 
 
     private List<HpoDisease> omim;
@@ -251,31 +246,33 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
     private void initializeAdultOnsetTerms() {
         adultOnset=new HashSet<>();
-        adultOnset.add(HpoOnsetTermIds.ADULT_ONSET);
-        adultOnset.add(HpoOnsetTermIds.LATE_ONSET);
-        adultOnset.add(HpoOnsetTermIds.MIDDLE_AGE_ONSET);
-        adultOnset.add(HpoOnsetTermIds.YOUNG_ADULT_ONSET);
+        adultOnset.add(HpoOnset.ADULT_ONSET);
+        adultOnset.add(HpoOnset.LATE_ONSET);
+        adultOnset.add(HpoOnset.MIDDLE_AGE_ONSET);
+        adultOnset.add(HpoOnset.YOUNG_ADULT_ONSET);
+       // adultOnset.add(HpoOnset.);
         LOGGER.trace(String.format("We found a total of %d adult onset terms",adultOnset.size()));
     }
 
     private void initializeChildhoodOnsetTerms() {
         childhoodOnset = new HashSet<>();
-        childhoodOnset.add(HpoOnsetTermIds.CHILDHOOD_ONSET);
-        childhoodOnset.add(HpoOnsetTermIds.ANTENATAL_ONSET);
-        childhoodOnset.add( HpoOnsetTermIds.CONGENITAL_ONSET);
-        childhoodOnset.add(HpoOnsetTermIds.EMBRYONAL_ONSET);
-        childhoodOnset.add(HpoOnsetTermIds.FETAL_ONSET);
-        childhoodOnset.add(HpoOnsetTermIds.INFANTILE_ONSET);
-        childhoodOnset.add(HpoOnsetTermIds.JUVENILE_ONSET);
-        childhoodOnset.add(HpoOnsetTermIds.NEONATAL_ONSET);
+        childhoodOnset.add(HpoOnset.CHILDHOOD_ONSET);
+        childhoodOnset.add(HpoOnset.ANTENATAL_ONSET);
+        childhoodOnset.add( HpoOnset.CONGENITAL_ONSET);
+        childhoodOnset.add(HpoOnset.EMBRYONAL_ONSET);
+        childhoodOnset.add(HpoOnset.FETAL_ONSET);
+        childhoodOnset.add(HpoOnset.INFANTILE_ONSET);
+        childhoodOnset.add(HpoOnset.JUVENILE_ONSET);
+        childhoodOnset.add(HpoOnset.NEONATAL_ONSET);
     }
 
 
     private boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
-        List<HpoAnnotation> tiwmlist= d.getPhenotypicAbnormalities();
-        for (HpoAnnotation annot:tiwmlist) {
-          if (this.descendentsOfTheTermOfInterest.contains(annot.id()))
-              return true;
+        while (d.phenotypicAbnormalities().hasNext()) {
+            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+            TermId tid = annotation.id();
+            if (this.descendentsOfTheTermOfInterest.contains(tid))
+                return true;
         }
         return false;
     }
@@ -294,13 +291,14 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
                 continue;
             }
             int n_annot=0;
-            for (HpoAnnotation annot : d.getPhenotypicAbnormalities() ){
-                TermId hpoId=annot.id();
+            while (d.phenotypicAbnormalities().hasNext()) {
+                HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+                TermId hpoId = annotation.id();
                 if (existsPath(hpoOntology,hpoId,termOfInterest)) {
                     n_annot++;
                 }
             }
-            String database=d.getDatabase();
+            String database=d.id().getValue();
             if (database.startsWith("OMIM")) {
                 omim.add(d);
                 n_omim_annot+=n_annot;
@@ -322,19 +320,27 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
 
     private boolean hasAdultOnset(HpoDisease d) {
-        List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
-        for (HpoAnnotation annot:ids) {
-            if (this.adultOnset.contains(annot.id()))
+        while (d.phenotypicAbnormalities().hasNext()) {
+            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+            TermId hpoId = annotation.id();
+            if (this.adultOnset.contains(hpoId))
                 return  true;
+            if (annotation.observedInInterval(HpoOnset.ADULT_ONSET).isPresent()) {
+                return true;
+            }
         }
         return false;
     }
 
     private boolean hasChildhoodOnset(HpoDisease d) {
-        List<HpoAnnotation> ids=d.getPhenotypicAbnormalities();
-        for (HpoAnnotation annot:ids) {
-            if (this.childhoodOnset.contains(annot.id()))
+        while (d.phenotypicAbnormalities().hasNext()) {
+            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+            TermId hpoId = annotation.id();
+            if (this.childhoodOnset.contains(hpoId))
                 return  true;
+            if (annotation.observedInInterval(HpoOnset.CHILDHOOD_ONSET).isPresent()) {
+                return true;
+            }
         }
         return false;
     }

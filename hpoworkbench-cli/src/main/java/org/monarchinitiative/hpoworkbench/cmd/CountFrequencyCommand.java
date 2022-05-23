@@ -1,8 +1,10 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoAnnotation;
-import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationLoader;
+import org.monarchinitiative.phenol.annotations.formats.hpo.*;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.*;
 import org.slf4j.Logger;
@@ -10,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -48,17 +52,17 @@ public class CountFrequencyCommand extends HPOCommand implements Callable<Intege
 
     }
 
-    public Integer call() {
-
-        String hpOboPath = this.downloadDirectory + File.separator + this.hpopath;
+    public Integer call() throws IOException {
+        String hpJsonPath = this.downloadDirectory + File.separator + this.hpopath;
         String annotationPath = this.downloadDirectory + File.separator + annotpath;
+
+        Ontology ontology = OntologyLoader.loadOntology(new File(hpJsonPath));
+        HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
+        HpoDiseaseLoader loader = HpoDiseaseLoader.of(ontology, options);
+        HpoDiseases diseases = loader.load(Path.of(annotationPath));
         termId = TermId.of(hpoTermId);
 
-
-        Ontology ontology = OntologyLoader.loadOntology(new File(hpOboPath));
-
-        Map<TermId, HpoDisease> annotationMap;
-        annotationMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(annotationPath), ontology);
+        Map<TermId, HpoDisease> annotationMap = diseases.diseaseById();
         LOGGER.trace("Annotation count total " + annotationMap.size());
         Set<TermId> descendents = getDescendents(ontology, termId);
         descendentTermCount = descendents.size();
@@ -70,10 +74,10 @@ public class CountFrequencyCommand extends HPOCommand implements Callable<Intege
             weightedAnnotationCounts.put(t, 0D);
         }
         for (HpoDisease d : annotationMap.values()) {
-            List<HpoAnnotation> ids = d.getPhenotypicAbnormalities();
-            for (HpoAnnotation tiwm : ids) {
-                TermId hpoid = tiwm.id();
-                double freq = tiwm.getFrequency();
+            while (d.phenotypicAbnormalities().hasNext()) {
+                HpoDiseaseAnnotation hpoDiseaseAnnot = d.phenotypicAbnormalities().next();
+                TermId hpoid = hpoDiseaseAnnot.id();
+                float freq = hpoDiseaseAnnot.frequency().orElse(1.0f);
                 if (descendents.contains(hpoid)) {
                     annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
                     weightedAnnotationCounts.put(hpoid, freq + weightedAnnotationCounts.get(hpoid));

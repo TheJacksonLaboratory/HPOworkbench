@@ -1,13 +1,13 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
 
-import org.monarchinitiative.hpoworkbench.io.FileDownloader;
+import org.monarchinitiative.biodownload.BioDownloader;
+import org.monarchinitiative.biodownload.FileDownloadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import java.io.File;
-import java.net.URL;
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 
@@ -26,14 +26,12 @@ import java.util.concurrent.Callable;
         description = "Download HPO/MONDO/medgen files.")
 public final class DownloadCommand extends HPOCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadCommand.class.getName());
-
-
-    private final String PHENOTYPE_HPOA_URL="http://purl.obolibrary.org/obo/hp/hpoa/phenotype.hpoa";
-
+    @CommandLine.Option(names={"-w","--overwrite"},
+            description = "overwrite previously downloaded files (default: ${DEFAULT-VALUE})")
+    public boolean overwrite = false;
 
 
     public String getName() { return "download"; }
-
     /**
 
      */
@@ -45,113 +43,21 @@ public final class DownloadCommand extends HPOCommand implements Callable<Intege
      */
     @Override
     public Integer call()  {
-        createDownloadDir(downloadDirectory);
-        downloadHpObo();
-        downloadPhenotypeDotHpoa();
-        downloadMedgen();
-        downloadGeneInfo();
-        return 0;
-    }
-
-    /** Download the phenotype.hpoa file. */
-    private void downloadPhenotypeDotHpoa() {
-        // Now the same for the phenotype.hpoa file
-        String downloadLocation=String.format("%s%sphenotype.hpoa",downloadDirectory, File.separator);
-        File f = new File(downloadLocation);
-        if (f.exists()) {
-            LOGGER.trace("cowardly refusing to download phenotype.hpoa, since it is already there");
-            return;
-        }
         try {
-            URL url = new URL(PHENOTYPE_HPOA_URL);
-            FileDownloader downloader = new FileDownloader();
-            boolean result = downloader.copyURLToFile(url,f);
-            if (result) {
-                LOGGER.trace("Downloaded phenotype.hpoa to "+ downloadLocation);
-            } else {
-                LOGGER.error("[ERROR] Could not download phenotype.hpoa to " + downloadLocation);
-            }
-
-        } catch (Exception e){
-            e.printStackTrace();
+            BioDownloader downloader = BioDownloader.builder(Path.of(downloadDirectory))
+                    .overwrite(overwrite)
+                    .hpoJson()
+                    .hpDiseaseAnnotations()
+                    .geneInfoHuman()
+                    .medgene2MIM()
+                    .build();
+            downloader.download();
+            LOGGER.info("Done!");
+            return 0;
+        } catch (FileDownloadException e) {
+            LOGGER.error("Error: {}", e.getMessage(), e);
+            return 1;
         }
-    }
-
-
-    private void downloadHpObo() {
-        String downloadLocation=String.format("%s%shp.obo",downloadDirectory, File.separator);
-        File f = new File(downloadLocation);
-        if (f.exists()) {
-            LOGGER.trace("cowardly refusing to download hp.obo, since it is already there");
-            return;
-        }
-        try {
-            URL url = new URL("https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo");
-            FileDownloader downloader = new FileDownloader();
-            boolean result = downloader.copyURLToFile(url,f);
-            if (result) {
-                LOGGER.trace("Downloaded hp.obo to "+ downloadLocation);
-            } else {
-                LOGGER.error("Could not download hp.obo to " + downloadLocation);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private void downloadMedgen() {
-        final  String MIM2GENE_MEDGEN_URL = "ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/mim2gene_medgen";
-        String filename = "mim2gene_medgen";
-        String downloadLocation=String.format("%s%s%s",downloadDirectory, File.separator,filename);
-        File f = new File(downloadLocation);
-        try {
-            URL url = new URL(MIM2GENE_MEDGEN_URL);
-            FileDownloader downloader = new FileDownloader();
-            boolean result = downloader.copyURLToFile(url,f);
-            if (result) {
-                LOGGER.trace("Downloaded mim2gene_medgen to "+ downloadLocation);
-            } else {
-                LOGGER.error("Could not download mim2gene_medgen to " + downloadLocation);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-    private void downloadGeneInfo() {
-         final  String GENE_INFO = "Homo_sapiens_gene_info.gz";
-         final  String GENE_INFO_URL = "ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz";
-        String downloadLocation=String.format("%s%s%s",downloadDirectory, File.separator,GENE_INFO);
-        File f = new File(downloadLocation);
-        try {
-            URL url = new URL(GENE_INFO_URL);
-            FileDownloader downloader = new FileDownloader();
-            boolean result = downloader.copyURLToFile(url,f);
-            if (result) {
-                LOGGER.trace("Downloaded gene info to "+ downloadLocation);
-            } else {
-                LOGGER.error("Could not download gene info to " + downloadLocation);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-
-
-
-    /**
-     * @param dir directory to which we will download files (default: 'data')
-     */
-    private void createDownloadDir(String dir) {
-        LOGGER.trace("creating download dir (and deleting previous version) at "+ dir);
-        File d =new File(dir);
-        if (d.exists()) {
-            d.delete();
-        }
-        d.mkdir();
     }
 
 }
