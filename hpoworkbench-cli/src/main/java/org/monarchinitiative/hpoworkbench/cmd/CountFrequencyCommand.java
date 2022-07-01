@@ -74,10 +74,9 @@ public class CountFrequencyCommand extends HPOCommand implements Callable<Intege
             weightedAnnotationCounts.put(t, 0D);
         }
         for (HpoDisease d : annotationMap.values()) {
-            while (d.phenotypicAbnormalities().hasNext()) {
-                HpoDiseaseAnnotation hpoDiseaseAnnot = d.phenotypicAbnormalities().next();
+            for (HpoDiseaseAnnotation hpoDiseaseAnnot : d.annotations()) {
                 TermId hpoid = hpoDiseaseAnnot.id();
-                float freq = hpoDiseaseAnnot.frequency().orElse(1.0f);
+                float freq = hpoDiseaseAnnot.frequency();
                 if (descendents.contains(hpoid)) {
                     annotationCounts.put(hpoid, 1 + annotationCounts.get(hpoid));
                     weightedAnnotationCounts.put(hpoid, freq + weightedAnnotationCounts.get(hpoid));

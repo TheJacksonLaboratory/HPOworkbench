@@ -60,8 +60,11 @@ public final class StartupTask extends Task<Void> {
         This way we ensure that GUI elements dependent on ontology presence (labels, buttons) stay disabled
         and that the user will be notified about the fact that the ontology is missing.
          */
+
         String hpoJsonPath = pgProperties.getProperty(OptionalHpoResource.HP_JSON_PATH_PROPERTY);
+        LOGGER.trace("StartupTask hpoJsonPath: {}", hpoJsonPath);
         String hpoAnnotPath = pgProperties.getProperty(OptionalHpoaResource.HPOA_PATH_PROPERTY);
+        LOGGER.trace("StartupTask hpoAnnotPath: {}", hpoAnnotPath);
         updateProgress(0.02, 1);
         if (hpoJsonPath != null) {
             final File hpJsonFile = new File(hpoJsonPath);
@@ -69,8 +72,9 @@ public final class StartupTask extends Task<Void> {
             if (hpJsonFile.isFile()) {
                 String msg = String.format("Loading HPO from file '%s'", hpJsonFile.getAbsoluteFile());
                 updateMessage(msg);
-                LOGGER.info(msg);
+                LOGGER.trace(msg);
                 final Ontology ontology = OntologyLoader.loadOntology(hpJsonFile);
+                LOGGER.trace("Loaded ontology with {} terms", ontology.countAllTerms());
                 updateProgress(0.25, 1);
                 optionalHpoResource.setOntology(ontology);
                 updateProgress(0.30, 1);
@@ -82,13 +86,13 @@ public final class StartupTask extends Task<Void> {
         } else {
             String msg = "Need to set path to hp.json file (See edit menu)";
             updateMessage(msg);
-            LOGGER.info(msg);
+            LOGGER.warn(msg);
             optionalHpoResource.setOntology(null);
         }
         if (hpoAnnotPath != null) {
             String msg = String.format("Loading phenotype.hpoa from file '%s'", hpoAnnotPath);
             updateMessage(msg);
-            LOGGER.info(msg);
+            LOGGER.trace(msg);
             final File hpoAnnotFile = new File(hpoAnnotPath);
             updateProgress(0.71, 1);
             if (optionalHpoResource.getOntology() == null) {
@@ -99,7 +103,7 @@ public final class StartupTask extends Task<Void> {
                 updateProgress(0.78, 1);
                 this.optionalHpoaResource.setAnnotationResources(hpoAnnotPath, optionalHpoResource.getOntology());
                 updateProgress(0.95, 1);
-                LOGGER.info("Loaded annotation maps");
+                LOGGER.trace("Loaded HPOA file");
             } else {
                 optionalHpoaResource.initializeWithEmptyMaps();
                 LOGGER.error("Cannot load phenotype.hpoa File was null");
@@ -108,6 +112,7 @@ public final class StartupTask extends Task<Void> {
             LOGGER.error("Cannot load phenotype.hpoa File path not found");
         }
         updateProgress(1, 1);
+        LOGGER.trace("Done StartupTask");
         return null;
     }
 }

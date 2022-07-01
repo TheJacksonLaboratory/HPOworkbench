@@ -7,8 +7,10 @@
     </appender>
     <logger name="org.monarchinitiative.hpoworkbench" level="INFO"/>
     <logger name="org.monarchinitiative.phenol" level="ERROR"/>
-    <logger name="org.springframework.boot" level="ERROR"/>
-    <root level="info">
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="com.sun" level="ERROR"/>
+    <logger name="javafx" level="ERROR"/>
+    <root level="trace">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
