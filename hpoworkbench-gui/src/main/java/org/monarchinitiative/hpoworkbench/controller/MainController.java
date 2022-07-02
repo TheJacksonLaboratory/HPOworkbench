@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
@@ -31,6 +32,7 @@ import org.monarchinitiative.hpoworkbench.gui.webviewerutil.WebViewerPopup;
 import org.monarchinitiative.hpoworkbench.html.AnnotationTlcHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.html.HpoStatsHtmlGenerator;
 import org.monarchinitiative.hpoworkbench.io.*;
+import org.monarchinitiative.hpoworkbench.resources.HostServicesWrapper;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoResource;
 import org.monarchinitiative.hpoworkbench.resources.OptionalHpoaResource;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
@@ -43,9 +45,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
+import org.w3c.dom.html.HTMLAnchorElement;
+
 
 import java.io.File;
 import java.util.*;
@@ -69,10 +72,6 @@ public class MainController {
 
     private final OptionalHpoaResource optionalHpoaResource;
 
-    /**
-     * Directory, where ontologies and HPO annotation files are being stored.
-     */
-    private final File hpoWorkbenchDir;
 
     /**
      * Application-specific properties (not the System properties!) defined in the 'application.properties' file that
@@ -81,6 +80,10 @@ public class MainController {
     private final Properties pgProperties;
 
     private final ExecutorService executor;
+    /** Use this to keep track of the HTML Dom events to avoid opening the same diaglog multiple times -- not
+     * sure why this is happening, but this hack prevents it until I can figure this out.
+     */
+    private EventTarget lastEventTarget = null;
 
     @Autowired
     DownloaderFactory factory;
@@ -128,17 +131,17 @@ public class MainController {
      */
     private String githubPassword;
 
+    @Autowired
+    private HostServicesWrapper hostServicesWrapper;
 
     @Autowired
     public MainController(OptionalHpoResource optionalHpoResource,
                           OptionalHpoaResource optionalHpoaResource,
                           @Qualifier("configProperties") Properties properties,
-                          @Qualifier("appHomeDir") File hpoWorkbenchDir,
                           ExecutorService executorService) {
         this.optionalHpoResource = optionalHpoResource;
         this.optionalHpoaResource = optionalHpoaResource;
         this.pgProperties = properties;
-        this.hpoWorkbenchDir = hpoWorkbenchDir;
         this.executor = executorService;
     }
 
@@ -164,8 +167,7 @@ public class MainController {
         });
         this.executor.submit(task);
         String ver = MainController.getVersion();
-        copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2017-2021");
-
+        copyrightLabel.setText("HPO Workbench, v. " + ver + ", \u00A9 Monarch Initiative 2017-2022");
         ChangeListener<? super Object> listener = (obs, oldval, newval) -> activateIfResourcesAvailable();
         optionalHpoResource.ontologyProperty().addListener(listener);
         optionalHpoaResource.directAnnotMapProperty().addListener(listener);
@@ -336,8 +338,6 @@ public class MainController {
     }
 
 
-
-
     /// for the analysis menu
     @FXML
     private void showHpoStatistics(ActionEvent e) {
@@ -354,7 +354,7 @@ public class MainController {
             popup.popup();
 
         } catch (HPOException ex) {
-            PopUps.showException("Error","Could not retrieve HPO Stats",ex);
+            PopUps.showException("Error", "Could not retrieve HPO Stats", ex);
         }
         e.consume();
     }
@@ -374,7 +374,6 @@ public class MainController {
         WebViewerPopup popup = WebViewerFactory.entriesNeedingMoreAnnotations(html, stage);
         popup.popup();
     }
-
 
 
     @FXML
@@ -397,12 +396,11 @@ public class MainController {
 
     }
 
-    // from HPO Tab Controller
-
     @FXML
     public void goButtonAction() {
         TermId id = ontologyLabelsAndTermIdMap.get(autocompleteTextfield.getText());
-        if (id == null) return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
+        if (id == null)
+            return; // button was clicked while field was hasTermsUniqueToOnlyOneDisease, no need to do anything
         Ontology hpo = optionalHpoResource.getOntology();
         if (hpo == null) {
             logger.error("goButtonAction: hpo is null");
@@ -422,7 +420,7 @@ public class MainController {
      */
     @FXML
     public void exportHierarchicalSummary() {
-        if (selectedTerm == null && getSelectedTerm()!=null) {
+        if (selectedTerm == null && getSelectedTerm() != null) {
             selectedTerm = getSelectedTerm().getValue().term;
         }
         if (selectedTerm == null) { // should only happen if the user hasn't selected anything at all.
@@ -486,17 +484,19 @@ public class MainController {
         }
     }
 
-    /** Function is called once all of the resources are found (hp obo, disease annotations, mondo). */
+    /**
+     * Function is called once all of the resources are found (hp obo, disease annotations, mondo).
+     */
     public void activateOntologyTree() {
-            if (optionalHpoResource.getOntology() == null) {
-                logger.error("activateOntologyTree: HPO null");
-            } else {
-                final Ontology hpo = optionalHpoResource.getOntology();
-                Platform.runLater(()->{
-                    initTree(hpo, k -> System.out.println("Consumed " + k));
-                    WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
-                });
-            }
+        if (optionalHpoResource.getOntology() == null) {
+            logger.error("activateOntologyTree: HPO null");
+        } else {
+            final Ontology hpo = optionalHpoResource.getOntology();
+            Platform.runLater(() -> {
+                initTree(hpo, k -> System.out.println("Consumed " + k));
+                WidthAwareTextFields.bindWidthAwareAutoCompletion(autocompleteTextfield, ontologyLabelsAndTermIdMap.keySet());
+            });
+        }
     }
 
     /**
@@ -562,12 +562,15 @@ public class MainController {
             logger.error("Attempt to get Indirect annotation map but it was null");
             return;
         }
-        List<HpoDisease> annotatedDiseases =  optionalHpoaResource.getIndirectAnnotMap().getOrDefault(term.id(), List.of());
-        int n_descendents = 42;//getDescendents(model.getHpoOntology(),term.getId()).size();
-        //todo--add number of descendents to HTML
-        String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
-        //System.out.print(content);
-        // infoWebEngine=this.infoWebView.getEngine();
+        if (optionalHpoResource.getOntology() == null) {
+            logger.error("updateDescription(): HP ontology object was null");
+            return;
+        }
+        Ontology ontology = optionalHpoResource.getOntology();
+        List<HpoDisease> annotatedDiseases = optionalHpoaResource.getIndirectAnnotMap().getOrDefault(term.id(), List.of());
+        int n_descendents = getDescendents(ontology, term.id()).size();
+
+        String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases, n_descendents);
         infoWebEngine.loadContent(content);
         infoWebEngine.getLoadWorker().stateProperty().addListener(// ChangeListener<Worker.State>
                 (observableValue, oldState, newState) -> {
@@ -578,24 +581,56 @@ public class MainController {
                                     String domEventType = event.getType();
                                     // System.err.println("EventType FROM updateHPO: " + domEventType);
                                     if (domEventType.equals(EVENT_TYPE_CLICK)) {
-                                        String href = ((Element) event.getTarget()).getAttribute("href");
-                                        // System.out.println("HREF "+href);
-                                        if (href.equals("http://www.human-phenotype-ontology.org")) {
-                                            return; // the external link is taken care of by the Webengine
-                                            // therefore, we do not need to do anything special here
+                                        EventTarget target = event.getCurrentTarget();
+                                        if (lastEventTarget != null && lastEventTarget.equals(target)) {
+                                            return;
+                                        } else {
+                                            lastEventTarget = target;
                                         }
+                                        HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
+                                        String href = anchorElement.getHref();
+                                        //handle opening URL outside JavaFX WebView
+                                        String [] fields = href.split("/");
+                                        String f = fields[fields.length-1];
+                                        openInHpoBrowser(f, href);
+                                        System.out.println(href);
+                                        event.preventDefault();
                                     }
                                 };
 
                         Document doc = infoWebView.getEngine().getDocument();
-                        NodeList nodeList = doc.getElementsByTagName("a");
+                        NodeList nodeList = doc.getElementsByTagName("a"); // get the HTML anchors from the DOM
                         for (int i = 0; i < nodeList.getLength(); i++) {
                             ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
+
                         }
                     }
                 });
-
     }
+
+    private void openInHpoBrowser(String label, String urlString) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Open Page on HPO Website");
+        alert.setHeaderText("Open Page on HPO Website");
+        alert.setContentText(String.format("Get more information about %s at the HPO website", label));
+
+        ButtonType buttonTypeOne = new ButtonType("Open");
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == buttonTypeOne) {
+            hostServicesWrapper.showDocument(urlString); // open in system browser
+            alert.close();
+        } else {
+            alert.close();
+        }
+    }
+
+
+
 
     /**
      * Initialize the ontology browser-tree in the left column of the app.

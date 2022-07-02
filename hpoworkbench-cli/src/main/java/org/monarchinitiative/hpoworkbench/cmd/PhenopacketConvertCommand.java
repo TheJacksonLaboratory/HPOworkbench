@@ -1,29 +1,7 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
-import org.ga4gh.vrsatile.v1.GeneDescriptor;
-import org.ga4gh.vrsatile.v1.VariationDescriptor;
-import org.ga4gh.vrsatile.v1.VcfRecord;
-import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.phenopackets.schema.v1.core.Disease;
-import org.phenopackets.schema.v1.core.OntologyClass;
-import org.phenopackets.schema.v1.core.VcfAllele;
-import org.phenopackets.schema.v2.Phenopacket;
-import org.phenopackets.schema.v2.core.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "convert",
         mixinStandardHelpOptions = true,

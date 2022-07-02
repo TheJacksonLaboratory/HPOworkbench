@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:daniel.danis@jax.org">Daniel Danis</a>
  * @version 0.1.10
- * @see OptionalResources
  * @see ResourceValidator
  * @since 0.1
  */

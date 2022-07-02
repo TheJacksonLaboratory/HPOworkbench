@@ -44,8 +44,7 @@ public class EncodingCheckCommand  extends HPOCommand implements Callable<Intege
     public static void checkLine(String line, int lineno, String previous) throws UnsupportedEncodingException {
         byte[] bytes = line.getBytes(StandardCharsets.ISO_8859_1);
         String decodedLine = new String(bytes);
-        if (line.equals(decodedLine)) return;
-        else {
+        if (! line.equals(decodedLine)) {
             for (int i=0; i< line.length();i++) {
                 if (line.charAt(i) != decodedLine.charAt(i)) {
                     System.out.println(previous);

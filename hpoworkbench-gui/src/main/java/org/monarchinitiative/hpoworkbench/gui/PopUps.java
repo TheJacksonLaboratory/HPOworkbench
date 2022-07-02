@@ -83,7 +83,7 @@ public class PopUps {
      * @param ownerWindow      - Stage with which the FileChooser will be associated
      * @param initialDirectory - Where to start the search
      * @param title            - Title of PopUp window
-     * @return
+     * @return File to be opened
      */
     public static File selectFileToOpen(Stage ownerWindow, File initialDirectory, String title) {
         final FileChooser filechooser = new FileChooser();
@@ -98,7 +98,7 @@ public class PopUps {
      * @param ownerWindow      Parent Stage object
      * @param initialDirectory Where to start the search
      * @param title            Title of PopUp window
-     * @return
+     * @return File to be saved
      */
     public static File selectFileToSave(Stage ownerWindow, File initialDirectory, String title, String initialFileName) {
         final FileChooser filechooser = new FileChooser();
@@ -114,7 +114,7 @@ public class PopUps {
      * @param ownerWindow      - Stage with which the DirectoryChooser will be associated
      * @param initialDirectory - Where to start the search
      * @param title            - Title of PopUp window
-     * @return
+     * @return Directory to be displayed
      */
     public static File selectDirectory(Stage ownerWindow, File initialDirectory, String title) {
         final DirectoryChooser dirchooser = new DirectoryChooser();
@@ -145,7 +145,7 @@ public class PopUps {
      * Ask user a boolean question and get an answer.
      *
      * @param windowTitle Title of PopUp window
-     * @return
+     * @return boolean value entered by user
      */
     public static boolean getBooleanFromUser(String question, String headerText, String windowTitle) {
         Alert al = new Alert(AlertType.CONFIRMATION);
@@ -160,10 +160,10 @@ public class PopUps {
     /**
      * Present user a window with buttons
      *
-     * @param choices
-     * @param labelText
-     * @param windowTitle
-     * @return
+     * @param choices List of options
+     * @param labelText Label of widget
+     * @param windowTitle Title of dialog that will be open
+     * @return The option that was selected by the user.
      */
     public static String getToggleChoiceFromUser(String[] choices, String labelText, String windowTitle) {
         Alert al = new Alert(AlertType.CONFIRMATION);

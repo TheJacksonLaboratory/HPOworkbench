@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class AnnotationTlc {
@@ -48,21 +47,21 @@ public class AnnotationTlc {
             String db = disease.id().getPrefix();
             if (! db.equals("OMIM")) continue;  // just look at OMIM entries
             String label = String.format("%s [%s]",disease.diseaseName(),disease.id().getValue());
-            if (disease.phenotypicAbnormalitiesCount()<3) {
-                underannotatedDiseases.put(label,disease.phenotypicAbnormalitiesCount());
+            if (disease.annotationCount()<3) {
+                underannotatedDiseases.put(label,disease.annotationCount());
             } else {
-                while (disease.phenotypicAbnormalities().hasNext()) {
-                    HpoDiseaseAnnotation ann = disease.phenotypicAbnormalities().next();
+                for (HpoDiseaseAnnotation ann : disease.annotations()) {
+                    if (ann.isAbsent()) continue; // it is OK to have a negated (excluded) annotation
                     TermId tid=ann.id();
                     String lab = hpoOntology.getTermMap().get(tid).getName();
                     if (lab.contains("Abnormality of")) {
                         String s = String.format("%s [%s]",lab,tid.getValue());
                         diseasesWithTooGeneralAnnotations.put(label,s);
-
                     }
                 }
             }
         }
+        LOGGER.info("diseasesWithTooGeneralAnnotations: n={}", diseasesWithTooGeneralAnnotations.size());
     }
 
 }

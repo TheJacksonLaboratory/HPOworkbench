@@ -71,15 +71,6 @@ public class PlatformUtil {
         return dir + File.separator + "hpoworkbench.log";
     }
 
-    /** Return the absolute path to the settings file, which is kept in the .loinc2hpo directory in the
-     * user's home directory. For simplicity assume one user per account etc. The file is a simple key:value file.
-     * @return
-     */
-//    public static String getPathToSettingsFile() {
-//        File dir = getHpoWorkbenchDir();
-//        return dir + File.separator + HPO_WORKBENCH_SETTINGS_FILENAME;
-//    }
-
     /* Based on this post: http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/ */
     private static CurrentPlatform figureOutPlatform() {
         String osName = System.getProperty("os.name").toLowerCase();

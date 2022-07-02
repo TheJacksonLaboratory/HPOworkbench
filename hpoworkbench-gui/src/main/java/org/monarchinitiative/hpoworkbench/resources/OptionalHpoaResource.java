@@ -45,6 +45,7 @@ public class OptionalHpoaResource {
     }
 
     public void setAnnotationResources(String phenotypeDotHpoaPath, Ontology hpo){
+        LOGGER.info("setAnnotationResources");
         DirectIndirectHpoAnnotationParser parser =
                 new DirectIndirectHpoAnnotationParser(phenotypeDotHpoaPath, hpo);
         Map<TermId, List<HpoDisease>> directMap = parser.getDirectAnnotMap();

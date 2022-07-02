@@ -9,9 +9,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.monarchinitiative.hpoworkbench.resources.HostServicesWrapper;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -36,8 +39,19 @@ public class HpoWorkbenchApplication extends Application {
 
     @Override
     public void init() {
+        ApplicationContextInitializer<GenericApplicationContext> initializer = genericApplicationContext -> {
+            genericApplicationContext.registerBean(Application.class, () -> HpoWorkbenchApplication.this);
+            genericApplicationContext.registerBean(HostServicesWrapper.class, this::getHostServicesWrapper);
+        };
+        applicationContext = new SpringApplicationBuilder(StockUiApplication.class)
+                .sources(HpoWorkbenchApplication.class)
+                .headless(false)
+                .initializers(initializer).run();
+    }
 
-        applicationContext = new SpringApplicationBuilder(StockUiApplication.class).run();
+
+    private HostServicesWrapper getHostServicesWrapper() {
+        return HostServicesWrapper.wrap(getHostServices());
     }
 
     /**

@@ -1,18 +1,18 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import org.monarchinitiative.phenol.annotations.base.Ratio;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
+import org.monarchinitiative.phenol.annotations.io.hpo.DiseaseDatabase;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaders;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.ontology.data.TermSynonym;
 import picocli.CommandLine;
 
 import java.io.*;
@@ -65,27 +65,24 @@ public class OnsetCommand extends  HPOCommand implements Callable<Integer> {
         }
 
         Ontology ontology = OntologyLoader.loadOntology(new File(hpopath));
-        HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
-        HpoDiseaseLoader loader = HpoDiseaseLoader.of(ontology, options);
+
+        HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.of(Set.of(DiseaseDatabase.OMIM), false, 5);
+        HpoDiseaseLoader loader = HpoDiseaseLoaders.defaultLoader(ontology, options);
         HpoDiseases diseases = loader.load(Path.of(annotpath));
+
+
+
+
         // HPO terms that are asserted to always be congenital
         termIdToCongenitalOnsetSet = parseHpoTermToHpoOnsetMap(ontology);
         Set<HpoDisease> congenitalDiseaseSet = new HashSet<>();
         for (var disease: diseases) {
-            if (! disease.id().getPrefix().equals("OMIM")) {
-                continue; // do not annotate ORPHA or DECIPHER
-            }
-            if (disease.globalOnset().isPresent()) {
-                continue;
-            } else {
-                var iterator = disease.phenotypicAbnormalities();
-                while (iterator.hasNext()) {
-                    HpoDiseaseAnnotation diseaseAnnotation = iterator.next();
-                    if (diseaseAnnotation.ratio().orElse(Ratio.of(0, 1)).frequency() > 0) {
+            if (disease.diseaseOnset().isEmpty()) {
+                for  (HpoDiseaseAnnotation diseaseAnnotation : disease.annotations()) {
+                    if (diseaseAnnotation.frequency() > 0) {
                         TermId hpoId = diseaseAnnotation.id();
                         if (termIdToCongenitalOnsetSet.contains(hpoId)) {
                             congenitalDiseaseSet.add(disease);
-                            continue;
                         }
                     }
                 }

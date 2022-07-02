@@ -2,7 +2,12 @@ package org.monarchinitiative.hpoworkbench.analysis;
 
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
+import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaders;
+import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -40,8 +45,15 @@ public class HpoStats {
         HPOParser parser = new HPOParser(hpoOboPath);
         this.hpoOntology = parser.getHPO();
 
-        this.diseaseMap = HpoDiseaseAnnotationParser.loadDiseaseMap(Path.of(annotpath), hpoOntology);
-        LOGGER.trace("Diseases imported: " + diseaseMap.size());
+       try {
+           HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
+           HpoDiseaseLoader loader = HpoDiseaseLoaders.defaultLoader(hpoOntology, options);
+           HpoDiseases diseases = loader.load(Path.of(annotpath));
+           this.diseaseMap = diseases.diseaseById();
+           LOGGER.trace("Diseases imported: " + diseaseMap.size());
+       } catch (IOException e) {
+           throw new PhenolRuntimeException("Could not load annotations from " + annotpath);
+       }
     }
 
     public void outputOntologyStats(Writer writer) {

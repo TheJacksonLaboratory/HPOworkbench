@@ -268,8 +268,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
 
     private boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
-        while (d.phenotypicAbnormalities().hasNext()) {
-            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+        for  (HpoDiseaseAnnotation annotation  : d.annotations()) {
             TermId tid = annotation.id();
             if (this.descendentsOfTheTermOfInterest.contains(tid))
                 return true;
@@ -291,8 +290,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
                 continue;
             }
             int n_annot=0;
-            while (d.phenotypicAbnormalities().hasNext()) {
-                HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+            for  (HpoDiseaseAnnotation annotation : d.annotations()) {
                 TermId hpoId = annotation.id();
                 if (existsPath(hpoOntology,hpoId,termOfInterest)) {
                     n_annot++;
@@ -320,8 +318,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
 
     private boolean hasAdultOnset(HpoDisease d) {
-        while (d.phenotypicAbnormalities().hasNext()) {
-            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+        for  (HpoDiseaseAnnotation annotation : d.annotations()) {
             TermId hpoId = annotation.id();
             if (this.adultOnset.contains(hpoId))
                 return  true;
@@ -333,8 +330,7 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
     }
 
     private boolean hasChildhoodOnset(HpoDisease d) {
-        while (d.phenotypicAbnormalities().hasNext()) {
-            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+        for  (HpoDiseaseAnnotation annotation : d.annotations()) {
             TermId hpoId = annotation.id();
             if (this.childhoodOnset.contains(hpoId))
                 return  true;
