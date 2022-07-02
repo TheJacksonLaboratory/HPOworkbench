@@ -562,8 +562,13 @@ public class MainController {
             logger.error("Attempt to get Indirect annotation map but it was null");
             return;
         }
+        if (optionalHpoResource.getOntology() == null) {
+            logger.error("updateDescription(): HP ontology object was null");
+            return;
+        }
+        Ontology ontology = optionalHpoResource.getOntology();
         List<HpoDisease> annotatedDiseases =  optionalHpoaResource.getIndirectAnnotMap().getOrDefault(term.id(), List.of());
-        int n_descendents = 42;//getDescendents(model.getHpoOntology(),term.getId()).size();
+        int n_descendents = getDescendents(ontology,term.id()).size();
         //todo--add number of descendents to HTML
         String content = HpoHtmlPageGenerator.getHTML(term, annotatedDiseases);
         //System.out.print(content);

@@ -48,21 +48,20 @@ public class AnnotationTlc {
             String db = disease.id().getPrefix();
             if (! db.equals("OMIM")) continue;  // just look at OMIM entries
             String label = String.format("%s [%s]",disease.diseaseName(),disease.id().getValue());
-            if (disease.phenotypicAbnormalitiesCount()<3) {
-                underannotatedDiseases.put(label,disease.phenotypicAbnormalitiesCount());
+            if (disease.annotationCount()<3) {
+                underannotatedDiseases.put(label,disease.annotationCount());
             } else {
-                while (disease.phenotypicAbnormalities().hasNext()) {
-                    HpoDiseaseAnnotation ann = disease.phenotypicAbnormalities().next();
+                for (HpoDiseaseAnnotation ann : disease.annotations()) {
                     TermId tid=ann.id();
                     String lab = hpoOntology.getTermMap().get(tid).getName();
                     if (lab.contains("Abnormality of")) {
                         String s = String.format("%s [%s]",lab,tid.getValue());
                         diseasesWithTooGeneralAnnotations.put(label,s);
-
                     }
                 }
             }
         }
+        LOGGER.info("diseasesWithTooGeneralAnnotations: n={}", diseasesWithTooGeneralAnnotations.size());
     }
 
 }

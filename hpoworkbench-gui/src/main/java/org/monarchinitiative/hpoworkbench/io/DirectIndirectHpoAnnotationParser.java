@@ -7,9 +7,7 @@ import org.monarchinitiative.hpoworkbench.exception.HPOWorkbenchException;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
+import org.monarchinitiative.phenol.annotations.io.hpo.*;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -84,8 +82,8 @@ public class DirectIndirectHpoAnnotationParser {
         }
         logger.trace("doParse in DirectIndirectParser");
         HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
-        HpoDiseaseLoader loader = HpoDiseaseLoader.of(ontology, options);
-        HpoDiseases diseases = loader.load(Path.of(this.pathToPhenotypeAnnotationTab));
+        HpoDiseaseLoader loader = HpoDiseaseLoaders.defaultLoader(ontology, options);
+        HpoDiseases diseases = loader.load(Path.of(pathToPhenotypeAnnotationTab));
         Map<TermId, HpoDisease> diseaseMap = diseases.diseaseById();
         directAnnotationMap=new HashMap<>();
         totalAnnotationMap=new HashMap<>();
@@ -95,12 +93,18 @@ public class DirectIndirectHpoAnnotationParser {
         }
         for (TermId diseaseId : diseaseMap.keySet()) {
             HpoDisease disease = diseaseMap.get(diseaseId);
-            while (disease.phenotypicAbnormalities().hasNext()) {
-                HpoDiseaseAnnotation annot = disease.phenotypicAbnormalities().next();
+            for  (HpoDiseaseAnnotation annot : disease.annotations()) {
                 TermId hpoId = annot.id();
-                directAnnotationMap.putIfAbsent(hpoId,new ArrayList<>());
-                directAnnotationMap.get(hpoId).add(disease);
-                Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, hpoId, true);
+
+                Set<TermId> ancs = new HashSet<>();
+                if (ontology.containsTerm(hpoId)) {
+                    hpoId = ontology.getPrimaryTermId(hpoId);
+                    ancs = OntologyAlgorithm.getAncestorTerms(ontology, hpoId, true);
+                    directAnnotationMap.putIfAbsent(hpoId,new ArrayList<>());
+                    directAnnotationMap.get(hpoId).add(disease);
+                } else {
+                    logger.error("Term {} in disease {} not contained in ontology", hpoId.getValue(), disease.diseaseName());
+                }
                 for (TermId t : ancs) {
                     tempmap.putIfAbsent(t, new HashSet<>());
                     Set<HpoDisease> diseaseset = tempmap.get(t);

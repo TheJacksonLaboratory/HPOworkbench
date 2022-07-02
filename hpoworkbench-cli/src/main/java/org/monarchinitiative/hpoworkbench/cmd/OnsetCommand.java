@@ -71,13 +71,14 @@ public class OnsetCommand extends  HPOCommand implements Callable<Integer> {
         HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.of(Set.of(DiseaseDatabase.OMIM), false, 5);
         HpoDiseaseLoader loader = HpoDiseaseLoaders.defaultLoader(ontology, options);
         HpoDiseases diseases = loader.load(Path.of(annotpath));
+
+
+
+
         // HPO terms that are asserted to always be congenital
         termIdToCongenitalOnsetSet = parseHpoTermToHpoOnsetMap(ontology);
         Set<HpoDisease> congenitalDiseaseSet = new HashSet<>();
         for (var disease: diseases) {
-            if (! disease.id().getPrefix().equals("OMIM")) {
-                continue; // do not annotate ORPHA or DECIPHER
-            }
             if (disease.diseaseOnset().isEmpty()) {
                 for  (HpoDiseaseAnnotation diseaseAnnotation : disease.annotations()) {
                     if (diseaseAnnotation.frequency() > 0) {
