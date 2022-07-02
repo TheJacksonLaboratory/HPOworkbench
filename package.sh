@@ -7,18 +7,18 @@
 
 ##
 # Static variables
-SRC_DIR=isopret-gui
+SRC_DIR=hpoworkbench-gui
 APP_NAME="hpoworkbench"
 CMD_NAME="hpoworkbench"
 VERSION=2.2.2
 
 BUILD_DIR=${SRC_DIR}/target
 
-JAR_NAME="hpoworkbench.jar"
+JAR_NAME="HpoWorkbench.jar"
 VENDOR="The Jackson Laboratory"
 DESCRIPTION="HPO Workbench is a Java application for exploring Human Phenotype Ontology (HPO) and HPO annotations."
 COPYRIGHT="Copyright 2022, All rights reserved"
-ICON="${BUILD_DIR}/classes/img/icon.jpg"
+ICON="${BUILD_DIR}/classes/img/icon"
 
 
 function detect_platform() {
@@ -122,7 +122,7 @@ PACKAGE="classpath"
 
 
 # 1. Build
-printf "Building isopret-gui\n"
+printf "Building hpoworkbench\n"
 ./mvnw clean package
 
 
