@@ -8,6 +8,7 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaders;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
@@ -269,8 +270,7 @@ public class HpoStats {
 
     /** is the disease annotated to the term we are interested in? */
     private boolean diseaseAnnotatedToTermOfInterest(HpoDisease d) {
-        while (d.phenotypicAbnormalities().hasNext()) {
-            HpoDiseaseAnnotation annotation = d.phenotypicAbnormalities().next();
+        for  (HpoDiseaseAnnotation annotation : d.annotations()) {
             TermId hpoId = annotation.id();
             if (this.descendentsOfTheTermOfInterest.contains(hpoId))
                 return true;
@@ -355,13 +355,13 @@ public class HpoStats {
         n_orphanet_annotations=0;
         n_decipher_annotations=0;
         for (HpoDisease d:omim) {
-            n_omim_annotations += (d.phenotypicAbnormalitiesCount());
+            n_omim_annotations += (d.annotationCount());
         }
         for (HpoDisease d:orphanet) {
-            n_orphanet_annotations += (d.phenotypicAbnormalitiesCount());
+            n_orphanet_annotations += (d.annotationCount());
         }
         for (HpoDisease d:decipher) {
-            n_decipher_annotations += (d.phenotypicAbnormalitiesCount());
+            n_decipher_annotations += (d.annotationCount());
         }
 
     }
@@ -380,7 +380,7 @@ public class HpoStats {
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
         HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
-        HpoDiseaseLoader loader = HpoDiseaseLoader.of(hpoOntology, options);
+        HpoDiseaseLoader loader = HpoDiseaseLoaders.defaultLoader(hpoOntology, options);
         HpoDiseases diseases = loader.load(Path.of(annotpath));
         Map<TermId, HpoDisease> diseaseMap = diseases.diseaseById();
 

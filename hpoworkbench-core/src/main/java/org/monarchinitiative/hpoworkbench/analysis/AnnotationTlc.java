@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class AnnotationTlc {
@@ -52,6 +51,7 @@ public class AnnotationTlc {
                 underannotatedDiseases.put(label,disease.annotationCount());
             } else {
                 for (HpoDiseaseAnnotation ann : disease.annotations()) {
+                    if (ann.isAbsent()) continue; // it is OK to have a negated (excluded) annotation
                     TermId tid=ann.id();
                     String lab = hpoOntology.getTermMap().get(tid).getName();
                     if (lab.contains("Abnormality of")) {

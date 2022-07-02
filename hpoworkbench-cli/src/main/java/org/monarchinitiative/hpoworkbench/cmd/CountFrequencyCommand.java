@@ -1,10 +1,9 @@
 package org.monarchinitiative.hpoworkbench.cmd;
 
-import org.monarchinitiative.phenol.annotations.assoc.HpoAssociationLoader;
 import org.monarchinitiative.phenol.annotations.formats.hpo.*;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaders;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.*;
 import org.slf4j.Logger;
@@ -14,7 +13,6 @@ import picocli.CommandLine;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -58,7 +56,7 @@ public class CountFrequencyCommand extends HPOCommand implements Callable<Intege
 
         Ontology ontology = OntologyLoader.loadOntology(new File(hpJsonPath));
         HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
-        HpoDiseaseLoader loader = HpoDiseaseLoader.of(ontology, options);
+        HpoDiseaseLoader loader = HpoDiseaseLoaders.defaultLoader(ontology, options);
         HpoDiseases diseases = loader.load(Path.of(annotationPath));
         termId = TermId.of(hpoTermId);
 

@@ -22,7 +22,7 @@ class HpoHtmlPageGenerator {
     /**
      * @return A String with the HTML for representing one HPO term and the diseases it is annotated to.
      */
-    static String getHTML(Term term, List<HpoDisease> annotatedDiseases) {
+    static String getHTML(Term term, List<HpoDisease> annotatedDiseases, int n_descendents) {
 
         String termID = term.id().getValue();
         String synonyms = (term.getSynonyms() == null) ? "" : term.getSynonyms().stream().map(TermSynonym::getValue)
@@ -36,7 +36,7 @@ class HpoHtmlPageGenerator {
             pmidList = "-";
         else
             pmidList = pmids.stream().map(SimpleXref::getCurie).collect(Collectors.joining(": "));
-        return String.format(HTML_TEMPLATE, CSS, term.getName(), termID, definition, comment, synonyms, pmidList, diseaseTable);
+        return String.format(HTML_TEMPLATE, CSS, term.getName(), termID, definition, comment, synonyms, pmidList, n_descendents, diseaseTable);
     }
 
     /**
@@ -62,18 +62,18 @@ class HpoHtmlPageGenerator {
                   </thead>
                   <tfoot>
                     <tr>
-                      <td colspan="2">More information: <a href="http://www.human-phenotype-ontology.org">HPO Website</a></td>
+                      <td colspan="2">More information: <a href="https://hpo.jax.org">HPO Website</a></td>
                     </tr>
                   </tfoot>""".indent(2), Id, diseases.size());
         StringBuilder sb = new StringBuilder();
         for (HpoDisease disease : diseases) {
             String row = String.format("""
                              <tr>
-                                <td><a href="%s">%s</a></td>
+                                <td><a href="https://hpo.jax.org/app/browse/disease/%s">%s</a></td>
                                 <td>%s</td>
                             </tr>""",
-                    disease.diseaseName(),
                     disease.id().getValue(),
+                    disease.diseaseName(),
                     disease.diseaseName());
             sb.append(row);
         }
@@ -146,11 +146,11 @@ class HpoHtmlPageGenerator {
         sb.append("</br>Source: TODO");
         return String.format("""
                         <tr>
-                                <td><a href="%s">%s</a></td>
-                                <td>%s</td>
-                                <td>%s</td>
-                                <td>%s</td>
-                              </tr>
+                          <td><a href="https://hpo.jax.org/app/browse/term/%s">%s</a></td>
+                          <td>%s</td>
+                          <td>%s</td>
+                          <td>%s</td>
+                        </tr>
                         """,
                 term.id().getValue(),
                 term.id().getValue(),
@@ -211,15 +211,6 @@ class HpoHtmlPageGenerator {
             }
             sb.append("\n");
         }
-//            if (negativeTerms.size()>0) {
-//                sb.append("<h2>Features that are not observed in this disease</h2><ol>");
-//                for (Term term : negativeTerms) {
-//                    sb.append("<li>").append(term.getName()).append("</li>\n");
-//                }
-//                sb.append("</ol>");
-//            }
-
-
         return sb.toString();
     }
 
@@ -235,6 +226,7 @@ class HpoHtmlPageGenerator {
             "<p><b>Comment:</b> %s</p>" +
             "<p><b>Synonyms:</b> %s</p>" +
             "<p><b>PMID:</b> %s</p>" +
+            "<p><b>Descendants:</b> %d</p>" +
             "%s" +
             "</body></html>";
 

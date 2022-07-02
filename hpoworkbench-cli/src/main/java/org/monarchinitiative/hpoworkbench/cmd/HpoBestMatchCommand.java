@@ -6,6 +6,7 @@ import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseaseAnnotation
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
+import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaders;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -97,8 +98,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
         for (TermId diseaseId : targets) {
             if (diseaseMap.containsKey(diseaseId)) {
                 HpoDisease disease = diseaseMap.get(diseaseId);
-                while (disease.phenotypicAbnormalities().hasNext()) {
-                    HpoDiseaseAnnotation annotation = disease.phenotypicAbnormalities().next();
+                for (HpoDiseaseAnnotation annotation  : disease.annotations()) {
                     TermId hpoId = annotation.id();
                    List<String> hits = getTwoHopMatches(hpoId);
                    if (hits.isEmpty()) {
@@ -132,8 +132,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
         for (TermId tid : sources) {
             if (diseaseMap.containsKey(tid)) {
                 HpoDisease disease = diseaseMap.get(tid);
-                while (disease.phenotypicAbnormalities().hasNext()) {
-                    HpoDiseaseAnnotation annotation = disease.phenotypicAbnormalities().next();
+                for  (HpoDiseaseAnnotation annotation : disease.annotations()) {
                     TermId hpoId = annotation.id();
                     counts.putIfAbsent(hpoId,0);
                     int c = counts.get(hpoId);
@@ -213,7 +212,7 @@ public class HpoBestMatchCommand  extends HPOCommand implements Callable<Integer
         HPOParser parser = new HPOParser(hpopath);
         hpoOntology=parser.getHPO();
         HpoDiseaseLoaderOptions options = HpoDiseaseLoaderOptions.defaultOptions();
-        HpoDiseaseLoader loader = HpoDiseaseLoader.of(hpoOntology, options);
+        HpoDiseaseLoader loader = HpoDiseaseLoaders.defaultLoader(hpoOntology, options);
         HpoDiseases diseases = loader.load(Path.of(annotpath));
         Map<TermId, HpoDisease> diseaseMap = diseases.diseaseById();
         LOGGER.trace("Diseases imported: " + diseaseMap.size());
