@@ -27,6 +27,7 @@ public class HpoWorkbench implements Callable<Integer> {
         CommandLine cline = new CommandLine(new HpoWorkbench())
                 .addSubcommand("word", new WordCommand())
                 .addSubcommand("stats", new HpoStatsCommand())
+                .addSubcommand("qc", new AnnotQcCommand())
                 .addSubcommand("download", new DownloadCommand())
                 .addSubcommand("batch", new BatchGitPostCommand())
                 .addSubcommand("countfreq", new CountFrequencyCommand())
