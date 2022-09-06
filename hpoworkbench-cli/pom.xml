@@ -19,7 +19,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <itext.version>7.1.0</itext.version>
-        <phenopacket-tools.version>1.0.0</phenopacket-tools.version>
     </properties>
 
     <dependencies>
@@ -28,52 +27,38 @@
             <artifactId>hpoworkbench-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.8.0</version>
         </dependency>
-
-
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
-            <version>4.6.3</version>
         </dependency>
         <dependency>
             <groupId>org.phenopackets</groupId>
             <artifactId>phenopacket-schema</artifactId>
-            <version>2.0.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.19.4</version>
         </dependency>
-
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>3.19.4</version>
         </dependency>
         <dependency>
             <groupId>org.phenopackets.phenopackettools</groupId>
             <artifactId>phenopacket-tools-converter</artifactId>
-            <version>${phenopacket-tools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.phenopackets.phenopackettools</groupId>
             <artifactId>phenopacket-tools-builder</artifactId>
-            <version>${phenopacket-tools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.monarchinitiative.biodownload</groupId>
             <artifactId>biodownload</artifactId>
-            <version>1.0.1</version>
         </dependency>
-
     </dependencies>
 
     <build>

@@ -38,11 +38,29 @@ public class AnnotQcCommand implements Callable<Integer> {
                          String [] fields = line.split("\t");
                          String freq = fields[6];
                          String id = fields[0];
+                         if (freq.isEmpty()) continue;
+                         if (freq.startsWith("HP")) continue;
                          if (freq.startsWith("/")) {
                              System.out.println(id + ": " + freq);
-                         }
-                         if (freq.endsWith("/")) {
+                         } else if (freq.endsWith("/")) {
                              System.out.println(id + ": " + freq);
+                         } else if (freq.endsWith("%")) {
+                             continue;
+                         } else {
+                             String [] f = freq.split("/");
+                             if (f.length != 2) {
+                                 System.out.println(id + ": " + freq);
+                             } else {
+                                 try {
+                                     Integer m = Integer.parseInt(f[0]);
+                                     Integer n = Integer.parseInt(f[1]);
+                                     if (n < m) {
+                                         System.out.println(id + ": " + freq);
+                                     }
+                                 } catch (NumberFormatException e) {
+                                     System.out.println(id + ": " + freq);
+                                 }
+                             }
                          }
 
                      }

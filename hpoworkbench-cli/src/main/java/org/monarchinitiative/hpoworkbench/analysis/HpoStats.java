@@ -3,7 +3,6 @@ package org.monarchinitiative.hpoworkbench.analysis;
 import org.monarchinitiative.hpoworkbench.io.HPOParser;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDisease;
 import org.monarchinitiative.phenol.annotations.formats.hpo.HpoDiseases;
-import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseAnnotationParser;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoader;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaderOptions;
 import org.monarchinitiative.phenol.annotations.io.hpo.HpoDiseaseLoaders;

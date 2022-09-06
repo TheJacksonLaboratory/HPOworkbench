@@ -17,18 +17,18 @@
     </parent>
 
 
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <phenol.version>2.0.0-RC3</phenol.version>
-        <phenopacket.version>2.0.0-RC2-SNAPSHOT</phenopacket.version>
+        <phenol.version>2.0.0-RC4</phenol.version>
+        <phenopacket.version>2.0.2</phenopacket.version>
+        <phenopacket-tools.version>1.0.0</phenopacket-tools.version>
         <spring.version>4.3.8.RELEASE</spring.version>
-        <jackson.fasterxml.version>2.11.4</jackson.fasterxml.version>
-        <slf4j.version>1.7.30</slf4j.version>
+        <jackson.fasterxml.version>2.13.4</jackson.fasterxml.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <commons.io>2.8.0</commons.io>
     </properties>
 
@@ -65,15 +65,30 @@
 
     <dependencyManagement>
         <dependencies>
-                <dependency>
-                    <groupId>org.monarchinitiative.phenol</groupId>
-                    <artifactId>phenol-core</artifactId>
-                    <version>${phenol.version}</version>
-                </dependency>
+            <dependency>
+                <groupId>org.monarchinitiative.phenol</groupId>
+                <artifactId>phenol-core</artifactId>
+                <version>${phenol.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.monarchinitiative.phenol</groupId>
+                <artifactId>phenol-annotations</artifactId>
+                <version>${phenol.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.monarchinitiative.phenol</groupId>
+                <artifactId>phenol-cli</artifactId>
+                <version>${phenol.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.monarchinitiative.phenol</groupId>
+                <artifactId>phenol-io</artifactId>
+                <version>${phenol.version}</version>
+            </dependency>
             <dependency>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli</artifactId>
-                <version>4.5.2</version>
+                <version>4.6.3</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
@@ -95,15 +110,82 @@
                 <artifactId>javafx-weaver-spring-boot-starter</artifactId>
                 <version>1.3.0</version>
             </dependency>
+            <dependency>
+                <groupId>me.xdrop</groupId>
+                <artifactId>fuzzywuzzy</artifactId>
+                <version>1.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.6.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.docx4j</groupId>
+                <artifactId>docx4j</artifactId>
+                <version>6.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>3.8.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.controlsfx</groupId>
+                <artifactId>controlsfx</artifactId>
+                <version>11.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.json-simple</groupId>
+                <artifactId>json-simple</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.4.0-b180830.0359</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>5.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.monarchinitiative.biodownload</groupId>
+                <artifactId>biodownload</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.phenopackets.phenopackettools</groupId>
+                <artifactId>phenopacket-tools-converter</artifactId>
+                <version>${phenopacket-tools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.phenopackets.phenopackettools</groupId>
+                <artifactId>phenopacket-tools-builder</artifactId>
+                <version>${phenopacket-tools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.phenopackets</groupId>
+                <artifactId>phenopacket-schema</artifactId>
+                <version>${phenopacket.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.19.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java-util</artifactId>
+                <version>3.19.4</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
-        </dependency>
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -116,66 +198,25 @@
             </exclusions>
         </dependency>
 
-
         <dependency>
             <groupId>me.xdrop</groupId>
             <artifactId>fuzzywuzzy</artifactId>
-            <version>1.3.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-core</artifactId>
-            <version>${phenol.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-annotations</artifactId>
-            <version>${phenol.version}</version>
         </dependency>
         <dependency>
             <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-cli</artifactId>
-            <version>${phenol.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-io</artifactId>
-            <version>${phenol.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>jcl-over-slf4j</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>

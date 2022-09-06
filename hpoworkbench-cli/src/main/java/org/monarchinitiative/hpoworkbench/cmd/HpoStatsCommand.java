@@ -319,22 +319,15 @@ public class HpoStatsCommand extends HPOCommand implements Callable<Integer> {
 
     private boolean hasAdultOnset(HpoDisease d) {
         for  (HpoDiseaseAnnotation annotation : d.annotations()) {
-            TermId hpoId = annotation.id();
-            if (this.adultOnset.contains(hpoId))
-                return  true;
-            if (annotation.observedInInterval(HpoOnset.ADULT_ONSET).isPresent()) {
+            if (annotation.observedInInterval(HpoOnset.ADULT_ONSET).isPositive())
                 return true;
-            }
         }
         return false;
     }
 
     private boolean hasChildhoodOnset(HpoDisease d) {
         for  (HpoDiseaseAnnotation annotation : d.annotations()) {
-            TermId hpoId = annotation.id();
-            if (this.childhoodOnset.contains(hpoId))
-                return  true;
-            if (annotation.observedInInterval(HpoOnset.CHILDHOOD_ONSET).isPresent()) {
+            if (annotation.observedInInterval(HpoOnset.CHILDHOOD_ONSET).isPositive()) {
                 return true;
             }
         }

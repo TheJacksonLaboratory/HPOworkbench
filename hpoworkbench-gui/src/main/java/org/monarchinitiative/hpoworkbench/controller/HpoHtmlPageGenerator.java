@@ -2,7 +2,7 @@ package org.monarchinitiative.hpoworkbench.controller;
 
 
 import com.google.common.collect.ImmutableList;
-import org.monarchinitiative.phenol.annotations.base.temporal.Age;
+import org.monarchinitiative.phenol.annotations.base.temporal.PointInTime;
 import org.monarchinitiative.phenol.annotations.formats.hpo.*;
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategory;
 import org.monarchinitiative.phenol.annotations.formats.hpo.category.HpoCategoryMap;
@@ -128,11 +128,9 @@ class HpoHtmlPageGenerator {
         String definition = term.getDefinition() != null ? term.getDefinition() : "";
         // try to get whatever we have in terms of frequency or modifiers
         String fr = String.format("Frequency=%.1f%%", annot.frequency());
-        List<TermId> modifiers = annot.metadata()
-                .map(HpoDiseaseAnnotationMetadata::modifiers)
-                .flatMap(Collection::stream)
-                .toList();
-        Optional<Age> onset = annot.earliestOnset();
+
+        List<TermId> modifiers = annot.modifiers();
+        Optional<PointInTime> onset = annot.earliestOnset();
         StringBuilder sb = new StringBuilder();
         sb.append(fr);
         if (modifiers.size() > 0) {
