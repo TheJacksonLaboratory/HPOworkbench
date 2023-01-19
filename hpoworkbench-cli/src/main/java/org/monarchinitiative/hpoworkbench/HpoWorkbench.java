@@ -31,7 +31,7 @@ public class HpoWorkbench implements Callable<Integer> {
                 .addSubcommand("download", new DownloadCommand())
                 .addSubcommand("batch", new BatchGitPostCommand())
                 .addSubcommand("countfreq", new CountFrequencyCommand())
-                .addSubcommand("git", new GitCommand())
+                .addSubcommand("git", new GitDownloadIssuesCommand())
                 .addSubcommand("descendents", new HpoListDescendentsCommand())
                 .addSubcommand("hpo2hpo", new Hpo2HpoCommand())
                 .addSubcommand("csv", new HPO2CSVCommand())

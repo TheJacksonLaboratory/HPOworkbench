@@ -29,11 +29,18 @@ public class GitHubIssueRetriever {
 
     private final String issue;
 
+    private final boolean retrieveClosedIssues;
 
-    public GitHubIssueRetriever(String myIssue) {
+
+    public GitHubIssueRetriever(String myIssue, boolean closed) {
         issue=myIssue;
+        this.retrieveClosedIssues = closed;
         int responsecode = retrieveIssues();
         logger.error(String.format("We retrieved %d issues for %s with response code %d", issues.size(),issue,responsecode));
+    }
+
+    public GitHubIssueRetriever(String myIssue) {
+        this(myIssue, false);
     }
 
 
