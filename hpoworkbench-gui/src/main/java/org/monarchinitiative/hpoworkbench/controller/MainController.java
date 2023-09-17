@@ -243,7 +243,7 @@ public class MainController {
         switch (type) {
             case WARNING -> label.setStyle("-fx-text-fill: orange; -fx-font-weight: bolder");
             case ERROR -> label.setStyle("-fx-text-fill: red; -fx-font-weight: bolder");
-            case INFO, default -> label.setStyle("-fx-text-fill: black; -fx-font-weight: bolder");
+            case INFO -> label.setStyle("-fx-text-fill: black; -fx-font-weight: bolder");
         }
 
 
